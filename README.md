@@ -7,6 +7,7 @@ Currently there are 17 kinds of digital integrated circuits that can handle bina
 These include multi-bit logic gates (or, and and xor), binary arithmetic (adder, multiplier, divider), registers (flipflop, pisoregister, shiftregister) for serial communication, wireless communication (receiver, transmitter) and some more.
 
 Install:
+--------
    * Copy jar file to the plugins folder of your craftbukkit installation.
    
    After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder containing the default plugin settings.
@@ -16,12 +17,15 @@ Install:
 NOTE: any already activated circuit will stay activated even if it's blocks are no longer of the required block type.
 
 How to use:
+-----------  
    TBD
 
-Commands:
+Commands:  
+---------
    /redchips-list	Message the player with a list of every currently activated circuit in the server.
 
 Available circuit classes:
+-------------------------
 * adder
 
 * and
