@@ -1,5 +1,5 @@
-<h1>RedstoneChips 0.2</h1>
-
+RedstoneChips 0.2
+==================
 
 This plugin makes it possible to build integrated redstone circuits with any number of inputs
 and outputs. 
