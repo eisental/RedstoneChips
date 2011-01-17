@@ -31,21 +31,21 @@ Each output block must have a redstone wire attached to it in order to activate 
 Here's an example (looking from above, each letter represents one block):  
 * b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * r - redstone wire * s - wall sign attached to the main block
 
->
+
 	    s	    
 	r o b i
 	    b
 	r o b i
 
 
-	sign text:
+sign text:
 	clock
 	2sec
 
 This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
 
 An image of the circuit:
-![clock example circuit](example.png "Clock example")
+![clock example circuit](example.png)
 
 Commands:  
 ---------
