@@ -28,8 +28,7 @@ Each output block must have a redstone wire attached to it in order to activate 
 * Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the closest to the sign.
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides. 
 
-Here's an example (looking from above):  
-Each letter represents a block.  
+Here's an example (looking from above, each letter represents one block):  
 * b - main block (sandstone by default)
 * i - input block (iron block by default)
 * o - output block (gold block by default)
@@ -43,9 +42,9 @@ Each letter represents a block.
 	r o b
 	    b i
 
-sign text:
-> clock
-> 2sec
+	sign text:
+	clock
+	2sec
 
 This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
 
