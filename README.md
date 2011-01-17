@@ -29,7 +29,6 @@ Each output block must have a redstone wire attached to it in order to activate 
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides. 
 
 Here's an example (looking from above, each letter represents one block):  
-
 * b - main block (sandstone by default)
 * i - input block (iron block by default)
 * o - output block (gold block by default)
