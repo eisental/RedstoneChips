@@ -45,7 +45,7 @@ sign text:
 This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
 
 An image of the circuit:
-![clock example circuit](/example.png)
+![clock example circuit](/eisental/RedstoneChips/blob/master/example.png)
 
 Commands:  
 ---------
