@@ -47,6 +47,10 @@ This will create a clock circuit with 2 outputs and 2 inputs. When the block lef
 An image of the circuit:
 ![clock example circuit](/eisental/RedstoneChips/raw/master/example.png)
 
+Destroying an IC:
+-----------------
+You can easily destroy an IC by destroying one of its structure blocks, including output redstone wires.
+
 Commands:  
 ---------
    * /redchips-list	Message the player with a list of every currently activated circuit in the server.
