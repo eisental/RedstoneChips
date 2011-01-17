@@ -36,6 +36,7 @@ Here's an example (looking from above, each letter represents one block):
 * r - redstone wire
 * s - wall sign attached to the main block
 
+
 	    s
 	    b
 	r o b i
