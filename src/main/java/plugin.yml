@@ -4,4 +4,4 @@ version: 0.2
 commands:
   redchips-list:
     description: Lists currently activated redstone circuits.
-    usage: /redchips-list
+    usage: /<command>

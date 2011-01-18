@@ -54,8 +54,11 @@ public abstract class Circuit {
     }
 
     public boolean redstoneChange(Block block, boolean newVal) {
+        System.out.println("REDSTONE CHANGE: " + newVal);
         for (int i=0; i<inputs.length; i++) {
+            System.out.println("CHECKING INPUT " + i);
             if (block.equals(inputs[i])) {
+                System.out.println("MATCH");
                 inputBits.set(i, newVal);
                 inputChange(i, newVal);
                 return true;

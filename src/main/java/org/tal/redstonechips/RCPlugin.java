@@ -22,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -71,7 +72,6 @@ public class RCPlugin extends JavaPlugin {
 
             @Override
             public void onBlockRedstoneChange(BlockFromToEvent event) {
-                System.out.println("ONBlockREDSTONECHANGE");
                 redstoneChange((BlockRedstoneEvent)event);
             }
 
@@ -109,11 +109,11 @@ public class RCPlugin extends JavaPlugin {
     }
 
     @Override
-    public void onCommand(Player player, String command, String[] args) {
-        if (command.equals("/redchips-list")) {
+    public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
+        if (cmd.getName().equals("/redchips-list")) {
             listCircuits(player);
-        }
-
+            return true;
+        } return false;
     }
 
     private void loadProperties() {
@@ -200,7 +200,6 @@ public class RCPlugin extends JavaPlugin {
     }
 
     private void redstoneChange(BlockRedstoneEvent e) {
-        System.out.println("REDSTONECHANGE");
 
         boolean newVal = (e.getNewCurrent()>0);
         boolean oldVal = (e.getOldCurrent()>0);
@@ -210,7 +209,7 @@ public class RCPlugin extends JavaPlugin {
 
         if (newVal!=oldVal) {
             // check if the block is an input of one of the circuits
-            for (Circuit c : circuits) if (c.redstoneChange(e.getBlock(), newVal)) break;
+            for (Circuit c : circuits) c.redstoneChange(e.getBlock(), newVal);
         }
     }
 
@@ -263,10 +262,6 @@ public class RCPlugin extends JavaPlugin {
         curMinus1 = curBlock.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
 
         do {
-            player.sendMessage("curBlock: " + curBlock.getX() + "," + curBlock.getY() + "," + curBlock.getZ() + " type: " + curBlock.getType());
-            player.sendMessage("curPlus1: " + curPlus1.getX() + "," + curPlus1.getY() + "," + curPlus1.getZ() + " type: " + curPlus1.getType());
-            player.sendMessage("curMinus1: " + curMinus1.getX() + "," + curMinus1.getY() + "," + curMinus1.getZ() + " type: " + curMinus1.getType());
-
             if (curPlus1.getType()==inputBlockType || curPlus1.getType()==outputBlockType) {
                 structure.add(curPlus1);
                 Block jack = curPlus1.getRelative((xAxis?0:1), 0, (xAxis?1:0));
@@ -281,8 +276,8 @@ public class RCPlugin extends JavaPlugin {
             }
 
             if (curMinus1.getType()==inputBlockType || curMinus1.getType()==outputBlockType) {
-                structure.add(curPlus1);
-                Block jack = curPlus1.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
+                structure.add(curMinus1);
+                Block jack = curMinus1.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
                 if (curMinus1.getType()==inputBlockType) {
                     inputs.add(jack);
                     player.sendMessage("input at " + jack.toString());

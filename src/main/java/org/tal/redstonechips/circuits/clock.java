@@ -51,9 +51,6 @@ public class clock extends Circuit {
         offBits.clear();
         if (player!=null) player.sendMessage("Clock will tick every " + freq*2 + " milliseconds.");
 
-        // TODO: delete this line:
-        this.redstoneChange(inputs[0], true);
-
         return true;
     }
 
