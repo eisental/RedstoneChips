@@ -21,15 +21,16 @@ NOTE: any already activated circuit will stay activated even after a change in t
 
 How to build an IC:
 -------------------
-   Every IC is made of a line of blocks (set with blockType in the properties file) with input and output blocks on the left or right. 
-Each output block must have a redstone wire attached to it in order to activate the circuit and counts as part of the circuit. You don't have to add redstone wire to the inputs and this can be done after activating the circuit. A wall sign must be attached to the first main block of the circuit with the circuit class name on the first line, and any additional arguments on the next lines.
+   Every IC is made of a line of blocks (sandstone by default) with input (iron) and output (gold) blocks to the left or to the right of the line. 
+Place a lever on the block next to each output block. Next place a wall sign attached to the first main block of the circuit with the circuit class name on the first line of text, and any additional arguments on the next lines.
 
-   Once the IC is built, right-click the sign to activate the circuit.
+   Once the IC is built, right-click the sign to activate it.
 
-* Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the closest to the sign.
+* Any block that can send a redstone current (redstone wire, redstone torch, button or level) can be placed on the block next to an input.
+* Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the ones closest to the sign.
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides. 
 
-This is an example 4-bit counter chip with 2 inputs and 4 outputs (looking from above, each letter represents one block):  
+Here's an example 4-bit counter chip with 2 inputs and 4 outputs (looking from above, each letter represents one block):  
 * b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * l - lever on any block face * s - wall sign attached to the main block
 
 	    s	    
