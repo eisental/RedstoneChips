@@ -50,7 +50,7 @@ This will create a clock circuit with 2 outputs and 2 inputs. When the block lef
 The 4-bit counter:
 ![counter example circuit](/eisental/RedstoneChips/raw/master/images/counter.png)
 
-[BasicCircuits](https://github.com/eisental/BasicCircuits/wiki) wiki
+For more info check the [BasicCircuits](https://github.com/eisental/BasicCircuits/wiki) Wiki.
 
 Destroying an IC:
 -----------------
