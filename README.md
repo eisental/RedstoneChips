@@ -5,7 +5,8 @@ A Bukkit plugin for building custom integrated redstone circuits with any number
 This is the core RedstoneChips plugin consisting of only the essentials. 
 To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin. 
 
-![counter example circuit](/eisental/RedstoneChips/raw/master/images/decoder.png)
+![counter example circuit](/eisental/RedstoneChips/raw/master/images/decoder.png "decoder circuit as a sequencer")
+
 
 Install:
 --------
@@ -21,7 +22,7 @@ NOTE: any already activated circuit will stay activated even after a change in t
 
 How to build an IC:
 -------------------
-   Every IC is made of a line of blocks (sandstone by default) with input (iron) and output (gold) blocks to the left or to the right of the line. 
+   Every IC is made of a line of blocks with input and output blocks to the left or to the right of the line. 
 Place a lever on the block next to each output block. Next place a wall sign attached to the first main block of the circuit with the circuit class name on the first line of text, and any additional arguments on the next lines.
 
    Once the IC is built, right-click the sign to activate it.
