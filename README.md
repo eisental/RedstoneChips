@@ -15,10 +15,7 @@ Install:
 After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder with default plugin settings.
 
 You can change the block types used to construct a circuit by editing this file. Default values are gold block for outputs, iron block for inputs, and sandstone for the circuit body.
-
-Type is NOT case-sensitive and can be any bukkit block material name.
-
-NOTE: any already activated circuit will stay activated even after a change in the block types.
+Type is NOT case-sensitive and can be any bukkit block material name. any already activated circuit will stay activated even after it's block types are invalid.
 
 How to build an IC:
 -------------------
