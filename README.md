@@ -5,6 +5,8 @@ A Bukkit plugin for building custom integrated redstone circuits with any number
 This is the core RedstoneChips plugin consisting of only the essentials. 
 To actually build ICs you need to download the [BasicCircuits](http://github.com/eisental/BasicCircuits) circuit package. 
 
+![counter example circuit](/eisental/RedstoneChips/raw/master/images/decoder.png)
+
 Install:
 --------
    * Copy jar file to the plugins folder of your craftbukkit installation.
