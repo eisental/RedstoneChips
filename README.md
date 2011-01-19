@@ -52,7 +52,7 @@ The 4-bit counter:
 
 Destroying an IC:
 -----------------
-You can easily destroy an IC by destroying one of its structure blocks, including output redstone wires.
+You can destroy an IC by breaking one of its structure blocks, including the output levers.
 
 Commands:  
 ---------
