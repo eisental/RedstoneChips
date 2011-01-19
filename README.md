@@ -5,7 +5,7 @@ A Bukkit plugin for building custom integrated redstone circuits with any number
 This is the core RedstoneChips plugin consisting of only the essentials. 
 To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin. 
 
-![counter example circuit](/eisental/RedstoneChips/raw/master/images/decoder.png "decoder circuit as a sequencer")
+![counter example circuit](/eisental/RedstoneChips/raw/master/images/above.jpg "note block sequencer")
 
 
 Install:
@@ -48,7 +48,7 @@ sign text (on first line):
 This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
 
 The 4-bit counter:
-![counter example circuit](/eisental/RedstoneChips/raw/master/images/counter.png)
+![counter example circuit](/eisental/RedstoneChips/raw/master/images/counter.jpg)
 
 For more info check the [BasicCircuits](https://github.com/eisental/BasicCircuits/wiki/BasicCircuits-) Wiki.
 
