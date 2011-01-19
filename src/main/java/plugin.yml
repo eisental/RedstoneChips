@@ -1,7 +1,0 @@
-name: RedstoneChips
-main: org.tal.redstonechips.RCPlugin
-version: 0.2
-commands:
-  redchips-list:
-    description: Lists currently activated redstone circuits.
-    usage: /<command>

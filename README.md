@@ -1,8 +1,8 @@
 RedstoneChips 0.2
 ==================
 
-This plugin makes it possible to build integrated redstone circuits with any number of inputs
-and outputs. 
+This plugin makes it possible to build integrated redstone circuits with any number of inputs and outputs.
+
 Currently there are 17 kinds of digital integrated circuits that can handle binary numbers of any length (though currently mostly limited to java 32bit integers). 
 These include multi-bit logic gates (or, and and xor), binary arithmetic (adder, multiplier, divider), registers (flipflop, pisoregister, shiftregister) for serial communication, wireless communication (receiver, transmitter) and some more.
 
@@ -28,24 +28,27 @@ Each output block must have a redstone wire attached to it in order to activate 
 * Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the closest to the sign.
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides. 
 
-Here's an example (looking from above, each letter represents one block):  
-* b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * r - redstone wire * s - wall sign attached to the main block
-
+Here's an example of a 4-bit counter chip with 2 inputs and 4 outputs (looking from above, each letter represents one block):  
+* b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * l - lever on any block face * s - wall sign attached to the main block
 
 	    s	    
-	r o b i
+	l o b i
 	    b
-	r o b i
+	l o b i
+	    b
+	l o b
+	    b
+	l o b
 
 
-sign text:
-	clock
-	2sec
+sign text (on first line):
+	counter
+
 
 This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
 
 An image of the circuit:
-![clock example circuit](/eisental/RedstoneChips/raw/master/example.png)
+![clock example circuit](/eisental/RedstoneChips/raw/master/images/counter.png)
 
 Destroying an IC:
 -----------------
@@ -91,6 +94,17 @@ Available circuit classes:
 
 * xor:
 
+
+Plans
+-----
+
+* Update readme with circuit docs and explain new lever outputs.
+
+* Put circuits in a new plugin jar and implement plugin communication between RedstoneChips and add-on circuit package plugins.
+
+* encoder and decoder
+
+* cosmictransmit and cosmicreceive
 
 
 
