@@ -24,7 +24,7 @@ Place a lever on the block next to each output block. Next place a wall sign att
 
    Once the IC is built, right-click the sign to activate it.
 
-* Any block that can send a redstone current (redstone wire, redstone torch, button or level) can be placed on the block next to an input.
+* Any block that can send a redstone current (redstone wire, redstone torch, button or lever) can be placed on the block next to an input.
 * Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the ones closest to the sign.
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides. 
 
