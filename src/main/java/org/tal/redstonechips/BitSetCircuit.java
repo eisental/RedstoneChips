@@ -1,8 +1,5 @@
 package org.tal.redstonechips;
 
-
-
-
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
