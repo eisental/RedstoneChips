@@ -1,0 +1,7 @@
+name: RedstoneChips
+main: org.tal.redstonechips.RedstoneChips
+version: 0.3
+commands:
+  redchips-list:
+    description: Lists currently activated redstone circuits.
+    usage: /<command>
