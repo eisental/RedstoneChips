@@ -3,7 +3,7 @@ RedstoneChips 0.3
 
 A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
 This is the core RedstoneChips plugin consisting of only the essentials. 
-To actually build ICs you need to download the [BasicCircuits](http://github.com/eisental/BasicCircuits) circuit package. 
+To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin. 
 
 ![counter example circuit](/eisental/RedstoneChips/raw/master/images/decoder.png)
 
@@ -11,7 +11,7 @@ Install:
 --------
    * Copy jar file to the plugins folder of your craftbukkit installation.
    
-After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder containing the default plugin settings.
+After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder with default plugin settings.
 
 You can change the block types used to construct a circuit by editing this file. Default values are gold block for outputs, iron block for inputs, and sandstone for the circuit body.
 
