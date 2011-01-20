@@ -4,7 +4,7 @@ RedstoneChips 0.4
 
 <div style="float:right">
 <strong>If you like this, </strong><br/>
-<a href="donate.md"><img src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" alt="DONATE" />
+<a href="donate.html"><img src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" alt="DONATE" /></a>
 </div>
 
 A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
