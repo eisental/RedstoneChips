@@ -1,4 +1,4 @@
-RedstoneChips 0.3
+RedstoneChips 0.4
 ==================
 
 A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
@@ -8,16 +8,17 @@ To actually build ICs you need to download and install the [BasicCircuits](http:
 ![counter example circuit](/eisental/RedstoneChips/raw/master/images/above.jpg "note block sequencer")
 
 
-Install:
+Install
 --------
    * Copy jar file to the plugins folder of your craftbukkit installation.
-   
+   * Install at least one circuit package plugin.
+
 After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder with default plugin settings.
 
 You can change the block types used to construct a circuit by editing this file. Default values are gold block for outputs, iron block for inputs, and sandstone for the circuit body.
 Type is NOT case-sensitive and can be any bukkit block material name. any already activated circuit will stay activated even after it's block types are invalid.
 
-How to build an IC:
+How to build an IC
 -------------------
    Every IC is made of a line of blocks with input and output blocks to the left or to the right of the line. 
 Place a lever on the block next to each output block. Next place a wall sign attached to the first main block of the circuit with the circuit class name on the first line of text, and any additional arguments on the next lines.
@@ -52,15 +53,21 @@ The 4-bit counter:
 
 For more info check the [BasicCircuits](https://github.com/eisental/BasicCircuits/wiki/BasicCircuits-) Wiki.
 
-Destroying an IC:
+Destroying an IC
 -----------------
 You can destroy an IC by breaking one of its structure blocks, including the output levers.
 
-Commands:  
+Commands
 ---------
    * /redchips-list	Message the player with a list of every currently activated circuit in the server.
 
 
+Changelog
+----------
+
+##### 20/01/11 RedstoneChips 0.4
+* temporary fix for the button bug.
+* better performance when working with a large number of circuits.
 
 
 
