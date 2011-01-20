@@ -81,16 +81,9 @@ public abstract class Circuit {
      * @param newVal true if the current is greater than 0.
      * @return true if block is an input of this circuit.
      */
-    public boolean redstoneChange(Block block, boolean newVal) {
-        for (int i=0; i<inputs.length; i++) {
-            if (block.equals(inputs[i])) {
-                inputBits.set(i, newVal);
-                inputChange(i, newVal);
-                return true;
-            }
-        }
-
-        return false;
+    public void redstoneChange(int idx, boolean newVal) {
+        inputBits.set(idx, newVal);
+        inputChange(idx, newVal);
     }
 
 

@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.block.BlockFace;
@@ -48,12 +47,13 @@ public class RedstoneChips extends JavaPlugin {
     private Material inputBlockType = Material.IRON_BLOCK;
     private Material outputBlockType = Material.GOLD_BLOCK;
 
-    static final Logger log = Logger.getLogger("Minecraft");
+    private static final Logger log = Logger.getLogger("Minecraft");
     private BlockListener rcBlockListener;
 
     private List<Circuit> circuits;
 
     private Map<String,Class> circuitClasses = new HashMap<String,Class>();
+    private Map<Block, Object[]> inputLookupMap = new HashMap<Block, Object[]>();
 
     public RedstoneChips(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -89,7 +89,7 @@ public class RedstoneChips extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
 
         loadProperties();
-        loadCircuits(getServer().getWorlds()[0]);
+        loadCircuits();
 
 
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Normal, this);
@@ -165,7 +165,7 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
-    private void loadCircuits(World w) {
+    private void loadCircuits() {
         Properties props = new Properties();
         File propFile = new File(circuitsFileName);
         if (!propFile.exists()) { // create empty file if doesn't already exist
@@ -184,7 +184,10 @@ public class RedstoneChips extends JavaPlugin {
                 String circuitString = props.getProperty(id);
                 Circuit c = RCPersistence.stringToCircuit(circuitString, this);
                 if (c==null) log.warning(desc.getName() + ": Error while loading circuit: " + circuitString);
-                else circuits.add(c);
+                else {
+                    circuits.add(c);
+                    this.addInputLookup(c);
+                }
             }
             log.info(desc.getName() + ": Loaded " + circuits.size() + " circuits");
         } catch (Exception ex) {
@@ -219,10 +222,24 @@ public class RedstoneChips extends JavaPlugin {
 
         boolean newVal = (e.getNewCurrent()>0);
         boolean oldVal = (e.getOldCurrent()>0);
+        if (newVal==oldVal) return; // not a change
 
-        if (newVal!=oldVal) {
-            // check if the block is an input of one of the circuits
-            for (Circuit c : circuits) c.redstoneChange(e.getBlock(), newVal);
+        Object[] o = inputLookupMap.get(e.getBlock());
+        if (o!=null) {
+            final Circuit c = (Circuit)o[0];
+            final int i = (Integer)o[1];
+            if (e.getBlock().getType()==Material.STONE_BUTTON) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            sleep(1000);
+                            c.redstoneChange(i, false);
+                        } catch (InterruptedException ex) {}
+                    }
+                }.start();
+            }
+            c.redstoneChange(i, newVal);
         }
     }
 
@@ -342,6 +359,7 @@ public class RedstoneChips extends JavaPlugin {
 
                 if (c.initCircuit(player, args)) {
                     circuits.add(c);
+                    addInputLookup(c);
                     saveCircuits();
                     player.sendMessage("Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
                     return true;
@@ -377,6 +395,7 @@ public class RedstoneChips extends JavaPlugin {
             p.sendMessage("You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
             destroyed.circuitDestroyed();
             circuits.remove(destroyed);
+            removeInputLookup(destroyed);
             saveCircuits();
         }
     }
@@ -392,6 +411,19 @@ public class RedstoneChips extends JavaPlugin {
         Class c = this.circuitClasses.get(name);
         if (c==null) throw new IllegalArgumentException("Unknown circuit type: " + name);
         else return (Circuit) c.newInstance();
+    }
+
+    private void addInputLookup(Circuit c) {
+        for (int i=0; i<c.inputs.length; i++) {
+            Block input = c.inputs[i];
+            inputLookupMap.put(input, new Object[]{c, i});
+        }
+    }
+
+    private void removeInputLookup(Circuit c) {
+        for (Block input : c.inputs) {
+            inputLookupMap.remove(input);
+        }
     }
 
 
