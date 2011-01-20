@@ -2,14 +2,14 @@
 RedstoneChips 0.4
 ==================
 
+A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
+This is the core RedstoneChips plugin consisting of only the essentials.
+To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin.
+
 <div style="float:right">
 <strong>If you like this, </strong><br/>
 <a href="donate.html"><img src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" alt="DONATE" /></a>
 </div>
-
-A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
-This is the core RedstoneChips plugin consisting of only the essentials.
-To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin.
 
 ![Note block sequencer](/eisental/RedstoneChips/raw/master/images/above.jpg "Note block sequencer")
 
