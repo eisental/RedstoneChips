@@ -8,7 +8,7 @@ To actually build ICs you need to download and install the [BasicCircuits](http:
 
 <div style="float:right">
 <strong>If you like this, </strong><br/>
-<a href="/eisental/RedstoneChips/blob/master/donate.html"><img src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" alt="DONATE" /></a>
+<a href="/eisental/RedstoneChips/raw/master/donate.html"><img src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" alt="DONATE" /></a>
 </div>
 
 ![Note block sequencer](/eisental/RedstoneChips/raw/master/images/above.jpg "Note block sequencer")
