@@ -15,7 +15,7 @@ A Bukkit plugin for building custom integrated redstone circuits with any number
 This is the core RedstoneChips plugin consisting of only the essentials. 
 To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin. 
 
-![counter example circuit](github.com/eisental/RedstoneChips/raw/master/images/above.jpg "note block sequencer")
+![counter example circuit](/eisental/RedstoneChips/raw/master/images/above.jpg "note block sequencer")
 
 Install
 --------
