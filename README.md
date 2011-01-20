@@ -7,8 +7,8 @@ To actually build ICs you need to download and install the [BasicCircuits](http:
 
 ![counter example circuit](/eisental/RedstoneChips/raw/master/images/above.jpg "note block sequencer")
 
+<div>
 If you like this, please
-
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_donations">
 <input type="hidden" name="business" value="VGT85LXRYEMB4">
@@ -20,6 +20,7 @@ If you like this, please
 <input type="image" src="https://www.paypal.com/en_US/NL/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
+</div>
 
 
 
