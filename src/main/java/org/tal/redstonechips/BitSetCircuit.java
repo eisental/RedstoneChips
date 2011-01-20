@@ -51,10 +51,15 @@ public abstract class BitSetCircuit extends Circuit {
     @Override
     public boolean init(Player player, String[] args) {
         // number of inputs must be an integer multiple of num of outputs
+        if (outputs.length==0) {
+            if (player!=null) player.sendMessage("Expecting at least 1 output pin.");
+            return false;
+        }
+
         if ((inputs.length % outputs.length)==0) {
             int inBitSetCount = inputs.length / outputs.length;
             wordlength = outputs.length;
-            if (player!=null) player.sendMessage("BitSetCircuit with " + inBitSetCount + " inputs of " + wordlength + " bits each.");
+            if (player!=null) player.sendMessage("Creating a bit-set circuit, with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
             inputBitSets = new BitSet[inBitSetCount];
             for (int i=0; i<inBitSetCount; i++) {
                 inputBitSets[i] = new BitSet(wordlength);
