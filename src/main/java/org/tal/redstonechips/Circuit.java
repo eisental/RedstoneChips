@@ -139,7 +139,7 @@ public abstract class Circuit {
         try {
             outputs[outIdx].setData((byte)(on?8|data:data&7));
         } catch (ConcurrentModificationException me) {
-            System.out.println("ConcurrentModificationException moving on.");
+
         }
     }
 
