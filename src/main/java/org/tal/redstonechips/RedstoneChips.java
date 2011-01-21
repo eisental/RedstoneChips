@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
@@ -27,6 +30,8 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockRightClickEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
@@ -49,11 +54,13 @@ public class RedstoneChips extends JavaPlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
     private BlockListener rcBlockListener;
+    private EntityListener rcEntityListener;
 
     private List<Circuit> circuits;
 
     private Map<String,Class> circuitClasses = new HashMap<String,Class>();
     private Map<Block, Object[]> inputLookupMap = new HashMap<Block, Object[]>();
+    private Map<Block, Circuit> structureLookupMap = new HashMap<Block, Circuit>();
 
     public RedstoneChips(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -77,6 +84,15 @@ public class RedstoneChips extends JavaPlugin {
                     checkCircuitDestroyed(event.getBlock(), event.getPlayer());
             }
         };
+
+        rcEntityListener = new EntityListener() {
+
+            @Override
+            public void onEntityExplode(EntityExplodeEvent event) {
+                for (Block b : event.blockList())
+                    checkCircuitDestroyed(b, null);
+            }
+        };
     }
 
     @Override
@@ -92,18 +108,21 @@ public class RedstoneChips extends JavaPlugin {
         loadCircuits();
 
 
-        pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Normal, this);
+        pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_RIGHTCLICKED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
+        pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
 
         log.info(desc.getName() + " " + desc.getVersion() + " enabled.");
     }
 
     @Override
     public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
-        if (cmd.getName().equals("/redchips-list")) {
-            listCircuits(player);
+        if (cmd.getName().equals("redchips-active")) {
+            listActiveCircuits(player);
             return true;
+        } else if (cmd.getName().equals("redchips-classes")) {
+            listCircuitClasses(player);
         } return false;
     }
 
@@ -186,7 +205,8 @@ public class RedstoneChips extends JavaPlugin {
                 if (c==null) log.warning(desc.getName() + ": Error while loading circuit: " + circuitString);
                 else {
                     circuits.add(c);
-                    this.addInputLookup(c);
+                    addInputLookup(c);
+                    addStructureLookup(c);
                 }
             }
             log.info(desc.getName() + ": Loaded " + circuits.size() + " circuits");
@@ -211,11 +231,39 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
-    public void listCircuits(Player p) {
-        p.sendMessage("Currently activated redstone circuits: ");
-        for (Circuit c : circuits)
-            p.sendMessage(circuits.indexOf(c) + ": " + c.getClass().getName() + " @ " + c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ());
+    private void listActiveCircuits(Player p) {
+        if (circuits.isEmpty()) p.sendMessage(ChatColor.GREEN + "There are no active circuits.");
+        else {
+            p.sendMessage("");
+            p.sendMessage(ChatColor.GREEN + "Active redstone circuits: ");
+            p.sendMessage(ChatColor.GREEN + "----------------------");
+            for (Circuit c : circuits)
+                p.sendMessage(circuits.indexOf(c) + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " + c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ());
+            p.sendMessage(ChatColor.GREEN + "----------------------");
+            p.sendMessage("");
+        }
 
+    }
+
+    private void listCircuitClasses(Player p) {
+        if (circuitClasses.isEmpty()) p.sendMessage(ChatColor.GREEN + "There are no circuit classes installed.");
+        else {
+            List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
+            Collections.sort(names);
+            p.sendMessage("");
+            p.sendMessage(ChatColor.GREEN + "Installed circuit classes:");
+            p.sendMessage(ChatColor.GREEN + "----------------------");
+            String list = "";
+            for (String name : names) {
+                list += name + ", ";
+                if (list.length()>20) {
+                    p.sendMessage(list.substring(0, list.length()-2));
+                    list = "";
+                }
+            }
+            p.sendMessage(ChatColor.GREEN + "----------------------");
+            p.sendMessage("");
+        }
     }
 
     private void redstoneChange(BlockRedstoneEvent e) {
@@ -346,6 +394,7 @@ public class RedstoneChips extends JavaPlugin {
                 if (c.initCircuit(player, args)) {
                     circuits.add(c);
                     addInputLookup(c);
+                    addStructureLookup(c);
                     saveCircuits();
                     player.sendMessage("Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
                     return true;
@@ -353,6 +402,8 @@ public class RedstoneChips extends JavaPlugin {
                     player.sendMessage(c.getClass().getSimpleName() + " was not activated.");
                     return false;
                 }
+            } catch (IllegalArgumentException ex) {
+                // unknown circuit name
             } catch (InstantiationException ex) {
                 ex.printStackTrace();
                 log.warning(ex.toString());
@@ -367,18 +418,10 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     private void checkCircuitDestroyed(Block b, Player p) {
-        Circuit destroyed = null;
-        for (Circuit c : circuits) {
-            for (Block s : c.structure) {
-                if (s.equals(b)) {
-                    destroyed = c;
-                    break;
-                }
-            }
-        }
+        Circuit destroyed = structureLookupMap.get(b);
 
         if (destroyed!=null) {
-            p.sendMessage("You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
+            if (p!=null) p.sendMessage("You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
             destroyed.circuitDestroyed();
             circuits.remove(destroyed);
             removeInputLookup(destroyed);
@@ -406,10 +449,19 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
+    private void addStructureLookup(Circuit c) {
+        for (int i=0; i<c.structure.length; i++)
+            structureLookupMap.put(c.structure[i], c);
+    }
+
+    private void removeStructureLookup(Circuit c) {
+        for (Block block : c.structure)
+            structureLookupMap.remove(block);
+    }
+
     private void removeInputLookup(Circuit c) {
         for (Block input : c.inputs) {
             inputLookupMap.remove(input);
         }
     }
-
 }
