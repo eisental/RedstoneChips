@@ -248,9 +248,6 @@ public class RedstoneChips extends JavaPlugin {
         Player player = event.getPlayer();
 
         if (b.getType()==Material.WALL_SIGN) {
-            int x = b.getX();
-            int y = b.getY();
-            int z = b.getZ();
 
             // first check if its already registered
             for (Circuit c : circuits) {
@@ -261,21 +258,10 @@ public class RedstoneChips extends JavaPlugin {
             }
 
             // try to detect a circuit in any possible orientation (N,W,S or E)
-            if (b.getFace(BlockFace.EAST).getType()==blockType) {
-                if (detectCircuit(b, BlockFace.EAST, player)) return;
-            }
-
-            if (b.getFace(BlockFace.WEST).getType()==blockType) {
-                if (detectCircuit(b, BlockFace.WEST, player)) return;
-            }
-
-            if (b.getFace(BlockFace.NORTH).getType()==blockType) {
-                if (detectCircuit(b, BlockFace.NORTH, player)) return;
-            }
-
-            if (b.getFace(BlockFace.SOUTH).getType()==blockType) {
-                if (detectCircuit(b, BlockFace.SOUTH, player)) return;
-            }
+            if (b.getData()==0x2) this.detectCircuit(b, BlockFace.WEST, player);
+            else if (b.getData()==0x3) this.detectCircuit(b, BlockFace.EAST, player);
+            else if (b.getData()==0x4) this.detectCircuit(b, BlockFace.SOUTH, player);
+            else if (b.getData()==0x5) this.detectCircuit(b, BlockFace.NORTH, player);
         }
     }
 

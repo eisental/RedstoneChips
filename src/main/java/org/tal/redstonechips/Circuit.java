@@ -2,6 +2,7 @@ package org.tal.redstonechips;
 
 
 import java.util.BitSet;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.World;
@@ -135,7 +136,11 @@ public abstract class Circuit {
     protected void sendOutput(int outIdx, boolean on) {
         outputBits.set(outIdx, on);
         byte data = outputs[outIdx].getData();
-        outputs[outIdx].setData((byte)(on?8|data:data&7));
+        try {
+            outputs[outIdx].setData((byte)(on?8|data:data&7));
+        } catch (ConcurrentModificationException me) {
+            System.out.println("ConcurrentModificationException moving on.");
+        }
     }
 
     /**
