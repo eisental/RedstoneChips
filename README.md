@@ -7,6 +7,7 @@ This is the core RedstoneChips plugin consisting of only the essentials.
 To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin.
 
 __If you like this, please__
+
 [![Donate](/eisental/RedstoneChips/raw/master/images/btn_donate_LG.gif")](http://sites.google.com/site/eisental/home/donate)
 
 ![Note block sequencer](/eisental/RedstoneChips/raw/master/images/above.jpg "Note block sequencer")
