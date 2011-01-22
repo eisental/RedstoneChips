@@ -89,7 +89,6 @@ Changelog
 * circuits are now destroyed when one of their blocks get exploded.
 * new /redchips-classes command.
 * renamed active list command to /redchips-active
-* new /redchips-classes command.
 * new /redchips-prefs command, for viewing and editing the preferences file from within the game.    
 * moved plugin files to the plugin folder.
 * preferences are now a yaml file.
