@@ -1,5 +1,4 @@
-
-RedstoneChips 0.4
+RedstoneChips 0.5
 ==================
 
 A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
@@ -14,43 +13,53 @@ __If you like this, please__
 
 Install
 --------
+   * Download [jar file](/eisental/RedstoneChips/RedstoneChips-0.5.jar).
    * Copy jar file to the plugins folder of your craftbukkit installation.
    * Install at least one circuit package plugin.
 
-After running craftbukkit with the plugin for the first time, a redstonechips.properties file is created in the server root folder with default plugin settings.
-
-You can change the block types used to construct a circuit by editing this file. Default values are gold block for outputs, iron block for inputs, and sandstone for the circuit body.
-Type is NOT case-sensitive and can be any bukkit block material name. any already activated circuit will stay activated even after it's block types are invalid.
+On the first time craftbukkit is started with the plugin installed, it will create a folder is inside the craftbukkit plugins folder
+and a preferences.yml file. The file redstonechip.dat is created after the activating a circuit for the first time.
+You can change the block types used to construct a circuit by editing preferences.yml or by using the /redchips-prefs command (see below).
+Default values are gold block for outputs, iron block for inputs, and sandstone for the chip itself.
+Type is NOT case-sensitive and can be any bukkit block material name or id.
+any already activated circuit will stay activated even after it's block types are no longer valid.
 
 How to build an IC
 -------------------
-   Every IC is made of a line of blocks with input and output blocks to the left or to the right of the line.
-Place a lever on the block next to each output block. Next place a wall sign attached to the first main block of the circuit with the circuit class name on the first line of text, and any additional arguments on the next lines.
-
-   Once the IC is built, right-click the sign to activate it.
+First build a line of chip blocks and add input and output blocks to the left or to the right of the line.
+Place a lever on the block next to each output block and a wall sign attached to the first main block of the circuit.
+On the first line of text write the circuit class name, any additional arguments must use the next lines.
+Once the IC is built, right-click the sign to activate it. You should receive a green confirmation message that lets you know
+that the circuit is now ready for use.
 
 * Any block that can send a redstone current (redstone wire, redstone torch, button or lever) can be placed on the block next to an input.
+  The direction of a redstone wire is irrelevant as long as its in the right place.
 * Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the ones closest to the sign.
+  Blocks south or west to the chip block will have a lower index that the blocks on the other side.
 * The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides.
 
 Here's an example 4-bit counter chip with 2 inputs and 4 outputs (looking from above, each letter represents one block):
 * b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * l - lever on any block face * s - wall sign attached to the main block
 
-	    s
-	l o b i
-	    b
-	l o b i
-	    b
-	l o b
-	    b
-	l o b
+	       s
+	0  l o b i  0
+	       b
+	1  l o b i  1
+	       b
+	2  l o b
+	       b
+	3  l o b
 
 
 sign text (on first line):
 	counter
 
+The first input pin is one line after the sign. Each time the block on its right receives a redstone current the chip will increment
+its internal variable by 1 and output it as a binary number by changing the state of the output levers. The least significant bit 
+is the first output (i.e. the one closest to the sign). For example, when the counter reaches 5, it will switch on outputs 0 and 2 
+giving out the binary number 1010. 
 
-This will create a clock circuit with 2 outputs and 2 inputs. When the block left to one of the input blocks receives a high redstone current the corresponding output will start to blink, turning on every 2 seconds.
+The second input pin is the reset pin. When it receives redstone current the counter will go back to 0.
 
 The 4-bit counter:
 ![counter example circuit](/eisental/RedstoneChips/raw/master/images/counter.jpg)
@@ -59,17 +68,36 @@ For more info check the [BasicCircuits](https://github.com/eisental/BasicCircuit
 
 Destroying an IC
 -----------------
-You can destroy an IC by breaking one of its structure blocks, including the output levers.
+You can destroy an IC by breaking any of its structure blocks, including the output levers.
+Creepers and TNT explosions will also cause the IC to stop functioning.
 
 Commands
 ---------
-   * /redchips-list	Message the player with a list of every currently activated circuit in the server.
-
+   * _/redchips-active_ Lists every currently active circuit on the server.
+   * _/redchips-classes_ Prints a list of installed circuit classes.
+   * _/redchips-prefs_ Prints preferences.
+   * _/redchips-prefs key_ Prints one preference key: value pair.
+   * _/redchips-preds key value_ Changes the value of a preference key and saves the file.
+     - Example: /redchips-prefs chipBlockType GLASS will make the plugin recognize new chips only when their body is made of glass.
 
 Changelog
 ----------
+#### RedstoneChips 0.5 (22/01/11)
+* improved circuit detection algorithm.
+* improved performance of circuit destruction.
+* circuits are now destroyed when one of their blocks get exploded.
+* new /redchips-classes command.
+* renamed active list command to /redchips-active
+* new /redchips-classes command.
+* new /redchips-prefs command, for viewing and editing the preferences file from within the game.
+    anybody can view them, but only an admin can edit.
+* moved plugin files to the plugin folder.
+* preferences are now a yaml file.
+* added color to player messages.
+* fixed error message when creating a bit-set circuit with no outputs.
+* catching concurrent modification exception when setting lever data
 
-##### 20/01/11 RedstoneChips 0.4
+#### RedstoneChips 0.4 (20/01/11)
 * temporary fix for the button bug.
 * better performance when working with a large number of circuits.
 
