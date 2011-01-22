@@ -5,6 +5,8 @@ import java.util.BitSet;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -137,9 +139,9 @@ public abstract class Circuit {
         outputBits.set(outIdx, on);
         byte data = outputs[outIdx].getData();
         try {
-            outputs[outIdx].setData((byte)(on?8|data:data&7));
+            outputs[outIdx].setData((byte)(on ? 0x8 : data&0x7));
         } catch (ConcurrentModificationException me) {
-
+            //Logger.getLogger("Minecraft").warning("We had another concurrent modification at sendoutput");
         }
     }
 
@@ -290,5 +292,10 @@ public abstract class Circuit {
             bits.set(i, (sbits.charAt(i)=='1'));
         }
         return bits;
+    }
+
+    protected void error(Player player, String message) {
+        if (player!=null) player.sendMessage(ChatColor.RED + message);
+        else Logger.getLogger("Minecraft").warning(message);
     }
 }

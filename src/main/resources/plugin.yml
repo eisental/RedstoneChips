@@ -8,3 +8,6 @@ commands:
   redchips-classes:
     description: Lists installed circuit classes.
     usage: /<command>
+  redchips-prefs:
+    description: View or change plugin preferences. Enter with no arguments to get a full list.
+

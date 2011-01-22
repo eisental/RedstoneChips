@@ -3,6 +3,7 @@ package org.tal.redstonechips;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -52,14 +53,14 @@ public abstract class BitSetCircuit extends Circuit {
     public boolean init(Player player, String[] args) {
         // number of inputs must be an integer multiple of num of outputs
         if (outputs.length==0) {
-            if (player!=null) player.sendMessage("Expecting at least 1 output pin.");
+            error(player, "Expecting at least 1 output pin.");
             return false;
         }
 
         if ((inputs.length % outputs.length)==0) {
             int inBitSetCount = inputs.length / outputs.length;
             wordlength = outputs.length;
-            if (player!=null) player.sendMessage("Creating a bit-set circuit, with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
+            if (player!=null) player.sendMessage(ChatColor.GREEN + "Creating a bit-set circuit with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
             inputBitSets = new BitSet[inBitSetCount];
             for (int i=0; i<inBitSetCount; i++) {
                 inputBitSets[i] = new BitSet(wordlength);
@@ -68,7 +69,7 @@ public abstract class BitSetCircuit extends Circuit {
 
             return true;
         } else {
-            player.sendMessage("Invalid number of inputs (" + inputs.length + "). Number of inputs must be a multiple of the number of outputs.");
+            error(player, "Invalid number of inputs (" + inputs.length + "). Number of inputs must be a multiple of the number of outputs.");
             return false;
         }
 
