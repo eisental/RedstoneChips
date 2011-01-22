@@ -73,12 +73,12 @@ Creepers and TNT explosions will also cause the IC to stop functioning.
 
 Commands
 ---------
-   * _/redchips-active_ Lists every currently active circuit on the server.
-   * _/redchips-classes_ Prints a list of installed circuit classes.
-   * _/redchips-prefs_ Prints preferences.
-   * _/redchips-prefs key_ Prints one preference key: value pair.
-   * _/redchips-preds key value_ Changes the value of a preference key and saves the file.
-     - Example: /redchips-prefs chipBlockType GLASS will make the plugin recognize new chips only when their body is made of glass.
+   * __/redchips-active__ Lists every currently active circuit on the server.
+   * __/redchips-classes__ Prints a list of installed circuit classes.
+   * __/redchips-prefs__ Prints preferences.
+   * __/redchips-prefs key__ Prints one preference key: value pair.
+   * __/redchips-preds key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
+     - Example: typing <code>/redchips-prefs chipBlockType GLASS</code> will make the plugin recognize new chips only when their body is made of glass.
 
 Changelog
 ----------
@@ -89,8 +89,7 @@ Changelog
 * new /redchips-classes command.
 * renamed active list command to /redchips-active
 * new /redchips-classes command.
-* new /redchips-prefs command, for viewing and editing the preferences file from within the game.
-    anybody can view them, but only an admin can edit.
+* new /redchips-prefs command, for viewing and editing the preferences file from within the game.    
 * moved plugin files to the plugin folder.
 * preferences are now a yaml file.
 * added color to player messages.
