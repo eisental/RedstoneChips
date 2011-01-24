@@ -28,17 +28,16 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockInteractEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockRightClickEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.material.Lever;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.tal.redstonechips.util.TargetBlock;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -57,6 +56,10 @@ public class RedstoneChips extends JavaPlugin {
     private Material inputBlockType = Material.IRON_BLOCK;
     private Material outputBlockType = Material.GOLD_BLOCK;
 
+    public static ChatColor infoColor = ChatColor.GREEN;
+    public static ChatColor errorColor = ChatColor.RED;
+    public static ChatColor debugColor = ChatColor.AQUA;
+
     private static final Logger logg = Logger.getLogger("Minecraft");
     private BlockListener rcBlockListener;
     private EntityListener rcEntityListener;
@@ -64,7 +67,9 @@ public class RedstoneChips extends JavaPlugin {
     private List<Circuit> circuits;
 
     private Map<String,Class> circuitClasses = new HashMap<String,Class>();
+
     private Map<Block, Object[]> inputLookupMap = new HashMap<Block, Object[]>();
+    private Map<Block, Object[]> outputLookupMap = new HashMap<Block, Object[]>();
     private Map<Block, Circuit> structureLookupMap = new HashMap<Block, Circuit>();
 
     private DumperOptions prefDump;
@@ -130,42 +135,29 @@ public class RedstoneChips extends JavaPlugin {
     @Override
     public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("redchips-active")) {
-            listActiveCircuits(player);
+            if (args.length==0)
+                listActiveCircuits(player, 1);
+            else {
+                try {
+                    listActiveCircuits(player, Integer.decode(args[0]));
+                } catch (NumberFormatException ne) {
+                    player.sendMessage(errorColor + "Invalid page number: " + args[0]);
+                }
+            }
             return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-classes")) {
             listCircuitClasses(player);
+            return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-prefs")) {
-            if (args.length==0) { // list preferences
-                printYaml(player, prefs);
-                player.sendMessage(ChatColor.GREEN + "Type /redchips-prefs <name> <value> to make changes.");
-            } else if (args.length==1) { // show one key value pair
-                Object o = prefs.get(args[0]);
-                if (o==null) player.sendMessage(ChatColor.RED + "Unknown preferences key: " + args[0]);
-                else {
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put(args[0], o);
-
-                    printYaml(player, map);
-                }
-            } else if (args.length==2) { // set value
-                if (!player.isOp()) {
-                    player.sendMessage(ChatColor.RED + "Unauthorized command: " + cmd.getName() + " " + args[0] + " " + args[1]);
-                    return true;
-                }
-                Yaml yaml = new Yaml(prefDump);
-                Map<String,Object> map = (Map<String,Object>)yaml.load(args[0] + ": " + args[1]);
-                for (String key : map.keySet()) {
-                    if (prefs.containsKey(key)) prefs.put(key, map.get(key));
-                    else {
-                        player.sendMessage(ChatColor.RED + "Unknown preferences key: " + key);
-                        return false;
-                    }
-                }
-                printYaml(player, map);
-                player.sendMessage(ChatColor.GREEN + "Saving changes...");
-                savePrefs();
-            }
-        } return false;
+            prefsCommand(args, player);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("redchips-debug")) {
+            debugCommand(player, args);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("redchips-pin")) {
+            pinCommand(player);
+            return true;
+        } else return false;
     }
 
     /**
@@ -278,6 +270,7 @@ public class RedstoneChips extends JavaPlugin {
                 else {
                     circuits.add(c);
                     addInputLookup(c);
+                    addOutputLookup(c);
                     addStructureLookup(c);
                 }
             }
@@ -298,33 +291,40 @@ public class RedstoneChips extends JavaPlugin {
 
         try {
             props.store(new FileOutputStream(propFile), "");
+            logg.info("Saved circuits state to file.");
         } catch (IOException ex) {
             logg.log(Level.SEVERE, null, ex);
         }
     }
 
-    private void listActiveCircuits(Player p) {
-        if (circuits.isEmpty()) p.sendMessage(ChatColor.GREEN + "There are no active circuits.");
+    private final static int maxlines = 15;
+    private void listActiveCircuits(Player p, int page) {
+        if (page<1) p.sendMessage(errorColor + "Invalid page number: " + page);
+        else if (page>(Math.ceil(circuits.size()/maxlines)+1)) p.sendMessage(errorColor + "Invalid page number: " + page);
+        if (circuits.isEmpty()) p.sendMessage(infoColor + "There are no active circuits.");
         else {
             p.sendMessage("");
-            p.sendMessage(ChatColor.GREEN + "Active redstone circuits: ");
-            p.sendMessage(ChatColor.GREEN + "----------------------");
-            for (Circuit c : circuits)
+            p.sendMessage(infoColor + "Active redstone circuits: ( page " + page + " / " + (int)(Math.ceil(circuits.size()/maxlines)+1)  + " )");
+            p.sendMessage(infoColor + "----------------------");
+            for (int i=(page-1)*maxlines; i<Math.min(circuits.size(), page*maxlines); i++) {
+                Circuit c = circuits.get(i);
                 p.sendMessage(circuits.indexOf(c) + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " + c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ());
-            p.sendMessage(ChatColor.GREEN + "----------------------");
+            }
+            p.sendMessage(infoColor + "----------------------");
+            p.sendMessage("Use /redchips-active <page number> to see other pages.");
             p.sendMessage("");
         }
 
     }
 
     private void listCircuitClasses(Player p) {
-        if (circuitClasses.isEmpty()) p.sendMessage(ChatColor.GREEN + "There are no circuit classes installed.");
+        if (circuitClasses.isEmpty()) p.sendMessage(infoColor + "There are no circuit classes installed.");
         else {
             List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
             Collections.sort(names);
             p.sendMessage("");
-            p.sendMessage(ChatColor.GREEN + "Installed circuit classes:");
-            p.sendMessage(ChatColor.GREEN + "----------------------");
+            p.sendMessage(infoColor + "Installed circuit classes:");
+            p.sendMessage(infoColor + "-----------------------");
             String list = "";
             ChatColor color = ChatColor.WHITE;
             for (String name : names) {
@@ -337,9 +337,52 @@ public class RedstoneChips extends JavaPlugin {
                     color = ChatColor.YELLOW;
                 else color = ChatColor.WHITE;
             }
-            p.sendMessage(ChatColor.GREEN + "----------------------");
+            if (!list.isEmpty()) p.sendMessage(list.substring(0, list.length()-2));
+            p.sendMessage(infoColor + "----------------------");
             p.sendMessage("");
         }
+    }
+
+    private void prefsCommand(String[] args, Player player) {
+            if (args.length==0) { // list preferences
+                printYaml(player, prefs);
+                player.sendMessage(infoColor + "Type /redchips-prefs <name> <value> to make changes.");
+            } else if (args.length==1) { // show one key value pair
+                Object o = prefs.get(args[0]);
+                if (o==null) player.sendMessage(errorColor + "Unknown preferences key: " + args[0]);
+                else {
+                    Map<String,Object> map = new HashMap<String,Object>();
+                    map.put(args[0], o);
+
+                    printYaml(player, map);
+                }
+            } else if (args.length>=2) { // set value
+                if (!player.isOp()) {
+                    player.sendMessage(errorColor + "Only admins are authorized to change preferences values.");
+                    return;
+                }
+
+                Yaml yaml = new Yaml(prefDump);
+
+                String val = "";
+                for (int i=1; i<args.length; i++)
+                    val += args[i] + " ";
+
+                Map<String,Object> map = (Map<String,Object>)yaml.load(args[0] + ": " + val);
+                for (String key : map.keySet()) {
+                    if (prefs.containsKey(key)) prefs.put(key, map.get(key));
+                    else {
+                        player.sendMessage(errorColor + "Unknown preferences key: " + key);
+                        return;
+                    }
+                }
+                printYaml(player, map);
+                player.sendMessage(infoColor + "Saving changes...");
+                savePrefs();
+            } else {
+                player.sendMessage(errorColor + "Bad redchips-prefs syntax.");
+            }
+
     }
 
     private void redstoneChange(BlockRedstoneEvent e) {
@@ -352,7 +395,7 @@ public class RedstoneChips extends JavaPlugin {
         if (o!=null) {
             final Circuit c = (Circuit)o[0];
             final int i = (Integer)o[1];
-            if (e.getBlock().getType()==Material.STONE_BUTTON) {
+            if (e.getBlock().getType()==Material.STONE_BUTTON) { // manually reset the button after 1 sec.
                 new Thread() {
                     @Override
                     public void run() {
@@ -376,7 +419,7 @@ public class RedstoneChips extends JavaPlugin {
             // first check if its already registered
             for (Circuit c : circuits) {
                 if (c.activationBlock.equals(b)) {
-                    player.sendMessage(ChatColor.GREEN + "Circuit is already activated.");
+                    player.sendMessage(infoColor + "Circuit is already activated.");
                     return;
                 }
             }
@@ -471,12 +514,13 @@ public class RedstoneChips extends JavaPlugin {
                 if (c.initCircuit(player, args)) {
                     circuits.add(c);
                     addInputLookup(c);
+                    addOutputLookup(c);
                     addStructureLookup(c);
                     saveCircuits();
-                    player.sendMessage(ChatColor.GREEN + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
+                    player.sendMessage(infoColor + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
                     return true;
                 } else {
-                    player.sendMessage(ChatColor.RED + c.getClass().getSimpleName() + " was not activated.");
+                    player.sendMessage(errorColor + c.getClass().getSimpleName() + " was not activated.");
                     return false;
                 }
             } catch (IllegalArgumentException ex) {
@@ -498,10 +542,11 @@ public class RedstoneChips extends JavaPlugin {
         Circuit destroyed = structureLookupMap.get(b);
 
         if (destroyed!=null && circuits.contains(destroyed)) {
-            if (p!=null) p.sendMessage(ChatColor.RED + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
+            if (p!=null) p.sendMessage(errorColor + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
             destroyed.circuitDestroyed();
             circuits.remove(destroyed);
             removeInputLookup(destroyed);
+            removeOutputLookup(destroyed);
             removeStructureLookup(destroyed);
             saveCircuits();
         }
@@ -527,6 +572,13 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
+    private void addOutputLookup(Circuit c) {
+        for (int i=0; i<c.outputs.length; i++) {
+            Block output = c.outputs[i];
+            outputLookupMap.put(output, new Object[]{c, i});
+        }
+    }
+
     private void addStructureLookup(Circuit c) {
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
@@ -543,15 +595,21 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
+    private void removeOutputLookup(Circuit c) {
+        for (Block output : c.outputs) {
+            outputLookupMap.remove(output);
+        }
+    }
+
     private void printYaml(Player player, Map<String, Object> map) {
         Yaml yaml = new Yaml(prefDump);
         String[] split = yaml.dump(map).split("\\n");
         player.sendMessage("");
-        player.sendMessage(ChatColor.GREEN + desc.getName() + " " + desc.getVersion() + " preferences:");
-        player.sendMessage(ChatColor.GREEN + "-----------------------------");
+        player.sendMessage(infoColor + desc.getName() + " " + desc.getVersion() + " preferences:");
+        player.sendMessage(infoColor + "-----------------------------");
         for (String line : split)
             player.sendMessage(line);
-        player.sendMessage(ChatColor.GREEN + "-----------------------------");
+        player.sendMessage(infoColor + "-----------------------------");
         player.sendMessage("");
     }
 
@@ -561,5 +619,65 @@ public class RedstoneChips extends JavaPlugin {
         else if (m instanceof Integer)
             return Material.getMaterial((Integer)m);
         else return null;
+    }
+
+    private void debugCommand(Player player, String[] args) {
+        boolean add = true;
+        if (args.length>0) {
+            if (args[0].equalsIgnoreCase("off"))
+                add = false;
+            else if (args[0].equalsIgnoreCase("on"))
+                add = true;
+            else {
+                player.sendMessage("Bad argument " + args[0] + ". Syntax should be: /redchips-debug on | off");
+            }
+        }
+
+        Block target = new TargetBlock(player).getTargetBlock();
+        Circuit c = this.structureLookupMap.get(target);
+        if (c==null) {
+            player.sendMessage(errorColor + "You need to point at a block of the circuit you wish to debug.");
+        } else {
+            if (add) {
+                try {
+                    c.addDebugger(player);
+                } catch (IllegalArgumentException ie) {
+                    player.sendMessage(infoColor + ie.getMessage());
+                    return;
+                }
+                player.sendMessage(debugColor + "You are now a debugger of the " + c.getClass().getSimpleName() + " circuit.");
+            } else {
+                try {
+                    c.removeDebugger(player);
+                } catch (IllegalArgumentException ie) {
+                    player.sendMessage(infoColor + ie.getMessage());
+                    return;
+                }
+                player.sendMessage(infoColor + "You will not receive any more debug messages ");
+                player.sendMessage(infoColor + "from the " + c.getClass().getSimpleName() + " circuit.");
+            }
+        }
+    }
+
+    private void pinCommand(Player player) {
+        Block target = new TargetBlock(player).getTargetBlock();
+        Object[] io = this.inputLookupMap.get(target);
+        if (io==null) {
+            Object[] oo = this.outputLookupMap.get(target);
+            if (oo==null) {
+                player.sendMessage(errorColor + "You need to point at an output or input block - ");
+                player.sendMessage(errorColor + "this can be an output lever or an input button, lever, wire, plate or torch.");
+            } else { // output pin
+                Circuit c = (Circuit)oo[0];
+                int i = (Integer)oo[1];
+                player.sendMessage(infoColor + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + infoColor + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
+            }
+        } else { // input pin
+            Circuit c = (Circuit)io[0];
+            int i = (Integer)io[1];
+            player.sendMessage(infoColor + c.getClass().getSimpleName() + ": input pin " + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+
+        }
+
     }
 }

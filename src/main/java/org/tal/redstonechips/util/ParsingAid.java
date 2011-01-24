@@ -1,4 +1,4 @@
-package org.tal.redstonechips.parsing;
+package org.tal.redstonechips.util;
 
 /*
  * ParsingAid.java

@@ -1,6 +1,6 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.5
+version: 0.6
 commands:
   redchips-active:
     description: Lists active redstone circuits.
@@ -10,4 +10,10 @@ commands:
     usage: /<command>
   redchips-prefs:
     description: View or change plugin preferences. Enter with no arguments to get a full list.
+  redchips-debug:
+    description: Point towards a circuit block and enter this command to receive debug messages from the circuit. To stop debugging
+                 the circuit, use /redchips-debug off.
+    usage: /<command> [on | off]
+  redchips-pin:
+    description: Point towards an input or output block (where actual redstone current flows), to get information about the pin.
 

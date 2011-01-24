@@ -1,15 +1,16 @@
 package org.tal.redstonechips;
 
 
-import java.util.BitSet;
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.util.BitSet7;
 
 /**
  * Represents a redstone integrated circuit.
@@ -56,11 +57,24 @@ public abstract class Circuit {
     public Block outputBlock;
 
     /**
-     * The World this circuit was built in.
+     * Reference to the minecraft World this circuit was built in.
      */
     public World world;
 
-    protected BitSet inputBits, outputBits;
+    /**
+     * List of players that will receive debug messages from this circuit.
+     */
+    private List<Player> debuggers;
+
+    /**
+     * The current state of each input bit. Should be used only for monitoring. Do not change its value.
+     */
+    protected BitSet7 inputBits;
+
+    /**
+     * The current state of each output bit. Should be used only for monitoring. Do not change its value.
+     */
+    protected BitSet7 outputBits;
 
     /**
      *
@@ -69,8 +83,9 @@ public abstract class Circuit {
      * @return result of call to Circuit.init()
      */
     public final boolean initCircuit(Player player, String[] args) {
-        inputBits = new BitSet(inputs.length);
-        outputBits = new BitSet(outputs.length);
+        debuggers = new ArrayList<Player>();
+        inputBits = new BitSet7(inputs.length);
+        outputBits = new BitSet7(outputs.length);
         this.args = args;
 
         return init(player, args);
@@ -86,6 +101,7 @@ public abstract class Circuit {
      */
     public void redstoneChange(int idx, boolean newVal) {
         inputBits.set(idx, newVal);
+        if (hasDebuggers()) debug("Input change: " + bitSetToBinaryString(inputBits, 0, inputs.length));
         inputChange(idx, newVal);
     }
 
@@ -133,13 +149,17 @@ public abstract class Circuit {
      * Changes the data byte of the selected output block to make a lever on or off.
      *
      * @param outIdx Output index. 0 for first output (closest to the sign) and so forth.
-     * @param on The new state of the output.
+     * @param level The new state of the output.
      */
-    protected void sendOutput(int outIdx, boolean on) {
-        outputBits.set(outIdx, on);
+    protected void sendOutput(int outIdx, boolean level) {
+        if (outputBits.get(outIdx)==level) return; // nothing to update.
+
+        outputBits.set(outIdx, level);
+        if (hasDebuggers()) debug("Output change: " + bitSetToBinaryString(outputBits, 0, outputs.length));
+
         byte data = outputs[outIdx].getData();
         try {
-            outputs[outIdx].setData((byte)(on ? 0x8 : data&0x7));
+            outputs[outIdx].setData((byte)(level ? 0x8 : data&0x7));
         } catch (ConcurrentModificationException me) {
             //Logger.getLogger("Minecraft").warning("We had another concurrent modification at sendoutput");
         }
@@ -154,7 +174,7 @@ public abstract class Circuit {
      * @param value The integer value to send out.
      */
     protected void sendInt(int startOutIdx, int length, int value) {
-        BitSet bits = intToBitSet(value, length);
+        BitSet7 bits = intToBitSet(value, length);
         sendBitSet(startOutIdx, length, bits);
     }
 
@@ -165,7 +185,7 @@ public abstract class Circuit {
      * @param length Number of bits to send out.
      * @param bits The BitSet object to send out. Any excessive bits in the BitSet is ignored.
      */
-    protected void sendBitSet(int startOutIdx, int length, BitSet bits) {        
+    protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
         for (int i=length-1; i>=0; i--) {
             sendOutput(startOutIdx+i, bits.get(i));
         }
@@ -177,7 +197,7 @@ public abstract class Circuit {
      *
      * @param bits BitSet object to send out.
      */
-    protected void sendBitSet(BitSet bits) {
+    protected void sendBitSet(BitSet7 bits) {
         sendBitSet(0, outputs.length, bits);
     }
 
@@ -189,7 +209,7 @@ public abstract class Circuit {
      * @param length Number of bits to read.
      * @return an unsigned integer number.
      */
-    protected static int bitSetToUnsignedInt(BitSet b, int startBit, int length) {
+    protected static int bitSetToUnsignedInt(BitSet7 b, int startBit, int length) {
         int val = 0;
         for (int i=0; i<length; i++) {
             if (b.get(i+startBit)) val += Math.pow(2,i);
@@ -206,7 +226,7 @@ public abstract class Circuit {
      * @param length Number of bits to read.
      * @return a signed integer number.
      */
-    protected static int bitSetToSignedInt(BitSet b, int startBit, int length) {
+    protected static int bitSetToSignedInt(BitSet7 b, int startBit, int length) {
         // treats the bit set as a two's complement encoding binary number.
         int signed = -(b.get(startBit+length-1)?1:0) * (int)Math.pow(2, length-1);
         for (int i=0; i<length-1; i++) {
@@ -214,6 +234,12 @@ public abstract class Circuit {
         }
 
         return signed;
+    }
+
+    protected static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
+        String ret = "";
+        for (int i=startBit; i<length+startBit; i++) ret += (b.get(i)?"1":"0");
+        return ret;
     }
 
     /**
@@ -224,7 +250,7 @@ public abstract class Circuit {
      * @param length Number of bits to shift.
      * @return BitSet s after shifting.
      */
-    protected static BitSet shiftLeft(BitSet s, int length) {
+    protected static BitSet7 shiftLeft(BitSet7 s, int length) {
         for (int i=length; i>0; i--) {
             s.set(i, s.get(i-1));
         }
@@ -242,7 +268,7 @@ public abstract class Circuit {
      * @param logical true for logical right shift; false for arithmetic right shift.
      * @return BitSet s after shifting.
      */
-    protected static BitSet shiftRight(BitSet s, int length, boolean logical) {
+    protected static BitSet7 shiftRight(BitSet7 s, int length, boolean logical) {
         for (int i=0; i<length-1; i++) {
             s.set(i, s.get(i+1));
         }
@@ -259,8 +285,8 @@ public abstract class Circuit {
      * @param length number of bits to use.
      * @return
      */
-    protected static BitSet intToBitSet(int value, int length) {
-        BitSet bits = new BitSet(length);
+    protected static BitSet7 intToBitSet(int value, int length) {
+        BitSet7 bits = new BitSet7(length);
         int index = 0;
         while (value != 0) {
             if (value % 2 != 0) {
@@ -274,7 +300,7 @@ public abstract class Circuit {
     }
 
 
-    public static Map<String,String> storeBitSet(Map<String,String> map, String key, BitSet bits, int length) {
+    public static Map<String,String> storeBitSet(Map<String,String> map, String key, BitSet7 bits, int length) {
         String sbits = "";
         for (int i=0; i<length; i++)
             sbits += (bits.get(i)?"1":"0");
@@ -283,8 +309,8 @@ public abstract class Circuit {
         return map;
     }
 
-    public static BitSet loadBitSet(Map<String, String> map, String key, int length) {
-        BitSet bits = new BitSet(length);
+    public static BitSet7 loadBitSet(Map<String, String> map, String key, int length) {
+        BitSet7 bits = new BitSet7(length);
         String sbits = map.get(key);
         if (sbits==null) return null;
 
@@ -295,7 +321,32 @@ public abstract class Circuit {
     }
 
     protected void error(Player player, String message) {
-        if (player!=null) player.sendMessage(ChatColor.RED + message);
-        else Logger.getLogger("Minecraft").warning(message);
+        if (player!=null) player.sendMessage(RedstoneChips.errorColor + message);
+        else Logger.getLogger("Minecraft").warning(this.getClass().getSimpleName() + ": " + message);
     }
+
+    protected void info(Player player, String message) {
+        if (player!=null) player.sendMessage(RedstoneChips.infoColor + message);
+        else Logger.getLogger("Minecraft").info(this.getClass().getSimpleName() + ": " + message);
+    }
+
+    protected void debug(String message) {
+        for (Player p : debuggers)
+            p.sendMessage(RedstoneChips.debugColor + this.getClass().getSimpleName() + ": " + message);
+    }
+
+    public void addDebugger(Player d) {
+        if (debuggers.contains(d)) throw new IllegalArgumentException("You are already debugging this circuit.");
+        debuggers.add(d);
+    }
+
+    public boolean removeDebugger(Player d) {
+        if (!debuggers.contains(d)) throw new IllegalArgumentException("You are not listed as a debugger of this circuit.");
+        return debuggers.remove(d);
+    }
+
+    public boolean hasDebuggers() { return !debuggers.isEmpty(); }
+
+    public BitSet7 getOutputBits() { return (BitSet7)outputBits.clone(); }
+    public BitSet7 getInputBits() { return (BitSet7)inputBits.clone(); }
 }
