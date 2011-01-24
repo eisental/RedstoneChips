@@ -1,4 +1,4 @@
-RedstoneChips 0.5
+RedstoneChips 0.6
 ==================
 
 A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
@@ -13,9 +13,11 @@ __If you like this, please__
 
 Install
 --------
-   * Download [jar file](/eisental/RedstoneChips/RedstoneChips-0.5.jar).
+   * Delete any previously installed jar files.
+   * Rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.6 (or delete it to remove previous settings).
+   * Download [jar file](/eisental/RedstoneChips/RedstoneChips-0.6.jar).
    * Copy jar file to the plugins folder of your craftbukkit installation.
-   * Install at least one circuit package plugin.
+   * Install [BasicCircuits 0.6](/eisental/BasicCircuits)
 
 On the first time craftbukkit is started with the plugin installed, it will create a folder is inside the craftbukkit plugins folder
 and a preferences.yml file. The file redstonechip.dat is created after the activating a circuit for the first time.
@@ -75,14 +77,22 @@ Commands
 ---------
    * __/redchips-active__ Lists every currently active circuit on the server.
    * __/redchips-classes__ Prints a list of installed circuit classes.
+   * __/redchips-pin__ Get info and identify chip pins. Point your cross at one of the pins and enter the command.
+   * __/redchips-debug__ Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command.
+                         The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
    * __/redchips-prefs__ Prints preferences.
    * __/redchips-prefs key__ Prints one preference key: value pair.
-   * __/redchips-preds key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
+   * __/redchips-prefs key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
      - Example: typing <code>/redchips-prefs chipBlockType GLASS</code> will change the preferences value and make the plugin
             immediately expect new chips to have their body made of glass.
 
 Changelog
 ----------
+#### RedstoneChips 0.6 (24/01/11)
+* new command /redchips-debug for getting debug messages from a circuit.
+* new command /redchips-pin for getting info about a specific chip pin.
+
+
 #### RedstoneChips 0.5 (22/01/11)
 * improved circuit detection algorithm.
 * improved performance of circuit destruction.
