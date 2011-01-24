@@ -78,8 +78,7 @@ Commands
    * __/redchips-active__ Lists every currently active circuit on the server.
    * __/redchips-classes__ Prints a list of installed circuit classes.
    * __/redchips-pin__ Get info and identify chip pins. Point your cross at one of the pins and enter the command.
-   * __/redchips-debug__ Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command.
-                         The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
+   * __/redchips-debug__ Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command. The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
    * __/redchips-prefs__ Prints preferences.
    * __/redchips-prefs key__ Prints one preference key: value pair.
    * __/redchips-prefs key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
