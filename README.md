@@ -82,8 +82,7 @@ Commands
    * __/redchips-prefs__ Prints preferences.
    * __/redchips-prefs key__ Prints one preference key: value pair.
    * __/redchips-prefs key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
-     - Example: typing <code>/redchips-prefs chipBlockType GLASS</code> will change the preferences value and make the plugin
-            immediately expect new chips to have their body made of glass.
+     - Example: typing <code>/redchips-prefs chipBlockType GLASS</code> will change the preferences value and make the plugin immediately expect new chips to have their body made of glass.
 
 Changelog
 ----------
