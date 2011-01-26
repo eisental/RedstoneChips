@@ -18,6 +18,10 @@ import org.tal.redstonechips.util.BitSet7;
  * @author Tal Eisenberg
  */
 public abstract class Circuit {
+    /**
+     * Reference to the core plugin instance.
+     */
+    private RedstoneChips redchips;
 
     /**
      * Circuit sign arguments. Any word found on the circuit sign from line 2 onward.
@@ -82,7 +86,8 @@ public abstract class Circuit {
      * @param args The sign arguments of this circuit. Stored in this.args.
      * @return result of call to Circuit.init()
      */
-    public final boolean initCircuit(Player player, String[] args) {
+    public final boolean initCircuit(Player player, String[] args, RedstoneChips rc) {
+        this.redchips = rc;
         debuggers = new ArrayList<Player>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
@@ -116,6 +121,7 @@ public abstract class Circuit {
 
     /**
      * Called when right-clicking the sign or when the plugin read circuit data from file.
+     * 
      * @param player The player that right-clicked the sign
      * @param args Any words on the sign after the circuit type.
      * @return true if the init was successful, false if an error occurred.
@@ -321,18 +327,18 @@ public abstract class Circuit {
     }
 
     protected void error(Player player, String message) {
-        if (player!=null) player.sendMessage(RedstoneChips.errorColor + message);
+        if (player!=null) player.sendMessage(redchips.getPrefsManager().getErrorColor() + message);
         else Logger.getLogger("Minecraft").warning(this.getClass().getSimpleName() + ": " + message);
     }
 
     protected void info(Player player, String message) {
-        if (player!=null) player.sendMessage(RedstoneChips.infoColor + message);
+        if (player!=null) player.sendMessage(redchips.getPrefsManager().getInfoColor() + message);
         else Logger.getLogger("Minecraft").info(this.getClass().getSimpleName() + ": " + message);
     }
 
     protected void debug(String message) {
         for (Player p : debuggers)
-            p.sendMessage(RedstoneChips.debugColor + this.getClass().getSimpleName() + ": " + message);
+            p.sendMessage(redchips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + ": " + message);
     }
 
     public void addDebugger(Player d) {

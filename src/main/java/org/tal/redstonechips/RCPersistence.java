@@ -29,7 +29,7 @@ public class RCPersistence {
 
         Circuit ret;
 
-        ret = plugin.getCircuitInstance(name);
+        ret = plugin.getCircuitLoader().getCircuitInstance(name);
 
         World world = stringToWorld(plugin.getServer(), sWorld);
         ret.world = world;
@@ -40,7 +40,7 @@ public class RCPersistence {
         ret.outputs = stringToBlockArray(world, sOutputs);
         ret.structure = stringToBlockArray(world, sStructure);
 
-        if (ret.initCircuit(null, stringArgsToArray(sArgs))) {
+        if (ret.initCircuit(null, stringArgsToArray(sArgs), plugin)) {
             ret.loadState(stateStringToMap(sState));
             return ret;
         }
