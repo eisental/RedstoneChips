@@ -118,12 +118,17 @@ public class CircuitManager {
 
     public void checkForCircuit(Block signBlock, Player player) {
         if (signBlock.getType()==Material.WALL_SIGN) {
+            Sign sign = (Sign)signBlock.getState();
+
             // first check if its already registered
             Circuit check = this.getCircuitByActivationBlock(signBlock);
             if (check!=null) {
                 player.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
                 return;
             }
+
+            // then check if the sign points to a known circuit type
+            if (!rc.getCircuitLoader().getCircuitClasses().containsKey(sign.getLine(0).trim())) return;
 
             List<Block> inputs = new ArrayList<Block>();
             List<Block> outputs = new ArrayList<Block>();
@@ -141,7 +146,6 @@ public class CircuitManager {
 
                 if (outputs.size()>0 || inputs.size()>0) {
                     if (!checkForLevers(outputs, player)) return;
-                    Sign sign = (Sign)signBlock.getState();
                     String[] args = getArgsFromSign(sign);
 
                     try {
@@ -167,7 +171,7 @@ public class CircuitManager {
                             return;
                         }
                     } catch (IllegalArgumentException ex) {
-                        // unknown circuit name
+                        // unknown circuit name. shouldn't happen at this stage.
                     } catch (InstantiationException ex) {
                         ex.printStackTrace();
                         rc.log(Level.WARNING, ex.toString());
