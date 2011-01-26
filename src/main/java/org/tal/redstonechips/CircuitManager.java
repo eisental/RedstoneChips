@@ -5,15 +5,10 @@
 
 package org.tal.redstonechips;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import org.bukkit.Material;
@@ -28,8 +23,6 @@ import org.bukkit.event.block.BlockRedstoneEvent;
  * @author Tal Eisenberg
  */
 public class CircuitManager {
-    public final static String circuitsFileName = "redstonechips.dat";
-
     private RedstoneChips rc;
     
     private List<Circuit> circuits;
@@ -40,55 +33,6 @@ public class CircuitManager {
 
     public CircuitManager(RedstoneChips plugin) {
         rc = plugin;
-    }
-
-    public void loadCircuits() {
-        Properties props = new Properties();
-        File propFile = new File(rc.getDataFolder(), circuitsFileName);
-        if (!propFile.exists()) { // create empty file if doesn't already exist
-            try {
-                props.store(new FileOutputStream(propFile), "");
-            } catch (IOException ex) {
-                rc.log(Level.SEVERE, ex.getMessage());
-            }
-        }
-
-        circuits = new ArrayList<Circuit>();
-
-        try {
-            props.load(new FileInputStream(propFile));
-            for (String id : props.stringPropertyNames()) {
-                String circuitString = props.getProperty(id);
-                Circuit c = CircuitPersistense.stringToCircuit(circuitString, rc);
-                if (c==null) rc.log(Level.WARNING, "Error while loading circuit: " + circuitString);
-                else {
-                    circuits.add(c);
-                    addInputLookup(c);
-                    addOutputLookup(c);
-                    addStructureLookup(c);
-                }
-            }
-            rc.log(Level.INFO, circuits.size() + " active circuits");
-        } catch (Exception ex) {
-            rc.log(Level.SEVERE, ex.getMessage());
-        }
-
-    }
-
-    public void saveCircuits() {
-        Properties props = new Properties();
-        File propFile = new File(rc.getDataFolder(), circuitsFileName);
-
-        for (Circuit c : circuits) {
-            props.setProperty(""+circuits.indexOf(c), CircuitPersistense.toFileString(c, rc));
-        }
-
-        try {
-            props.store(new FileOutputStream(propFile), "");
-            rc.log(Level.INFO, "Saved circuits state to file.");
-        } catch (IOException ex) {
-            rc.log(Level.SEVERE, ex.getMessage());
-        }
     }
 
     public void redstoneChange(BlockRedstoneEvent e) {
@@ -160,10 +104,9 @@ public class CircuitManager {
 
                         if (c.initCircuit(player, args, rc)) {
                             circuits.add(c);
-                            addInputLookup(c);
-                            addOutputLookup(c);
-                            addStructureLookup(c);
-                            saveCircuits();
+                            this.addCircuitLookups(c);
+                            rc.getCircuitPersistence().saveCircuits(circuits);
+
                             player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
                             return;
                         } else {
@@ -185,8 +128,6 @@ public class CircuitManager {
     }
 
     private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
-        rc.log(Level.INFO, "scanBranch: " + origin + " inputs: " + inputs.size() + " outputs: " + outputs.size() + " structure: " + structure.size());
-
         // look in every horizontal direction for inputs, outputs or interaction blocks.
         checkAttachedIO(origin, direction, inputs, outputs, interactions, structure);
 
@@ -320,10 +261,8 @@ public class CircuitManager {
             if (p!=null) p.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
             destroyed.circuitDestroyed();
             circuits.remove(destroyed);
-            removeInputLookup(destroyed);
-            removeOutputLookup(destroyed);
-            removeStructureLookup(destroyed);
-            saveCircuits();
+            removeCircuitLookups(destroyed);
+            rc.getCircuitPersistence().saveCircuits(circuits);
         }
     }
 
@@ -340,6 +279,15 @@ public class CircuitManager {
         return this.activationLookupMap.get(activationBlock);
     }
 
+    void setCircuitList(List<Circuit> circuits) {
+        this.circuits = circuits;
+
+        for (Circuit c : circuits)
+            addCircuitLookups(c);
+
+        rc.log(Level.INFO, circuits.size() + " active circuits");
+    }
+
     public Object[] lookupInputBlock(Block inputBlock) {
         return this.inputLookupMap.get(inputBlock);
     }
@@ -348,39 +296,31 @@ public class CircuitManager {
         return this.outputLookupMap.get(outputBlock);
     }
 
-    private void addInputLookup(Circuit c) {
-        for (int i=0; i<c.inputs.length; i++) {
-            Block input = c.inputs[i];
-            inputLookupMap.put(input, new Object[]{c, i});
-        }
-    }
-
-    private void addOutputLookup(Circuit c) {
-        for (int i=0; i<c.outputs.length; i++) {
-            Block output = c.outputs[i];
-            outputLookupMap.put(output, new Object[]{c, i});
-        }
-    }
-
-    private void addStructureLookup(Circuit c) {
+    private void addCircuitLookups(Circuit c) {
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
+
+        for (int i=0; i<c.inputs.length; i++)
+            inputLookupMap.put(c.inputs[i], new Object[]{c, i});
+
+
+        for (int i=0; i<c.outputs.length; i++)
+            outputLookupMap.put(c.outputs[i], new Object[]{c, i});
+
+        activationLookupMap.put(c.activationBlock, c);
     }
 
-    private void removeStructureLookup(Circuit c) {
+    private void removeCircuitLookups(Circuit c) {
         for (Block block : c.structure)
             structureLookupMap.remove(block);
-    }
 
-    private void removeInputLookup(Circuit c) {
-        for (Block input : c.inputs) {
+        for (Block input : c.inputs)
             inputLookupMap.remove(input);
-        }
-    }
 
-    private void removeOutputLookup(Circuit c) {
-        for (Block output : c.outputs) {
+        for (Block output : c.outputs)
             outputLookupMap.remove(output);
-        }
+
+        activationLookupMap.remove(c.activationBlock);
+
     }
 }

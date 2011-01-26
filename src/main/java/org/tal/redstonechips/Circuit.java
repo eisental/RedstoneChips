@@ -348,4 +348,8 @@ public abstract class Circuit {
 
     public BitSet7 getOutputBits() { return (BitSet7)outputBits.clone(); }
     public BitSet7 getInputBits() { return (BitSet7)inputBits.clone(); }
+
+    public String getCircuitClass() {
+        return this.getClass().getSimpleName();
+    }
 }

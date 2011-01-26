@@ -35,6 +35,7 @@ public class RedstoneChips extends JavaPlugin {
 
     private PrefsManager prefsManager;
     private CircuitManager circuitManager;
+    private CircuitPersistence circuitPersistence;
     private CircuitLoader circuitLoader;
     private CommandHandler commandHandler;
 
@@ -43,9 +44,10 @@ public class RedstoneChips extends JavaPlugin {
 
         prefsManager = new PrefsManager(this);
         circuitManager = new CircuitManager(this);
+        circuitPersistence = new CircuitPersistence(this);
         circuitLoader = new CircuitLoader(this);
         commandHandler = new CommandHandler(this);
-        
+
         rcBlockListener = new BlockListener() {
 
             @Override
@@ -78,7 +80,7 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        circuitManager.saveCircuits();
+        circuitPersistence.saveCircuits(circuitManager.getCircuits());
 
         PluginDescriptionFile desc = this.getDescription();
         logg.info(desc.getName() + " " + desc.getVersion() + " disabled.");
@@ -89,7 +91,7 @@ public class RedstoneChips extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
 
         prefsManager.loadPrefs();
-        circuitManager.loadCircuits();
+        circuitManager.setCircuitList(circuitPersistence.loadCircuits());
 
 
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
@@ -139,5 +141,9 @@ public class RedstoneChips extends JavaPlugin {
 
     public CircuitManager getCircuitManager() {
         return circuitManager;
+    }
+
+    CircuitPersistence getCircuitPersistence() {
+        return circuitPersistence;
     }
 }
