@@ -163,6 +163,7 @@ public class CommandHandler {
 
     public void pinCommand(Player player) {
         Block target = new TargetBlock(player).getTargetBlock();
+
         Object[] io = rc.getCircuitManager().lookupInputBlock(target);
         if (io==null) {
             Object[] oo = rc.getCircuitManager().lookupOutputBlock(target);
@@ -177,7 +178,7 @@ public class CommandHandler {
         } else { // input pin
             Circuit c = (Circuit)io[0];
             int i = (Integer)io[1];
-            player.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+            player.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
 
         }
 

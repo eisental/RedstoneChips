@@ -30,6 +30,7 @@ public class PrefsManager {
     private Material chipBlockType = Material.SANDSTONE;
     private Material inputBlockType = Material.IRON_BLOCK;
     private Material outputBlockType = Material.GOLD_BLOCK;
+    private Material interactionBlockType = Material.LAPIS_BLOCK;
 
     private ChatColor infoColor = ChatColor.GREEN;
     private ChatColor errorColor = ChatColor.RED;
@@ -76,6 +77,12 @@ public class PrefsManager {
                 if (i==null) rc.log(Level.WARNING, "Unknown material: " + prefs.get("chipBlockType"));
                 else chipBlockType = i;
             } else prefs.put("chipBlockType", chipBlockType.name());
+
+            if (prefs.containsKey("interactionBlockType")) {
+                Material i = findMaterial(prefs.get("interactionBlockType"));
+                if (i==null) rc.log(Level.WARNING, "Unknown material: " + prefs.get("interactionBlockType"));
+                else interactionBlockType = i;
+            } else prefs.put("interactionBlockType", interactionBlockType.name());
 
             yaml.dump(prefs, new FileWriter(propFile));
         } catch (IOException ex) {
@@ -138,6 +145,10 @@ public class PrefsManager {
 
     public Material getChipBlockType() {
         return chipBlockType;
+    }
+
+    public Material getInteractionBlockType() {
+        return interactionBlockType;
     }
 
     public ChatColor getErrorColor() {

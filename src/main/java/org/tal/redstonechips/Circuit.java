@@ -29,12 +29,12 @@ public abstract class Circuit {
     public String[] args;
 
     /**
-     * Input blocks. Starting count from sign block.
+     * Input blocks. Will listen to redstone change events on these blocks.
      */
     public Block[] inputs;
 
     /**
-     * Output blocks. Starting count from sign block.
+     * Output blocks. List of lever blocks.
      */
     public Block[] outputs;
 
@@ -45,20 +45,14 @@ public abstract class Circuit {
     public Block[] structure;
 
     /**
+     * Interaction blocks. Used for interaction points with the physical world.
+     */
+    public Block[] interactionBlocks;
+
+    /**
      * The sign block. Used to activate the circuit.
      */
     public Block activationBlock;
-
-    /**
-     * The last block in the line. Can be used to find where the chip ends.
-     */
-    public Block lastLineBlock;
-
-    /**
-     * One block further in the line after the lastLineBlock. This block is not part of the circuit
-     * and can be used as physical output such as changing sign text, wool color, etc.
-     */
-    public Block outputBlock;
 
     /**
      * Reference to the minecraft World this circuit was built in.
@@ -161,7 +155,6 @@ public abstract class Circuit {
         if (outputBits.get(outIdx)==level) return; // nothing to update.
 
         outputBits.set(outIdx, level);
-        if (hasDebuggers()) debug("Output change: " + bitSetToBinaryString(outputBits, 0, outputs.length));
 
         byte data = outputs[outIdx].getData();
         try {
@@ -244,7 +237,7 @@ public abstract class Circuit {
 
     protected static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
         String ret = "";
-        for (int i=startBit; i<length+startBit; i++) ret += (b.get(i)?"1":"0");
+        for (int i=length+startBit-1; i>=startBit; i--) ret += (b.get(i)?"1":"0");
         return ret;
     }
 

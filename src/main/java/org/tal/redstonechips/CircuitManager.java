@@ -59,7 +59,7 @@ public class CircuitManager {
             props.load(new FileInputStream(propFile));
             for (String id : props.stringPropertyNames()) {
                 String circuitString = props.getProperty(id);
-                Circuit c = RCPersistence.stringToCircuit(circuitString, rc);
+                Circuit c = CircuitPersistense.stringToCircuit(circuitString, rc);
                 if (c==null) rc.log(Level.WARNING, "Error while loading circuit: " + circuitString);
                 else {
                     circuits.add(c);
@@ -80,7 +80,7 @@ public class CircuitManager {
         File propFile = new File(rc.getDataFolder(), circuitsFileName);
 
         for (Circuit c : circuits) {
-            props.setProperty(""+circuits.indexOf(c), RCPersistence.toFileString(c, rc));
+            props.setProperty(""+circuits.indexOf(c), CircuitPersistense.toFileString(c, rc));
         }
 
         try {
@@ -117,132 +117,196 @@ public class CircuitManager {
     }
 
     public void checkForCircuit(Block signBlock, Player player) {
-        Block b = signBlock;
-
-        if (b.getType()==Material.WALL_SIGN) {
-
+        if (signBlock.getType()==Material.WALL_SIGN) {
             // first check if its already registered
-            for (Circuit c : circuits) {
-                if (c.activationBlock.equals(b)) {
-                    player.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
-                    return;
-                }
+            Circuit check = this.getCircuitByActivationBlock(signBlock);
+            if (check!=null) {
+                player.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
+                return;
             }
 
-            // try to detect a circuit in any possible orientation (N,W,S or E)
-            if (b.getData()==0x2) this.detectCircuit(b, BlockFace.WEST, player);
-            else if (b.getData()==0x3) this.detectCircuit(b, BlockFace.EAST, player);
-            else if (b.getData()==0x4) this.detectCircuit(b, BlockFace.SOUTH, player);
-            else if (b.getData()==0x5) this.detectCircuit(b, BlockFace.NORTH, player);
+            List<Block> inputs = new ArrayList<Block>();
+            List<Block> outputs = new ArrayList<Block>();
+            List<Block> structure = new ArrayList<Block>();
+            List<Block> interactions = new ArrayList<Block>();
+
+            structure.add(signBlock);
+            
+            BlockFace direction = findSignDirection(signBlock.getData());
+            Block firstChipBlock = signBlock.getFace(direction);
+
+            if (firstChipBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
+                structure.add(firstChipBlock);
+                scanBranch(firstChipBlock, direction, inputs, outputs, interactions, structure);
+
+                if (outputs.size()>0 || inputs.size()>0) {
+                    if (!checkForLevers(outputs, player)) return;
+                    Sign sign = (Sign)signBlock.getState();
+                    String[] args = getArgsFromSign(sign);
+
+                    try {
+                        Circuit c = rc.getCircuitLoader().getCircuitInstance(sign.getLine(0).trim());
+                        c.activationBlock = signBlock;
+                        c.inputs = inputs.toArray(new Block[inputs.size()]);
+                        c.outputs = outputs.toArray(new Block[outputs.size()]);
+                        c.structure = structure.toArray(new Block[structure.size()]);
+                        c.interactionBlocks = interactions.toArray(new Block[interactions.size()]);
+
+                        c.args = args;
+
+                        if (c.initCircuit(player, args, rc)) {
+                            circuits.add(c);
+                            addInputLookup(c);
+                            addOutputLookup(c);
+                            addStructureLookup(c);
+                            saveCircuits();
+                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
+                            return;
+                        } else {
+                            player.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
+                            return;
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        // unknown circuit name
+                    } catch (InstantiationException ex) {
+                        ex.printStackTrace();
+                        rc.log(Level.WARNING, ex.toString());
+                    } catch (IllegalAccessException ex) {
+                        ex.printStackTrace();
+                        rc.log(Level.WARNING, ex.toString());
+                    }
+                }
+            }
         }
     }
 
-    private boolean detectCircuit(Block blockClicked, BlockFace direction, Player player) {
-        List<Block> inputs = new ArrayList<Block>();
-        List<Block> outputs = new ArrayList<Block>();
-        List<Block> structure = new ArrayList<Block>();
-        Block curPlus1, curMinus1, curBlock;
-        boolean xAxis = (direction==BlockFace.SOUTH || direction==BlockFace.NORTH);
-        structure.add(blockClicked);
-        curBlock = blockClicked.getFace(direction);
-        curPlus1 = curBlock.getRelative((xAxis?0:1), 0, (xAxis?1:0));
-        curMinus1 = curBlock.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
+    private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+        rc.log(Level.INFO, "scanBranch: " + origin + " inputs: " + inputs.size() + " outputs: " + outputs.size() + " structure: " + structure.size());
 
+        // look in every horizontal direction for inputs, outputs or interaction blocks.
+        checkAttachedIO(origin, direction, inputs, outputs, interactions, structure);
 
-        while(curBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
-            if (curPlus1.getType()==rc.getPrefsManager().getInputBlockType() ||
-                    curPlus1.getType()==rc.getPrefsManager().getOutputBlockType()) {
-                structure.add(curPlus1);
-                Block jack = curPlus1.getRelative((xAxis?0:1), 0, (xAxis?1:0));
-                if (curPlus1.getType()==rc.getPrefsManager().getInputBlockType()) {
-                    inputs.add(jack);
-                    //player.sendMessage("Found input at " + jack.toString());
-                } else {
-                    outputs.add(jack);
-                    structure.add(jack);
-                    //player.sendMessage("Found output at " + jack.toString());
-                }
-            }
+        // look in every direction, inculding up and down for more chip blocks.
+        checkAttachedChipBlock(origin, direction, inputs, outputs, interactions, structure);
+    }
 
-            if (curMinus1.getType()==rc.getPrefsManager().getInputBlockType() || curMinus1.getType()==rc.getPrefsManager().getOutputBlockType()) {
-                structure.add(curMinus1);
-                Block jack = curMinus1.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
-                if (curMinus1.getType()==rc.getPrefsManager().getInputBlockType()) {
-                    inputs.add(jack);
-                    //player.sendMessage("Found input at " + jack.toString());
-                } else {
-                    outputs.add(jack);
-                    structure.add(jack);
-                    //player.sendMessage("Found output at " + jack.toString());
-                }
-            }
+    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+        
+        // look for chip blocks in original direction
+        checkForChipBlockOnSideFace(origin, direction, inputs, outputs, interactions, structure);
+        
+        // look backwards. Structure should already contain this block unless last checked block was below or above.
+        checkForChipBlockOnSideFace(origin, getOppositeFace(direction), inputs, outputs, interactions, structure);
 
-            structure.add(curBlock); // a line block.
-
-            // iterate forward
-            curBlock = curBlock.getFace(direction);
-            curPlus1 = curBlock.getRelative((xAxis?0:1), 0, (xAxis?1:0));
-            curMinus1 = curBlock.getRelative((xAxis?0:-1), 0, (xAxis?-1:0));
+        // look up. If found chip block above, will try to continue in the old direction 1 block up.
+        Block up = origin.getFace(BlockFace.UP);
+        if (!structure.contains(up) && up.getType()==rc.getPrefsManager().getChipBlockType()) {
+            structure.add(up);
+            scanBranch(up, direction, inputs, outputs, interactions, structure);
         }
 
-        Block outputBlock = curBlock;
-        Block lastLineBlock = structure.get(structure.size()-1);
+        // look down. If found chip block below, will try to continue in the old direction 1 block down.
+        Block down = origin.getFace(BlockFace.DOWN);
+        if (!structure.contains(down) && down.getType()==rc.getPrefsManager().getChipBlockType()) {
+            structure.add(down);
+            scanBranch(down, direction, inputs, outputs, interactions, structure);
+        }
+
+        // look for chip blocks to the right
+        checkForChipBlockOnSideFace(origin, getRightFace(direction), inputs, outputs, interactions, structure);
+        
+        // look for chip blocks to the left
+        checkForChipBlockOnSideFace(origin, getLeftFace(direction), inputs, outputs, interactions, structure);
+    }
+
+    private void checkAttachedIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+        checkForIO(origin, getRightFace(face), inputs, outputs, interactions, structure);
+        checkForIO(origin, getLeftFace(face), inputs, outputs, interactions, structure);
+        checkForIO(origin, face, inputs, outputs, interactions, structure);
+        checkForIO(origin, getOppositeFace(face), inputs, outputs, interactions, structure);
+    }
+
+    private void checkForIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+        Block b = origin.getFace(face);
+        if (!structure.contains(b)) {
+            if (b.getType()==rc.getPrefsManager().getInputBlockType()) {
+                structure.add(b);
+                inputs.add(b.getFace(face));
+            } else if (b.getType()==rc.getPrefsManager().getOutputBlockType()) {
+                structure.add(b);
+                Block o = b.getFace(face);
+                structure.add(o);
+                outputs.add(o);
+            } else if (b.getType()==rc.getPrefsManager().getInteractionBlockType()) {
+                structure.add(b);
+                interactions.add(b.getFace(face));
+            }
+        }
+    }
+
+    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+        Block b = origin.getFace(face);
+        if (!structure.contains(b)) {
+            if (b.getType()==rc.getPrefsManager().getChipBlockType()) {
+                structure.add(b);
+                scanBranch(b, face, inputs, outputs, interactions, structure);
+            }
+        }
+    }
+
+    private static BlockFace getLeftFace(BlockFace direction) {
+        if (direction==BlockFace.WEST) return BlockFace.SOUTH;
+        else if (direction==BlockFace.EAST) return BlockFace.NORTH;
+        else if (direction==BlockFace.SOUTH) return BlockFace.EAST;
+        else if (direction==BlockFace.NORTH) return BlockFace.WEST;
+        else throw new IllegalArgumentException("Invalid block face: " + direction);
+    }
+
+    private static BlockFace getRightFace(BlockFace direction) {
+        if (direction==BlockFace.WEST) return BlockFace.NORTH;
+        else if (direction==BlockFace.EAST) return BlockFace.SOUTH;
+        else if (direction==BlockFace.SOUTH) return BlockFace.WEST;
+        else if (direction==BlockFace.NORTH) return BlockFace.EAST;
+        else throw new IllegalArgumentException("Invalid block face: " + direction);
+    }
+
+    private static BlockFace getOppositeFace(BlockFace direction) {
+        if (direction==BlockFace.WEST) return BlockFace.EAST;
+        else if (direction==BlockFace.EAST) return BlockFace.WEST;
+        else if (direction==BlockFace.SOUTH) return BlockFace.NORTH;
+        else if (direction==BlockFace.NORTH) return BlockFace.SOUTH;
+        else throw new IllegalArgumentException("Invalid block face: " + direction);
+    }
 
 
+    private static BlockFace findSignDirection(byte signData) {
+        if (signData==0x2) return BlockFace.WEST;
+        else if (signData==0x3) return BlockFace.EAST;
+        else if (signData==0x4) return BlockFace.SOUTH;
+        else if (signData==0x5) return BlockFace.NORTH;
+        else throw new IllegalArgumentException("Invalid wall sign data value: " + signData);
+    }
+
+    private boolean checkForLevers(List<Block> outputs, Player player) {
         for (Block o : outputs) {
             if (o.getType()!=Material.LEVER) {
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Missing lever block attached to one or more outputs.");
+                player.sendMessage(rc.getPrefsManager().getErrorColor() + "A lever is missing from one or more outputs.");
                 return false;
             }
+        } return true;
+    }
+
+    private String[] getArgsFromSign(Sign sign) {
+        String sargs = sign.getLine(1) + " " + sign.getLine(2) + " " + sign.getLine(3);
+        StringTokenizer t = new StringTokenizer(sargs);
+        String[] args = new String[t.countTokens()];
+        int i = 0;
+        while (t.hasMoreElements()) {
+            args[i] = t.nextToken();
+            i++;
         }
 
-        if (outputs.size()>0 || inputs.size()>0) {
-            // we have a circuit
-            Sign sign = (Sign)blockClicked.getState();
-            String sargs = sign.getLine(1) + " " + sign.getLine(2) + " " + sign.getLine(3);
-            StringTokenizer t = new StringTokenizer(sargs);
-            String[] args = new String[t.countTokens()];
-            int i = 0;
-            while (t.hasMoreElements()) {
-                args[i] = t.nextToken();
-                i++;
-            }
-
-            try {
-                Circuit c = rc.getCircuitLoader().getCircuitInstance(sign.getLine(0).trim());
-                c.activationBlock = blockClicked;
-                c.outputBlock = outputBlock;
-                c.inputs = inputs.toArray(new Block[inputs.size()]);
-                c.outputs = outputs.toArray(new Block[outputs.size()]);
-                c.structure = structure.toArray(new Block[structure.size()]);
-                c.lastLineBlock = lastLineBlock;
-                c.args = args;
-
-                if (c.initCircuit(player, args, rc)) {
-                    circuits.add(c);
-                    addInputLookup(c);
-                    addOutputLookup(c);
-                    addStructureLookup(c);
-                    saveCircuits();
-                    player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
-                    return true;
-                } else {
-                    player.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
-                    return false;
-                }
-            } catch (IllegalArgumentException ex) {
-                // unknown circuit name
-            } catch (InstantiationException ex) {
-                ex.printStackTrace();
-                rc.log(Level.WARNING, ex.toString());
-            } catch (IllegalAccessException ex) {
-                ex.printStackTrace();
-                rc.log(Level.WARNING, ex.toString());
-            }
-        }
-
-        // if we reached this point the circuit wasn't created.
-        return false;
+        return args;
     }
 
     public void checkCircuitDestroyed(Block b, Player p) {
