@@ -1,5 +1,8 @@
-xor gate 
-----------
+---
+layout: main
+title: xor gate
+---
+
 Performs a logical XOR operation on any number of bit groups and outputs the result.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/xor.java)

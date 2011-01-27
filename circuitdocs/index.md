@@ -4,22 +4,22 @@ title: Basic Circuits documentation
 ---
 
 ## logic gates
-[not](Not.md), [and](And.md), [or](Or.md), [xor](Xor.md)
+[not](Not.html), [and](And.html), [or](Or.html), [xor](Xor.html)
 
 ## integer arithmetic
-[adder](Adder.md), [multiplier](Multiplier.md), [divider](Divider.md), [random](Random.md)
+[adder](Adder.html), [multiplier](Multiplier.html), [divider](Divider.html), [random](Random.html)
 
 ## registers
-[flipflop](Flipflop.md), [shiftregister](Shiftregister.md), [pisoregister](Pisoregister.md)
+[flipflop](Flipflop.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html)
 
 ## basic digital circuits
-[clock](Clock.md), [counter](Counter.md), [encoder](Encoder.md), [decoder](Decoder.md), [multiplexer](Multiplexer.md), [demultiplexer](Demultiplexer.md), [pulse](Pulse.md)
+[clock](Clock.html), [counter](Counter.html), [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [pulse](Pulse.html)
 
 ## wireless communication
-[transmitter](Transmitter.md), [receiver](Receiver.md), [iptransmitter](Iptransmitter.md), [ipreceiver](Ipreceiver.md)
+[transmitter](Transmitter.html), [receiver](Receiver.html), [iptransmitter](Iptransmitter.html), [ipreceiver](Ipreceiver.html)
 
 ## actuators
-[print](Print.md), [pixel](Pixel.md), [synth](Synth.md)
+[print](Print.html), [pixel](Pixel.html), [synth](Synth.html)
 
 
 

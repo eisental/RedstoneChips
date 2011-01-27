@@ -3,13 +3,13 @@ layout: main
 title: RedstoneChips 0.7
 ---
 
-<p>RedstoneChips is a <a href="http://github.com/Bukkit">Bukkit</a> plugin that allows you to build custom integrated redstone
-    circuits on your minecraft server. Circuits can be built with any number of inputs and outputs and with any imaginable
+<p>RedstoneChips is a <a href="http://bukkit.org">Bukkit</a> plugin that allows you to build custom integrated redstone
+    circuits on your craftbukkit minecraft server. Circuits can be built with any number of inputs and outputs and with any imaginable
     structure. RedstoneChips currently consists of two plugins:</p>
 
 <ul>
 <li><a href="http://github.com/eisental/RedstoneChips"><strong>RedstoneChips-0.7</strong></a> - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.</li>
-<li><a href="http://github.com/eisental/BasicCircuits"><strong>BasicCircuits-0.7</strong></a> - The basic circuit package containing many different circuit classes. Check out the <a href="/RedstoneChips/circuitdocs/basiccircuits.md">circuitdocs</a> for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
+<li><a href="http://github.com/eisental/BasicCircuits"><strong>BasicCircuits-0.7</strong></a> - The basic circuit package containing many different circuit classes. Check out the <a href="/RedstoneChips/circuitdocs/index.html">circuitdocs</a> for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
 </ul>
 
 <p>RedstoneChips and BasicCircuits are currently under heavy development. Don't expect them to work as advertised or at all.
@@ -18,13 +18,13 @@ title: RedstoneChips 0.7
     in the <a href="http://forums.bukkit.org/threads/redstonechips-0-6-integrated-circuits-plugin.1205/">forum thread</a> at Bukkit.org
 </p>
 
-<p> To learn how to build redstone chips check the <a href="/RedstoneChips/howto.md">how-to</a> page. For a full documentation of available circuits in the BasicCircuits package check the <a href="/RedstoneChis/circuitdocs/index.ms">circuitdocs</a>
+<p> To learn how to build redstone chips check the <a href="/RedstoneChips/howto.html">how-to</a> page. For a full documentation of available circuits in the BasicCircuits package check the <a href="/RedstoneChis/circuitdocs/index.ms">circuitdocs</a>
 
 
 <h2>Installation</h2>
 
 <ul>
-<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your &lt;craftbukkit&gt;/plugins/RedstoneChips-XX folder to RedstoneChips-0.7 (or delete it to remove previous settings).</li>
+<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <code>&lt;craftbukkit&gt;/plugins/RedstoneChips-XX</code> folder to <code>RedstoneChips-0.7</code> (or delete it to remove previous settings).</li>
 <li>Download the <a href="/eisental/RedstoneChips/RedstoneChips-0.7.jar">RedsoneChips 0.7</a> jar file.</li>
 <li>Download the <a href="/eisental/BasicCircuits/BasicCircuits-0.7.jar">BasicCircuits 0.7</a> jar file.</li>
 <li>Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.</li>
@@ -32,7 +32,7 @@ title: RedstoneChips 0.7
 
 <p>On the first time craftbukkit is started with the plugin installed, it will create a folder inside the craftbukkit plugins folder
 and a preferences.yml file inside it. The file redstonechip.circuits is created after activating a circuit for the first time and contain all the information required to reactivate the circuits after a server restart.
-You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the /redchips-prefs command (see <a href="/RedstoneChips/howto.md">how-to</a> for command info).
+You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the /redchips-prefs command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
 </p>
 
 <h2>Changelog</h2>
@@ -52,11 +52,11 @@ You can change the block types used to construct a circuit and other settings by
 <h4>BasicCircuits 0.7</h4>
 <ul>
 <li>iptransmitter and ipreceiver are disabled for the time being.</li>
-<li>New <a href="/RedstoneChips/circuitdocs/Synth.md">synth</a> circuit for controlling noteblocks.</li>
+<li>New <a href="/RedstoneChips/circuitdocs/Synth.html">synth</a> circuit for controlling noteblocks.</li>
 <li>Support for 1-bit pixel circuits.</li>
-<li>New <a href="/RedstoneChips/circuitdocs/Counter.md">counter</a> sign arguments, min, max and direction.</li>
-<li>Added debug messages to <a href="/RedstoneChips/circuitdocs/Counter.md">counter</a>.</li>
+<li>New <a href="/RedstoneChips/circuitdocs/Counter.html">counter</a> sign arguments, min, max and direction.</li>
+<li>Added debug messages to <a href="/RedstoneChips/circuitdocs/Counter.html">counter</a>.</li>
 <li>Changes to pixel, synth, and print to support multiple interface blocks.</li>
-<li><a href="/RedstoneChips/circuitdocs/Encoder.md">encoder</a> now only requires that the number of inputs be less than or equal to the maximum number that can be represented by its outputs.</li>
+<li><a href="/RedstoneChips/circuitdocs/Encoder.html">encoder</a> now only requires that the number of inputs be less than or equal to the maximum number that can be represented by its outputs.</li>
 </ul>
 <p>For older changelogs look at the <a href="http://github.com/eisental/BasicCircuits">github pages</a></p>
