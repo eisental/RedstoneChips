@@ -109,7 +109,7 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_RIGHTCLICKED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
-
+        pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
         PluginDescriptionFile desc = this.getDescription();
         logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");
     }

@@ -72,7 +72,7 @@ public class CircuitManager {
                 return;
             }
 
-            // then check if the sign points to a known circuit type
+            // then check if the sign text points to a known circuit type
             if (!rc.getCircuitLoader().getCircuitClasses().containsKey(sign.getLine(0).trim())) return;
 
             List<Block> inputs = new ArrayList<Block>();
@@ -263,6 +263,14 @@ public class CircuitManager {
             destroyed.circuitDestroyed();
             circuits.remove(destroyed);
             removeCircuitLookups(destroyed);
+
+            for (Block output : destroyed.outputs) {
+                if (output.getType()==Material.LEVER) {
+                    // turn lever off
+                    output.setData((byte)(output.getData()&0x7));
+                }
+            }
+
             rc.getCircuitPersistence().saveCircuits(circuits);
         }
     }

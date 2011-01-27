@@ -77,7 +77,7 @@ public class PrefsManager {
             Yaml yaml = new Yaml(prefDump);
             prefs = (Map<String, Object>)yaml.load(new FileInputStream(propFile));
             if (prefs==null) prefs = new HashMap<String, Object>();
-            loadDefaultsIfNeeded(inpBTKey, oBTKey, cBTKey, iCKey, eCKey, dCKey);
+            loadDefaultsIfNeeded(inpBTKey, oBTKey, cBTKey, intBTKey, iCKey, eCKey, dCKey);
 
             try {
                 inputBlockType = findMaterial(prefs.get(inpBTKey));
