@@ -3,12 +3,12 @@ layout: main
 title: synth
 ---
 
-Sets the pitch of any note block connected to one of its interface blocks according to its data pins. 
+Sets the pitch of any note block connected to one of its interface blocks according to the state of its data pins. 
 You still need to trigger the note block somehow to make it play its note.
 
 There are two ways to use this circuit. 
 
-1. Use without any sign arguments (just write `synth` on the sign). The noteblock pitch is set according to the value of the data pins. Possible values are between 0 to f#1 to 24 for f#3. This mode requires 1-4 data pins and 1 clock pin. For example, send 00110 (decimal 6) to the data pins, and then trigger the clock input to update the noteblocks pitch to c2. 
+1. Use without any sign arguments (just write `synth` on the sign). The noteblock pitch is set according to the value of the data pins. Possible values are between 0 (f#1) to 24 (f#3). This mode requires 1-4 data pins and 1 clock pin. For example, send 00110 (decimal 6) to the data pins, and then trigger the clock input to update the noteblocks pitch to c2. 
 2. Use a note index by adding a list of notes to the sign. These can be either note numbers or note names. Note names should be always be written with a note name and an octave number afterwards - for ex. f#1, eb2, g2, are all valid note names. 
 The pitch is then set by setting the data pins to one of the note indexes. For example if your sign text (from the 2nd line) is 'f#2 a2 c#3', setting the pins to 0 and triggering the clock will set the block's pitch to f#2, setting the pins to 1 will set the pitch to a2 and setting them to 3 will set the pitch to c#3. You can have as many pitches as you like as long as they fit on the sign.
 
