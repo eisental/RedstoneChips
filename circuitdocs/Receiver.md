@@ -15,4 +15,4 @@ Outputs any data sent wirelessly by a [transmitter](Transmitter) chip over the c
 1. `   receiver   `
 2. `  <broadcast channel> ` (NOT optional)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

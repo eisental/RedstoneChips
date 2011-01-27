@@ -10,6 +10,9 @@ Any data that is sent to the ipreceiver's port number (using the server address)
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 
+* * *
+
+
 #### I/O setup 
 * Can have any number of outputs and 0 inputs
 
@@ -17,4 +20,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 1. `   receiver   `
 2. `  <port> ` (NOT optional)
 
-##### Version history: Added to BasicCircuits 0.6
+__Version history:__ Added to BasicCircuits 0.6

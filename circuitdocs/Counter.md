@@ -8,6 +8,9 @@ The bit-size of the counter is set by the number of output pins. When the counte
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/counter.java)
 
+* * *
+
+
 #### I/O setup 
 * Should have 2 inputs and any number of outputs.
 * input 0 (inc): When set to high the counter output is incremented by 1.
@@ -16,4 +19,4 @@ The bit-size of the counter is set by the number of output pins. When the counte
 #### Sign text
 1. `   counter   `
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

@@ -9,6 +9,9 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/shiftregister.java)
 
+* * *
+
+
 #### I/O setup 
 * Should have 2 inputs and any number of outputs.
 * Input pin 0: clock input
@@ -19,4 +22,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 ***
 back to [Circuit Classes](Home)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

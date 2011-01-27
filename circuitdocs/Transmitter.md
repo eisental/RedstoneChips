@@ -10,6 +10,9 @@ A transmitter with one input pin doesn't have a send pin and it will send a mess
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/transmitter.java)
 
+* * *
+
+
 #### I/O setup 
 * input 0 is the send pin unless only the transmitter uses only 1 input pin.
 * inputs 1 and above are the data pins.
@@ -21,4 +24,4 @@ A transmitter with one input pin doesn't have a send pin and it will send a mess
 ***
 back to [Circuit Classes](Home)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

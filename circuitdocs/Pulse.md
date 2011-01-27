@@ -7,6 +7,9 @@ A pulse generator. When one of the inputs changes from off to on, the correspond
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pulse.java)
     
+* * *
+
+
 #### I/O setup 
 * Can have any number of input, output pairs. At least 1 pair is required.
 
@@ -14,4 +17,4 @@ A pulse generator. When one of the inputs changes from off to on, the correspond
 1. `   pixel   `
 2. `  [duration] ` (default value is 1sec)
 
-##### Version history: Added to BasicCircuits 0.6
+__Version history:__ Added to BasicCircuits 0.6

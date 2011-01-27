@@ -9,6 +9,9 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/demultiplexer.java)
 
+* * *
+
+
 #### I/O setup 
 * Number of outputs must be a multiple of <output sets count> argument.
 * bit-size is determined by number of outputs / <output sets count> argument.
@@ -22,4 +25,4 @@ as well as 4 groups of 4-bit output pins - total of 16 outputs.
 1. `   multiplexer   `
 2. ` <output sets count> ` (NOT optional)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

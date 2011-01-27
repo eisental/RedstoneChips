@@ -12,6 +12,9 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/multiplexer.java)
 
+* * *
+
+
 #### I/O setup 
 * Number of outputs determine the bit-size.
 * First log2(input sets count) pins are the select pins. 
@@ -22,4 +25,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 1. `   multiplexer   `
 2. ` <input sets count> ` (NOT optional)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

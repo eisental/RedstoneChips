@@ -18,6 +18,9 @@ A second sign argument with the word 'add' would cause the chip to add any new p
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/print.java)
 
+* * *
+
+
 #### I/O setup 
 * At least 2 inputs and 0 outputs. 
 
@@ -26,4 +29,4 @@ A second sign argument with the word 'add' would cause the chip to add any new p
 2. `  <type> ` (Not optional)
 3. ` [add] `
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

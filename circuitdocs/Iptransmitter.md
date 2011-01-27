@@ -13,6 +13,9 @@ An iptransmitter with only 1 input is also possible. In that case whenever the i
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 
+* * *
+
+
 #### I/O setup 
 * input 0 is the send pin.
 * inputs 1 and above are the data pins.
@@ -22,4 +25,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 1. `   iptransmitter   `
 2. ` <address> <port> ` (NOT optional)
 
-##### Version history: Added to BasicCircuits 0.6
+__Version history:__ Added to BasicCircuits 0.6

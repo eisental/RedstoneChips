@@ -14,6 +14,9 @@ There are two ways to use this circuit.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pixel.java)
 
+* * *
+
+
 #### Colors and IDs (Case insensitive)
 - 0: White
 - 1: Orange
@@ -40,4 +43,4 @@ There are two ways to use this circuit.
 1. `   pixel   `
 2. `  [color] ... [color] ` 
 
-##### Version history: Added to BasicCircuits 0.6
+__Version history:__ Added to BasicCircuits 0.6

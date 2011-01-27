@@ -7,6 +7,9 @@ Performs a logical OR operation on any number of bit groups and outputs the resu
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/or.java)
 
+* * *
+
+
 #### I/O setup 
 * Number of output pins sets the word length of each bit set.  
 * Number of input pins can be any multiple of the word length.
@@ -14,5 +17,5 @@ Performs a logical OR operation on any number of bit groups and outputs the resu
 #### Sign text
 `   or   `
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1
 

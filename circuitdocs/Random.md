@@ -8,10 +8,13 @@ The chip can have any number of matching inputs and outputs.
  
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/random.java)
 
+* * *
+
+
 #### I/O setup 
 * Must have the same number of outputs and inputs.
 
 #### Sign text
 1. `   random   `
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1

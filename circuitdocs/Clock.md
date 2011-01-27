@@ -18,6 +18,9 @@ This would probably use game ticks when bukkit supports tick events.
  
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/clock.java)
 
+* * *
+
+
 #### I/O setup 
 * Should have the same number of inputs and outputs.
 
@@ -26,4 +29,4 @@ This would probably use game ticks when bukkit supports tick events.
 2. ` [frequency] `
 3. ` [pulse-width] ` (default is 0.5)
 
-##### Version history: Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.1
