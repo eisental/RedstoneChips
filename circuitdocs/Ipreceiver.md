@@ -17,6 +17,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 1. `   receiver   `
 2. `  <port> ` (NOT optional)
 
-__New in BasicCircuits 0.6__
-***
-back to [Circuit Classes](Home)
+##### Version history: Added to BasicCircuits 0.6

@@ -21,4 +21,4 @@ A transmitter with one input pin doesn't have a send pin and it will send a mess
 ***
 back to [Circuit Classes](Home)
 
-### Version history: Added on BasicCircuits 0.1
+##### Version history: Added to BasicCircuits 0.1

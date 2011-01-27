@@ -14,7 +14,5 @@ Performs a logical OR operation on any number of bit groups and outputs the resu
 #### Sign text
 `   or   `
 
-***
-back to [Circuit Classes](Home)
-
+##### Version history: Added to BasicCircuits 0.1
 

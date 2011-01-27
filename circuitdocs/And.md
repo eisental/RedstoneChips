@@ -14,9 +14,6 @@ Performs a logical AND operation on any number of bit groups and outputs the res
 #### Sign text
 `   and   `
 
-***
-
-back to [Circuit Classes](Home)
-
+##### Version history: Added to BasicCircuits 0.1
 
 

@@ -14,8 +14,6 @@ There are two ways to use this circuit.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pixel.java)
 
-<iframe title="YouTube video player" class="youtube-player" type="text/html" width="480" height="390" src="http://www.youtube.com/embed/wj51vULmLXM?rel=0" frameborder="0" allowFullScreen></iframe>
-
 #### Colors and IDs (Case insensitive)
 - 0: White
 - 1: Orange
@@ -41,7 +39,5 @@ There are two ways to use this circuit.
 #### Sign text
 1. `   pixel   `
 2. `  [color] ... [color] ` 
-***
 
-
-back to [Circuit Classes](Home)
+##### Version history: Added to BasicCircuits 0.6

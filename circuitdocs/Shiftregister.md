@@ -19,4 +19,4 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 ***
 back to [Circuit Classes](Home)
 
-### Version history: Added on BasicCircuits 0.1
+##### Version history: Added to BasicCircuits 0.1

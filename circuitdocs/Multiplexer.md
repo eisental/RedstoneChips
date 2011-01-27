@@ -21,5 +21,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 #### Sign text
 1. `   multiplexer   `
 2. ` <input sets count> ` (NOT optional)
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

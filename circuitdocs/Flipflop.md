@@ -10,5 +10,5 @@ A flipflop register of any bit size. When an input is set to high, its correspon
 * Number of inputs 
 #### Sign text
 1. `   flipflop   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

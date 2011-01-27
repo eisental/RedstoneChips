@@ -13,5 +13,5 @@ The chip can have any number of matching inputs and outputs.
 
 #### Sign text
 1. `   random   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

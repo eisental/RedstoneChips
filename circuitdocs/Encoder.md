@@ -15,5 +15,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Priority_encoder)
 
 #### Sign text
 1. `   encoder   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

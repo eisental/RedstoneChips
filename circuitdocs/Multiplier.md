@@ -16,5 +16,5 @@ If an optional constant argument is added to the sign text, the IC will multiply
 1. `   multiplier   `
 
 2. ` [constant number]  `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

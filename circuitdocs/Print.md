@@ -25,5 +25,5 @@ A second sign argument with the word 'add' would cause the chip to add any new p
 1. `   print   `
 2. `  <type> ` (Not optional)
 3. ` [add] `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

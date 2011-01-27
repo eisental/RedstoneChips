@@ -17,4 +17,4 @@ If an optional constant argument is added to the sign text, the IC will add it t
 
 2. ` [constant number]  `
 
-### Version history: Added to BasicCircuits 0.1
+##### Version history: Added to BasicCircuits 0.1

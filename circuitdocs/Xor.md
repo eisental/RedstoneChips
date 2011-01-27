@@ -14,4 +14,4 @@ Performs a logical XOR operation on any number of bit groups and outputs the res
 #### Sign text
 `   xor   `
 
-### Version history: Added on BasicCircuits 0.2
+##### Version history: Added to BasicCircuits 0.1

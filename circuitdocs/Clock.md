@@ -25,5 +25,5 @@ This would probably use game ticks when bukkit supports tick events.
 1. `   clock   `
 2. ` [frequency] `
 3. ` [pulse-width] ` (default is 0.5)
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

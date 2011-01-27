@@ -11,5 +11,5 @@ Can have any number of input, output pairs.
 
 #### Sign text
 1. `   not   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.6

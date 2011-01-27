@@ -21,5 +21,5 @@ as well as 4 groups of 4-bit output pins - total of 16 outputs.
 #### Sign text
 1. `   multiplexer   `
 2. ` <output sets count> ` (NOT optional)
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

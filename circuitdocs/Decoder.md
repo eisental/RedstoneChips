@@ -17,5 +17,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Decoder)
 
 #### Sign text
 1. `   decoder   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

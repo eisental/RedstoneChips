@@ -18,5 +18,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 * Input pins 3 and above: data input
 #### Sign text
 1. `   shiftregister   `
-***
-back to [Circuit Classes](Home)
+
+##### Version history: Added to BasicCircuits 0.1

@@ -16,5 +16,4 @@ The bit-size of the counter is set by the number of output pins. When the counte
 #### Sign text
 1. `   counter   `
 
-***
-back to [Circuit Classes](Home)
+##### Version history: Added to BasicCircuits 0.1
