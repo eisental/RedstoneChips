@@ -3,21 +3,21 @@ layout: main
 title: RedstoneChips Usage Guide
 ---
 
-How to build an IC
-===================
+Building a Chip
+---------------
 
 
 
 Chip detection scanning rules
-=============================
+------------------------------
 
 
 
 Debugging methods
-=================
+-----------------
 
 
 
 Plugin commands
-===============
+----------------
 
