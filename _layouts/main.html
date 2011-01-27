@@ -1,12 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
- "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
- <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-	<head>
-		<title>{{ page.title }}</title>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<meta http-equiv="content-language" content="en" />
-	</head>
-	<body>
-		{{ content }}
-	</body>
- </html>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ page.title }} - eisental</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="/css/screen.css" type="text/css" />
+	<link rel="stylesheet" href="/css/highlight.css" type="text/css" />
+	<link rel="stylesheet" href="/css/custom.css" type="text/css" />
+</head>
+<body class="page_{{ page.class }}">
+	<div class="container">	
+		<div class="header span-24 last">
+			<h1 id="top">RedstoneChips</h1>
+		</div>
+		<div class="nav span-3">
+			<ul>
+				<li><a href="/index.html" id="intro">introduction</a></li>
+				<li><a href="/circuitdocs/basiccircuits.md" id="circuitdocs">circuit docs</a></li>
+				<li><a href="/vidsnshots.html" id="vidsnshots">vids & screenshots</a></li>
+				<li><a href="mailto:redstonechips@gmail.com">mail</a></li>
+				<li><a href="mailto:redstonechips@gmail.com">donate</a></li>
+			</ul>
+		</div>
+		<div class="content span-21 last">
+			{{ content }}
+		</div>
+		<div class="footer span-24 last">
+			<p><a href="#top">&uarr;</a> <a href="/blog.xml">rss</a> powered by <a href="http://wiki.github.com/mojombo/jekyll">Jekyll</a> and <a href="http://github.com">GitHub</a>.</p>
+		</div>
+	</div>
+	<a href="http://github.com/eisental"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+</body>
+</html>
