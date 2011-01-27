@@ -1,5 +1,8 @@
-print
-----------
+---
+layout: main
+title: print
+---
+
 Prints the data pins (inputs 1 and above) as text on a sign block when the clock pin (input 0) is set to high. The sign should be placed on the output block, 1 block after the last body block of the circuit. This means you can also place it as a wall-sign on the opposite end of the circuit to the circuit sign.
 
 The first sign argument sets the way the data is printed to the sign.

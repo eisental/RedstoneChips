@@ -1,5 +1,8 @@
-demultiplexer
-----------
+---
+layout: main
+title: demultiplexer
+---
+
 The reverse operation of the [multiplexer](Multiplexer) chip. Sends one set of input data to a selected output set.
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)

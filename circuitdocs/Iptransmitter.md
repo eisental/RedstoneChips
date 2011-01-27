@@ -1,5 +1,8 @@
-iptransmitter
-----------
+---
+layout: main
+title: iptransmitter
+---
+
 Transmit your messages to anywhere in the known universe. Works exactly the same as the [transmitter](Transmitter) circuit except that the input bits are sent over UDP to any internet address.
 You can use it together with ipreceiver to send and receive bits between minecraft servers.
 

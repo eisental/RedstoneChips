@@ -1,5 +1,8 @@
-ipreceiver
-----------
+---
+layout: main
+title: ipreceiver
+---
+
 Receive messages from anywhere in the known universe. Works exactly the same as the [receiver](Receiver) circuit only it's set to listen for incoming messages on a UDP port from any internet address.
 Any data that is sent to the ipreceiver's port number (using the server address) would cause the circuit to change its outputs accordingly.
 

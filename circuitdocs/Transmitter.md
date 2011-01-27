@@ -20,3 +20,5 @@ A transmitter with one input pin doesn't have a send pin and it will send a mess
 2. ` <broadcast channel> ` (NOT optional)
 ***
 back to [Circuit Classes](Home)
+
+### Version history: Added on BasicCircuits 0.1

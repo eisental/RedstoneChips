@@ -1,6 +1,9 @@
-shiftregister
-----------
- A SIPO shift register. Can be built with any bit-length determined by the number of output pins.
+---
+layout: main
+title: shiftregister
+---
+
+A SIPO shift register. Can be built with any bit-length determined by the number of output pins.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
@@ -15,3 +18,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 1. `   shiftregister   `
 ***
 back to [Circuit Classes](Home)
+
+### Version history: Added on BasicCircuits 0.1

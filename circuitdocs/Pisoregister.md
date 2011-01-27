@@ -1,5 +1,8 @@
-pisoregister
-----------
+---
+layout: main
+title: pisoregister
+---
+
 A PISO shift register. Can be built with any bit-length determined by the number of input pins.
 When write/shift pin is set to HIGH, the data input values are stored in the register.
 Once the write/shift pin is set to LOW, any pulse in clock input will set the output pin to the next register bit.

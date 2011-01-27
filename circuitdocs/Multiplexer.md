@@ -1,5 +1,8 @@
-multiplexer
-----------
+---
+layout: main
+title: multiplexer
+---
+
 A multiplexer chip capable of multiplexing any number of input sets of any size. Number of outputs determine the bit-size.
 
 For example, to build a 4 bit multiplexer that can select one input out of 3 you would need 2 select inputs, and 3 input sets of 4 pins each.

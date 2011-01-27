@@ -1,5 +1,8 @@
-decoder
-----------
+---
+layout: main
+title: decoder
+---
+
 Reverse operation of the [encoder](Encoder) chip.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Decoder)

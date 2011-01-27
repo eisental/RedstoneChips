@@ -1,6 +1,9 @@
-encoder
-----------
- A priority encoder circuit of any size. Bit size is determined by the number of outputs.
+---
+layout: main
+title: encoder
+---
+
+A priority encoder circuit of any size. Bit size is determined by the number of outputs.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Priority_encoder)
 

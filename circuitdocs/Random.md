@@ -1,5 +1,8 @@
-random
-----------
+---
+layout: main
+title: random
+---
+
 When one of the input pins becomes high its corresponding output pin is randomly set (50% chance) to either on or off.
 The chip can have any number of matching inputs and outputs.
  

@@ -1,5 +1,8 @@
-divider
-----------
+---
+layout: main
+title: divider
+---
+
 Performs an arithmetic division on any number of bit sets and outputs the result as a binary number.
 If an optional constant argument is added to the sign text, the IC will divide the result by the constant.
 

@@ -1,6 +1,9 @@
-counter
-----------
- A counter chip of any bit-size (limited to 32bits at the moment). Outputs a binary number representing the current count value. 
+---
+layout: main
+title: counter
+---
+
+A counter chip of any bit-size (limited to 32bits at the moment). Outputs a binary number representing the current count value. 
 The bit-size of the counter is set by the number of output pins. When the counter value overflows the number of output bits it goes back to 0.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/counter.java)

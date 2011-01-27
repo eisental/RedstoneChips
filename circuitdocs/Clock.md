@@ -1,5 +1,8 @@
-clock
-----------
+---
+layout: main
+title: clock
+---
+
 Simple clock chip with any number of triggerable outputs. Whenever an input pin is set to high, the corresponding output pin will start sending clock pulses. Only one clock is actually used in each chip causing the outputs to be synchronised.
 Pulse width is currently 50%. 
 

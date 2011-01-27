@@ -1,5 +1,8 @@
-pixel
-----------
+---
+layout: main
+title: pixel
+---
+
 Changes dye color of any wool block placed in a 3x3x3 cube around the output block (one block after the last chip block).
 
 When the clock pin (input 0) is set to HIGH, the circuit will update wool color according to the value of the input pins.  

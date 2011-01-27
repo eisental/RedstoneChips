@@ -1,5 +1,8 @@
-or gate 
-----------
+---
+layout: main
+title: or gate
+---
+
 Performs a logical OR operation on any number of bit groups and outputs the result.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/or.java)

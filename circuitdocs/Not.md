@@ -1,5 +1,7 @@
-not
-----------
+---
+layout: main
+title: not gate
+---
 A NOT gate. When an input state changes, it's corresponding output pin is set to the inverted value. 
 Can have any number of input, output pairs.
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/not.java)

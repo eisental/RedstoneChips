@@ -1,5 +1,8 @@
-multiplier
-----------
+---
+layout: main
+title: multiplier
+---
+
 Performs an arithmetic multiplication on any number of bit sets and outputs the result as a binary number.
 If an optional constant argument is added to the sign text, the IC will multiply the result by the constant.
 
