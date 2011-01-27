@@ -1,4 +1,4 @@
-package org.tal.redstonechips;
+package org.tal.redstonechips.circuit;
 
 import java.util.HashMap;
 import java.util.Map;

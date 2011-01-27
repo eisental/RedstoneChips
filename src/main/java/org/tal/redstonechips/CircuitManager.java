@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public class CircuitManager {
             List<Block> inputs = new ArrayList<Block>();
             List<Block> outputs = new ArrayList<Block>();
             List<Block> structure = new ArrayList<Block>();
-            List<Block> interactions = new ArrayList<Block>();
+            List<Block> interfaceBlocks = new ArrayList<Block>();
 
             structure.add(signBlock);
             
@@ -86,7 +87,7 @@ public class CircuitManager {
 
             if (firstChipBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
                 structure.add(firstChipBlock);
-                scanBranch(firstChipBlock, direction, inputs, outputs, interactions, structure);
+                scanBranch(firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
 
                 if (outputs.size()>0 || inputs.size()>0) {
                     if (!checkForLevers(outputs, player)) return;
@@ -98,7 +99,7 @@ public class CircuitManager {
                         c.inputs = inputs.toArray(new Block[inputs.size()]);
                         c.outputs = outputs.toArray(new Block[outputs.size()]);
                         c.structure = structure.toArray(new Block[structure.size()]);
-                        c.interactionBlocks = interactions.toArray(new Block[interactions.size()]);
+                        c.interfaceBlocks = interfaceBlocks.toArray(new Block[interfaceBlocks.size()]);
 
                         c.args = args;
 
@@ -127,51 +128,51 @@ public class CircuitManager {
         }
     }
 
-    private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
-        // look in every horizontal direction for inputs, outputs or interaction blocks.
-        checkAttachedIO(origin, direction, inputs, outputs, interactions, structure);
+    private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+        // look in every horizontal direction for inputs, outputs or interface blocks.
+        checkAttachedIO(origin, direction, inputs, outputs, interfaces, structure);
 
         // look in every direction, inculding up and down for more chip blocks.
-        checkAttachedChipBlock(origin, direction, inputs, outputs, interactions, structure);
+        checkAttachedChipBlock(origin, direction, inputs, outputs, interfaces, structure);
     }
 
-    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         
         // look for chip blocks in original direction
-        checkForChipBlockOnSideFace(origin, direction, inputs, outputs, interactions, structure);
+        checkForChipBlockOnSideFace(origin, direction, inputs, outputs, interfaces, structure);
         
         // look backwards. Structure should already contain this block unless last checked block was below or above.
-        checkForChipBlockOnSideFace(origin, getOppositeFace(direction), inputs, outputs, interactions, structure);
+        checkForChipBlockOnSideFace(origin, getOppositeFace(direction), inputs, outputs, interfaces, structure);
 
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
         Block up = origin.getFace(BlockFace.UP);
         if (!structure.contains(up) && up.getType()==rc.getPrefsManager().getChipBlockType()) {
             structure.add(up);
-            scanBranch(up, direction, inputs, outputs, interactions, structure);
+            scanBranch(up, direction, inputs, outputs, interfaces, structure);
         }
 
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
         Block down = origin.getFace(BlockFace.DOWN);
         if (!structure.contains(down) && down.getType()==rc.getPrefsManager().getChipBlockType()) {
             structure.add(down);
-            scanBranch(down, direction, inputs, outputs, interactions, structure);
+            scanBranch(down, direction, inputs, outputs, interfaces, structure);
         }
 
         // look for chip blocks to the right
-        checkForChipBlockOnSideFace(origin, getRightFace(direction), inputs, outputs, interactions, structure);
+        checkForChipBlockOnSideFace(origin, getRightFace(direction), inputs, outputs, interfaces, structure);
         
         // look for chip blocks to the left
-        checkForChipBlockOnSideFace(origin, getLeftFace(direction), inputs, outputs, interactions, structure);
+        checkForChipBlockOnSideFace(origin, getLeftFace(direction), inputs, outputs, interfaces, structure);
     }
 
-    private void checkAttachedIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
-        checkForIO(origin, getRightFace(face), inputs, outputs, interactions, structure);
-        checkForIO(origin, getLeftFace(face), inputs, outputs, interactions, structure);
-        checkForIO(origin, face, inputs, outputs, interactions, structure);
-        checkForIO(origin, getOppositeFace(face), inputs, outputs, interactions, structure);
+    private void checkAttachedIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+        checkForIO(origin, getRightFace(face), inputs, outputs, interfaces, structure);
+        checkForIO(origin, getLeftFace(face), inputs, outputs, interfaces, structure);
+        checkForIO(origin, face, inputs, outputs, interfaces, structure);
+        checkForIO(origin, getOppositeFace(face), inputs, outputs, interfaces, structure);
     }
 
-    private void checkForIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+    private void checkForIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         Block b = origin.getFace(face);
         if (!structure.contains(b)) {
             if (b.getType()==rc.getPrefsManager().getInputBlockType()) {
@@ -182,19 +183,19 @@ public class CircuitManager {
                 Block o = b.getFace(face);
                 structure.add(o);
                 outputs.add(o);
-            } else if (b.getType()==rc.getPrefsManager().getInteractionBlockType()) {
+            } else if (b.getType()==rc.getPrefsManager().getInterfaceBlockType()) {
                 structure.add(b);
-                interactions.add(b.getFace(face));
+                interfaces.add(b.getFace(face));
             }
         }
     }
 
-    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interactions, List<Block> structure) {
+    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         Block b = origin.getFace(face);
         if (!structure.contains(b)) {
             if (b.getType()==rc.getPrefsManager().getChipBlockType()) {
                 structure.add(b);
-                scanBranch(b, face, inputs, outputs, interactions, structure);
+                scanBranch(b, face, inputs, outputs, interfaces, structure);
             }
         }
     }

@@ -29,7 +29,7 @@ public class PrefsManager {
     private static final String cBTKey = "chipBlockType";
     private static final String inpBTKey = "inputBlockType";
     private static final String oBTKey = "outputBlockType";
-    private static final String intBTKey = "interactionBlockType";
+    private static final String intBTKey = "interfaceBlockType";
 
     private static final String iCKey = "infoColor";
     private static final String eCKey = "errorColor";
@@ -42,7 +42,7 @@ public class PrefsManager {
     private Material chipBlockType;
     private Material inputBlockType;
     private Material outputBlockType;
-    private Material interactionBlockType;
+    private Material interfaceBlockType;
 
     private ChatColor infoColor;
     private ChatColor errorColor;
@@ -82,7 +82,7 @@ public class PrefsManager {
             try {
                 inputBlockType = findMaterial(prefs.get(inpBTKey));
                 outputBlockType = findMaterial(prefs.get(oBTKey));
-                interactionBlockType = findMaterial(prefs.get(intBTKey));
+                interfaceBlockType = findMaterial(prefs.get(intBTKey));
                 chipBlockType = findMaterial(prefs.get(cBTKey));
             } catch (IllegalArgumentException ie) {
                 rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
@@ -160,8 +160,8 @@ public class PrefsManager {
         return chipBlockType;
     }
 
-    public Material getInteractionBlockType() {
-        return interactionBlockType;
+    public Material getInterfaceBlockType() {
+        return interfaceBlockType;
     }
 
     public ChatColor getErrorColor() {

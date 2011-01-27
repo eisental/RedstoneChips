@@ -1,4 +1,4 @@
-package org.tal.redstonechips;
+package org.tal.redstonechips.circuit;
 
 
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
@@ -45,9 +46,9 @@ public abstract class Circuit {
     public Block[] structure;
 
     /**
-     * Interaction blocks. Used for interaction points with the physical world.
+     * Interface blocks. Used for interaction points with the physical world.
      */
-    public Block[] interactionBlocks;
+    public Block[] interfaceBlocks;
 
     /**
      * The sign block. Used to activate the circuit.

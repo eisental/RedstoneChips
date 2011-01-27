@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.circuit.Circuit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;

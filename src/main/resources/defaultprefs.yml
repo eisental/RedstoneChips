@@ -2,7 +2,7 @@
 chipBlockType: SANDSTONE
 inputBlockType: IRON_BLOCK
 outputBlockType: GOLD_BLOCK
-interactionBlockType: LAPIS_BLOCK
+interfaceBlockType: LAPIS_BLOCK
 
 ## chat colors
 infoColor: GREEN

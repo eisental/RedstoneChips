@@ -10,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockListener;
@@ -52,7 +53,8 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onBlockRedstoneChange(BlockFromToEvent event) {
-                circuitManager.redstoneChange((BlockRedstoneEvent)event);
+                if (!event.isCancelled());
+                    circuitManager.redstoneChange((BlockRedstoneEvent)event);
             }
 
             @Override
@@ -62,10 +64,18 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onBlockDamage(BlockDamageEvent event) {
-                if (event.getDamageLevel()==BlockDamageLevel.BROKEN)
-                    circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
+                if (!event.isCancelled()) {
+                    if (event.getDamageLevel()==BlockDamageLevel.BROKEN)
+                        circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
+                }
             }
 
+            @Override
+            public void onBlockBurn(BlockBurnEvent event) {
+                if (!event.isCancelled()) {
+                    circuitManager.checkCircuitDestroyed(event.getBlock(), null);
+                }
+            }
         };
 
         rcEntityListener = new EntityListener() {
@@ -75,6 +85,7 @@ public class RedstoneChips extends JavaPlugin {
                 for (Block b : event.blockList())
                     circuitManager.checkCircuitDestroyed(b, null);
             }
+
         };
     }
 

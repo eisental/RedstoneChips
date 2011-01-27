@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.circuit.Circuit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;

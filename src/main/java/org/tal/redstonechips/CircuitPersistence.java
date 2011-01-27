@@ -1,5 +1,6 @@
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -91,7 +92,7 @@ public class CircuitPersistence {
         map.put("activationBlock", makeBlockList(c.activationBlock));
         map.put("inputs", makeBlockListsList(c.inputs));
         map.put("outputs", makeBlockListsList(c.outputs));
-        map.put("interactions", makeBlockListsList(c.interactionBlocks));
+        map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
         map.put("structure", makeBlockListsList(c.structure));
         map.put("signArgs", c.args);
         map.put("state", c.saveState());
@@ -106,7 +107,7 @@ public class CircuitPersistence {
         c.activationBlock = getBlock((List<Integer>)map.get("activationBlock"), world);
         c.inputs = getBlockArray((List<List<Integer>>)map.get("inputs"), world);
         c.outputs = getBlockArray((List<List<Integer>>)map.get("outputs"), world);
-        c.interactionBlocks = getBlockArray((List<List<Integer>>)map.get("interactions"), world);
+        c.interfaceBlocks = getBlockArray((List<List<Integer>>)map.get("interfaces"), world);
         c.structure = getBlockArray((List<List<Integer>>)map.get("structure"), world);
         List<String> signArgs = (List<String>)map.get("signArgs");
         c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
