@@ -4,14 +4,14 @@ body {
 }
 
 a {
-	color: #88B304;
+	color: #46B068;
 	text-decoration: none;
 	padding: 3px;
 }
 
 a:hover {
 	color: #fff;
-	background-color: #91C000;
+	background-color: #46B068;
 }
 
 .header h1 {
@@ -42,17 +42,6 @@ a:hover {
 	padding: 0 5px 0 5px;
 	font-size: 20px;
 	display: block;
-}
-
-body.page_home a#home,
-body.page_blog a#blog,
-body.page_ a#blog,
-body.page_projects a#projects,
-body.page_snippets a#snippets,
-body.page_links a#links,
-body.page_me a#me {
-	background-color: #88B304;
-	color: #fff;
 }
 
 .content {
