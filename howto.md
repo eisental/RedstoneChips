@@ -23,7 +23,7 @@ Simple [adder](/RedstoneChips/circuitdocs/Adder.html) circuit. Input and output 
 
 
 
-A pixel circuit with a more complex structure. Input and output order is a bit harder to find out.  
+A [pixel](/RedstoneChips/circuitdocs/Pixel.html) circuit with a more complex structure. Input and output order is a bit harder to find out.  
 
 ![pixel circuit](/RedstoneChips/images/pixel2.png)
 
