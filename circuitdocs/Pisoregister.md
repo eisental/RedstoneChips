@@ -4,8 +4,9 @@ title: pisoregister
 ---
 
 A PISO shift register. Can be built with any bit-length determined by the number of input pins.
-When write/shift pin is set to HIGH, the data input values are stored in the register.
-Once the write/shift pin is set to LOW, any pulse in clock input will set the output pin to the next register bit.
+When write/shift pin is set to HIGH, the data input values are stored in the register. In this state the circuit is in write mode and will not
+send any output.
+Once the write/shift pin is set to LOW, the circuit changes into shift mode and any pulse in the clock input will set the output pin to the next register bit. Once the last bit has reached, the circuit will go back to data bit 0.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
@@ -13,13 +14,13 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 * * *
 
-
 #### I/O setup 
 * Should have at least 3 inputs and only one output.
 * Input pin 0: clock input
 * Input pin 1: write/shift pin
-* Input pins 3 and above: data input
+* Input pins 2 and above: data input
+
 #### Sign text
-1. `   shiftregister   `
+1. `   pisoregister   `
 
 __Version history:__ Added to BasicCircuits 0.1

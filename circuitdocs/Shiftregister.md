@@ -4,6 +4,7 @@ title: shiftregister
 ---
 
 A SIPO shift register. Can be built with any bit-length determined by the number of output pins.
+Each time the clock input is set to high, the register shifts one bit to the left and it's first bit is set to the current state of the data pin.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
@@ -13,7 +14,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 
 #### I/O setup 
-* Should have 2 inputs and any number of outputs.
+* Should have 2 inputs. Can have any number of outputs.
 * Input pin 0: clock input
 * Input pint 1: data input
 

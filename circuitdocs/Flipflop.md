@@ -11,7 +11,8 @@ A flipflop register of any bit size. When an input is set to high, its correspon
 
 
 #### I/O setup 
-* Number of inputs 
+* Can have any number of input/output pairs. Must have the same number of inputs and outputs.
+
 #### Sign text
 1. `   flipflop   `
 
