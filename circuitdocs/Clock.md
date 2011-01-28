@@ -20,8 +20,6 @@ Currently you can't have a clock tick faster than once every 200ms.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/clock.java)
 
-![Clock circuits](/RedstoneChips/images/clock.png "Clock circuits")
-
 * * *
 
 
@@ -32,5 +30,7 @@ Currently you can't have a clock tick faster than once every 200ms.
 1. `   clock   `
 2. ` [frequency] `
 3. ` [pulse-width] ` (default is 0.5)
+
+![Clock circuits](/RedstoneChips/images/clock.png "Clock circuits")
 
 __Version history:__ Added to BasicCircuits 0.1

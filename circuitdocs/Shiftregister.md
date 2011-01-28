@@ -10,7 +10,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/shiftregister.java)
 
-![a 4-bit shiftregister](/RedstoneChips/images/shiftregister.png "a 4-bit shiftregister")
+
 
 * * *
 
@@ -24,5 +24,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 1. `   shiftregister   `
 ***
 back to [Circuit Classes](Home)
+
+![a 4-bit shiftregister](/RedstoneChips/images/shiftregister.png "a 4-bit shiftregister")
 
 __Version history:__ Added to BasicCircuits 0.1

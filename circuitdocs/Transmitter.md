@@ -10,8 +10,6 @@ A transmitter with one input pin doesn't have a send pin and will send a message
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/transmitter.java)
 
-![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
-
 * * *
 
 
@@ -25,5 +23,7 @@ A transmitter with one input pin doesn't have a send pin and will send a message
 2. ` <broadcast channel> ` (NOT optional)
 ***
 back to [Circuit Classes](Home)
+
+![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
 
 __Version history:__ Added to BasicCircuits 0.1

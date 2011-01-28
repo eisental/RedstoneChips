@@ -8,8 +8,6 @@ The chip can have any number of matching inputs and outputs. It's also possible 
  
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/random.java)
 
-![Random in 1 input mode](/RedstoneChips/images/random.png "Random in 1 input mode")
-
 * * *
 
 #### I/O setup 
@@ -17,5 +15,7 @@ The chip can have any number of matching inputs and outputs. It's also possible 
 
 #### Sign text
 1. `   random   `
+
+![random in 1 input mode](/RedstoneChips/images/random.png "random in 1 input mode")
 
 __Version history:__ Added to BasicCircuits 0.1
