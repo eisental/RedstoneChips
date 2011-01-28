@@ -12,8 +12,8 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 Installation
 ------------
 * If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.7 (or delete it to remove previous settings).
-* Download the [RedsoneChips-0.7](http://eisental.github.com/eisental/RedstoneChips/RedstoneChips-0.7.jar) jar file.
-* Download the [BasicCircuits-0.7](http://eisental.github.com/eisental/BasicCircuits/BasicCircuits-0.7.jar) jar file.
+* Download the [RedsoneChips-0.7](http://github.com/eisental/RedstoneChips/RedstoneChips-0.7.jar) jar file.
+* Download the [BasicCircuits-0.7](http://github.com/eisental/BasicCircuits/BasicCircuits-0.7.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
