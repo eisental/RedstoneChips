@@ -54,6 +54,7 @@ Plugin commands
 
  - `/redchips-active` Lists every currently active circuit on the server.
  - `/redchips-classes` Prints a list of installed circuit classes.
+ - `/redchips-channels` Lists currently used transmitter/receiver broadcast channels. 
  - `/redchips-pin` Point your cross at one of the pins and enter the command to get the current state of the pin and its index. You have to point to the block where redstone current actually flows. That is, you need to point at levers, buttons or redstone wire and not at the output / input blocks.
  - `/redchips-debug` Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command. The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
  - `/redchips-prefs` Prints preferences.
