@@ -3,7 +3,7 @@ layout: main
 title: iptransmitter
 ---
 
-__NOTE:__ I decided to disable iptransmitter in BasicCircuits 0.7 until i get the time to work on it some more.
+__NOTE:__ ipreceiver and iptransmitter are disabled in BasicCircuits 0.7 until i find the time to work on them some more.
 
 Transmit your messages to anywhere in the known universe. Works exactly the same as the [transmitter](Transmitter) circuit except that the input bits are sent over UDP to any internet address.
 You can use it together with ipreceiver to send and receive bits between minecraft servers.
