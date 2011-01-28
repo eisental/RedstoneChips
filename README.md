@@ -6,7 +6,7 @@ Circuits can be built with any number of inputs and outputs and with any imagina
 two plugins:
 
 - RedstoneChips-0.7 - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
-- [BasicCircuits-0.7](http://github.com/eisental/BasicCircuits) - The basic circuit package containing many different circuit classes. Check out the circuitdocs for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
+- [BasicCircuits-0.71](http://github.com/eisental/BasicCircuits) - The basic circuit package containing many different circuit classes. Check out the circuitdocs for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
 
 __For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
 
@@ -14,7 +14,7 @@ Installation
 ------------
 * If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.7 (or delete it to remove previous settings).
 * Download the [RedsoneChips-0.7](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.7.jar) jar file.
-* Download the [BasicCircuits-0.7](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.7.jar) jar file.
+* Download the [BasicCircuits-0.71](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.71.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
