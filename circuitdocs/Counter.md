@@ -35,4 +35,5 @@ or
 or
 1. `   counter   `
 2. ` <min> <max> <direction> `
+
 __Version history:__ Added to BasicCircuits 0.1
