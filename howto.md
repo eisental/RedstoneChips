@@ -24,13 +24,9 @@ Simple [adder](/RedstoneChips/circuitdocs/Adder.html) circuit. Input and output 
 
 
 A [pixel](/RedstoneChips/circuitdocs/Pixel.html) circuit with a more complex structure. Input and output order is a bit harder to find out.  
+Interface blocks are connected on the "roof".
 
 ![pixel circuit](/RedstoneChips/images/pixel2.png)
-
-Destroying a Chip
------------------
-You can destroy a chip by breaking any of its structure blocks, including the output levers. Creepers, TNT explosions and fire (in case you're using flammable blocks) will also cause the IC to stop functioning.
-
 
 Chip detection scanning rules
 ------------------------------
@@ -49,6 +45,9 @@ One very important thing to note is that the recursive scanning process work by 
 
 The exact algorithm can be found at the [CircuitManager](http://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/CircuitManager.java) class.
 
+Destroying a Chip
+-----------------
+You can destroy a chip by breaking any of its structure blocks, including the output levers. Creepers, TNT explosions and fire (in case you're using flammable blocks) will also cause the IC to stop functioning.
 
 Plugin commands
 ----------------
