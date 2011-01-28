@@ -14,8 +14,6 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.util.TargetBlock;
 
 /**
@@ -27,7 +25,7 @@ public class CommandHandler {
     private final static int MaxLines = 15;
 
     public CommandHandler(RedstoneChips plugin) {
-        rc = plugin;
+        rc = plugin; 
     }
 
 
