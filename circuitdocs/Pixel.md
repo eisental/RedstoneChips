@@ -43,4 +43,6 @@ There are two ways to use this circuit.
 1. `   pixel   `
 2. `  [color] ... [color] ` 
 
+![pixel circuit w/o sign arguments](/RedstoneChips/images/pixel3.png "pixel circuit w/o sign arguments")
+
 __Version history:__ Added to BasicCircuits 0.6

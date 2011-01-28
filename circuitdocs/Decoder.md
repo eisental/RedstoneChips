@@ -21,4 +21,6 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Decoder)
 #### Sign text
 1. `   decoder   `
 
+![4-bit decoder](/RedstoneChips/images/decoder.png "4-bit decoder")
+
 __Version history:__ Added to BasicCircuits 0.1
