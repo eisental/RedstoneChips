@@ -20,9 +20,9 @@ There are 3 possible sign arguments (See below for the correct ordering), max, m
 
 
 #### I/O setup 
-* Should have 2 inputs and any number of outputs.
-* input 0 (inc): When set to high the counter output is incremented by 1.
-* input 1 (reset): Sets the output of the counter to its initial state.
+- Should have 2 inputs and any number of outputs.
+- input 0 (inc): When set to high the counter output is incremented by 1.
+- input 1 (reset): Sets the output of the counter to its initial state.
 
 #### Sign text
 1. `   counter   `
