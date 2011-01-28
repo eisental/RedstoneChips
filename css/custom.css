@@ -4,14 +4,14 @@ body {
 }
 
 a {
-	color: B0122F;
+	color: #B0122F;
 	text-decoration: none;
 	padding: 3px;
 }
 
 a:hover {
 	color: #fff;
-	background-color: B0122F;
+	background-color: #B0122F;
 }
 
 .header h1 {
