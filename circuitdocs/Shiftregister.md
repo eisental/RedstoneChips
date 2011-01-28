@@ -10,6 +10,8 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/shiftregister.java)
 
+![a 4-bit shiftregister](/RedstoneChips/images/shiftregister.png "a 4-bit shiftregister")
+
 * * *
 
 

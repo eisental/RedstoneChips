@@ -12,6 +12,8 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pisoregister.java)
 
+![4-bit pisoregister](/RedstoneChips/images/pisoregister.png "4-bit pisoregister")
+
 * * *
 
 #### I/O setup 

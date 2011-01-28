@@ -15,8 +15,12 @@ The clock's pulse width is set to 0.5 by default which means that the clock outp
 Uses a java thread to run the clock, therefore you should be careful about building too many clock chips. perhaps use a main clock and sent it through a [transmitter](Transmitter).
 A thread is started whenever any of the inputs becomes high and stopped when all inputs become low.
 This would probably use game ticks when bukkit supports tick events.
- 
+
+Currently you can't have a clock tick faster than once every 200ms.
+
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/clock.java)
+
+![Clock circuits](/RedstoneChips/images/clock.png "Clock circuits")
 
 * * *
 
