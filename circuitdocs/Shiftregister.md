@@ -22,8 +22,6 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 #### Sign text
 1. `   shiftregister   `
-***
-back to [Circuit Classes](Home)
 
 ![a 4-bit shiftregister](/RedstoneChips/images/shiftregister.png "a 4-bit shiftregister")
 

@@ -21,8 +21,6 @@ A transmitter with one input pin doesn't have a send pin and will send a message
 #### Sign text
 1. `   transmitter   `
 2. ` <broadcast channel> ` (NOT optional)
-***
-back to [Circuit Classes](Home)
 
 ![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
 
