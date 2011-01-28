@@ -4,6 +4,7 @@ RedstoneChips 0.7
 RedstoneChips is a Bukkit plugin that allows you to build custom integrated redstone circuits on your craftbukkit minecraft server.
 Circuits can be built with any number of inputs and outputs and with any imaginable structure. RedstoneChips currently consists of
 two plugins:
+
 - RedstoneChips-0.7 - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
 - [BasicCircuits-0.7](http://github.com/eisental/BasicCircuits) - The basic circuit package containing many different circuit classes. Check out the circuitdocs for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
 
