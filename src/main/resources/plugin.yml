@@ -16,4 +16,3 @@ commands:
     usage: /<command> [on | off]
   redchips-pin:
     description: Point towards an input or output block (where actual redstone current flows), to get information about the pin.
-

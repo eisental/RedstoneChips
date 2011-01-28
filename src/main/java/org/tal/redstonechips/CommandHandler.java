@@ -14,6 +14,8 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.util.TargetBlock;
 
 /**
@@ -164,7 +166,11 @@ public class CommandHandler {
 
     public void pinCommand(Player player) {
         Block target = new TargetBlock(player).getTargetBlock();
+        sendPinInfo(target, player);
 
+    }
+
+    private void sendPinInfo(Block target, Player player) {
         Object[] io = rc.getCircuitManager().lookupInputBlock(target);
         if (io==null) {
             Object[] oo = rc.getCircuitManager().lookupOutputBlock(target);
@@ -182,6 +188,5 @@ public class CommandHandler {
             player.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
 
         }
-
     }
 }
