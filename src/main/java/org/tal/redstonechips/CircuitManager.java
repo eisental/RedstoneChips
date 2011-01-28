@@ -108,7 +108,7 @@ public class CircuitManager {
                             this.addCircuitLookups(c);
                             rc.getCircuitPersistence().saveCircuits(circuits);
 
-                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " inputs and " + outputs.size() + " outputs.");
+                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " input" + (inputs.size()!=1?"s":"") + " and " + outputs.size() + " output" + (outputs.size()!=1?"s":"")+ ".");
                             return;
                         } else {
                             player.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
