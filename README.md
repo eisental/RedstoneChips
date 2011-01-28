@@ -1,91 +1,34 @@
-RedstoneChips 0.6
+RedstoneChips 0.7
 ==================
 
-A Bukkit plugin for building custom integrated redstone circuits with any number of inputs and outputs.
-This is the core RedstoneChips plugin consisting of only the essentials.
-To actually build ICs you need to download and install the [BasicCircuits](http://github.com/eisental/BasicCircuits) plugin.
+RedstoneChips is a Bukkit plugin that allows you to build custom integrated redstone circuits on your craftbukkit minecraft server.
+Circuits can be built with any number of inputs and outputs and with any imaginable structure. RedstoneChips currently consists of
+two plugins:
+- RedstoneChips-0.7 - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
+- [BasicCircuits-0.7](http://github.com/eisental/BasicCircuits) - The basic circuit package containing many different circuit classes. Check out the circuitdocs for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
 
-__If you like this, please__
+__For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
 
-[![Donate](/eisental/RedstoneChips/raw/master/images/btn_donate_LG.gif")](http://sites.google.com/site/eisental/home/donate)
+Installation
+------------
+* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.7 (or delete it to remove previous settings).
+* Download the [RedsoneChips-0.7](http://eisental.github.com/eisental/RedstoneChips/RedstoneChips-0.7.jar) jar file.
+* Download the [BasicCircuits-0.7](http://eisental.github.com/eisental/BasicCircuits/BasicCircuits-0.7.jar) jar file.
+* Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
-![Note block sequencer](/eisental/RedstoneChips/raw/master/images/above.jpg "Note block sequencer")
-
-Install
---------
-   * Delete any previously installed jar files.
-   * Rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.6 (or delete it to remove previous settings).
-   * Download [jar file](/eisental/RedstoneChips/RedstoneChips-0.6.jar).
-   * Copy jar file to the plugins folder of your craftbukkit installation.
-   * Install [BasicCircuits 0.6](/eisental/BasicCircuits)
-
-On the first time craftbukkit is started with the plugin installed, it will create a folder is inside the craftbukkit plugins folder
-and a preferences.yml file. The file redstonechip.dat is created after the activating a circuit for the first time.
-You can change the block types used to construct a circuit by editing preferences.yml or by using the /redchips-prefs command (see below).
-Default values are gold block for outputs, iron block for inputs, and sandstone for the chip itself.
-Type is NOT case-sensitive and can be any bukkit block material name or id.
-any already activated circuit will stay activated even after it's block types are no longer valid.
-
-How to build an IC
--------------------
-First build a line of chip blocks and add input and output blocks to the left or to the right of the line.
-Place a lever on the block next to each output block and a wall sign attached to the first main block of the circuit.
-On the first line of text write the circuit class name, any additional arguments must use the next lines.
-Once the IC is built, right-click the sign to activate it. You should receive a green confirmation message that lets you know
-that the circuit is now ready for use.
-
-* Any block that can send a redstone current (redstone wire, redstone torch, button or lever) can be placed on the block next to an input.
-  The direction of a redstone wire is irrelevant as long as its in the right place.
-* Input and output numbering starts from the sign onwards. i.e. input/output 0 will be the ones closest to the sign.
-  Blocks south or west to the chip block will have a lower index that the blocks on the other side.
-* The main line can be of any length and input and output blocks can be placed anywhere along this line, on both sides.
-
-Here's an example 4-bit counter chip with 2 inputs and 4 outputs (looking from above, each letter represents one block):
-* b - main block (sandstone by default) * i - input block (iron block by default) * o - output block (gold block by default) * l - lever on any block face * s - wall sign attached to the main block
-
-	       s
-	0  l o b i  0
-	       b
-	1  l o b i  1
-	       b
-	2  l o b
-	       b
-	3  l o b
-
-
-sign text (on first line):
-	counter
-
-The first input pin is one line after the sign. Each time the block on its right receives a redstone current the chip will increment
-its internal variable by 1 and output it as a binary number by changing the state of the output levers. The least significant bit 
-is the first output (i.e. the one closest to the sign). For example, when the counter reaches 5, it will switch on outputs 0 and 2 
-giving out the binary number 1010. 
-
-The second input pin is the reset pin. When it receives redstone current the counter will go back to 0.
-
-The 4-bit counter:
-![counter example circuit](/eisental/RedstoneChips/raw/master/images/counter.jpg)
-
-For more info check the [BasicCircuits](https://github.com/eisental/BasicCircuits/wiki/BasicCircuits-) Wiki.
-
-Destroying an IC
------------------
-You can destroy an IC by breaking any of its structure blocks, including the output levers.
-Creepers and TNT explosions will also cause the IC to stop functioning.
-
-Commands
----------
-   * __/redchips-active__ Lists every currently active circuit on the server.
-   * __/redchips-classes__ Prints a list of installed circuit classes.
-   * __/redchips-pin__ Get info and identify chip pins. Point your cross at one of the pins and enter the command.
-   * __/redchips-debug__ Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command. The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
-   * __/redchips-prefs__ Prints preferences.
-   * __/redchips-prefs key__ Prints one preference key: value pair.
-   * __/redchips-prefs key value__ Changes the value of a preference key and saves the file. Only admins are allowed to change the preferences values.
-     - Example: typing <code>/redchips-prefs chipBlockType GLASS</code> will change the preferences value and make the plugin immediately expect new chips to have their body made of glass.
 
 Changelog
 ----------
+#### RedstoneChips 0.7 (27/01/11)
+* Completely new circuit detection algorithm. Circuits can now be built in almost any shape.
+* New storage format for the active circuits file (now named redstonechips.circuits).
+* Interface blocks replace the output block used by circuits such as pixel, print and synth. More than one interface block per chip is now possible. Interface blocks are placed the same way as input and output blocks and they're indicated by a block of material interfaceBlockType (also added to preferences).
+* Fixed print order of binary numbers. LSB is now the rightmost character.
+* Missing output levers will now cause an error message to be displayed.
+* Output levers will now turn off after a circuit is destroyed.
+* A circuit will now deactivate when one of its structure blocks burns down.
+* Chat colors are added to the preferences file and can be modified using /redchips-prefs.
+
 #### RedstoneChips 0.6 (24/01/11)
 * new command /redchips-debug for getting debug messages from a circuit.
 * new command /redchips-pin for getting info about a specific chip pin.
