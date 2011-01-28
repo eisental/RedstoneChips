@@ -5,12 +5,12 @@ title: RedstoneChips Usage Guide
 
 Building a Chip
 ---------------
-- Start by build a structure made of chip blocks (sandstone blocks by default). 
-- Place a wall sign attached to one of the chip blocks. This is the starting point of the circuit and affects the orders of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
-- Add output blocks (gold block by default) and input blocks (iron block by default). Make sure that each block has a chip block on one of its sides (not just above or below). Changes in redstone current will be sensed on the block attached to the input block on the opposite side from where the chip block is attached to the input block. 
-- The circuit outputs its bits by setting levers on and off. Attach levers to each output block on the opposite side from where the chip block is attached to the output blocks.
-- Some circuits, such as the [print](/RedstoneChips/circuitdocs/Print.html) require you to add interface blocks (lapis blocks by default). Again, make sure that each interface block has a chip block on one of its horizontal sides. The circuit will then use the block on the opposite side as a point of interaction with the "physical" world. In the case of the print circuit, it will update the text of sign attached to the interface block (on the appropriate side).
-- Last but not least, go back to your circuit sign and right-click it, to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated with y input(s) and z output(s)' 
+- Start by build a structure made of __chip blocks__ (sandstone blocks by default). 
+- Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the orders of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
+- Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Make sure that each block has a chip block on one of its sides (not just above or below). Changes in redstone current will be sensed on the block attached to the input block on the opposite side from where the chip block is attached to the input block. 
+- The circuit outputs its bits by setting levers on and off. Attach __levers__ to each output block on the opposite side from where the chip block is attached to the output blocks.
+- Some circuits, such as the [print](/RedstoneChips/circuitdocs/Print.html) circuit require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block has a chip block on one of its horizontal sides. The circuit will then use the block on the opposite side as a point of interaction with the "physical" world. In the case of the print circuit, it will update the text of sign attached to the interface block (on the appropriate side).
+- Last but not least, go back to your circuit sign and __right-click__ it, to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated with y input(s) and z output(s)' 
 
 The order of your input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. See "Chip detection scanning rules" for more information on predicting the order of pins in more complex structures.
 
