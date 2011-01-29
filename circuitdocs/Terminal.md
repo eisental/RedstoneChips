@@ -4,7 +4,7 @@ title: terminal
 ---
 
 An input terminal for sending ascii characters or numbers over redstone wires. 
-To use it, point towards one of its interface blocks and enter the chat command /rc-type <data>
+To use it, point towards one of its interface blocks and enter the chat command `/rc-type <data>`
 Once the command is executed, the terminal will send the command data through its output according to the `type` sign argument.
 
 The first sign argument sets the way the data is encoded.
