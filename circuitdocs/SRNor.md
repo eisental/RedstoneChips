@@ -1,6 +1,6 @@
 ---
 layout: main
-title: SR NOR Latch
+title: srnor
 ---
 A SR NOR latch.  When an input state changes from low to high, it's corresponding output pin is set to low while all other output pins are set to high.  This SR NOR latch can support any number of input, output pairs.
 
