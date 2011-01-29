@@ -15,7 +15,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 #### I/O setup 
 * Number of outputs must be a multiple of the `<no. of output sets>` argument.
 * bit-size is determined by number of outputs / `<no. of output sets>` argument.
-* First log2(input sets count) pins are the select pins. 
+* First `log2(<no. of input sets>)` pins are the select pins. 
 * One input bit set should follow the select pins of the same size as one output set.
 
 For example to demultiplex a 4-bit input into 4 4-bit output sets you would need 3 select input pins and additional 4 data inputs - total of 7 inputs
