@@ -13,8 +13,8 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Multiplexer)
 
 
 #### I/O setup 
-* Number of outputs must be a multiple of the `no. of output sets` argument.
-* bit-size is determined by number of outputs / `output sets count` argument.
+* Number of outputs must be a multiple of the `<no. of output sets>` argument.
+* bit-size is determined by number of outputs / `<no. of output sets>` argument.
 * First log2(input sets count) pins are the select pins. 
 * One input bit set should follow the select pins of the same size as one output set.
 
