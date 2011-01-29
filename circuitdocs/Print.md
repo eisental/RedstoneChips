@@ -26,7 +26,7 @@ A second sign argument with the word 'add' would cause the chip to add any new p
 
 #### Sign text
 1. `   print   `
-2. `  <type> ` (Not optional)
+2. `  [type] ` (num by default)
 3. ` [add] `
 
 __Version history:__ Added to BasicCircuits 0.1

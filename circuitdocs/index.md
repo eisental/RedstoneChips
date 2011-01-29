@@ -13,13 +13,16 @@ title: Basic Circuits documentation
 [flipflop](Flipflop.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html), [srnor](SRNor.html)
 
 ## basic digital circuits
-[clock](Clock.html), [counter](Counter.html), [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [pulse](Pulse.html)
+[clock](Clock.html), [counter](Counter.html), [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [pulse](Pulse.html), [router](Router.html)
 
 ## wireless communication
 [transmitter](Transmitter.html), [receiver](Receiver.html), [iptransmitter](Iptransmitter.html), [ipreceiver](Ipreceiver.html)
 
 ## actuators
 [print](Print.html), [pixel](Pixel.html), [synth](Synth.html)
+
+## sensors
+[terminal](Terminal.html)
 
 
 

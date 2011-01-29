@@ -15,4 +15,6 @@ A SR NOR latch.  When an input state changes from low to high, it's correspondin
 #### Sign text
 1. `   srnor   `
 
+![4-bit SR NOR latch](/RedstoneChips/images/flipflop.png "4-bit SR NOR latch")
+
 __Version history:__ Added to BasicCircuits 0.72
