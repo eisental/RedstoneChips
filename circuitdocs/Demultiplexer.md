@@ -22,7 +22,7 @@ For example to demultiplex a 4-bit input into 4 4-bit output sets you would need
 as well as 4 groups of 4-bit output pins - total of 16 outputs.
 
 #### Sign text
-1. `   multiplexer   `
+1. `   demultiplexer   `
 2. ` <no. of output sets> ` (NOT optional)
 
 __Version history:__ Added to BasicCircuits 0.1
