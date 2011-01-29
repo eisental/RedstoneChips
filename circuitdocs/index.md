@@ -10,7 +10,7 @@ title: Basic Circuits documentation
 [adder](Adder.html), [multiplier](Multiplier.html), [divider](Divider.html), [random](Random.html)
 
 ## registers
-[flipflop](Flipflop.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html)
+[flipflop](Flipflop.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html), [srnor](SRNor.html)
 
 ## basic digital circuits
 [clock](Clock.html), [counter](Counter.html), [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [pulse](Pulse.html)
