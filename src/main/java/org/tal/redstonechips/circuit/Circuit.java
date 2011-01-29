@@ -101,7 +101,7 @@ public abstract class Circuit {
      */
     public void redstoneChange(int idx, boolean newVal) {
         inputBits.set(idx, newVal);
-        if (hasDebuggers()) debug("Input change: " + bitSetToBinaryString(inputBits, 0, inputs.length));
+        if (hasDebuggers()) debug("Input change: " + bitSetToBinaryString(inputBits, 0, inputs.length) + " (" + bitSetToUnsignedInt(inputBits, 0, inputs.length) + ")");
         inputChange(idx, newVal);
     }
 
