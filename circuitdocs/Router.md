@@ -28,7 +28,7 @@ If two or more inputs are routed to the same output they are ORed together.
 
 #### Sign text
 1. `   router   `
-2. ` [table entry],...,[table entry] `
+2. ` [table entry] ... [table entry] `
 
 
 __Version history:__ Added to BasicCircuits 0.73
