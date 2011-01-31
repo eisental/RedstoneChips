@@ -23,7 +23,7 @@ Changelog
 ----------
 #### RedstoneChips 0.71 (31/01/11)
 * Updated to work with new bukkit command api.
-* New /redchips-deactivate command for deactivating circuits without destroying them, activated either by pointing at the circuit or remotely for admins, by using '/redchips-deactivate <circuit id>'.
+* New /redchips-deactivate command for deactivating circuits without destroying them, activated either by pointing at the circuit or remotely for admins, by using `/redchips-deactivate <circuit id>`.
 * New /redchips-destroy command to destroy a circuit and all of its blocks. The command is disabled by default. Set preference key 'enableDestroyCircuit' to 'true' to enable.
 * Circuit debuggers are now notified when the circuit is destroyed including info about who destroyed it and where.
 
