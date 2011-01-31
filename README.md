@@ -1,25 +1,33 @@
-RedstoneChips 0.7
-==================
+RedstoneChips 
+=============
 
 RedstoneChips is a Bukkit plugin that allows you to build custom integrated redstone circuits on your craftbukkit minecraft server.
 Circuits can be built with any number of inputs and outputs and with any imaginable structure. RedstoneChips currently consists of
 two plugins:
 
-- RedstoneChips-0.7 - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
-- [BasicCircuits-0.73](http://github.com/eisental/BasicCircuits) - The basic circuit package containing many different circuit classes. Check out the circuitdocs for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
+- RedstoneChips - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
+- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The base circuit package containing many different circuit classes. Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info.
+  In the future additional circuit packages will hopefully be available as well.
 
 __For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
 
 Installation
 ------------
 * If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.7 (or delete it to remove previous settings).
-* Download the [RedsoneChips-0.7](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.7.jar) jar file.
-* Download the [BasicCircuits-0.73](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.73.jar) jar file.
+* Download the [RedsoneChips-0.71](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.71.jar) jar file.
+* Download the [BasicCircuits-0.74](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.74.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
 Changelog
 ----------
+#### RedstoneChips 0.71 (31/01/11)
+* Updated to work with new bukkit command api.
+* New /redchips-deactivate command for deactivating circuits without destroying them, activated either by pointing at the circuit or remotely for admins, by using '/redchips-deactivate <circuit id>'.
+* New /redchips-destroy command to destroy a circuit and all of its blocks. The command is disabled by default. Set preference key 'enableDestroyCircuit' to 'true' to enable.
+* Circuit debuggers are now notified when the circuit is destroyed including info about who destroyed it and where.
+
+
 #### RedstoneChips 0.7 (27/01/11)
 * Completely new circuit detection algorithm. Circuits can now be built in almost any shape.
 * New storage format for the active circuits file (now named redstonechips.circuits).
