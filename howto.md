@@ -67,6 +67,7 @@ Plugin commands
 Preference keys
 ---------------
 
+
 ##### Block types - these can be any material name or id.
 - `chipBlockType` - Sets the chip's structure block material (`SANDSTONE` by default).
 - `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
@@ -79,4 +80,4 @@ Preference keys
 - `debugColor` - Color of debug messages (`AQUA` by default)
 
 ##### Permissions
-- `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values or `true` or `false` (`false` by default).
+- `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).
