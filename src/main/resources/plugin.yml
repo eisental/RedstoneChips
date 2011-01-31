@@ -19,3 +19,5 @@ commands:
   redchips-destroy:
     description: Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter
                  the command.
+  redchips-deactivate:
+    description: Destroys a circuit w/o removing its blocks. Point at a block of the circuit or enter the circuit's id number as an argument.

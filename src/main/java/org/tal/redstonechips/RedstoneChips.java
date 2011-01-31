@@ -139,6 +139,9 @@ public class RedstoneChips extends JavaPlugin {
                 commandHandler.destroyCommand(sender);
             } else sender.sendMessage(prefsManager.getErrorColor()+"/redchips-destroy is disabled. You can enable it using /redchips-prefs enableDestroyCommand true");
             return true;
+        } else if (cmd.getName().equalsIgnoreCase("redchips-deactivate")) {
+            commandHandler.deactivateCommand(sender, args);
+            return true;
         } else return false;
     }
 

@@ -169,6 +169,7 @@ public class CommandHandler {
 
     public void destroyCommand(CommandSender sender) {
         Player player = checkIsPlayer(sender);
+        if (player==null) return;
 
         Block target = new TargetBlock(player).getTargetBlock();
         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
@@ -180,6 +181,39 @@ public class CommandHandler {
 
             rc.getCircuitManager().destroyCircuit(c, sender);
         }
+    }
+
+    public void deactivateCommand(CommandSender sender, String[] args) {
+        int idx = -1;
+        if (args.length>0) {
+            try {
+                idx = Integer.decode(args[0]);
+            } catch (NumberFormatException ne) {
+                sender.sendMessage("Bad circuit id number: " + args[0]);
+            }
+        }
+        
+        Player player = checkIsPlayer(sender);
+        if (player==null) return;
+
+        Circuit c = null;
+        if (idx==-1) {
+            if (!sender.isOp()) {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You must be an admin to remotely deactivate a circuit.");
+            }
+            Block target = new TargetBlock(player).getTargetBlock();
+            c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+            if (c==null) {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to deactivate.");
+                return;
+            }
+        } else {
+            if (idx<rc.getCircuitManager().getCircuits().size()) {
+                c = rc.getCircuitManager().getCircuits().get(idx);
+            } else sender.sendMessage(rc.getPrefsManager().getErrorColor() + "There's no activated circuit with id " + idx);
+        }
+
+        rc.getCircuitManager().destroyCircuit(c, sender);
     }
 
     public void pinCommand(CommandSender sender) {
