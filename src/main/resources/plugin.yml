@@ -1,6 +1,6 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.71
+version: 0.72
 commands:
   redchips-active:
     description: Lists active redstone circuits.
