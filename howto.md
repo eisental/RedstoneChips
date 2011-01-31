@@ -66,18 +66,17 @@ Plugin commands
 
 Preference keys
 ---------------
-##### block types
-These can be any material name or id.
-`chipBlockType` - Sets the chip's structure block material (`SANDSTONE` by default).
-`inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
-`outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
-`interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
 
-##### message colors
-These can be any chat color name.
-`infoColor` - Color of info messages (`GREEN` by default)
-`errorColor` - Color of error messages (`RED` by default)
-`debugColor` - Color of debug messages (`AQUA` by default)
+##### Block types - these can be any material name or id.
+- `chipBlockType` - Sets the chip's structure block material (`SANDSTONE` by default).
+- `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
+- `outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
+- `interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
 
-##### permissions
-`enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values or `true` or `false` (`false` by default).
+##### Message colors - these can be any chat color name.
+- `infoColor` - Color of info messages (`GREEN` by default)
+- `errorColor` - Color of error messages (`RED` by default)
+- `debugColor` - Color of debug messages (`AQUA` by default)
+
+##### Permissions
+- `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values or `true` or `false` (`false` by default).
