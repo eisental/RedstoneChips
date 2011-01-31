@@ -149,6 +149,10 @@ public class RedstoneChips extends JavaPlugin {
         for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
     }
 
+    public void removeCircuitClasses(Class... circuitClasses) {
+        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
+    }
+
     void log(Level level, String message) {
         logg.log(level, this.getDescription().getName() + ": " + message);
     }
@@ -168,4 +172,5 @@ public class RedstoneChips extends JavaPlugin {
     CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
     }
+
 }
