@@ -1,6 +1,6 @@
 ---
 layout: main
-title: RedstoneChips 0.7
+title: RedstoneChips 0.71
 ---
 
 <p>RedstoneChips is a <a href="http://bukkit.org">Bukkit</a> plugin that allows you to build custom integrated redstone
@@ -8,12 +8,12 @@ title: RedstoneChips 0.7
     structure. RedstoneChips currently consists of two plugins:</p>
 
 <ul>
-<li><a href="http://github.com/eisental/RedstoneChips"><strong>RedstoneChips-0.7</strong></a> - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.</li>
-<li><a href="http://github.com/eisental/BasicCircuits"><strong>BasicCircuits-0.73</strong></a> - The basic circuit package containing many different circuit classes. Check out the <a href="/RedstoneChips/circuitdocs/index.html">circuitdocs</a> for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
+<li><a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.71.jar"><strong>RedstoneChips-0.71</strong></a> - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.</li>
+<li><a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.74.jar"><strong>BasicCircuits-0.74</strong></a> - The basic circuit package containing many different circuit classes. Check out the <a href="/RedstoneChips/circuitdocs/index.html">circuitdocs</a> for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
 </ul>
 
 <p>RedstoneChips and BasicCircuits are currently under heavy development. Don't expect them to work as advertised or at all.
-    If you want to report a bug or another issue you can use the github project page links above.
+    If you want to report a bug or another issue you can use the github project page links below.
     If you have any question, suggestion or new idea you can send me an email by clicking on the mail link to the left, or post a message
     in the <a href="http://forums.bukkit.org/threads/redstonechips-0-6-integrated-circuits-plugin.1205/">forum thread</a> at Bukkit.org
 </p>
@@ -25,9 +25,10 @@ title: RedstoneChips 0.7
 <h2>Installation</h2>
 
 <ul>
-<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <code>&lt;craftbukkit&gt;/plugins/RedstoneChips-XX</code> folder to <code>RedstoneChips-0.7</code> (or delete it to remove previous settings).</li>
-<li>Download the <a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.7.jar">RedsoneChips 0.7</a> jar file.</li>
-<li>Download the <a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.73.jar">BasicCircuits 0.73</a> jar file.</li>
+    <li>Download the latest craftbukkit release. The current version requires craftbukkit #183 or above.</li>
+<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <code>&lt;craftbukkit&gt;/plugins/RedstoneChips-XX</code> folder to <code>RedstoneChips-0.71</code> (or delete it to remove previous settings).</li>
+<li>Download the <a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.71.jar">RedsoneChips 0.71</a> jar file.</li>
+<li>Download the <a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.74.jar">BasicCircuits 0.74</a> jar file.</li>
 <li>Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.</li>
 </ul>
 
@@ -36,7 +37,18 @@ and a preferences.yml file inside it. The file redstonechip.circuits is created 
 You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the /redchips-prefs command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
 </p>
 
+<p>Check out <a href="http://github.com/eisental/RedstoneChips">RedstoneChips source code at github.com</a></p>
+<p>Check out <a href="http://github.com/eisental/BasicCircuits">BasicCircuit source code at github.com</a></p>
+
 <h2>Changelog</h2>
+
+<h4>RestoneChips 0.71 (31/01/11)</h4>
+<ul>
+    <li>Updated to work with new bukkit command api.</li>
+    <li>New /redchips-deactivate command for deactivating circuits without destroying them, activated either by pointing at the circuit or remotely for admins, by using '/redchips-deactivate <circuit id>'.</li>
+    <li>New /redchips-destroy command to destroy a circuit and all of its blocks. The command is disabled by default. Set preference key 'enableDestroyCircuit' to 'true' to enable.</li>
+    <li>Circuit debuggers are now notified when the circuit is destroyed including info about who destroyed it and where.</li>
+</ul>
 
 <h4>RedstoneChips 0.7 (27/01/11)</h4>
 <ul>
@@ -51,6 +63,16 @@ You can change the block types used to construct a circuit and other settings by
 </ul>
 <p>For older changelogs look at the RedstoneChips <a href="http://github.com/eisental/RedstoneChips">github pages</a></p>
 <hr>
+
+<h4>BasicCircuit 0.74 (31/01/11)</h4>
+<ul>
+<li>Added pulse argument for positive, negative and double edge-triggering.</li>
+<li>Circuit classes are now disabled when the plugin is disabled.</li>
+<li>Updated to work with the new bukkit command api. </li>
+<li>Router now uses a clock input. If two or more inputs are routed to the same output they're now ORed together.</li>
+<li>New circuit: decadecounter. Commissioned by I D</li>
+<li>Pulse circuit with a 0 pulse length will not create a thread and is now very safe to use.</li>
+</ul>
 
 <h4>BasicCircuits 0.73 (29/01/11)</h4>
 <ul><li>New terminal and router circuits.</li></ul>
