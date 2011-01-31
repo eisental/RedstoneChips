@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -26,14 +26,9 @@ public class PrefsManager {
     private static final String defaultsFileName = "/defaultprefs.yml";
     private static final String prefsFileName = "preferences.yml";
 
-    private static final String cBTKey = "chipBlockType";
-    private static final String inpBTKey = "inputBlockType";
-    private static final String oBTKey = "outputBlockType";
-    private static final String intBTKey = "interfaceBlockType";
-
-    private static final String iCKey = "infoColor";
-    private static final String eCKey = "errorColor";
-    private static final String dCKey = "debugColor";
+    public enum Prefs { chipBlockType, inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
+        enableDestroyCommand;
+    };
 
     private RedstoneChips rc;
     private DumperOptions prefDump;
@@ -77,22 +72,22 @@ public class PrefsManager {
             Yaml yaml = new Yaml(prefDump);
             prefs = (Map<String, Object>)yaml.load(new FileInputStream(propFile));
             if (prefs==null) prefs = new HashMap<String, Object>();
-            loadDefaultsIfNeeded(inpBTKey, oBTKey, cBTKey, intBTKey, iCKey, eCKey, dCKey);
+            loadMissingPrefs();
 
             try {
-                inputBlockType = findMaterial(prefs.get(inpBTKey));
-                outputBlockType = findMaterial(prefs.get(oBTKey));
-                interfaceBlockType = findMaterial(prefs.get(intBTKey));
-                chipBlockType = findMaterial(prefs.get(cBTKey));
+                inputBlockType = findMaterial(prefs.get(Prefs.inputBlockType.name()));
+                outputBlockType = findMaterial(prefs.get(Prefs.outputBlockType.name()));
+                interfaceBlockType = findMaterial(prefs.get(Prefs.interfaceBlockType.name()));
+                chipBlockType = findMaterial(prefs.get(Prefs.chipBlockType.name()));
             } catch (IllegalArgumentException ie) {
                 rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
             }
 
 
             try {
-                infoColor = ChatColor.valueOf((String)prefs.get(iCKey));
-                errorColor = ChatColor.valueOf((String)prefs.get(eCKey));
-                debugColor = ChatColor.valueOf((String)prefs.get(dCKey));
+                infoColor = ChatColor.valueOf((String)prefs.get(Prefs.infoColor.name()));
+                errorColor = ChatColor.valueOf((String)prefs.get(Prefs.errorColor.name()));
+                debugColor = ChatColor.valueOf((String)prefs.get(Prefs.debugColor.name()));
             } catch (IllegalArgumentException ie) {
                 rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
             }
@@ -135,17 +130,17 @@ public class PrefsManager {
         return map;
     }
 
-    public void printYaml(Player player, Map<String, Object> map) {
+    public void printYaml(CommandSender sender, Map<String, Object> map) {
 
         Yaml yaml = new Yaml(prefDump);
         String[] split = yaml.dump(map).split("\\n");
-        player.sendMessage("");
-        player.sendMessage(getInfoColor() + rc.getDescription().getName() + " " + rc.getDescription().getVersion() + " preferences:");
-        player.sendMessage(getInfoColor() + "-----------------------------");
+        sender.sendMessage("");
+        sender.sendMessage(getInfoColor() + rc.getDescription().getName() + " " + rc.getDescription().getVersion() + " preferences:");
+        sender.sendMessage(getInfoColor() + "-----------------------------");
         for (String line : split)
-            player.sendMessage(line);
-        player.sendMessage(getInfoColor() + "-----------------------------");
-        player.sendMessage("");
+            sender.sendMessage(line);
+        sender.sendMessage(getInfoColor() + "-----------------------------");
+        sender.sendMessage("");
     }
 
     public Material getInputBlockType() {
@@ -189,8 +184,8 @@ public class PrefsManager {
     }
 
 
-    public void loadDefaultsIfNeeded(String... keys) {
-        for (String key : keys) {
+    private void loadMissingPrefs() {
+        for (String key : defaults.keySet()) {
             if (!prefs.containsKey(key))
                 prefs.put(key, defaults.get(key));
         }

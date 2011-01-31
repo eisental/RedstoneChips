@@ -8,3 +8,6 @@ interfaceBlockType: LAPIS_BLOCK
 infoColor: GREEN
 errorColor: RED
 debugColor: AQUA
+
+## enable or disable /redchips-destroy
+enableDestroyCommand: false

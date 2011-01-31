@@ -1,6 +1,6 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.7
+version: 0.71
 commands:
   redchips-active:
     description: Lists active redstone circuits.
@@ -15,4 +15,7 @@ commands:
                  the circuit, use /redchips-debug off.
     usage: /<command> [on | off]
   redchips-pin:
-    description: Point towards an input or output block (where actual redstone current flows), to get information about the pin.
+    description: Point at an input or output block (where actual redstone current flows), to get information about the pin.
+  redchips-destroy:
+    description: Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter
+                 the command.

@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
@@ -126,6 +127,10 @@ public class CircuitManager {
                 }
             }
         }
+    }
+
+    public void destroyCircuits() {
+        for (Circuit c : circuits) c.circuitDestroyed();
     }
 
     private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
@@ -259,19 +264,7 @@ public class CircuitManager {
         Circuit destroyed = structureLookupMap.get(b);
 
         if (destroyed!=null && circuits.contains(destroyed)) {
-            if (p!=null) p.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
-            destroyed.circuitDestroyed();
-            circuits.remove(destroyed);
-            removeCircuitLookups(destroyed);
-
-            for (Block output : destroyed.outputs) {
-                if (output.getType()==Material.LEVER) {
-                    // turn lever off
-                    output.setData((byte)(output.getData()&0x7));
-                }
-            }
-
-            rc.getCircuitPersistence().saveCircuits(circuits);
+            destroyCircuit(destroyed, p);
         }
     }
 
@@ -330,6 +323,33 @@ public class CircuitManager {
             outputLookupMap.remove(output);
 
         activationLookupMap.remove(c.activationBlock);
+
+    }
+
+    public void destroyCircuit(Circuit destroyed, CommandSender destroyer) {
+        if (destroyer!=null) destroyer.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
+        destroyed.circuitDestroyed();
+        circuits.remove(destroyed);
+        removeCircuitLookups(destroyed);
+
+        for (Block output : destroyed.outputs) {
+            if (output.getType()==Material.LEVER) {
+                // turn lever off
+                output.setData((byte)(output.getData()&0x7));
+            }
+        }
+
+        String dName;
+        if (destroyer!=null && destroyer.isPlayer()) dName = ((Player)destroyer).getDisplayName();
+        else dName = "unknown command sender";
+        for (Player p : destroyed.getDebuggers()) {
+            if (!p.equals(destroyer)) {
+                p.sendMessage(rc.getPrefsManager().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " + 
+                        rc.getPrefsManager().getErrorColor() + "destroyed by " + dName +
+                        rc.getPrefsManager().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
+            }
+        }
+        rc.getCircuitPersistence().saveCircuits(circuits);
 
     }
 }

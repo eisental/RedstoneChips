@@ -7,7 +7,7 @@ import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.command.Command;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -92,6 +92,7 @@ public class RedstoneChips extends JavaPlugin {
     @Override
     public void onDisable() {
         circuitPersistence.saveCircuits(circuitManager.getCircuits());
+        circuitManager.destroyCircuits();
 
         PluginDescriptionFile desc = this.getDescription();
         logg.info(desc.getName() + " " + desc.getVersion() + " disabled.");
@@ -110,26 +111,33 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
+
         PluginDescriptionFile desc = this.getDescription();
         logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");
     }
 
     @Override
-    public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("redchips-active")) {
-            commandHandler.listActiveCircuits(player, args);
+            commandHandler.listActiveCircuits(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-classes")) {
-            commandHandler.listCircuitClasses(player);
+            commandHandler.listCircuitClasses(sender);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-prefs")) {
-            commandHandler.prefsCommand(args, player);
+            commandHandler.prefsCommand(args, sender);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-debug")) {
-            commandHandler.debugCommand(player, args);
+            commandHandler.debugCommand(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("redchips-pin")) {
-            commandHandler.pinCommand(player);
+            commandHandler.pinCommand(sender);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("redchips-destroy")) {
+            boolean enableDestroyCommand = (Boolean)prefsManager.getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
+            if (enableDestroyCommand) {
+                commandHandler.destroyCommand(sender);
+            } else sender.sendMessage(prefsManager.getErrorColor()+"/redchips-destroy is disabled. You can enable it using /redchips-prefs enableDestroyCommand true");
             return true;
         } else return false;
     }

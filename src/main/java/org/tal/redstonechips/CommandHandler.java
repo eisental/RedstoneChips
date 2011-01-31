@@ -12,7 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.util.TargetBlock;
 
@@ -29,7 +31,7 @@ public class CommandHandler {
     }
 
 
-    public void listActiveCircuits(Player p, String[] args) {
+    public void listActiveCircuits(CommandSender p, String[] args) {
         int page = 1;
         if (args.length>0) {
             try {
@@ -59,7 +61,7 @@ public class CommandHandler {
 
     }
 
-    public void listCircuitClasses(Player p) {
+    public void listCircuitClasses(CommandSender p) {
         Map<String,Class> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
         if (circuitClasses.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no circuit classes installed.");
         else {
@@ -86,22 +88,22 @@ public class CommandHandler {
         }
     }
 
-    public void prefsCommand(String[] args, Player player) {
+    public void prefsCommand(String[] args, CommandSender sender) {
             if (args.length==0) { // list preferences
-                rc.getPrefsManager().printYaml(player, rc.getPrefsManager().getPrefs());
-                player.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /redchips-prefs <name> <value> to make changes.");
+                rc.getPrefsManager().printYaml(sender, rc.getPrefsManager().getPrefs());
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /redchips-prefs <name> <value> to make changes.");
             } else if (args.length==1) { // show one key value pair
                 Object o = rc.getPrefsManager().getPrefs().get(args[0]);
-                if (o==null) player.sendMessage(rc.getPrefsManager().getErrorColor() + "Unknown preferences key: " + args[0]);
+                if (o==null) sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Unknown preferences key: " + args[0]);
                 else {
                     Map<String,Object> map = new HashMap<String,Object>();
                     map.put(args[0], o);
 
-                    rc.getPrefsManager().printYaml(player, map);
+                    rc.getPrefsManager().printYaml(sender, map);
                 }
             } else if (args.length>=2) { // set value
-                if (!player.isOp()) {
-                    player.sendMessage(rc.getPrefsManager().getErrorColor() + "Only admins are authorized to change preferences values.");
+                if (!sender.isOp()) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Only admins are authorized to change preferences values.");
                     return;
                 }
 
@@ -111,19 +113,22 @@ public class CommandHandler {
 
                 try {
                     Map<String, Object> map = rc.getPrefsManager().setYaml(args[0] + ": " + val);
-                    rc.getPrefsManager().printYaml(player, map);                    
+                    rc.getPrefsManager().printYaml(sender, map);
                 } catch (IllegalArgumentException ie) {
-                    player.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
                 }
-                player.sendMessage(rc.getPrefsManager().getInfoColor() + "Saving changes...");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Saving changes...");
                 rc.getPrefsManager().savePrefs();
             } else {
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad redchips-prefs syntax.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad redchips-prefs syntax.");
             }
 
     }
 
-    public void debugCommand(Player player, String[] args) {
+    public void debugCommand(CommandSender sender, String[] args) {
+        Player player = checkIsPlayer(sender);
+        if (player==null) return;
+
         boolean add = true;
         if (args.length>0) {
             if (args[0].equalsIgnoreCase("off"))
@@ -162,29 +167,55 @@ public class CommandHandler {
         }
     }
 
-    public void pinCommand(Player player) {
+    public void destroyCommand(CommandSender sender) {
+        Player player = checkIsPlayer(sender);
+
+        Block target = new TargetBlock(player).getTargetBlock();
+        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+        if (c==null) {
+            player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to destroy.");
+        } else {
+            for (Block b : c.structure)
+                b.setType(Material.AIR);
+
+            rc.getCircuitManager().destroyCircuit(c, sender);
+        }
+    }
+
+    public void pinCommand(CommandSender sender) {
+        Player player = checkIsPlayer(sender);
+
         Block target = new TargetBlock(player).getTargetBlock();
         sendPinInfo(target, player);
 
     }
 
-    private void sendPinInfo(Block target, Player player) {
+    private void sendPinInfo(Block target, CommandSender sender) {
         Object[] io = rc.getCircuitManager().lookupInputBlock(target);
         if (io==null) {
             Object[] oo = rc.getCircuitManager().lookupOutputBlock(target);
             if (oo==null) {
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at an output or input block - ");
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "this can be an output lever or an input button, lever, wire, plate or torch.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at an output or input block - ");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "this can be an output lever or an input button, lever, wire, plate or torch.");
             } else { // output pin
                 Circuit c = (Circuit)oo[0];
                 int i = (Integer)oo[1];
-                player.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
             }
         } else { // input pin
             Circuit c = (Circuit)io[0];
             int i = (Integer)io[1];
-            player.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
 
         }
     }
+
+    private Player checkIsPlayer(CommandSender sender) {
+        if (sender.isPlayer()) return (Player)sender;
+        else {
+            sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Only players are allowed to use this command.");
+            return null;
+        }
+    }
+
 }

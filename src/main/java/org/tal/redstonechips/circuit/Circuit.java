@@ -353,4 +353,8 @@ public abstract class Circuit {
     public String getCircuitClass() {
         return this.getClass().getSimpleName();
     }
+
+    public Iterable<Player> getDebuggers() {
+        return debuggers;
+    }
 }
