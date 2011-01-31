@@ -57,7 +57,27 @@ Plugin commands
  - `/redchips-channels` Lists currently used transmitter/receiver broadcast channels. 
  - `/redchips-pin` Point your cross at one of the pins and enter the command to get the current state of the pin and its index. You have to point to the block where redstone current actually flows. That is, you need to point at levers, buttons or redstone wire and not at the output / input blocks.
  - `/redchips-debug` Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command. The plugin will now send you debug messages from this circuit. Enter /redchips-debug off while pointing, to stop debugging.
- - `/redchips-prefs` Prints preferences.
+ - `/redchips-destroy` Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/redchips-prefs enableDestroyCommand true`
+ - `/redchips-deactivate` Deactivates a circuit w/o removing its blocks. Point at a block of the circuit or for admins, enter the circuit's id number as an argument.
+ - `/redchips-prefs` Prints preferences. See below for a list of preference keys.
  - `/redchips-prefs key` Prints one preference key: value pair.
  - `/redchips-prefs key value` Changes the value of a preference key and saves the file. Only admins are allowed to use this command.
      - Example: typing <code>/redchips-prefs chipBlockType glass</code> will change the preferences value and make the plugin immediately expect new chips to have their body made of glass.
+
+Preference keys
+---------------
+##### block types
+These can be any material name or id.
+`chipBlockType` - Sets the chip's structure block material (`SANDSTONE` by default).
+`inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
+`outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
+`interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
+
+##### message colors
+These can be any chat color name.
+`infoColor` - Color of info messages (`GREEN` by default)
+`errorColor` - Color of error messages (`RED` by default)
+`debugColor` - Color of debug messages (`AQUA` by default)
+
+##### permissions
+`enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values or `true` or `false` (`false` by default).
