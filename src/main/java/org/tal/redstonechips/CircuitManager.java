@@ -340,7 +340,7 @@ public class CircuitManager {
         }
 
         String dName;
-        if (destroyer!=null && destroyer.isPlayer()) dName = ((Player)destroyer).getDisplayName();
+        if (destroyer!=null && destroyer instanceof Player) dName = ((Player)destroyer).getDisplayName();
         else dName = "unknown command sender";
         for (Player p : destroyed.getDebuggers()) {
             if (!p.equals(destroyer)) {

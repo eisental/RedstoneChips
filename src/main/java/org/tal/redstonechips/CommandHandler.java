@@ -245,7 +245,7 @@ public class CommandHandler {
     }
 
     private Player checkIsPlayer(CommandSender sender) {
-        if (sender.isPlayer()) return (Player)sender;
+        if (sender instanceof Player) return (Player)sender;
         else {
             sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Only players are allowed to use this command.");
             return null;

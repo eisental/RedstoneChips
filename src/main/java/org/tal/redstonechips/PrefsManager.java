@@ -32,7 +32,6 @@ public class PrefsManager {
 
     private RedstoneChips rc;
     private DumperOptions prefDump;
-    private Map<String,Object> prefs;
 
     private Material chipBlockType;
     private Material inputBlockType;
@@ -43,6 +42,7 @@ public class PrefsManager {
     private ChatColor errorColor;
     private ChatColor debugColor;
 
+    private Map<String,Object> prefs;
     private Map<String, Object> defaults;
 
     public PrefsManager(RedstoneChips plugin) {
@@ -189,6 +189,15 @@ public class PrefsManager {
             if (!prefs.containsKey(key))
                 prefs.put(key, defaults.get(key));
         }
+    }
+
+    public void registerCircuitPreference(String key, Object defaultValue) {
+        // add default value
+        defaults.put(key, defaultValue);
+
+        // check if pref is missing
+        if (!prefs.containsKey(key))
+            prefs.put(key, defaultValue);
     }
 
 }
