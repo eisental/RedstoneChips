@@ -30,7 +30,7 @@ public abstract class Circuit {
     public String[] args;
 
     /**
-     * Input blocks. Will listen to redstone change events on these blocks.
+     * Input blocks. Will listen to redstone change events around these blocks.
      */
     public Block[] inputs;
 

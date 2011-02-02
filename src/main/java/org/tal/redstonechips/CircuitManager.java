@@ -19,6 +19,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.tal.redstonechips.circuit.InputPin;
 
 /**
  *
@@ -28,7 +29,7 @@ public class CircuitManager {
     private RedstoneChips rc;
     
     private List<Circuit> circuits;
-    private Map<Block, Object[]> inputLookupMap = new HashMap<Block, Object[]>();
+    private Map<Block, List<InputPin>> inputLookupMap = new HashMap<Block, List<InputPin>>();
     private Map<Block, Object[]> outputLookupMap = new HashMap<Block, Object[]>();
     private Map<Block, Circuit> structureLookupMap = new HashMap<Block, Circuit>();
     private Map<Block, Circuit> activationLookupMap = new HashMap<Block, Circuit>();
@@ -43,23 +44,28 @@ public class CircuitManager {
         boolean oldVal = (e.getOldCurrent()>0);
         if (newVal==oldVal) return; // not a change
 
-        Object[] o = inputLookupMap.get(e.getBlock());
-        if (o!=null) {
-            final Circuit c = (Circuit)o[0];
-            final int i = (Integer)o[1];
+        List<InputPin> inputList = inputLookupMap.get(e.getBlock());
+        if (inputList==null) return;
+
+        for (InputPin inputPin : inputList) {
+            inputPin.updateValue(e.getBlock(), newVal);
+
+            inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getORedValue());
+
             if (e.getBlock().getType()==Material.STONE_BUTTON) { // manually reset the button after 1 sec.
+                final BlockRedstoneEvent buttonEvent = new BlockRedstoneEvent(e.getBlock(), e.getFace(), e.getNewCurrent(), 0);
                 new Thread() {
                     @Override
                     public void run() {
                         try {
                             sleep(1000);
-                            c.redstoneChange(i, false);
+                            redstoneChange(buttonEvent);
                         } catch (InterruptedException ex) {}
                     }
                 }.start();
             }
-            c.redstoneChange(i, newVal);
         }
+
     }
 
     public void checkForCircuit(Block signBlock, Player player) {
@@ -88,10 +94,14 @@ public class CircuitManager {
 
             if (firstChipBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
                 structure.add(firstChipBlock);
-                scanBranch(firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
+                try {
+                    scanBranch(firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
+                } catch (IllegalArgumentException ie) {
+                    player.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
+                    return;
+                }
 
                 if (outputs.size()>0 || inputs.size()>0) {
-                    if (!checkForLevers(outputs, player)) return;
                     String[] args = getArgsFromSign(sign);
 
                     try {
@@ -109,7 +119,8 @@ public class CircuitManager {
                             this.addCircuitLookups(c);
                             rc.getCircuitPersistence().saveCircuits(circuits);
 
-                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " input" + (inputs.size()!=1?"s":"") + " and " + outputs.size() + " output" + (outputs.size()!=1?"s":"")+ ".");
+                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " input" + (inputs.size()!=1?"s":"") + ", " + outputs.size() + " output" + (outputs.size()!=1?"s":"")+
+                                    rc.getPrefsManager().getInfoColor() + " and " + interfaceBlocks.size() + " interface block(s).");
                             return;
                         } else {
                             player.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
@@ -182,17 +193,36 @@ public class CircuitManager {
         if (!structure.contains(b)) {
             if (b.getType()==rc.getPrefsManager().getInputBlockType()) {
                 structure.add(b);
-                inputs.add(b.getFace(face));
+                inputs.add(b);
             } else if (b.getType()==rc.getPrefsManager().getOutputBlockType()) {
                 structure.add(b);
-                Block o = b.getFace(face);
+                Block o = findLeverAround(b);
                 structure.add(o);
                 outputs.add(o);
             } else if (b.getType()==rc.getPrefsManager().getInterfaceBlockType()) {
                 structure.add(b);
-                interfaces.add(b.getFace(face));
+                interfaces.add(b);
             }
         }
+    }
+
+    private Block findLeverAround(Block b) {
+        Block up = b.getFace(BlockFace.UP);
+        Block north = b.getFace(BlockFace.NORTH);
+        Block east = b.getFace(BlockFace.EAST);
+        Block south = b.getFace(BlockFace.SOUTH);
+        Block west = b.getFace(BlockFace.WEST);
+
+        int leverCount = 0;
+        Block ret = null;
+        if (up.getType()==Material.LEVER) { leverCount++; ret = up; }
+        if (north.getType()==Material.LEVER) { leverCount++; ret = north; }
+        if (east.getType()==Material.LEVER) { leverCount++; ret = east; }
+        if (south.getType()==Material.LEVER) { leverCount++; ret = south; }
+        if (west.getType()==Material.LEVER) { leverCount++; ret = west; }
+        if (leverCount>1) throw new IllegalArgumentException("An output block has more than one lever connected to it.");
+        else if (leverCount==0) throw new IllegalArgumentException("A lever is missing from one or more outputs.");
+        else return ret;
     }
 
     private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
@@ -238,15 +268,6 @@ public class CircuitManager {
         else throw new IllegalArgumentException("Invalid wall sign data value: " + signData);
     }
 
-    private boolean checkForLevers(List<Block> outputs, Player player) {
-        for (Block o : outputs) {
-            if (o.getType()!=Material.LEVER) {
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "A lever is missing from one or more outputs.");
-                return false;
-            }
-        } return true;
-    }
-
     private String[] getArgsFromSign(Sign sign) {
         String sargs = sign.getLine(1) + " " + sign.getLine(2) + " " + sign.getLine(3);
         StringTokenizer t = new StringTokenizer(sargs);
@@ -290,7 +311,7 @@ public class CircuitManager {
         rc.log(Level.INFO, circuits.size() + " active circuits");
     }
 
-    public Object[] lookupInputBlock(Block inputBlock) {
+    public List<InputPin> lookupInputBlock(Block inputBlock) {
         return this.inputLookupMap.get(inputBlock);
     }
 
@@ -302,14 +323,20 @@ public class CircuitManager {
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
 
-        for (int i=0; i<c.inputs.length; i++)
-            inputLookupMap.put(c.inputs[i], new Object[]{c, i});
-
-
         for (int i=0; i<c.outputs.length; i++)
             outputLookupMap.put(c.outputs[i], new Object[]{c, i});
 
         activationLookupMap.put(c.activationBlock, c);
+
+        for (int i=0; i<c.inputs.length; i++) {
+            InputPin ipin = new InputPin(c, c.inputs[i], i);
+            for (Block b : ipin.getPowerBlocks()) {
+                if (!inputLookupMap.containsKey(b))
+                    inputLookupMap.put(b, new ArrayList<InputPin>());
+
+                inputLookupMap.get(b).add(ipin);
+            }
+        }
     }
 
     private void removeCircuitLookups(Circuit c) {

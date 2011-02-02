@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.TargetBlock;
 
 /**
@@ -225,22 +226,23 @@ public class CommandHandler {
     }
 
     private void sendPinInfo(Block target, CommandSender sender) {
-        Object[] io = rc.getCircuitManager().lookupInputBlock(target);
-        if (io==null) {
+
+        List<InputPin> inputList = rc.getCircuitManager().lookupInputBlock(target);
+        if (inputList==null) {
             Object[] oo = rc.getCircuitManager().lookupOutputBlock(target);
             if (oo==null) {
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at an output or input block - ");
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "this can be an output lever or an input button, lever, wire, plate or torch.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at an output lever or input block.");
             } else { // output pin
                 Circuit c = (Circuit)oo[0];
                 int i = (Integer)oo[1];
                 sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
             }
         } else { // input pin
-            Circuit c = (Circuit)io[0];
-            int i = (Integer)io[1];
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
-
+            for (InputPin io : inputList) {
+                Circuit c = io.getCircuit();
+                int i = io.getIndex();
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+            }
         }
     }
 
