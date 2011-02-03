@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -104,30 +104,31 @@ public class CircuitPersistence {
         World world = findWorld((String)map.get("world"));
 
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
-        c.activationBlock = getBlock((List<Integer>)map.get("activationBlock"), world);
-        c.inputs = getBlockArray((List<List<Integer>>)map.get("inputs"), world);
-        c.outputs = getBlockArray((List<List<Integer>>)map.get("outputs"), world);
-        c.interfaceBlocks = getBlockArray((List<List<Integer>>)map.get("interfaces"), world);
-        c.structure = getBlockArray((List<List<Integer>>)map.get("structure"), world);
+        c.world = world;
+        c.activationBlock = getLocation((List<Integer>)map.get("activationBlock"), world);
+        c.inputs = getLocationArray((List<List<Integer>>)map.get("inputs"), world);
+        c.outputs = getLocationArray((List<List<Integer>>)map.get("outputs"), world);
+        c.interfaceBlocks = getLocationArray((List<List<Integer>>)map.get("interfaces"), world);
+        c.structure = getLocationArray((List<List<Integer>>)map.get("structure"), world);
         List<String> signArgs = (List<String>)map.get("signArgs");
         c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
         c.loadState((Map<String,String>)map.get("state"));
         return c;
     }
 
-    private List<Integer> makeBlockList(Block b) {
+    private List<Integer> makeBlockList(Location l) {
         List<Integer> list = new ArrayList<Integer>();
-        list.add(b.getX());
-        list.add(b.getY());
-        list.add(b.getZ());
+        list.add(l.getBlockX());
+        list.add(l.getBlockY());
+        list.add(l.getBlockZ());
 
         return list;
     }
 
-    private Object makeBlockListsList(Block[] inputs) {
+    private Object makeBlockListsList(Location[] locs) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (Block b : inputs)
-            list.add(makeBlockList(b));
+        for (Location l : locs)
+            list.add(makeBlockList(l));
         return list;
     }
 
@@ -138,15 +139,15 @@ public class CircuitPersistence {
         throw new IllegalArgumentException("World " + worldName + " was not found on the server.");
     }
 
-    private Block getBlock(List<Integer> coords, World world) {
-        return world.getBlockAt(coords.get(0), coords.get(1), coords.get(2));
+    private Location getLocation(List<Integer> coords, World world) {
+        return world.getBlockAt(coords.get(0), coords.get(1), coords.get(2)).getLocation();
     }
 
-    private Block[] getBlockArray(List<List<Integer>> list, World world) {
-        List<Block> blocks = new ArrayList<Block>();
+    private Location[] getLocationArray(List<List<Integer>> list, World world) {
+        List<Location> locs = new ArrayList<Location>();
         for (List<Integer> coords : list)
-            blocks.add(getBlock(coords, world));
+            locs.add(getLocation(coords, world));
 
-        return blocks.toArray(new Block[blocks.size()]);
+        return locs.toArray(new Location[locs.size()]);
     }
 }

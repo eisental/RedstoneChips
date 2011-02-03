@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -177,8 +178,8 @@ public class CommandHandler {
         if (c==null) {
             player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to destroy.");
         } else {
-            for (Block b : c.structure)
-                b.setType(Material.AIR);
+            for (Location l : c.structure)
+                c.world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).setType(Material.AIR);
 
             rc.getCircuitManager().destroyCircuit(c, sender);
         }

@@ -18,6 +18,11 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockRightClickEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
@@ -33,6 +38,8 @@ public class RedstoneChips extends JavaPlugin {
 
     private BlockListener rcBlockListener;
     private EntityListener rcEntityListener;
+    private PlayerListener rcPlayerListener;
+    private WorldListener rcWorldListener;
 
     private PrefsManager prefsManager;
     private CircuitManager circuitManager;
@@ -85,6 +92,22 @@ public class RedstoneChips extends JavaPlugin {
                 for (Block b : event.blockList())
                     circuitManager.checkCircuitDestroyed(b, null);
             }
+        };
+
+        rcPlayerListener = new PlayerListener() {
+
+            @Override
+            public void onPlayerQuit(PlayerEvent event) {
+                circuitManager.checkDebuggerQuit(event.getPlayer());
+            }
+        };
+
+        rcWorldListener = new WorldListener() {
+
+            @Override
+            public void onChunkLoaded(ChunkLoadEvent event) {
+                circuitManager.checkUpdateOutputLevers(event.getChunk());
+            }
 
         };
     }
@@ -111,6 +134,8 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
+        pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
+        pm.registerEvent(Type.CHUNK_LOADED, rcWorldListener, Priority.Monitor, this);
 
         PluginDescriptionFile desc = this.getDescription();
         logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");

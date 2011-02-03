@@ -7,6 +7,7 @@ package org.tal.redstonechips.circuit;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -16,17 +17,17 @@ import org.bukkit.block.BlockFace;
  */
 public class InputPin {
     private Circuit circuit;
-    private Block inputBlock;
+    private Location inputLoc;
     private int index;
-    private Map<Block, Boolean> powerBlocks;
+    private Map<Location, Boolean> powerBlocks;
 
-    public InputPin(Circuit circuit, Block block, int index) {
-        inputBlock = block;
+    public InputPin(Circuit circuit, Location loc, int index) {
+        inputLoc = loc;
         this.circuit = circuit;
         this.index = index;
 
         // assuming circuit already has its structure block set up.
-        powerBlocks = new HashMap<Block, Boolean>();
+        powerBlocks = new HashMap<Location, Boolean>();
 
         addPowerBlock(BlockFace.UP);
         addPowerBlock(BlockFace.NORTH);
@@ -37,7 +38,7 @@ public class InputPin {
 
     public Circuit getCircuit() { return circuit; }
 
-    public Block getInputBlock() { return inputBlock; }
+    public Location getInputLocation() { return inputLoc; }
 
     public int getIndex() { return index; }
 
@@ -50,14 +51,15 @@ public class InputPin {
     }
 
     private void addPowerBlock(BlockFace direction) {
+        Block inputBlock = circuit.world.getBlockAt(inputLoc.getBlockX(), inputLoc.getBlockY(), inputLoc.getBlockZ());
         Block b = inputBlock.getFace(direction);
-        if (!partOfStructure(b)) powerBlocks.put(b, b.isBlockPowered());
+
+        if (!partOfStructure(b)) powerBlocks.put(b.getLocation(), b.getData()>0);
     }
 
     private boolean partOfStructure(Block b) {
-        for (Block s : circuit.structure) {
-            if (s==b) {
-                System.out.println("Not adding block " + b + " as input src since already part of structure.");
+        for (Location l : circuit.structure) {
+            if (l.equals(b.getLocation())) {
                 return true;
             }
         }
@@ -65,16 +67,16 @@ public class InputPin {
         return false;
     }
 
-    public void updateValue(Block block, boolean newVal) {
-        if (!powerBlocks.containsKey(block))
-            throw new IllegalArgumentException("Block " + block + " is not a power block of input " + index + " of circuit " + circuit);
+    public void updateValue(Location loc, boolean newVal) {
+        if (!powerBlocks.containsKey(loc))
+            throw new IllegalArgumentException("Block @ " + loc + " is not a power block of input " + index + " of circuit " + circuit);
         else {
-            powerBlocks.put(block, newVal);
+            powerBlocks.put(loc, newVal);
         }
 
     }
 
-    public Iterable<Block> getPowerBlocks() {
+    public Iterable<Location> getPowerBlocks() {
         return powerBlocks.keySet();
     }
 }

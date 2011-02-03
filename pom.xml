@@ -4,7 +4,7 @@
   <groupId>org.tal</groupId>
   <artifactId>RedstoneChips</artifactId>
   <packaging>jar</packaging>
-  <version>0.72</version>
+  <version>0.75</version>
   <name>RedstoneChips</name>
   <url>http://maven.apache.org</url>
   <repositories>

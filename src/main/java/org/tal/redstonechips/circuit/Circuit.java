@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -32,28 +33,28 @@ public abstract class Circuit {
     /**
      * Input blocks. Will listen to redstone change events around these blocks.
      */
-    public Block[] inputs;
+    public Location[] inputs;
 
     /**
      * Output blocks. List of lever blocks.
      */
-    public Block[] outputs;
+    public Location[] outputs;
 
     /**
      * Contains any block that is part of this circuit. When any block is broken the circuit is destroyed.
      * This includes the sign block, body blocks, input blocks, output blocks and output lever blocks.
      */
-    public Block[] structure;
+    public Location[] structure;
 
     /**
      * Interface blocks. Used for interaction points with the physical world.
      */
-    public Block[] interfaceBlocks;
+    public Location[] interfaceBlocks;
 
     /**
      * The sign block. Used to activate the circuit.
      */
-    public Block activationBlock;
+    public Location activationBlock;
 
     /**
      * Reference to the minecraft World this circuit was built in.
@@ -100,6 +101,8 @@ public abstract class Circuit {
      * @return true if block is an input of this circuit.
      */
     public void redstoneChange(int idx, boolean newVal) {
+        if (inputBits.get(idx)==newVal) return;
+
         inputBits.set(idx, newVal);
         if (hasDebuggers()) debug("Input change: " + bitSetToBinaryString(inputBits, 0, inputs.length) + " (" + bitSetToUnsignedInt(inputBits, 0, inputs.length) + ")");
         inputChange(idx, newVal);
@@ -146,6 +149,15 @@ public abstract class Circuit {
     public void circuitDestroyed() {}
 
     /**
+     * Causes the circuit to update the state of its output levers according to the values
+     * in outputBits.
+     */
+    public void updateOutputLevers() {
+        for (int i=0; i<outputs.length; i++)
+            changeLeverState(getOutputBlock(i), outputBits.get(i));
+    }
+
+    /**
      * Sets the physical state of one of the outputs.
      * Changes the data byte of the selected output block to make a lever on or off.
      *
@@ -156,10 +168,13 @@ public abstract class Circuit {
         if (outputBits.get(outIdx)==level) return; // nothing to update.
 
         outputBits.set(outIdx, level);
+        changeLeverState(getOutputBlock(outIdx), level);
+    }
 
-        byte data = outputs[outIdx].getData();
+    private void changeLeverState(Block lever, boolean level) {
+        byte data = lever.getData();
         try {
-            outputs[outIdx].setData((byte)(level ? 0x8 : data&0x7));
+            lever.setData((byte)(level ? 0x8 : data&0x7));
         } catch (ConcurrentModificationException me) {
             //Logger.getLogger("Minecraft").warning("We had another concurrent modification at sendoutput");
         }
@@ -354,7 +369,18 @@ public abstract class Circuit {
         return this.getClass().getSimpleName();
     }
 
-    public Iterable<Player> getDebuggers() {
+    public List<Player> getDebuggers() {
         return debuggers;
     }
+
+    protected Block getOutputBlock(int outputIdx) {
+        Location l = outputs[outputIdx];
+        return world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+    }
+
+    protected Block getInputBlock(int inputIdx) {
+        Location l = inputs[inputIdx];
+        return world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+    }
+
 }

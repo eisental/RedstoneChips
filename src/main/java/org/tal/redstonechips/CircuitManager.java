@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips;
 
+import org.bukkit.Chunk;
 import org.tal.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,6 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.tal.redstonechips.circuit.InputPin;
+import org.tal.redstonechips.util.ChunkLocation;
 
 /**
  *
@@ -29,10 +32,12 @@ public class CircuitManager {
     private RedstoneChips rc;
     
     private List<Circuit> circuits;
-    private Map<Block, List<InputPin>> inputLookupMap = new HashMap<Block, List<InputPin>>();
-    private Map<Block, Object[]> outputLookupMap = new HashMap<Block, Object[]>();
-    private Map<Block, Circuit> structureLookupMap = new HashMap<Block, Circuit>();
-    private Map<Block, Circuit> activationLookupMap = new HashMap<Block, Circuit>();
+
+    private Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
+    private Map<Location, List<InputPin>> inputLookupMap = new HashMap<Location, List<InputPin>>();
+    private Map<Location, Object[]> outputLookupMap = new HashMap<Location, Object[]>();
+    private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
+    private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
     public CircuitManager(RedstoneChips plugin) {
         rc = plugin;
@@ -44,11 +49,11 @@ public class CircuitManager {
         boolean oldVal = (e.getOldCurrent()>0);
         if (newVal==oldVal) return; // not a change
 
-        List<InputPin> inputList = inputLookupMap.get(e.getBlock());
+        List<InputPin> inputList = inputLookupMap.get(e.getBlock().getLocation());
         if (inputList==null) return;
 
         for (InputPin inputPin : inputList) {
-            inputPin.updateValue(e.getBlock(), newVal);
+            inputPin.updateValue(e.getBlock().getLocation(), newVal);
 
             inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getORedValue());
 
@@ -82,18 +87,18 @@ public class CircuitManager {
             // then check if the sign text points to a known circuit type
             if (!rc.getCircuitLoader().getCircuitClasses().containsKey(sign.getLine(0).trim())) return;
 
-            List<Block> inputs = new ArrayList<Block>();
-            List<Block> outputs = new ArrayList<Block>();
-            List<Block> structure = new ArrayList<Block>();
-            List<Block> interfaceBlocks = new ArrayList<Block>();
+            List<Location> inputs = new ArrayList<Location>();
+            List<Location> outputs = new ArrayList<Location>();
+            List<Location> structure = new ArrayList<Location>();
+            List<Location> interfaceBlocks = new ArrayList<Location>();
 
-            structure.add(signBlock);
+            structure.add(signBlock.getLocation());
             
             BlockFace direction = findSignDirection(signBlock.getData());
             Block firstChipBlock = signBlock.getFace(direction);
 
             if (firstChipBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
-                structure.add(firstChipBlock);
+                structure.add(firstChipBlock.getLocation());
                 try {
                     scanBranch(firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
                 } catch (IllegalArgumentException ie) {
@@ -106,17 +111,18 @@ public class CircuitManager {
 
                     try {
                         Circuit c = rc.getCircuitLoader().getCircuitInstance(sign.getLine(0).trim());
-                        c.activationBlock = signBlock;
-                        c.inputs = inputs.toArray(new Block[inputs.size()]);
-                        c.outputs = outputs.toArray(new Block[outputs.size()]);
-                        c.structure = structure.toArray(new Block[structure.size()]);
-                        c.interfaceBlocks = interfaceBlocks.toArray(new Block[interfaceBlocks.size()]);
+                        c.world = signBlock.getWorld();
+                        c.activationBlock = signBlock.getLocation();
+                        c.inputs = inputs.toArray(new Location[inputs.size()]);
+                        c.outputs = outputs.toArray(new Location[outputs.size()]);
+                        c.structure = structure.toArray(new Location[structure.size()]);
+                        c.interfaceBlocks = interfaceBlocks.toArray(new Location[interfaceBlocks.size()]);
 
                         c.args = args;
-
+                        
                         if (c.initCircuit(player, args, rc)) {
+                            this.addCircuitLookups(c, true);
                             circuits.add(c);
-                            this.addCircuitLookups(c);
                             rc.getCircuitPersistence().saveCircuits(circuits);
 
                             player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " input" + (inputs.size()!=1?"s":"") + ", " + outputs.size() + " output" + (outputs.size()!=1?"s":"")+
@@ -144,7 +150,7 @@ public class CircuitManager {
         for (Circuit c : circuits) c.circuitDestroyed();
     }
 
-    private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void scanBranch(Block origin, BlockFace direction, List<Location> inputs, List<Location> outputs, List<Location> interfaces, List<Location> structure) {
         // look in every horizontal direction for inputs, outputs or interface blocks.
         checkAttachedIO(origin, direction, inputs, outputs, interfaces, structure);
 
@@ -152,7 +158,7 @@ public class CircuitManager {
         checkAttachedChipBlock(origin, direction, inputs, outputs, interfaces, structure);
     }
 
-    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Location> inputs, List<Location> outputs, List<Location> interfaces, List<Location> structure) {
         
         // look for chip blocks in original direction
         checkForChipBlockOnSideFace(origin, direction, inputs, outputs, interfaces, structure);
@@ -162,15 +168,15 @@ public class CircuitManager {
 
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
         Block up = origin.getFace(BlockFace.UP);
-        if (!structure.contains(up) && up.getType()==rc.getPrefsManager().getChipBlockType()) {
-            structure.add(up);
+        if (!structure.contains(up.getLocation()) && up.getType()==rc.getPrefsManager().getChipBlockType()) {
+            structure.add(up.getLocation());
             scanBranch(up, direction, inputs, outputs, interfaces, structure);
         }
 
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
         Block down = origin.getFace(BlockFace.DOWN);
-        if (!structure.contains(down) && down.getType()==rc.getPrefsManager().getChipBlockType()) {
-            structure.add(down);
+        if (!structure.contains(down.getLocation()) && down.getType()==rc.getPrefsManager().getChipBlockType()) {
+            structure.add(down.getLocation());
             scanBranch(down, direction, inputs, outputs, interfaces, structure);
         }
 
@@ -181,27 +187,27 @@ public class CircuitManager {
         checkForChipBlockOnSideFace(origin, getLeftFace(direction), inputs, outputs, interfaces, structure);
     }
 
-    private void checkAttachedIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkAttachedIO(Block origin, BlockFace face, List<Location> inputs, List<Location> outputs, List<Location> interfaces, List<Location> structure) {
         checkForIO(origin, getRightFace(face), inputs, outputs, interfaces, structure);
         checkForIO(origin, getLeftFace(face), inputs, outputs, interfaces, structure);
         checkForIO(origin, face, inputs, outputs, interfaces, structure);
         checkForIO(origin, getOppositeFace(face), inputs, outputs, interfaces, structure);
     }
 
-    private void checkForIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkForIO(Block origin, BlockFace face, List<Location> inputs, List<Location> outputs, List<Location> interfaces, List<Location> structure) {
         Block b = origin.getFace(face);
-        if (!structure.contains(b)) {
+        if (!structure.contains(b.getLocation())) {
             if (b.getType()==rc.getPrefsManager().getInputBlockType()) {
-                structure.add(b);
-                inputs.add(b);
+                structure.add(b.getLocation());
+                inputs.add(b.getLocation());
             } else if (b.getType()==rc.getPrefsManager().getOutputBlockType()) {
-                structure.add(b);
+                structure.add(b.getLocation());
                 Block o = findLeverAround(b);
-                structure.add(o);
-                outputs.add(o);
+                structure.add(o.getLocation());
+                outputs.add(o.getLocation());
             } else if (b.getType()==rc.getPrefsManager().getInterfaceBlockType()) {
-                structure.add(b);
-                interfaces.add(b);
+                structure.add(b.getLocation());
+                interfaces.add(b.getLocation());
             }
         }
     }
@@ -225,11 +231,11 @@ public class CircuitManager {
         else return ret;
     }
 
-    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Location> inputs, List<Location> outputs, List<Location> interfaces, List<Location> structure) {
         Block b = origin.getFace(face);
-        if (!structure.contains(b)) {
+        if (!structure.contains(b.getLocation())) {
             if (b.getType()==rc.getPrefsManager().getChipBlockType()) {
-                structure.add(b);
+                structure.add(b.getLocation());
                 scanBranch(b, face, inputs, outputs, interfaces, structure);
             }
         }
@@ -282,7 +288,7 @@ public class CircuitManager {
     }
 
     public void checkCircuitDestroyed(Block b, Player p) {
-        Circuit destroyed = structureLookupMap.get(b);
+        Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.contains(destroyed)) {
             destroyCircuit(destroyed, p);
@@ -295,60 +301,95 @@ public class CircuitManager {
     }
 
     public Circuit getCircuitByStructureBlock(Block structureBlock) {
-        return this.structureLookupMap.get(structureBlock);
+        return this.structureLookupMap.get(structureBlock.getLocation());
     }
 
     public Circuit getCircuitByActivationBlock(Block activationBlock) {
-        return this.activationLookupMap.get(activationBlock);
+        return this.activationLookupMap.get(activationBlock.getLocation());
     }
 
     void setCircuitList(List<Circuit> circuits) {
         this.circuits = circuits;
 
         for (Circuit c : circuits)
-            addCircuitLookups(c);
+            addCircuitLookups(c, false);
 
         rc.log(Level.INFO, circuits.size() + " active circuits");
     }
 
     public List<InputPin> lookupInputBlock(Block inputBlock) {
-        return this.inputLookupMap.get(inputBlock);
+        return this.inputLookupMap.get(inputBlock.getLocation());
     }
 
     public Object[] lookupOutputBlock(Block outputBlock) {
-        return this.outputLookupMap.get(outputBlock);
+        return this.outputLookupMap.get(outputBlock.getLocation());
     }
 
-    private void addCircuitLookups(Circuit c) {
+    private void addCircuitLookups(Circuit c, boolean newCircuit) {
+        List<Chunk> usedChunks = new ArrayList<Chunk>();
+
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
 
-        for (int i=0; i<c.outputs.length; i++)
+        for (int i=0; i<c.outputs.length; i++) {
             outputLookupMap.put(c.outputs[i], new Object[]{c, i});
+
+            Chunk outputChunk = c.world.getBlockAt(c.outputs[i].getBlockX(), c.outputs[i].getBlockY(), c.outputs[i].getBlockZ()).getChunk();
+
+            if (!usedChunks.contains(outputChunk))
+                usedChunks.add(outputChunk);
+        }
 
         activationLookupMap.put(c.activationBlock, c);
 
         for (int i=0; i<c.inputs.length; i++) {
             InputPin ipin = new InputPin(c, c.inputs[i], i);
-            for (Block b : ipin.getPowerBlocks()) {
-                if (!inputLookupMap.containsKey(b))
-                    inputLookupMap.put(b, new ArrayList<InputPin>());
+            for (Location l : ipin.getPowerBlocks()) {
+                if (!inputLookupMap.containsKey(l))
+                    inputLookupMap.put(l, new ArrayList<InputPin>());
 
-                inputLookupMap.get(b).add(ipin);
+                inputLookupMap.get(l).add(ipin);
             }
+
+            if (newCircuit) c.inputChange(ipin.getIndex(), ipin.getORedValue());
+        }
+
+        for (Chunk chunk : usedChunks) {
+            ChunkLocation cl = ChunkLocation.fromChunk(chunk);
+            if (!chunkLookupMap.containsKey(cl))
+                chunkLookupMap.put(cl, new ArrayList<Circuit>());
+            chunkLookupMap.get(cl).add(c);
+        }
+
+        if (newCircuit) {
+            // in case the levers were already on before activation.
+            c.updateOutputLevers();
         }
     }
 
     private void removeCircuitLookups(Circuit c) {
-        for (Block block : c.structure)
-            structureLookupMap.remove(block);
+        for (Location l : c.structure)
+            structureLookupMap.remove(l);
 
-        for (Block input : c.inputs)
-            inputLookupMap.remove(input);
+        for (Location l : c.outputs)
+            outputLookupMap.remove(l);
 
-        for (Block output : c.outputs)
-            outputLookupMap.remove(output);
+        List<Location> inputBlocksToRemove = new ArrayList<Location>();
+        for (Location l : inputLookupMap.keySet()) {
+            List<InputPin> pins = inputLookupMap.get(l);
+            List<InputPin> toRemove = new ArrayList<InputPin>();
+            for (InputPin pin : pins) {
+                if (pin.getCircuit()==c)
+                    toRemove.add(pin);
+            }
 
+            pins.removeAll(toRemove);
+            if (pins.isEmpty())
+                inputBlocksToRemove.add(l);
+        }
+        for (Location l : inputBlocksToRemove)
+            inputLookupMap.remove(l);
+        
         activationLookupMap.remove(c.activationBlock);
 
     }
@@ -359,7 +400,9 @@ public class CircuitManager {
         circuits.remove(destroyed);
         removeCircuitLookups(destroyed);
 
-        for (Block output : destroyed.outputs) {
+        for (Location l : destroyed.outputs) {
+            Block output = destroyed.world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+
             if (output.getType()==Material.LEVER) {
                 // turn lever off
                 output.setData((byte)(output.getData()&0x7));
@@ -378,5 +421,23 @@ public class CircuitManager {
         }
         rc.getCircuitPersistence().saveCircuits(circuits);
 
+    }
+
+    public void checkDebuggerQuit(Player player) {
+        for (Circuit c : circuits) {
+            if (c.getDebuggers().contains(player)) {
+                c.getDebuggers().remove(player);
+            }
+
+        }
+    }
+
+    public void checkUpdateOutputLevers(Chunk chunk) {
+        List<Circuit> circuitsInChunk = chunkLookupMap.get(ChunkLocation.fromChunk(chunk));
+        if (circuitsInChunk!=null) {
+            for (Circuit c : circuitsInChunk) {
+                c.updateOutputLevers();
+            }
+        }
     }
 }
