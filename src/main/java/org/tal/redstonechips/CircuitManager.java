@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -125,8 +126,13 @@ public class CircuitManager {
                             circuits.add(c);
                             rc.getCircuitPersistence().saveCircuits(circuits);
 
-                            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Activated " + c.getClass().getSimpleName() + " with " + inputs.size() + " input" + (inputs.size()!=1?"s":"") + ", " + outputs.size() + " output" + (outputs.size()!=1?"s":"")+
-                                    rc.getPrefsManager().getInfoColor() + " and " + interfaceBlocks.size() + " interface block(s).");
+                            ChatColor infoColor = rc.getPrefsManager().getInfoColor();
+                            ChatColor debugColor = rc.getPrefsManager().getDebugColor();
+                            player.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + infoColor + " circuit:");
+                            player.sendMessage(debugColor + "> " + ChatColor.WHITE + inputs.size() + debugColor + " input"
+                                    + (inputs.size()!=1?"s":"") + ", " + ChatColor.YELLOW + outputs.size() + debugColor + " output"
+                                    + (outputs.size()!=1?"s":"") + " and " + ChatColor.BLUE + interfaceBlocks.size() + debugColor
+                                    + " interface block" + (interfaceBlocks.size()!=1?"s":"") + ".");
                             return;
                         } else {
                             player.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
