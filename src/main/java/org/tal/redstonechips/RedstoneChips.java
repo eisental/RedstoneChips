@@ -1,6 +1,8 @@
 package org.tal.redstonechips;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Server;
@@ -21,7 +23,6 @@ import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
@@ -46,6 +47,8 @@ public class RedstoneChips extends JavaPlugin {
     private CircuitPersistence circuitPersistence;
     private CircuitLoader circuitLoader;
     private CommandHandler commandHandler;
+
+    private static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
     public RedstoneChips(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -112,6 +115,10 @@ public class RedstoneChips extends JavaPlugin {
         };
     }
 
+    public static void addCircuitLibrary(CircuitIndex lib) {
+        circuitLibraries.add(lib);
+    }
+
     @Override
     public void onDisable() {
         circuitPersistence.saveCircuits(circuitManager.getCircuits());
@@ -123,12 +130,28 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PluginManager pm = getServer().getPluginManager();
+        PluginDescriptionFile desc = this.getDescription();
+        logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");
+
+        // load circuit classes
+        for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
+            String libMsg = desc.getName() + ": Loading " + lib.getClass().getSimpleName() + " > ";
+            Class[] classes = lib.getCircuitClasses();
+            if (classes != null && classes.length>0) {
+                for (Class c : classes)
+                    libMsg += c.getSimpleName() + ", ";
+
+                logg.info(libMsg.substring(0, libMsg.length()-2) + ".");
+                
+                this.addCircuitClasses(classes);
+            } else
+                logg.info(libMsg + "No circuit classes were loaded.");
+        }
 
         prefsManager.loadPrefs();
         circuitManager.setCircuitList(circuitPersistence.loadCircuits());
 
-
+        PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_RIGHTCLICKED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
@@ -136,9 +159,6 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
         pm.registerEvent(Type.CHUNK_LOADED, rcWorldListener, Priority.Monitor, this);
-
-        PluginDescriptionFile desc = this.getDescription();
-        logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");
     }
 
     @Override

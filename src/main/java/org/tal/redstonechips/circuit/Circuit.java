@@ -337,12 +337,12 @@ public abstract class Circuit {
 
     protected void error(Player player, String message) {
         if (player!=null) player.sendMessage(redchips.getPrefsManager().getErrorColor() + message);
-        else Logger.getLogger("Minecraft").warning(this.getClass().getSimpleName() + ": " + message);
+        else Logger.getLogger("Minecraft").warning(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
     protected void info(Player player, String message) {
         if (player!=null) player.sendMessage(redchips.getPrefsManager().getInfoColor() + message);
-        else Logger.getLogger("Minecraft").info(this.getClass().getSimpleName() + ": " + message);
+        //else Logger.getLogger("Minecraft").info(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
     protected void debug(String message) {
