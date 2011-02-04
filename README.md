@@ -21,7 +21,8 @@ Installation
 
 Changelog
 ----------
-#### RedstoneChips 0.75 (4/02/11)
+#### RedstoneChips 0.76 (and 0.75) (4/02/11)
+- New circuit library loading mechanism for solving startup issues. Adding new circuit libraries should be a bit easier.
 - Circuits can receive redstone current from the top or any side of an input block.
 - Output levers can be attached to any side or on top of an output block.
 - Controlled blocks can be attached to any side (including top and bottom) of an interface block.

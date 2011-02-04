@@ -25,6 +25,8 @@ public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex 
 
     public CircuitLibrary(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
+
+        RedstoneChips.addCircuitLibrary(this);
     }
 
     @Override
