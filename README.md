@@ -22,10 +22,10 @@ Installation
 Changelog
 ----------
 #### RedstoneChips 0.75 (4/02/11)
-- Circuits can receive redstone current from the top or any side of an input block
-- Output levers can be attached to any side or on top of an output block
-- Controlled blocks can be attached to any side (including top and bottom) of an interface block 
-- Circuits will now update their output levers when their chunk is loaded
+- Circuits can receive redstone current from the top or any side of an input block.
+- Output levers can be attached to any side or on top of an output block.
+- Controlled blocks can be attached to any side (including top and bottom) of an interface block.
+- Circuits will now update their output levers when their chunk is loaded.
 - After activating a circuit its outputs are now immediately updated according to the current state of its inputs.
 - Fixed some bugs dealing with chunk load / unload and other stuff.
 
