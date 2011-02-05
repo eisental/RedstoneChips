@@ -44,4 +44,6 @@ public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex 
         redstoneChips = (RedstoneChips)p;
     }
 
+    @Override
+    public void onRedstoneChipsEnable() { }
 }

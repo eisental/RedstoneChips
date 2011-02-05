@@ -23,7 +23,7 @@ public abstract class Circuit {
     /**
      * Reference to the core plugin instance.
      */
-    private RedstoneChips redchips;
+    protected RedstoneChips redstoneChips;
 
     /**
      * Circuit sign arguments. Any word found on the circuit sign from line 2 onward.
@@ -83,7 +83,7 @@ public abstract class Circuit {
      * @return result of call to Circuit.init()
      */
     public final boolean initCircuit(Player player, String[] args, RedstoneChips rc) {
-        this.redchips = rc;
+        this.redstoneChips = rc;
         debuggers = new ArrayList<Player>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
@@ -336,18 +336,18 @@ public abstract class Circuit {
     }
 
     protected void error(Player player, String message) {
-        if (player!=null) player.sendMessage(redchips.getPrefsManager().getErrorColor() + message);
-        else Logger.getLogger("Minecraft").warning(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
+        if (player!=null) player.sendMessage(redstoneChips.getPrefsManager().getErrorColor() + message);
+        else Logger.getLogger("Minecraft").warning(redstoneChips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
     protected void info(Player player, String message) {
-        if (player!=null) player.sendMessage(redchips.getPrefsManager().getInfoColor() + message);
+        if (player!=null) player.sendMessage(redstoneChips.getPrefsManager().getInfoColor() + message);
         //else Logger.getLogger("Minecraft").info(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
     protected void debug(String message) {
         for (Player p : debuggers)
-            p.sendMessage(redchips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + ": " + message);
+            p.sendMessage(redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + ": " + message);
     }
 
     public void addDebugger(Player d) {

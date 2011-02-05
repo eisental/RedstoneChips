@@ -51,10 +51,12 @@ public class CircuitPersistence {
                     try {
                         Circuit c = parseCircuitMap(circuitMap);
                         circuits.add(c);
+                    } catch (IllegalArgumentException ie) {
+                        rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                     } catch (InstantiationException ex) {
-                        rc.log(Level.SEVERE, ex.toString());
+                        rc.log(Level.WARNING, ex.toString());
                     } catch (IllegalAccessException ex) {
-                        rc.log(Level.SEVERE, ex.toString());
+                        rc.log(Level.WARNING, ex.toString());
                     }
                 }
             }

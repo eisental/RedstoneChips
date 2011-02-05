@@ -98,6 +98,14 @@ public class Range {
         else return 1;
     }
 
+    public boolean isInRange(double value) {
+        if (has1 && value<num1) return false;
+
+        if (has2 && value>num2) return false;
+
+        return true;
+    }
+
     @Override
     public String toString() {
         return (has1?""+num1:"") + ".." + (has2?""+num2:"");

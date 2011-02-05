@@ -115,6 +115,27 @@ public class RedstoneChips extends JavaPlugin {
         };
     }
 
+    /**
+     * Tells the plugin to add a list of circuit classes to the circuit loader.
+     * @param circuitClasses An array of Class objects that extend the Circuit class.
+     */
+    public void addCircuitClasses(Class... circuitClasses) {
+        for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
+    }
+
+    /**
+     * Removes a list of circuit classes from the circuit loader.
+     * @param circuitClasses An array of Class objects to be removed.
+     */
+    public void removeCircuitClasses(Class... circuitClasses) {
+        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
+    }
+
+    /**
+     * Tells the plugin to load circuit classes from this circuit library when enabled.
+     *
+     * @param lib Any object implementing the CircuitIndex interface.
+     */
     public static void addCircuitLibrary(CircuitIndex lib) {
         circuitLibraries.add(lib);
     }
@@ -146,6 +167,10 @@ public class RedstoneChips extends JavaPlugin {
                 this.addCircuitClasses(classes);
             } else
                 logg.info(libMsg + "No circuit classes were loaded.");
+        }
+
+        for (CircuitIndex lib : this.circuitLibraries) {
+            lib.onRedstoneChipsEnable();
         }
 
         prefsManager.loadPrefs();
@@ -190,30 +215,38 @@ public class RedstoneChips extends JavaPlugin {
         } else return false;
     }
 
-    public void addCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
-    }
-
-    public void removeCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
-    }
-
     void log(Level level, String message) {
         logg.log(level, this.getDescription().getName() + ": " + message);
     }
 
+    /**
+     * Returns the plugin's preference manager. The object responsible for loading, saving and editing the plugin preferences.
+     * @return A reference to the plugin's PrefsManager object.
+     */
     public PrefsManager getPrefsManager() {
         return prefsManager;
     }
 
+    /**
+     * Returns the plugin's circuit loader. The object responsible for creating new instances of Circuit classes.
+     * @return A reference to the plugin's CircuitLoader object.
+     */
     public CircuitLoader getCircuitLoader() {
         return circuitLoader;
     }
 
+    /**
+     * Returns the plugin's circuit manager. The object responsible for creating and managing active circuits.
+     * @return A reference to the plugin's CircuitManager object.
+     */
     public CircuitManager getCircuitManager() {
         return circuitManager;
     }
 
+    /**
+     * Returns the plugin's circuit loader. The object responsible for saving and loading the active circuit list from storage.
+     * @return A reference to the plugin's CircuitPresistence object.
+     */
     CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
     }

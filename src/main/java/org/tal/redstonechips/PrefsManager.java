@@ -191,12 +191,23 @@ public class PrefsManager {
         }
     }
 
-    public void registerCircuitPreference(String key, Object defaultValue) {
+    /**
+     * Allows circuit libraries to register their own preferences keys. This method should be called
+     * in the circuit libraries constructor to insure the key is added before RedstoneChips is enabled.
+     * The name of the circuit class is prepended to the key together with a dot - i.e. the preference key becomes name.key
+     *
+     * @param circuitClass The circuit class that uses this preference key.
+     * @param key The new preference key.
+     * @param defaultValue The preference default value.
+     */
+    public void registerCircuitPreference(Class circuitClass, String key, Object defaultValue) {
+        key = circuitClass.getSimpleName() + "." + key;
+
         // add default value
         defaults.put(key, defaultValue);
 
         // check if pref is missing
-        if (!prefs.containsKey(key))
+        if (prefs!=null && !prefs.containsKey(key))
             prefs.put(key, defaultValue);
     }
 
