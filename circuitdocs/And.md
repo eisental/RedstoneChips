@@ -11,8 +11,8 @@ Performs a logical AND operation on any number of bit groups and outputs the res
 
 
 #### I/O setup 
-* Number of output pins sets the word length of each bit set.  
-* Number of input pins can be any multiple of the word length.
+* Can have any number of outputs. The number of output pins determines the number of bits in each input bit set.  
+* The number of input pins can be any multiple of the number of outputs.
 
 #### Sign text
 `   and   `

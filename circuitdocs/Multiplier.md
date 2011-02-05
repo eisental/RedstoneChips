@@ -3,7 +3,7 @@ layout: main
 title: multiplier
 ---
 
-Performs an arithmetic multiplication on any number of bit sets and outputs the result as a binary number.
+Performs an arithmetic multiplication on any number of input bit sets and outputs the result as a binary number.
 If an optional constant argument is added to the sign text, the IC will multiply the result by the constant.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/multiplier.java)
@@ -12,8 +12,8 @@ If an optional constant argument is added to the sign text, the IC will multiply
 
 
 #### I/O setup 
-* Number of output pins sets the word length of each bit set.  
-* Number of input pins can be any multiple of the word length.
+* Can have any number of outputs. The number of output pins determines the number of bits in each input bit set.  
+* The number of input pins can be any multiple of the number of outputs.
 
 #### Sign text
 1. `   multiplier   `

@@ -3,7 +3,8 @@ layout: main
 title: print
 ---
 
-Prints the data pins (inputs 1 and above) as text on a sign block when the clock pin (input 0) is set to high. The sign should be placed on the output block, 1 block after the last body block of the circuit. This means you can also place it as a wall-sign on the opposite end of the circuit to the circuit sign.
+Prints the data pins (inputs 1 and above) as text on a sign block when the clock pin (input 0) is set to high. 
+Any wall sign, attached to an interface block will be updated.
 
 The first sign argument sets the way the data is printed to the sign.
 * num - prints input bits as unsigned integer.
@@ -15,6 +16,8 @@ The first sign argument sets the way the data is printed to the sign.
 * bin - prints the incoming bits as a series of 0s and 1s.
 
 A second sign argument with the word 'add' would cause the chip to add any new printed text to what's already printed.
+If the clock signal fails to update the signs, you can try using a redstone repeater (two redstone inverters in a row) between the 
+clock source (this can be also a lever or button of course) and the clock pin.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/print.java)
 
@@ -22,7 +25,7 @@ A second sign argument with the word 'add' would cause the chip to add any new p
 
 
 #### I/O setup 
-* At least 2 inputs and 0 outputs. 
+* At least 2 inputs and no outputs. 
 
 #### Sign text
 1. `   print   `

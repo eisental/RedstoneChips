@@ -4,7 +4,7 @@ title: random
 ---
 
 When one of the input pins becomes high its corresponding output pin is randomly set (50% chance) to either high or low.
-The chip can have any number of matching inputs and outputs. It's also possible to use 1 input pin to trigger any number of outputs.
+The chip can have any number of matching inputs and outputs. It's also possible to use 1 input pin to trigger any number of outputs simultaneously.
  
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/random.java)
 
