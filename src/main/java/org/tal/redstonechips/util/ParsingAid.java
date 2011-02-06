@@ -1,5 +1,3 @@
-package org.tal.redstonechips.util;
-
 /*
  * ParsingAid.java
  *
@@ -21,6 +19,7 @@ package org.tal.redstonechips.util;
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.tal.redstonechips.util;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;

@@ -30,9 +30,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.LongBuffer;
 import java.util.Arrays;
-import java.util.BitSet;
 
 /**
+ * Borrowed from JDK7 so I can use the new valueOf() methods.
+ *
  * This class implements a vector of bits that grows as needed. Each
  * component of the bit set has a {@code boolean} value. The
  * bits of a {@code BitSet} are indexed by nonnegative integers.

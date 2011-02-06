@@ -1,6 +1,5 @@
 package org.tal.redstonechips.circuit;
 
-
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
- * Represents a redstone integrated circuit.
+ * Represents a RedstoneChips circuit.
  *
  * @author Tal Eisenberg
  */
@@ -31,28 +30,28 @@ public abstract class Circuit {
     public String[] args;
 
     /**
-     * Input blocks. Will listen to redstone change events around these blocks.
+     * Input block locations. The circuit will listen to redstone change events around these blocks.
      */
     public Location[] inputs;
 
     /**
-     * Output blocks. List of lever blocks.
+     * Output blocks. List of lever block locations.
      */
     public Location[] outputs;
 
     /**
-     * Contains any block that is part of this circuit. When any block is broken the circuit is destroyed.
-     * This includes the sign block, body blocks, input blocks, output blocks and output lever blocks.
+     * Contains the location of any block that is part of this circuit. When any block in this array is broken the circuit is destroyed.
+     * This includes the sign block, chip blocks, input blocks, output blocks and output lever blocks.
      */
     public Location[] structure;
 
     /**
-     * Interface blocks. Used for interaction points with the physical world.
+     * Interface block locations. Used for interaction points with the "physical" world.
      */
     public Location[] interfaceBlocks;
 
     /**
-     * The sign block. Used to activate the circuit.
+     * The location of the sign block that was used to activate the circuit.
      */
     public Location activationBlock;
 
@@ -78,9 +77,9 @@ public abstract class Circuit {
 
     /**
      *
-     * @param player The player that activated the circuit. Used for sending error or status messages when activating.
-     * @param args The sign arguments of this circuit. Stored in this.args.
-     * @return result of call to Circuit.init()
+     * @param player The player that activated the circuit. Used for sending error or status messages after activation.
+     * @param args The sign arguments of this circuit. Stored in the args field.
+     * @return result of call to abstract Circuit.init() method.
      */
     public final boolean initCircuit(Player player, String[] args, RedstoneChips rc) {
         this.redstoneChips = rc;
@@ -93,12 +92,12 @@ public abstract class Circuit {
     }
 
     /**
-     * Called by the plugin whenever a redstone change event is fired with a new redstone current.
-     * If block is an input of this circuit, the new value is stored in inputBits bit set
-     * and Circuit.inputChange() method is called.
+     * Called by the plugin whenever a redstone change event is fired with a new redstone current on blocks surrounding or on top of 
+     * a circuit input. If the new value is different from the corresponding value stored in inputBits the inputBits value is updated
+     * and the inputChange(idx, newVal) method is called.
+     *
      * @param block The block that changed current level.
      * @param newVal true if the current is greater than 0.
-     * @return true if block is an input of this circuit.
      */
     public void redstoneChange(int idx, boolean newVal) {
         if (inputBits.get(idx)==newVal) return;
@@ -113,21 +112,21 @@ public abstract class Circuit {
      * Called when a redstone change event occurred on one of the circuit input blocks.
      *
      * @param inIdx index of changed input pin. 0 is closest to the sign block.
-     * @param newLevel new level of the changed input.
+     * @param state The new state of the changed input.
      */
-    public abstract void inputChange(int inIdx, boolean newLevel);
+    public abstract void inputChange(int inIdx, boolean state);
 
     /**
-     * Called when right-clicking the sign or when the plugin read circuit data from file.
+     * Called when right-clicking the sign or when the plugin reads circuit data from file after restarting the server.
      * 
-     * @param player The player that right-clicked the sign
+     * @param player The player that right-clicked the sign, or null if called on startup.
      * @param args Any words on the sign after the circuit type.
      * @return true if the init was successful, false if an error occurred.
      */
     protected abstract boolean init(Player player, String[] args);
 
     /**
-     * Called when the plugin needs to save circuits to disk.
+     * Called when the plugin needs to save the circuits state to disk.
      * The circuit should return a map containing any data needed to bring the circuit back to its current state
      * after a server restart.
      *
@@ -149,7 +148,7 @@ public abstract class Circuit {
     public void circuitDestroyed() {}
 
     /**
-     * Causes the circuit to update the state of its output levers according to the values
+     * Causes the circuit to update the state of its output levers according to the current values
      * in outputBits.
      */
     public void updateOutputLevers() {
@@ -159,22 +158,24 @@ public abstract class Circuit {
 
     /**
      * Sets the physical state of one of the outputs.
-     * Changes the data byte of the selected output block to make a lever on or off.
+     * Changes the data byte of the selected output block to make the lever turn on or off.
      *
      * @param outIdx Output index. 0 for first output (closest to the sign) and so forth.
-     * @param level The new state of the output.
+     * @param state The new state of the output.
      */
-    protected void sendOutput(int outIdx, boolean level) {
-        if (outputBits.get(outIdx)==level) return; // nothing to update.
+    protected void sendOutput(int outIdx, boolean state) {
+        if (outputBits.get(outIdx)==state) return; // nothing to update.
 
-        outputBits.set(outIdx, level);
-        changeLeverState(getOutputBlock(outIdx), level);
+        outputBits.set(outIdx, state);
+        changeLeverState(getOutputBlock(outIdx), state);
     }
 
     private void changeLeverState(Block lever, boolean level) {
         byte data = lever.getData();
+        byte newData = (byte)(level? data | 0x8 : data & 0x7);
+
         try {
-            lever.setData((byte)(level ? 0x8 : data&0x7));
+            lever.setData(newData);
         } catch (ConcurrentModificationException me) {
             //Logger.getLogger("Minecraft").warning("We had another concurrent modification at sendoutput");
         }
@@ -196,12 +197,12 @@ public abstract class Circuit {
     /**
      * Sends a BitSet object to the circuit outputs.
      *
-     * @param startOutIdx First output index
-     * @param length Number of bits to send out.
-     * @param bits The BitSet object to send out. Any excessive bits in the BitSet is ignored.
+     * @param startOutIdx First output pin that will be set.
+     * @param length Number of bits to set.
+     * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
      */
     protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
-        for (int i=length-1; i>=0; i--) {
+        for (int i=0; i<length; i++) {
             sendOutput(startOutIdx+i, bits.get(i));
         }
     }
@@ -251,6 +252,15 @@ public abstract class Circuit {
         return signed;
     }
 
+    /**
+     * Convert a BitSet to a binary representation string.
+     * Converting each bit into "0" or "1".
+     * Result is a binary number with its most significant bit on the left.
+     * @param b BitSet to convert
+     * @param startBit Start converting from this bit. Treat it as the least significant bit.
+     * @param length Number of bits to read from the BitSet after the startBit.
+     * @return Binary representation String of the BitSet.
+     */
     protected static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
         String ret = "";
         for (int i=length+startBit-1; i>=startBit; i--) ret += (b.get(i)?"1":"0");
@@ -315,6 +325,16 @@ public abstract class Circuit {
     }
 
 
+    /**
+     * Stores a BitSet object as a string in a map. Used for state persistence.
+     * Basically converts the BitSet into a string of "1" and "0" according to its bit values.
+     *
+     * @param map A Map object to store the bit set in.
+     * @param key The map key in which to store the bit set.
+     * @param bits The bit set that will be stored in the map.
+     * @param length Number of bits to store.
+     * @return The same map object as the parameter.
+     */
     public static Map<String,String> storeBitSet(Map<String,String> map, String key, BitSet7 bits, int length) {
         String sbits = "";
         for (int i=0; i<length; i++)
@@ -324,60 +344,132 @@ public abstract class Circuit {
         return map;
     }
 
-    public static BitSet7 loadBitSet(Map<String, String> map, String key, int length) {
-        BitSet7 bits = new BitSet7(length);
+    /**
+     * Parses a string representation of a BitSet into a BitSet7 object. Used for loading circuit state from file.
+     * @param map The map to read the BitSet string from.
+     * @param key The map key that points to the BitSet string.
+     * @return The parsed BitSet7 object.
+     */
+    public static BitSet7 loadBitSet(Map<String, String> map, String key) {
         String sbits = map.get(key);
+        BitSet7 bits = new BitSet7(sbits.length());
         if (sbits==null) return null;
 
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<sbits.length(); i++) {
             bits.set(i, (sbits.charAt(i)=='1'));
         }
         return bits;
     }
 
+    /**
+     * Useful method for posting error messages. Sends an error message to the requested player using the error chat color as
+     * set in the preferences file. If player is null the message is sent to the console logger as a warning.
+     * @param player The Player to send the message to.
+     * @param message The error message.
+     */
     protected void error(Player player, String message) {
         if (player!=null) player.sendMessage(redstoneChips.getPrefsManager().getErrorColor() + message);
         else Logger.getLogger("Minecraft").warning(redstoneChips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
+    /**
+     * Useful method for posting info messages. Sends an info message to the requested player using the info chat color as
+     * set in the preferences file. If player is null the message is simply ignored.
+     * @param player The Player to send the message to.
+     * @param message The error message.
+     */
     protected void info(Player player, String message) {
         if (player!=null) player.sendMessage(redstoneChips.getPrefsManager().getInfoColor() + message);
         //else Logger.getLogger("Minecraft").info(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
+    /**
+     * Sends a debug message to all debugging players of this circuit, using the debug chat color preferences key.
+     * Please check that hasDebuggers() returns true before processing any debug messages.
+     *
+     * @param message The error message.
+     */
     protected void debug(String message) {
         for (Player p : debuggers)
             p.sendMessage(redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + ": " + message);
     }
 
-    public void addDebugger(Player d) {
+    /**
+     * Adds the player as a debugger for the circuit.
+     *
+     * @param d The player to add.
+     * @throws IllegalArgumentException If the player is already in the debuggers list.
+     */
+    public void addDebugger(Player d) throws IllegalArgumentException {
         if (debuggers.contains(d)) throw new IllegalArgumentException("You are already debugging this circuit.");
         debuggers.add(d);
     }
 
-    public boolean removeDebugger(Player d) {
+    /**
+     * Removes the player from the debuggers list.
+     *
+     * @param d The player
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public void removeDebugger(Player d) throws IllegalArgumentException {
         if (!debuggers.contains(d)) throw new IllegalArgumentException("You are not listed as a debugger of this circuit.");
-        return debuggers.remove(d);
+        debuggers.remove(d);
     }
 
+    /**
+     * Checks if the circuit has any debuggers waiting for debug messages. This method should be used
+     * before processing any debug information to avoid wasting cpu when no debuggers are listening.
+     *
+     * @return True if the circuit has any debuggers.
+     */
     public boolean hasDebuggers() { return !debuggers.isEmpty(); }
 
+    /**
+     *
+     * @return a clone of the outputBits field.
+     */
     public BitSet7 getOutputBits() { return (BitSet7)outputBits.clone(); }
+
+    /**
+     *
+     * @return a clone of the inputBits field.
+     */
     public BitSet7 getInputBits() { return (BitSet7)inputBits.clone(); }
 
+    /**
+     *
+     * @return The name of this circuit class, as it should be typed on the chip sign.
+     */
     public String getCircuitClass() {
         return this.getClass().getSimpleName();
     }
 
+    /**
+     *
+     * @return The circuit's debuggers list.
+     */
     public List<Player> getDebuggers() {
         return debuggers;
     }
 
+    /**
+     * Used for getting a Block object for an output pin's lever.
+     *
+     * @param outputIdx The required output pin number.
+     * @return The lever block of the specific output index.
+     */
     protected Block getOutputBlock(int outputIdx) {
         Location l = outputs[outputIdx];
         return world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());
     }
 
+    /**
+     * Used for getting a Block object for an input pin's lever.
+     *
+     * @param inputIdx The required input pin number.
+     * @return The input block (the iron block by default) of the specific input index.
+     */
     protected Block getInputBlock(int inputIdx) {
         Location l = inputs[inputIdx];
         return world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ());

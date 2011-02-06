@@ -56,7 +56,7 @@ public class CircuitManager {
         for (InputPin inputPin : inputList) {
             inputPin.updateValue(e.getBlock().getLocation(), newVal);
 
-            inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getORedValue());
+            inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getPinValue());
 
             if (e.getBlock().getType()==Material.STONE_BUTTON) { // manually reset the button after 1 sec.
                 final BlockRedstoneEvent buttonEvent = new BlockRedstoneEvent(e.getBlock(), e.getFace(), e.getNewCurrent(), 0);
@@ -357,7 +357,7 @@ public class CircuitManager {
                 inputLookupMap.get(l).add(ipin);
             }
 
-            if (newCircuit) c.inputChange(ipin.getIndex(), ipin.getORedValue());
+            if (newCircuit) c.inputChange(ipin.getIndex(), ipin.getPinValue());
         }
 
         for (Chunk chunk : usedChunks) {

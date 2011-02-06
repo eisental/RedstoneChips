@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.tal.redstonechips.util;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
 /**
+ * Used for storing a chunk location.
  *
  * @author Tal Eisenberg
  */
@@ -22,6 +18,11 @@ public class ChunkLocation {
         this.world = world;
     }
 
+    /**
+     * Creates a ChunkLocation object for the parameter chunk.
+     * @param chunk Chunk to extract location data from.
+     * @return The ChunkLocation object pointing to the chunks location.
+     */
     public static ChunkLocation fromChunk(Chunk chunk) {
         return new ChunkLocation(chunk.getX(), chunk.getZ(), chunk.getWorld());
     }

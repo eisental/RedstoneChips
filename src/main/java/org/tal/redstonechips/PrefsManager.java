@@ -26,6 +26,9 @@ public class PrefsManager {
     private static final String defaultsFileName = "/defaultprefs.yml";
     private static final String prefsFileName = "preferences.yml";
 
+    /**
+     * enum of all the default preferences keys.
+     */
     public enum Prefs { chipBlockType, inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
         enableDestroyCommand;
     };
@@ -45,6 +48,11 @@ public class PrefsManager {
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
 
+    /**
+     * PrefsManager constructor. Loads the defaults from file to the defaults Map.
+     *
+     * @param plugin reference to the RedstoneChips instance.
+     */
     public PrefsManager(RedstoneChips plugin) {
         this.rc = plugin;
 
@@ -56,6 +64,9 @@ public class PrefsManager {
         defaults = (Map<String, Object>) yaml.load(getClass().getResourceAsStream(defaultsFileName));
     }
 
+    /**
+     * Loads the preferences from the preferences yaml file.
+     */
     public void loadPrefs() {
         if (!rc.getDataFolder().exists()) rc.getDataFolder().mkdir();
 
@@ -98,6 +109,9 @@ public class PrefsManager {
         }
     }
 
+    /**
+     * Saves the current preferences values from the prefs Map to the preferences yaml file.
+     */
     public void savePrefs() {
         if (!rc.getDataFolder().exists()) rc.getDataFolder().mkdir();
 
@@ -120,7 +134,15 @@ public class PrefsManager {
         loadPrefs();
     }
 
-    public Map<String, Object> setYaml(String yaml) {
+    /**
+     * Adds a chunk of yaml to the preferences Map. Parses the yaml into a Map object and sets the preference values according
+     * to the map. Only changing the value of EXISTING preferences keys is allowed.
+     *
+     * @param yaml a String of yaml code.
+     * @return Map object containing the parsed yaml values.
+     * @throws IllegalArgumentException If one of the yaml keys was not found in the preferences map.
+     */
+    public Map<String, Object> setYaml(String yaml) throws IllegalArgumentException {
         Yaml y = new Yaml(prefDump);
         Map<String,Object> map = (Map<String,Object>)y.load(yaml);
         for (String key : map.keySet()) {
@@ -130,6 +152,11 @@ public class PrefsManager {
         return map;
     }
 
+    /**
+     * Sends a map object as a yaml dump to the sender.
+     * @param sender The sender that will receive the yaml dump messages.
+     * @param map The map to dump into yaml code.
+     */
     public void printYaml(CommandSender sender, Map<String, Object> map) {
 
         Yaml yaml = new Yaml(prefDump);
@@ -143,34 +170,66 @@ public class PrefsManager {
         sender.sendMessage("");
     }
 
+    /**
+     *
+     * @return The current input block type preference value.
+     */
     public Material getInputBlockType() {
         return inputBlockType;
     }
 
+    /**
+     *
+     * @return The current output block type preference value.
+     */
     public Material getOutputBlockType() {
         return outputBlockType;
     }
 
+    /**
+     *
+     * @return The current chip block type preference value.
+     */
     public Material getChipBlockType() {
         return chipBlockType;
     }
 
+    /**
+     *
+     * @return The current interface block type preference value.
+     */
     public Material getInterfaceBlockType() {
         return interfaceBlockType;
     }
 
+    /**
+     *
+     * @return The current error chat message color preference value.
+     */
     public ChatColor getErrorColor() {
         return errorColor;
     }
 
+    /**
+     *
+     * @return The current info chat message color preference value.
+     */
     public ChatColor getInfoColor() {
         return infoColor;
     }
 
+    /**
+     *
+     * @return The current debug chat message color preference value.
+     */
     public ChatColor getDebugColor() {
         return debugColor;
     }
 
+    /**
+     *
+     * @return a Map containing every preference keys currently set.
+     */
     public Map<String, Object> getPrefs() {
         return prefs;
     }
@@ -193,8 +252,8 @@ public class PrefsManager {
 
     /**
      * Allows circuit libraries to register their own preferences keys. This method should be called
-     * in the circuit libraries constructor to insure the key is added before RedstoneChips is enabled.
-     * The name of the circuit class is prepended to the key together with a dot - i.e. the preference key becomes name.key
+     * in the CircuitIndex onRedstoneChipsEnable() method to insure the key is added before RedstoneChips reads the preferences file.
+     * The preferences key is set in the format of class-name.key
      *
      * @param circuitClass The circuit class that uses this preference key.
      * @param key The new preference key.

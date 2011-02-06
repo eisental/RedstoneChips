@@ -1,5 +1,3 @@
-package org.tal.redstonechips.util;
-
 /*
  *
  *  Copyright (C) 2010 Tal Eisenberg
@@ -18,14 +16,14 @@ package org.tal.redstonechips.util;
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+package org.tal.redstonechips.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Main
+ * @author Tal Eisenberg
  */
 public class Tokenizer {
     private static char[] stringNesters = { '\'', '"'};

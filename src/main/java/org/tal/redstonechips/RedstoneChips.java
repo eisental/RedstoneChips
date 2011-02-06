@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 /**
+ * RedstoneChips Bukkit JavaPlugin implementation. The main entry point of the plugin.
  *
  * @author Tal Eisenberg
  */

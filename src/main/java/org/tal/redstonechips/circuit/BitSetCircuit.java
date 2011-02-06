@@ -7,7 +7,7 @@ import org.tal.redstonechips.util.BitSet7;
 
 /**
  * A Redstone Circuit that treats its inputs as multiple bit sets.
- * The word length of each set is the number of output bits.
+ * The word length of each set is determined by the number of output bits.
  *
  * @author Tal Eisenberg
  */
@@ -18,15 +18,6 @@ public abstract class BitSetCircuit extends Circuit {
      * The word length the circuit will deal with.
      */
     protected int wordlength;
-
-    /**
-     * If true, it is assumed that each output bit set has an additional carry bit at the end.
-     * This means that each output set must have one more output pin than each input set.
-     *
-     * Not implemented yet.
-     */
-    protected boolean outputCarry; // TODO: implement outputCarry
-
 
     @Override
     public void inputChange(int inIdx, boolean newLevel) {
@@ -80,7 +71,7 @@ public abstract class BitSetCircuit extends Circuit {
      */
     @Override
     public void loadState(Map<String, String> state) {
-        inputBits = Circuit.loadBitSet(state, "inputBits", inputs.length);
+        inputBits = Circuit.loadBitSet(state, "inputBits");
         
         int curBit = 0;
         for (BitSet7 s : this.inputBitSets) {
