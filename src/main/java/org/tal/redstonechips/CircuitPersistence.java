@@ -81,7 +81,6 @@ public class CircuitPersistence {
         
         try {
             yaml.dump(circuitMaps, new FileWriter(file));
-            rc.log(Level.INFO, "Saved circuits state to file.");
         } catch (IOException ex) {
             rc.log(Level.SEVERE, ex.getMessage());
         }

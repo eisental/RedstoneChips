@@ -13,14 +13,20 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.76 (or delete it to remove previous settings).
-* Download the [RedsoneChips-0.76](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.76.jar) jar file.
-* Download the [BasicCircuits-0.76](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.76.jar) jar file.
+* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.77 (or delete it to remove previous settings).
+* Download the [RedsoneChips-0.77](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.77.jar) jar file.
+* Download the [BasicCircuits-0.77](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.77.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
 Changelog
 ----------
+#### RedstoneChips 0.77 (7/02/11)
+- Moved CircuitIndex and CircuitLibrary classes to package org.tal.redstonechips.circuit
+- Using the new scheduler for turning off buttons that are directly connected to an input block.
+- Some message text / color changes.
+- Removed log message when storing circuits after circuit activate/deactivate 
+
 #### RedstoneChips 0.76 (and 0.75) (4/02/11)
 - New circuit library loading mechanism for solving startup issues. Adding new circuit libraries should be a bit easier.
 - Circuits can receive redstone current from the top or any side of an input block.

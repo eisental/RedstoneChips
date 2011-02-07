@@ -1,5 +1,6 @@
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.circuit.CircuitIndex;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,6 +144,7 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        log(Level.INFO, "Saving circuits state to file.");
         circuitPersistence.saveCircuits(circuitManager.getCircuits());
         circuitManager.destroyCircuits();
 

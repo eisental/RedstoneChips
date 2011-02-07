@@ -182,6 +182,7 @@ public class CommandHandler {
                 c.world.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).setType(Material.AIR);
 
             rc.getCircuitManager().destroyCircuit(c, sender);
+            player.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + c.getCircuitClass() + " chip is destroyed.");
         }
     }
 
@@ -216,6 +217,7 @@ public class CommandHandler {
         }
 
         rc.getCircuitManager().destroyCircuit(c, sender);
+        sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + c.getCircuitClass() + " circuit is now deactivated.");
     }
 
     public void pinCommand(CommandSender sender) {

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tal.redstonechips;
+package org.tal.redstonechips.circuit;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.tal.redstonechips.RedstoneChips;
 
 /**
  * A Bukkit JavaPlugin implementation for circuit libraries. Provides invisible inter-plugin communication with RedstoneChips and

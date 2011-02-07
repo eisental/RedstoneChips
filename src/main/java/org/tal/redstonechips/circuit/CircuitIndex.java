@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tal.redstonechips;
+package org.tal.redstonechips.circuit;
 
 /**
  * An interface used for enabling the circuit library to inform RedstoneChips of all the Circuit classes it provides.

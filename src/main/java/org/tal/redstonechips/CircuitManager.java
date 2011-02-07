@@ -60,15 +60,12 @@ public class CircuitManager {
 
             if (e.getBlock().getType()==Material.STONE_BUTTON) { // manually reset the button after 1 sec.
                 final BlockRedstoneEvent buttonEvent = new BlockRedstoneEvent(e.getBlock(), e.getFace(), e.getNewCurrent(), 0);
-                new Thread() {
+                rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            sleep(1000);
-                            redstoneChange(buttonEvent);
-                        } catch (InterruptedException ex) {}
+                        redstoneChange(buttonEvent);
                     }
-                }.start();
+                }, 20);
             }
         }
 
@@ -297,6 +294,7 @@ public class CircuitManager {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.contains(destroyed)) {
+            if (p!=null) p.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
             destroyCircuit(destroyed, p);
         }
     }
@@ -401,7 +399,6 @@ public class CircuitManager {
     }
 
     public void destroyCircuit(Circuit destroyed, CommandSender destroyer) {
-        if (destroyer!=null) destroyer.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
         destroyed.circuitDestroyed();
         circuits.remove(destroyed);
         removeCircuitLookups(destroyed);
@@ -421,7 +418,7 @@ public class CircuitManager {
         for (Player p : destroyed.getDebuggers()) {
             if (!p.equals(destroyer)) {
                 p.sendMessage(rc.getPrefsManager().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " + 
-                        rc.getPrefsManager().getErrorColor() + "destroyed by " + dName +
+                        rc.getPrefsManager().getErrorColor() + "deactivated by " + dName +
                         rc.getPrefsManager().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
             }
         }
