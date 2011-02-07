@@ -26,6 +26,8 @@ Changelog
 - Using the new scheduler for turning off buttons that are directly connected to an input block.
 - Some message text / color changes.
 - Removed log message when storing circuits after circuit activate/deactivate 
+- Added javadocs to most classes
+- Circuit libraries can add their own preferences keys.
 
 #### RedstoneChips 0.76 (and 0.75) (4/02/11)
 - New circuit library loading mechanism for solving startup issues. Adding new circuit libraries should be a bit easier.
