@@ -1,6 +1,6 @@
 ---
 layout: main
-title: RedstoneChips circuit documentation
+title: Circuit classes documentation
 ---
 
 ## logic gates
