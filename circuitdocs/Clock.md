@@ -7,16 +7,12 @@ Simple clock chip with any number of triggerable outputs. Whenever an input pin 
 Pulse width is currently 50%. 
 
 The clock frequency is set in the sign argument. Default value is 1000 (1 second).
-Frequency argument can either be the duration in milliseconds or it can use [units](https://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/parsing/UnitParser.java). 
+The frequency argument can be either the duration in milliseconds or it can use a large number of [units](https://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/parsing/UnitParser.java). 
 Some examples include 1000ms 1sec 60bpm 2hz and even 1year.
 
-The clock's pulse width is set to 0.5 by default which means that the clock output would be on half of the time and off half of the time. You can change the pulse width by adding a second argument to the chip sign. The argument should be a fraction between 0 and 1. A lower number would cause the clock to change its output back to off faster. 
+The clock's pulse width is set to 0.5 by default which means that the clock output would be on half of the time and off half of the time. You can change the pulse width by adding a second argument to the chip sign. The argument should be a fraction between 0 and 1. A lower number would cause the clock to change its output back to off faster. Use a pulse width of 0 for better stability and performance.
  
-Uses a java thread to run the clock, therefore you should be careful about building too many clock chips. perhaps use a main clock and sent it through a [transmitter](Transmitter).
-A thread is started whenever any of the inputs becomes high and stopped when all inputs become low.
-This would probably use game ticks when bukkit supports tick events.
-
-Currently you can't have a clock tick faster than once every 200ms.
+The clock can't run faster than once per 100 ms. 
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/clock.java)
 

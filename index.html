@@ -1,18 +1,19 @@
 ---
 layout: main
-title: RedstoneChips 0.76
+title: RedstoneChips 0.77
 ---
 
 <p>RedstoneChips is a <a href="http://bukkit.org">Bukkit</a> plugin that allows you to build custom integrated redstone
     circuits on your craftbukkit minecraft server. Circuits can be built with any number of inputs and outputs and with any imaginable
-    structure. RedstoneChips currently consists of two plugins:</p>
+    structure. RedstoneChips currently consists of the following plugins:</p>
 
 <ul>
-<li><a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.76.jar"><strong>RedstoneChips-0.76</strong></a> - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.</li>
-<li><a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.76.jar"><strong>BasicCircuits-0.76</strong></a> - The basic circuit package containing many different circuit classes. Check out the <a href="/RedstoneChips/circuitdocs/index.html">circuitdocs</a> for more info. In the future, different circuit packages might be available but for now you must install BasicCircuits to have any circuit classes to choose from.
+<li><a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.77.jar"><strong>RedstoneChips-0.77</strong></a> - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.</li>
+<li><a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.77.jar"><strong>BasicCircuits-0.77</strong></a> - The basic circuit package containing many different circuit classes. </li>
+<li><a href="http://github.com/downloads/eisental/SensorLibrary/SensorLibrary-0.1.jar"><strong>SensorLibrary-0.1</strong></a> - An optional circuit library for various sensor chips.</li>
 </ul>
-
-<p>RedstoneChips and BasicCircuits are currently under heavy development. Don't expect them to work as advertised or at all.
+<p>Check out the <a href="/RedstoneChips/circuitdocs/index.html">circuitdocs</a> for more info. </p>
+<p>RedstoneChips and the circuit libraries are currently under heavy development. Don't expect them to work as advertised or at all.
     If you want to report a bug or another issue you can use the github project page links below.
     If you have any question, suggestion or new idea you can send me an email by clicking on the mail link to the left, or post a message
     in the <a href="http://forums.bukkit.org/threads/redstonechips-0-6-integrated-circuits-plugin.1205/">forum thread</a> at Bukkit.org
@@ -25,10 +26,12 @@ title: RedstoneChips 0.76
 <h2>Installation</h2>
 
 <ul>
-    <li>Download the latest craftbukkit release. The current version requires craftbukkit #231 or above.</li>
-<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <code>&lt;craftbukkit&gt;/plugins/RedstoneChips-XX</code> folder to <code>RedstoneChips-0.76</code> (or delete it to remove previous settings).</li>
-<li>Download the <a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.76.jar">RedsoneChips 0.76</a> jar file.</li>
-<li>Download the <a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.76.jar">BasicCircuits 0.76</a> jar file.</li>
+    <li>Download the latest craftbukkit release. The current version requires craftbukkit #271 or above.</li>
+<li>If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <code>&lt;craftbukkit&gt;/plugins/RedstoneChips-XX</code> folder to <code>RedstoneChips-0.77</code> (or delete it to remove previous settings).</li>
+<li>Download the <a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.77.jar">RedsoneChips 0.77</a> jar file.</li>
+<li>Download the <a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.77.jar">BasicCircuits 0.77</a> jar file.</li>
+<li>Optionally download the <a href="http://github.com/downloads/eisental/SensorLibrary/SensorLibrary-0.1.jar">SensorLibrary 0.1</a> jar file.</li>
+
 <li>Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.</li>
 </ul>
 
@@ -37,86 +40,9 @@ and a preferences.yml file inside it. The file redstonechip.circuits is created 
 You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the /redchips-prefs command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
 </p>
 
-<p>Check out <a href="http://github.com/eisental/RedstoneChips">RedstoneChips source code at github.com</a></p>
-<p>Check out <a href="http://github.com/eisental/BasicCircuits">BasicCircuit source code at github.com</a></p>
+<h3>Changelogs and source code</h3>
+<p>RedstoneChips <a href="http://github.com/eisental/RedstoneChips">github pages</a></p>
 
-<h2>Changelog</h2>
-<h4>RedstoneChips 0.76 (and 0.75) (4/02/11)</h4>
-<ul>
-<li>New circuit library loading mechanism for solving startup issues. Adding new circuit libraries should be a bit easier.</li>
-<li>Circuits can receive redstone current from the top or any side of an input block.</li>
-<li>Output levers can be attached to any side or on top of an output block.</li>
-<li>Controlled blocks can be attached to any side (including top and bottom) of an interface block.</li>
-<li>Circuits will now update their output levers when their chunk is loaded.</li>
-<li>After activating a circuit its outputs are now immediately updated according to the current state of its inputs.</li>
-<li>Fixed some bugs dealing with chunk load / unload and other stuff.</li>
-</ul>
+<p>BasicCircuits <a href="http://github.com/eisental/BasicCircuits">github pages</a></p>
 
-<h4>RedstoneChips 0.71 (31/01/11)</h4>
-<ul>
-    <li>Updated to work with new bukkit command api.</li>
-    <li>New /redchips-deactivate command for deactivating circuits without destroying them, activated either by pointing at the circuit or remotely for admins, by using '/redchips-deactivate <circuit id>'.</li>
-    <li>New /redchips-destroy command to destroy a circuit and all of its blocks. The command is disabled by default. Set preference key 'enableDestroyCircuit' to 'true' to enable.</li>
-    <li>Circuit debuggers are now notified when the circuit is destroyed including info about who destroyed it and where.</li>
-</ul>
-
-<h4>RedstoneChips 0.7 (27/01/11)</h4>
-<ul>
-<li>Completely new circuit detection algorithm. Circuits can now be built in almost any shape.</li>
-<li>New storage format for the active circuits file (now named redstonechips.circuits).</li>
-<li>Interface blocks replace the output block used by circuits such as pixel, print and synth. More than one interface block per chip is now possible. Interface blocks are placed the same way as input and output blocks and they're indicated by a block of material interfaceBlockType (also added to preferences).</li>
-<li>Fixed print order of binary numbers. LSB is now the rightmost character.</li>
-<li>Missing output levers will now cause an error message to be displayed.</li>
-<li>Output levers will now turn off after a circuit is destroyed</li>
-<li>A circuit will now deactivate when one of its structure blocks burn down</li>
-<li>Chat colors are added to the preferences file and can be modified using /redchips-prefs.</li>
-</ul>
-<p>For older changelogs look at the RedstoneChips <a href="http://github.com/eisental/RedstoneChips">github pages</a></p>
-<hr>
-
-<h4>BasicCircuits 0.76 (and 0.75) (4/02/11)</h4>
-<ul>
-<li>Support the new library load mechanism in RedstoneChips 0.76.</li>
-<li>Updated pixel, print and synth to work with the interface block changes. print output signs can be attached to any side of the interface block and multiple signs per interface block are supported. pixel's center is now the inerface block itself, wool can be added anywhere around it. synth noteblocks can be attached to any face of the interface block, including multiple noteblocks per interface block.</li>
-<li>synth circuits will now PLAY the note when the clock pin is triggered instead of just changing the noteblock's pitch. No extra triggering is needed for the noteblock. </li>
-<li>Fixed bug in counter when using it without arguments.</li>
-</ul>
-
-<h4>BasicCircuits 0.74 (31/01/11)</h4>
-<ul>
-<li>Added pulse argument for positive, negative and double edge-triggering.</li>
-<li>Circuit classes are now disabled when the plugin is disabled.</li>
-<li>Updated to work with the new bukkit command api. </li>
-<li>Router now uses a clock input. If two or more inputs are routed to the same output they're now ORed together.</li>
-<li>New circuit: decadecounter. Commissioned by I D</li>
-<li>Pulse circuit with a 0 pulse length will not create a thread and is now very safe to use.</li>
-</ul>
-
-<h4>BasicCircuits 0.73 (29/01/11)</h4>
-<ul><li>New terminal and router circuits.</li></ul>
-
-<h4>BasicCircuits 0.72 (28/01/11)</h4>
-<ul>
-  <li>New SR NOR latch.</li>
-</ul>
-
-<h4>BasicCircuits 0.71 (28/01/11)</h4>
-<ul>
-<li>Fixed bug in counter circuit. It will now work properly without any sign arguments.</li>
-<li>New flipflop reset mode. It's possible to activate a flipflop with one extra reset input pin (input 0). When the reset pin
-  is triggered all flipflops in the chip reset to their off state.</li>
-</ul>
-
-<h4>BasicCircuits 0.7 (27/01/11)</h4>
-<ul>
-<li>iptransmitter and ipreceiver are disabled for the time being.</li>
-<li>New <a href="/RedstoneChips/circuitdocs/Synth.html">synth</a> circuit for controlling noteblocks.</li>
-<li>Support for 1-bit pixel circuits.</li>
-<li>New <a href="/RedstoneChips/circuitdocs/Counter.html">counter</a> sign arguments, min, max and direction.</li>
-<li>Added debug messages to <a href="/RedstoneChips/circuitdocs/Counter.html">counter</a>.</li>
-<li>Changes to pixel, synth, and print to support multiple interface blocks.</li>
-<li><a href="/RedstoneChips/circuitdocs/Encoder.html">encoder</a> now only requires that the number of inputs be less than or equal to the maximum number that can be represented by its outputs.</li>
-<li>clock is now limited to a minimum interval of 200ms.</li>
-<li>fixed some bugs and added debug messages to pisoregister and receiver.</li>
-</ul>
-<p>For older changelogs look at the BasicCircuits <a href="http://github.com/eisental/BasicCircuits">github pages</a></p>
+<p>SensorLibrary <a href="http://github.com/eisental/SensorLibrary">github pages</a></p>
