@@ -2,12 +2,14 @@ RedstoneChips
 =============
 
 RedstoneChips is a Bukkit plugin that allows you to build custom integrated redstone circuits on your craftbukkit minecraft server.
-Circuits can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of
-two plugins:
+Circuits can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
 - RedstoneChips - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
-- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The base circuit package containing many different circuit classes. Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info.
-  In the future additional circuit packages will hopefully be available as well.
+- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The base circuit library containing many different circuit classes. 
+
+- [SensorLibrary](http://github.com/eisental/SensorLibrary) - An optional circuit library for sensor chips.
+
+Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info about the circuit libraries.
 
 __For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
 
