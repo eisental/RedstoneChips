@@ -5,6 +5,8 @@
 
 package org.tal.redstonechips.circuit;
 
+import org.tal.redstonechips.RedstoneChips;
+
 /**
  * An interface used for enabling the circuit library to inform RedstoneChips of all the Circuit classes it provides.
  * 
@@ -21,4 +23,10 @@ public interface CircuitIndex {
      * Called by the RedstoneChips plugin immediately after finishing loading circuit classes from every circuit library.
      */
     public void onRedstoneChipsEnable();
+
+    /**
+     * Called by the RedstoneChips plugin on the beginning of its onEnable() method.
+     * @param instance Plugin reference.
+     */
+    public void setRedstoneChipsInstance(RedstoneChips instance);
 }

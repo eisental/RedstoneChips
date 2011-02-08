@@ -51,10 +51,13 @@ public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex 
         if (p==null) {
             logger.warning(getDescription().getName() + " " + getDescription().getVersion() + ": Required plugin " + rcName + " is missing.");
         }
-
-        redstoneChips = (RedstoneChips)p;
     }
 
     @Override
     public void onRedstoneChipsEnable() { }
+
+    @Override
+    public void setRedstoneChipsInstance(RedstoneChips instance) {
+        this.redstoneChips = instance;
+    }
 }

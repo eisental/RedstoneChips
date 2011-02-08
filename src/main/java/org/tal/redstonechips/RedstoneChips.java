@@ -159,6 +159,8 @@ public class RedstoneChips extends JavaPlugin {
 
         // load circuit classes
         for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
+            lib.setRedstoneChipsInstance(this);
+            
             String libMsg = desc.getName() + ": Loading " + lib.getClass().getSimpleName() + " > ";
             Class[] classes = lib.getCircuitClasses();
             if (classes != null && classes.length>0) {
