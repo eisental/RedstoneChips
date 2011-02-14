@@ -3,7 +3,7 @@ layout: main
 title: delay
 ---
 
-A fixed delay chip. When one of its inputs changes state, the corresponding output changes it state accordingly after a certain time duration. 
+A fixed delay chip. When one of its inputs changes state, the corresponding output changes its state accordingly after a certain time duration. 
 A sign argument is used to set the delay duration. Possible values are any duration in the same format as [clock](Clock): 120bpm, 10hz, 1sec, 2years are all possible.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/delay.java)
