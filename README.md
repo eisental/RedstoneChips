@@ -1,13 +1,13 @@
 RedstoneChips 
 =============
 
-RedstoneChips is a Bukkit plugin that allows you to build custom integrated redstone circuits on your craftbukkit minecraft server.
+RedstoneChips is a Bukkit plugin that allows you to build custom redstone chips on your craftbukkit minecraft server.
 Circuits can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
 - RedstoneChips - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
 - [BasicCircuits](http://github.com/eisental/BasicCircuits) - The base circuit library containing many different circuit classes. 
 
-- [SensorLibrary](http://github.com/eisental/SensorLibrary) - An optional circuit library for sensor chips.
+- [SensorLibrary](http://github.com/eisental/SensorLibrary) - An extra circuit library for sensor chips.
 
 Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info about the circuit libraries.
 
@@ -15,14 +15,31 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to RedstoneChips-0.77 (or delete it to remove previous settings).
-* Download the [RedsoneChips-0.77](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.77.jar) jar file.
-* Download the [BasicCircuits-0.77](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.77.jar) jar file.
+* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to /RedstoneChips (or delete it to remove previous settings).
+* Download the [RedsoneChips-0.8](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.8.jar) jar file.
+* Download the [BasicCircuits-0.8](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.8.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
 Changelog
 ----------
+#### RedstoneChips 0.8 (14/02/11)
+- Many internal changes in the way input pins are handled and their lookup maps.
+- Using ChatFixUtil by Olof Larsson prevent chat color client crashes.
+- When scanning a chip, chip blocks are first looked for to the right and to the left instead of in the original direction. This means that branches closer to the sign will have lower pin numbers.
+- any IO block (input, output or interaction) can now be placed on top or below a chip block.
+- Circuits can now register themselves as receivers or transmitters on a specific broadcast channel to receive bits wirelessly. 
+- Circuits can now register themselves as type receivers to receive text entered by using the /rc-type command.
+- Moved /rc-channels command into RedstoneChips to work with the new ReceivingCircuit and TransmittingCircuit interfaces.
+- Moved /rc-type command into RedstoneChips to work with the new rcTypeReceiver interface.
+- Uses <craftbukkit>/plugins/RedstoneChips as the data folder. The version number is no longer part of the folder name.
+- Saves the circuit state whenever the world is saved instead of doing it on every circuit activation/deactivation.
+- Shorter command names: redchips-active -> rc-list, redchips-classes -> rc-classes, redchips-prefs -> rc-prefs, redchips-debug -> rc-debug, redchips-pin -> rc-pin, redchips-destroy -> rc-destroy, redchips-deactivate -> rc-break, redchips-channels -> rc-channels.
+- New commands: /rc-reset to reactivate a circuit. Useful for applying changes to the circuit structure or sign arguments; /rc-info print's a lot of information about a circuit. Used by pointing at a circuit or with a circuit id.
+- Material names in the preferences can be entered without spearating underscores.
+- Added a check for infinite feedback loops, such as a not gate in which the output is connected straight to the input. This will no longer cause the server to crash and the offending circuit will now be disabled. To use it again it needs to be reactivated.
+- Circuits will behave much more nicely on server restarts.
+
 #### RedstoneChips 0.77 (7/02/11)
 - Moved CircuitIndex and CircuitLibrary classes to package org.tal.redstonechips.circuit
 - Using the new scheduler for turning off buttons that are directly connected to an input block.
