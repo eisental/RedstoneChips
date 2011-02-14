@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.tal.redstonechips.util.ChatFixUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -165,7 +166,7 @@ public class PrefsManager {
         sender.sendMessage(getInfoColor() + rc.getDescription().getName() + " " + rc.getDescription().getVersion() + " preferences:");
         sender.sendMessage(getInfoColor() + "-----------------------------");
         for (String line : split)
-            sender.sendMessage(line);
+            ChatFixUtil.sendCSMessage(sender, line);
         sender.sendMessage(getInfoColor() + "-----------------------------");
         sender.sendMessage("");
     }
@@ -234,14 +235,38 @@ public class PrefsManager {
         return prefs;
     }
 
-    private static Material findMaterial(Object m) throws IllegalArgumentException{
-        if (m instanceof String)
-            return Material.getMaterial(((String)m).toUpperCase());
-        else if (m instanceof Integer)
-            return Material.getMaterial((Integer)m);
-        else throw new IllegalArgumentException("Invalid material: " + m);
+    private static Material findMaterial(Object m) throws IllegalArgumentException {
+        if (m instanceof String) {
+            Material material = findMaterial((String)m);
+            if (material==null) throw new IllegalArgumentException("Unknown material name: " + m);
+            else return material;
+        } else if (m instanceof Integer) {
+            Material material = Material.getMaterial((Integer)m);
+            if (material==null) throw new IllegalArgumentException("Unknown material type id: " + m);
+            else return material;
+        }  else
+            throw new IllegalArgumentException("Invalid material: " + m);
     }
 
+    public static Material findMaterial(String m) throws IllegalArgumentException {
+        try {
+            // try to parse as int type id.
+            int i = Integer.decode(m);
+            Material material = Material.getMaterial(i);
+            if (material==null) throw new IllegalArgumentException("Unknown material type id: " + m);
+            else return material;
+        } catch (NumberFormatException ne) {
+            // try as material name
+            for (Material material : Material.values()) {
+                if (material.name().equals(m.toUpperCase()))
+                    return material;
+                else if(material.name().replaceAll("_", "").equals(m.toUpperCase()))
+                    return material;
+            }
+
+            throw new IllegalArgumentException("Unknown material name: " + m);
+        }
+    }
 
     private void loadMissingPrefs() {
         for (String key : defaults.keySet()) {

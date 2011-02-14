@@ -11,8 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.BlockVector;
+import org.tal.redstonechips.circuit.InputPin;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -89,9 +90,9 @@ public class CircuitPersistence {
     private Map<String, Object> circuitToMap(Circuit c) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("class", c.getCircuitClass());
-        map.put("world", c.activationBlock.getWorld().getName());
+        map.put("world", c.world.getName());
         map.put("activationBlock", makeBlockList(c.activationBlock));
-        map.put("inputs", makeBlockListsList(c.inputs));
+        map.put("inputs", makeInputPinsList(c.inputs));
         map.put("outputs", makeBlockListsList(c.outputs));
         map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
         map.put("structure", makeBlockListsList(c.structure));
@@ -106,30 +107,37 @@ public class CircuitPersistence {
 
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
         c.world = world;
-        c.activationBlock = getLocation((List<Integer>)map.get("activationBlock"), world);
-        c.inputs = getLocationArray((List<List<Integer>>)map.get("inputs"), world);
-        c.outputs = getLocationArray((List<List<Integer>>)map.get("outputs"), world);
-        c.interfaceBlocks = getLocationArray((List<List<Integer>>)map.get("interfaces"), world);
-        c.structure = getLocationArray((List<List<Integer>>)map.get("structure"), world);
+        c.activationBlock = getBlockVector((List<Integer>)map.get("activationBlock"));
+        c.outputs = getBlockVectorArray((List<List<Integer>>)map.get("outputs"));
+        c.interfaceBlocks = getBlockVectorArray((List<List<Integer>>)map.get("interfaces"));
+        c.structure = getBlockVectorArray((List<List<Integer>>)map.get("structure"));
+        c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);
         List<String> signArgs = (List<String>)map.get("signArgs");
         c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
         c.loadState((Map<String,String>)map.get("state"));
         return c;
     }
 
-    private List<Integer> makeBlockList(Location l) {
+    private List<Integer> makeBlockList(BlockVector v) {
         List<Integer> list = new ArrayList<Integer>();
-        list.add(l.getBlockX());
-        list.add(l.getBlockY());
-        list.add(l.getBlockZ());
+        list.add(v.getBlockX());
+        list.add(v.getBlockY());
+        list.add(v.getBlockZ());
 
         return list;
     }
 
-    private Object makeBlockListsList(Location[] locs) {
+    private Object makeInputPinsList(InputPin[] inputs) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (Location l : locs)
-            list.add(makeBlockList(l));
+        for (InputPin p : inputs)
+            list.add(makeBlockList(p.getInputBlock()));
+        return list;
+    }
+
+    private Object makeBlockListsList(BlockVector[] vs) {
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        for (BlockVector v : vs)
+            list.add(makeBlockList(v));
         return list;
     }
 
@@ -140,15 +148,25 @@ public class CircuitPersistence {
         throw new IllegalArgumentException("World " + worldName + " was not found on the server.");
     }
 
-    private Location getLocation(List<Integer> coords, World world) {
-        return world.getBlockAt(coords.get(0), coords.get(1), coords.get(2)).getLocation();
+    private BlockVector getBlockVector(List<Integer> coords) {
+        return new BlockVector(coords.get(0), coords.get(1), coords.get(2));
     }
 
-    private Location[] getLocationArray(List<List<Integer>> list, World world) {
-        List<Location> locs = new ArrayList<Location>();
+    private BlockVector[] getBlockVectorArray(List<List<Integer>> list) {
+        List<BlockVector> vectors = new ArrayList<BlockVector>();
         for (List<Integer> coords : list)
-            locs.add(getLocation(coords, world));
+            vectors.add(getBlockVector(coords));
 
-        return locs.toArray(new Location[locs.size()]);
+        return vectors.toArray(new BlockVector[vectors.size()]);
+    }
+
+    private InputPin[] getInputPinsArray(List<List<Integer>> list, Circuit c) {
+        List<InputPin> inputs = new ArrayList<InputPin>();
+        for (int i=0; i<list.size(); i++) {
+            List<Integer> coords = list.get(i);
+            inputs.add(new InputPin(c, new BlockVector(coords.get(0), coords.get(1), coords.get(2)), i));
+        }
+
+        return inputs.toArray(new InputPin[inputs.size()]);
     }
 }

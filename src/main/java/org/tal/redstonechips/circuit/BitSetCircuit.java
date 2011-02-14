@@ -1,7 +1,5 @@
 package org.tal.redstonechips.circuit;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.util.BitSet7;
 
@@ -63,31 +61,5 @@ public abstract class BitSetCircuit extends Circuit {
             return false;
         }
 
-    }
-
-    /**
-     * Loads state input values to inputBitSets.
-     * @param state
-     */
-    @Override
-    public void loadState(Map<String, String> state) {
-        inputBits = Circuit.loadBitSet(state, "inputBits");
-        
-        int curBit = 0;
-        for (BitSet7 s : this.inputBitSets) {
-            for (int i=0; i<wordlength; i++) {
-                s.set(i, inputBits.get(curBit+i));
-            }
-            curBit += wordlength;
-        }
-    }
-
-    /**
-     * Saves state of all the input bits.
-     * @return Map containing 'inputBits' key.
-     */
-    @Override
-    public Map<String, String> saveState() {
-        return Circuit.storeBitSet(new HashMap<String,String>(), "inputBits", inputBits, inputs.length);
     }
 }

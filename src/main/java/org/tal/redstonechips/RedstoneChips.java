@@ -1,21 +1,22 @@
 package org.tal.redstonechips;
 
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.world.WorldEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockRightClickEvent;
@@ -29,6 +30,10 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.BlockVector;
+import org.tal.redstonechips.circuit.ReceivingCircuit;
+import org.tal.redstonechips.circuit.TransmittingCircuit;
+import org.tal.redstonechips.circuit.rcTypeReceiver;
 
 
 /**
@@ -52,8 +57,12 @@ public class RedstoneChips extends JavaPlugin {
 
     private static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
+    public Map<BlockVector, rcTypeReceiver> rcTypeReceivers = new HashMap<BlockVector, rcTypeReceiver>();
+    public List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
+    public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
+
     public RedstoneChips(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, folder, plugin, cLoader);
+        super(pluginLoader, instance, desc, new File(plugin.getParentFile(), desc.getName()), plugin, cLoader);
 
         prefsManager = new PrefsManager(this);
         circuitManager = new CircuitManager(this);
@@ -62,11 +71,9 @@ public class RedstoneChips extends JavaPlugin {
         commandHandler = new CommandHandler(this);
 
         rcBlockListener = new BlockListener() {
-
             @Override
-            public void onBlockRedstoneChange(BlockFromToEvent event) {
-                if (!event.isCancelled());
-                    circuitManager.redstoneChange((BlockRedstoneEvent)event);
+            public void onBlockRedstoneChange(BlockRedstoneEvent event) {
+                circuitManager.redstoneChange((BlockRedstoneEvent)event);
             }
 
             @Override
@@ -75,11 +82,9 @@ public class RedstoneChips extends JavaPlugin {
             }
 
             @Override
-            public void onBlockDamage(BlockDamageEvent event) {
-                if (!event.isCancelled()) {
-                    if (event.getDamageLevel()==BlockDamageLevel.BROKEN)
-                        circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
-                }
+            public void onBlockBreak(BlockBreakEvent event) {
+                if (!event.isCancelled())
+                    circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
             }
 
             @Override
@@ -114,6 +119,13 @@ public class RedstoneChips extends JavaPlugin {
                 circuitManager.checkUpdateOutputLevers(event.getChunk());
             }
 
+            @Override
+            public void onWorldSaved(WorldEvent event) {
+                if (event.getWorld()==getServer().getWorlds().get(0)) {
+                    log(Level.INFO, "Saving circuits state to file.");
+                    circuitPersistence.saveCircuits(circuitManager.getCircuits());
+                }
+            }
         };
     }
 
@@ -144,18 +156,18 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        log(Level.INFO, "Saving circuits state to file.");
-        circuitPersistence.saveCircuits(circuitManager.getCircuits());
         circuitManager.destroyCircuits();
 
         PluginDescriptionFile desc = this.getDescription();
-        logg.info(desc.getName() + " " + desc.getVersion() + " disabled.");
+        String msg = desc.getName() + " " + desc.getVersion() + " disabled.";
+        logg.info(msg);
     }
 
     @Override
     public void onEnable() {
         PluginDescriptionFile desc = this.getDescription();
-        logg.info(desc.getName() + " " + desc.getVersion() + " enabled.");
+        String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
+        logg.info(msg);
 
         // load circuit classes
         for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
@@ -167,14 +179,17 @@ public class RedstoneChips extends JavaPlugin {
                 for (Class c : classes)
                     libMsg += c.getSimpleName() + ", ";
 
-                logg.info(libMsg.substring(0, libMsg.length()-2) + ".");
+                libMsg = libMsg.substring(0, libMsg.length()-2) + ".";
+                logg.info(libMsg);
                 
                 this.addCircuitClasses(classes);
-            } else
-                logg.info(libMsg + "No circuit classes were loaded.");
+            } else {
+                libMsg = libMsg + "No circuit classes were loaded.";
+                logg.info(libMsg);
+            }
         }
 
-        for (CircuitIndex lib : this.circuitLibraries) {
+        for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
             lib.onRedstoneChipsEnable();
         }
 
@@ -184,44 +199,58 @@ public class RedstoneChips extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_RIGHTCLICKED, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.BLOCK_DAMAGED, rcBlockListener, Priority.Monitor, this);
+        pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
         pm.registerEvent(Type.CHUNK_LOADED, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.WORLD_SAVED, rcWorldListener, Priority.Monitor, this);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("redchips-active")) {
+        if (cmd.getName().equalsIgnoreCase("rc-list")) {
             commandHandler.listActiveCircuits(sender, args);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-classes")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-classes")) {
             commandHandler.listCircuitClasses(sender);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-prefs")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-prefs")) {
             commandHandler.prefsCommand(args, sender);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-debug")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-debug")) {
             commandHandler.debugCommand(sender, args);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-pin")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-pin")) {
             commandHandler.pinCommand(sender);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-destroy")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-destroy")) {
             boolean enableDestroyCommand = (Boolean)prefsManager.getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
             if (enableDestroyCommand) {
                 commandHandler.destroyCommand(sender);
-            } else sender.sendMessage(prefsManager.getErrorColor()+"/redchips-destroy is disabled. You can enable it using /redchips-prefs enableDestroyCommand true");
+            } else sender.sendMessage(prefsManager.getErrorColor()+"/rc-destroy is disabled. You can enable it using /redchips-prefs enableDestroyCommand true");
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("redchips-deactivate")) {
+        } else if (cmd.getName().equalsIgnoreCase("rc-break")) {
             commandHandler.deactivateCommand(sender, args);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-type")) {
+            commandHandler.handleRcType(sender, args);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-reset")) {
+            commandHandler.resetCircuit(sender);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-info")) {
+            commandHandler.printCircuitInfo(sender, args);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-channels")) {
+            commandHandler.listBroadcastChannels(sender);
             return true;
         } else return false;
     }
 
     void log(Level level, String message) {
-        logg.log(level, this.getDescription().getName() + ": " + message);
+        String logMsg = this.getDescription().getName() + ": " + message;
+        logg.log(level, logMsg);
     }
 
     /**
@@ -254,6 +283,58 @@ public class RedstoneChips extends JavaPlugin {
      */
     CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
+    }
+
+    /**
+     * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
+     * the /rc-type command the rcTypeReceiver circuit will receive the typed text.
+     * 
+     * @param typingBlock The block to point towards while typing.
+     * @param circuit The circuit that will receive the typed text.
+     */
+    public void registerRcTypeReceiver(BlockVector typingBlock, rcTypeReceiver circuit) {
+        rcTypeReceivers.put(typingBlock, circuit);
+    }
+
+    /**
+     * The rcTypeReceiver will no longer receive /rc-type commands.
+     * @param circuit The rcTypeReceiver to remove.
+     */
+    public void removeRcTypeReceiver(rcTypeReceiver circuit) {
+        for (BlockVector v : rcTypeReceivers.keySet()) {
+            if (rcTypeReceivers.get(v)==circuit)
+                rcTypeReceivers.remove(v);
+        }
+    }
+
+    public void addReceiver(ReceivingCircuit r) {
+        receivers.add(r);
+
+        // find already existing transmitters for this channel
+        for (TransmittingCircuit t : transmitters) {
+            if (t.getChannel()!=null && t.getChannel().equals(r.getChannel())) t.addReceiver(r);
+        }
+
+    }
+
+    public void removeReceiver(ReceivingCircuit r) {
+        receivers.remove(r);
+    }
+
+    public List<TransmittingCircuit> getTransmitters() {
+        return transmitters;
+    }
+
+    public List<ReceivingCircuit> getReceivers() {
+        return receivers;
+    }
+
+    public void addTransmitter(TransmittingCircuit t) {
+        transmitters.add(t);
+    }
+
+    public void removeTransmitter(TransmittingCircuit t) {
+        transmitters.remove(t);
     }
 
 }
