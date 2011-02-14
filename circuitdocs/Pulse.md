@@ -22,7 +22,7 @@ Though it's not possible to see the current change the pulse is there and can be
 * Can have any number of input, output pairs. At least 1 pair is required.
 
 #### Sign text
-1. `   pixel   `
+1. `   pulse   `
 2. `  [duration] ` (default value is 1sec)
 3. `  [edge-trigger] ` (default value is positive)
 

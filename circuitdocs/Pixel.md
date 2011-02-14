@@ -12,7 +12,12 @@ There are two ways to use this circuit.
 * Use without arguments (just write `pixel` on the sign) - Wool color is set according to the color list below. This mode requires 4 data pins and 1 clock pin. For example, to change the wool color to Pink, send 0110 (decimal 6) to the data pins, and then send a pulse to the clock input.
 * Use a color index by adding a list of colors to the sign (Either color IDs or names). Then set the color by sending its index to the data pins. For example, if the sign text from the 2nd line is set to `black white`, an input of 0 will change the wool color to black and an input of 1 will change it to white. Any number of colors can be used. The circuit requires enough data pins to support the largest index: 2 colors require 1 data pin,  3-4 require 2 pins, 5-8 require 3 pins, and so on. 
 
-It's possible to build the chip without a clock pin if only 1 data pin is used.
+When the last sign argument is a broadcast channel name (i.e. not a color name). The pixel is set to receive new data from the selected channel.
+In this operation mode it's possible to use a transmitter to set the pixel's color wirelessly. The transmitted bits should not include a clock value, starting at bit 0 with the pixel color or index. You can build the chip without any inputs in this mode.
+
+
+It's possible to build the chip without a clock pin if only 1 data pin is used.  
+
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pixel.java)
 

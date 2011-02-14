@@ -16,7 +16,7 @@ title: Circuit classes documentation
 [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [router](Router.html), [comparator](Comparator.html)
 
 ## sequential logic circuits
-[clock](Clock.html), [pulse](Pulse.html), [counter](Counter.html), [decadecounter](Decadecounter.html)
+[clock](Clock.html), [pulse](Pulse.html), [delay](Delay.html), [counter](Counter.html), [ringcounter](Ringcounter.html)
 
 ## wireless communication
 [transmitter](Transmitter.html), [receiver](Receiver.html), [iptransmitter](Iptransmitter.html), [ipreceiver](Ipreceiver.html)
