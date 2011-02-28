@@ -5,7 +5,7 @@ title: RedstoneChips Usage Guide
 
 Building a Chip
 ---------------
-- Start by building the chip's __structure__ built out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
+- Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
 - Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
 - Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each block has to be attached to a chip block. Changes in redstone current will be sensed on any side or on top of the input blocks. 
 - The circuit outputs its bits by setting levers on and off. Attach __levers__ to any side or on top of each output block.
@@ -28,7 +28,7 @@ Interface blocks are the lapis blocks placed on the "roof".
 
 ![pixel circuit](/RedstoneChips/images/pixel2.png)
 
-Chip detection scanning rules
+Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
 To be able to understand the pin numbering of more complex structures you need to understand how the plugin detects and scans the structure once you right-click the circuit sign. It scans the circuit block by block starting at the sign. The pins are numbered as the circuit structure is scanned, therefore when the structure is a straight line the counting starts at the sign and onwards. When more than one dimension is used the plugin will scan according to the following rules:
 1. The sign block is added to the structure and then the plugin moves to the chip block the sign is attached to. 
