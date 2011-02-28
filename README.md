@@ -15,14 +15,23 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* If you're updating from a previous version, delete any previously installed RedstoneChips and BasicCircuits jar files and rename your <craftbukkit>/plugins/RedstoneChips-XX folder to /RedstoneChips (or delete it to remove previous settings).
-* Download the [RedsoneChips-0.8](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.8.jar) jar file.
-* Download the [BasicCircuits-0.8](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.8.jar) jar file.
+* Download the [RedsoneChips-0.82](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.82.jar) jar file.
+* Download the [BasicCircuits-0.82](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.82.jar) jar file.
 * Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 
 Changelog
 ----------
+#### RedstoneChips 0.82 (28/02/11)
+- Every chip can now use a different block as a chip block. The chip's block type is determined by the block type the sign is attached to. This means 
+- /rc-debug can be used with a circuit id number and /rc-debug alloff can be used to stop receiving debug messages from all circuits.
+- Uses the new Bukkit Player.getTargetBlock().
+- Supports /rc-reset with circuit id as an argument; New /rc-help command for some info about RC commands.
+-  Temporary fix for yet another circuit library load order problem. Many changes to the way circuit libraries behave. Check [LibraryTemplate](https://github.com/eisental/LibraryTemplate) for info.
+- Changed Circuit.init() to use CommandSender instead of player. If you're working on a circuit library you need to change your circuits to use `public void init(CommandSender sender, String[] args) {}`
+- Don't need to use ChatFixUtil anymore.
+- Doesn't use the old constructor. Good riddance.
+
 #### RedstoneChips 0.8 (14/02/11)
 - Many internal changes in the way input pins are handled and their lookup maps.
 - Using ChatFixUtil by Olof Larsson prevent chat color client crashes.
