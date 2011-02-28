@@ -1,6 +1,6 @@
 ---
 layout: main
-title: pirsensor
+title: rangefinder
 ---
 
 An ultrasonic range finder. When the clock pin is triggered the chip will output the distance to the closest obstacle. Place an interface block and attach a noteblock to 1 of its sides to set the direction of the range finder. The chip will fire a wave in the opposite direction to the face of the noteblock that's attaches to the interface block.
