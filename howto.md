@@ -5,7 +5,7 @@ title: RedstoneChips Usage Guide
 
 Building a Chip
 ---------------
-- Start by build a structure made of __chip blocks__ (sandstone blocks by default). 
+- Start by building the chip's __structure__ built out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
 - Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
 - Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each block has to be attached to a chip block. Changes in redstone current will be sensed on any side or on top of the input blocks. 
 - The circuit outputs its bits by setting levers on and off. Attach __levers__ to any side or on top of each output block.
@@ -54,26 +54,25 @@ __Power tools__, however, will not cause it to decativate and can result in "pha
 
 Plugin commands
 ----------------
-
- - `/rc-list` Prints a list of activated chips on the server. The id number shown on the list can be used with other commands.
- - `/rc-classes` Prints a list of installed circuit classes.
- - `/rc-channels` Lists currently used transmitter/receiver broadcast channels. 
- - `/rc-pin` Point your cross at one of the pins and enter the command to get the current state of the pin and its index. You have to point to the block where redstone current actually flows. That is, you need to point at levers, buttons or redstone wire and not at the output / input blocks.
- - `/rc-debug` Register a player as a debugger for a specific circuit. Point your cross at one of the circuit blocks and enter the command. The plugin will now send you debug messages from this circuit. Enter `/redchips-debug off` while pointing, to stop debugging.
- - `/rc-destroy` Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/redchips-prefs enableDestroyCommand true`
- - `/rc-break` Deactivates a circuit w/o removing its blocks. Point at a block of the circuit or for admins, enter the circuit's id number as an argument. Right-click the chip sign to reactivate it.
- - `/rc-reset` Reactivates a circuit. To use, point at a block of the circuit and enter the command. It's very useful if you've made changes to the chip structure and want to quickly update it or if you made changes to the sign arguments without destroying the sign.
- - `/rc-info` Prints a lot of information about the current state of a circuit. To use, point at a block of the circuit and enter the command. 
- - `/rc-prefs` Prints preferences. See below for a list of preference keys.
- - `/rc-prefs key` Prints one preference key: value pair.
- - `/rc-prefs key value` Changes the value of a preference key and saves the file. Only admins are allowed to use this command.
-     - Example: typing <code>/redchips-prefs chipBlockType glass</code> will change the preferences value and make the plugin immediately expect new chips to have their body made of glass.
+- `/rc-list` - Prints a list of active chips including their id numbers and locations.
+- `/rc-classes` - Prints a list of installed circuit classes.
+- `/rc-prefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
+      To change a specific value use /rc-prefs <pref key> <new value>.
+- `/rc-debug` - Register yourself to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use /rc-debug off or /rc-debug <chip id> off. To stop receiving debug messages from any circuit use /rc-debug alloff
+- `/rc-pin` - Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
+      source to use.
+- `/rc-destroy` - Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use /rc-prefs enableDestroyCommand true.
+- `/rc-break` - Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+- `/rc-type` - Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
+- `/rc-reset` - Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
+- `/rc-channels` - Prints a list of currently used wireless broadcast channels.
+- `/rc-info` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+- `/rc-help` - Prints a list or description of all RedstoneChips commands. Use /rc-help <command name> to get help about a specific command.
 
 Preference keys
 ---------------
 
 ##### Block types - these can be any material name or id.
-- `chipBlockType` - Sets the chip's structure block material (`SANDSTONE` by default).
 - `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
 - `outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
 - `interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
