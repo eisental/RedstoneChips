@@ -2,6 +2,7 @@
 layout: main
 title: Circuit classes documentation
 ---
+Here you can find documentation for circuit classes in both BasicCircuits and SensorLibrary. 
 
 ## logic gates
 [not](Not.html), [and](And.html), [or](Or.html), [xor](Xor.html)
@@ -25,7 +26,7 @@ title: Circuit classes documentation
 [print](Print.html), [pixel](Pixel.html), [synth](Synth.html)
 
 ## sensors
-[terminal](Terminal.html), [pirsensor](Pirsensor.html), [photocell](Photocell.html)
+[terminal](Terminal.html), [pirsensor](Pirsensor.html), [photocell](Photocell.html), [daytime](Daytime.html), [rangefinder](Rangefinder.html)
 
 
 

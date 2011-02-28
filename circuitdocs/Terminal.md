@@ -12,6 +12,8 @@ The first sign argument sets the way the data is encoded.
 * `ascii` (default) - Sends one character's ascii value over the data outputs, triggers the clock output and then moves to the next character.
 * `num` - Reads the whole line as an integer number, sends the integer over the data outputs and then triggers the clock output.
 
+The chip can be built with an optional clear input pin. When the clear pin is triggered any data left on the chip's outputs is set to off.
+
 This circuit can be directly connected to a [print](Print.html) circuit. 
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/terminal.java)
@@ -23,6 +25,7 @@ This circuit can be directly connected to a [print](Print.html) circuit.
 * ascii mode requires 1 clock output and 8 data output pins.
 * num mode requires 1 clock output and 1 or more data output pins.
 * Requires at least 1 interface block.
+* Can have 1 optional clear input pin.
 
 #### Sign text
 1. `   terminal   `

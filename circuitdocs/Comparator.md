@@ -24,4 +24,5 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Digital_comparator)
 #### Sign text
 1. `   comparator   `
 2. `   [constant]   ` (optional)
+
 __Version history:__ Added to BasicCircuits 0.77
