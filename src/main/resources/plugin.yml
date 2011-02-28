@@ -1,40 +1,42 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.8
+version: 0.82
 author: eisental
 description: Core plugin for integrated redstone circuits 
 website: eisental.github.com/RedstoneChips
 commands:
   rc-list:
-    description: Lists active redstone circuits.
+    description: Prints a list of active chips including their id numbers and locations.
     usage: /<command>
   rc-classes:
-    description: Lists installed circuit classes.
+    description: Prints a list of installed circuit classes.
     usage: /<command>
   rc-prefs:
-    description: View or change plugin preferences. Enter with no arguments to get a full list.
+    description: Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
+      To change a specific value use /rc-prefs <pref key> <new value>.
   rc-debug:
-    description: Point towards a circuit block and enter this command to receive debug messages from the circuit. To stop debugging
-                 the circuit, use /redchips-debug off.
-    usage: /<command> [on | off]
+    description: Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish
+      to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use /rc-debug off or /rc-debug <chip id> off.
+      To stop receiving debug messages from any circuit use /rc-debug alloff
   rc-pin:
-    description: Point at an input or output block (where actual redstone current flows), to get information about the pin.
+    description: Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
+      source to use.
   rc-destroy:
     description: Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter
-                 the command.
+                 the command. This command is disabled by default. To enable it use /rc-prefs enableDestroyCommand true.
   rc-break:
-    description: Deactivates a circuit w/o removing its blocks. Point at a block of the circuit or enter the circuit's id number as an argument.
+    description: Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
   rc-type:
-    description: Used for typing text or numbers into the circuit. Used by terminal and print for ex.
-    usage: /<command> <data>
+    description: Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
   rc-reset:
-    description: Reactivates a circuit, applying any changes made to the sign with sign edit commands.
-    usage: /<command>
+    description: Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using
+      the chip's id number as an argument if you have admin priviliges.
   rc-channels:
-    description: Lists currently used wireless broadcast channels.
-    usage: /<command>
+    description: Prints a list of currently used wireless broadcast channels.
   rc-info:
-    description: Sends an info message to the command sender about the trageted circuit. Point at a block of the circuit you wish to get info about.
-    usage: /<command>
+    description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+  rc-help:
+    description: Prints a list or description of all RedstoneChips commands. Use /rc-help <command name> to get help about a specific command.
+
 
 

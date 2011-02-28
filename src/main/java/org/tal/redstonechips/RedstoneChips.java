@@ -1,16 +1,15 @@
 package org.tal.redstonechips;
 
+import java.io.File;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.world.WorldEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,7 +26,6 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BlockVector;
@@ -61,9 +59,42 @@ public class RedstoneChips extends JavaPlugin {
     public List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
     public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
 
-    public RedstoneChips(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, new File(plugin.getParentFile(), desc.getName()), plugin, cLoader);
+    /**
+     * Tells the plugin to add a list of circuit classes to the circuit loader.
+     * @param circuitClasses An array of Class objects that extend the Circuit class.
+     */
+    public void addCircuitClasses(Class... circuitClasses) {
+        for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
+    }
 
+    /**
+     * Removes a list of circuit classes from the circuit loader.
+     * @param circuitClasses An array of Class objects to be removed.
+     */
+    public void removeCircuitClasses(Class... circuitClasses) {
+        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
+    }
+
+    /**
+     * Tells the plugin to load circuit classes from this circuit library when enabled.
+     *
+     * @param lib Any object implementing the CircuitIndex interface.
+     */
+    public static void addCircuitLibrary(CircuitIndex lib) {
+        circuitLibraries.add(lib);
+    }
+
+    @Override
+    public void onDisable() {
+        circuitManager.destroyCircuits();
+
+        PluginDescriptionFile desc = this.getDescription();
+        String msg = desc.getName() + " " + desc.getVersion() + " disabled.";
+        logg.info(msg);
+    }
+
+    @Override
+    public void onEnable() {
         prefsManager = new PrefsManager(this);
         circuitManager = new CircuitManager(this);
         circuitPersistence = new CircuitPersistence(this);
@@ -127,47 +158,8 @@ public class RedstoneChips extends JavaPlugin {
                 }
             }
         };
-    }
-
-    /**
-     * Tells the plugin to add a list of circuit classes to the circuit loader.
-     * @param circuitClasses An array of Class objects that extend the Circuit class.
-     */
-    public void addCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
-    }
-
-    /**
-     * Removes a list of circuit classes from the circuit loader.
-     * @param circuitClasses An array of Class objects to be removed.
-     */
-    public void removeCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
-    }
-
-    /**
-     * Tells the plugin to load circuit classes from this circuit library when enabled.
-     *
-     * @param lib Any object implementing the CircuitIndex interface.
-     */
-    public static void addCircuitLibrary(CircuitIndex lib) {
-        circuitLibraries.add(lib);
-    }
-
-    @Override
-    public void onDisable() {
-        circuitManager.destroyCircuits();
 
         PluginDescriptionFile desc = this.getDescription();
-        String msg = desc.getName() + " " + desc.getVersion() + " disabled.";
-        logg.info(msg);
-    }
-
-    @Override
-    public void onEnable() {
-        PluginDescriptionFile desc = this.getDescription();
-        String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
-        logg.info(msg);
 
         // load circuit classes
         for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
@@ -205,6 +197,9 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
         pm.registerEvent(Type.CHUNK_LOADED, rcWorldListener, Priority.Monitor, this);
         pm.registerEvent(Type.WORLD_SAVED, rcWorldListener, Priority.Monitor, this);
+
+        String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
+        logg.info(msg);
     }
 
     @Override
@@ -237,13 +232,16 @@ public class RedstoneChips extends JavaPlugin {
             commandHandler.handleRcType(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-reset")) {
-            commandHandler.resetCircuit(sender);
+            commandHandler.resetCircuit(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-info")) {
             commandHandler.printCircuitInfo(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-channels")) {
             commandHandler.listBroadcastChannels(sender);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
+            commandHandler.commandHelp(sender, args);
             return true;
         } else return false;
     }
@@ -337,4 +335,8 @@ public class RedstoneChips extends JavaPlugin {
         transmitters.remove(t);
     }
 
+    @Override
+    public File getDataFolder() {
+        return new File(super.getDataFolder().getParentFile(), getDescription().getName());
+    }
 }

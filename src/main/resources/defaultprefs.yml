@@ -1,5 +1,4 @@
 ## block types
-chipBlockType: SANDSTONE
 inputBlockType: IRON_BLOCK
 outputBlockType: GOLD_BLOCK
 interfaceBlockType: LAPIS_BLOCK

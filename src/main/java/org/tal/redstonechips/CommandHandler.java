@@ -9,6 +9,7 @@ import org.tal.redstonechips.circuit.Circuit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -24,8 +25,6 @@ import org.tal.redstonechips.circuit.ReceivingCircuit;
 import org.tal.redstonechips.circuit.TransmittingCircuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
 import org.tal.redstonechips.util.BitSetUtils;
-import org.tal.redstonechips.util.ChatFixUtil;
-import org.tal.redstonechips.util.TargetBlock;
 
 /**
  *
@@ -39,10 +38,9 @@ public class CommandHandler {
         rc = plugin; 
     }
 
-
     public void listActiveCircuits(CommandSender p, String[] args) {
         List<Circuit> circuits = rc.getCircuitManager().getCircuits();
-        if (circuits.isEmpty()) ChatFixUtil.sendCSMessage(p, rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
+        if (circuits.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
         else {
             String title = "Active redstone circuits";
             String commandName = "rc-list";
@@ -60,7 +58,7 @@ public class CommandHandler {
 
     public void listCircuitClasses(CommandSender p) {
         Map<String,Class> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
-        if (circuitClasses.isEmpty()) ChatFixUtil.sendCSMessage(p, rc.getPrefsManager().getInfoColor() + "There are no circuit classes installed.");
+        if (circuitClasses.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no circuit classes installed.");
         else {
             List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
             Collections.sort(names);
@@ -79,7 +77,7 @@ public class CommandHandler {
                     color = ChatColor.YELLOW;
                 else color = ChatColor.WHITE;
             }
-            if (!list.isEmpty()) ChatFixUtil.sendCSMessage(p, list.substring(0, list.length()-2));
+            if (!list.isEmpty()) p.sendMessage(list.substring(0, list.length()-2));
             p.sendMessage(rc.getPrefsManager().getInfoColor() + "----------------------");
             p.sendMessage("");
         }
@@ -123,43 +121,87 @@ public class CommandHandler {
     }
 
     public void debugCommand(CommandSender sender, String[] args) {
-        Player player = checkIsPlayer(sender);
-        if (player==null) return;
-
+        int id = -1;
         boolean add = true;
-        if (args.length>0) {
-            if (args[0].equalsIgnoreCase("off"))
-                add = false;
-            else if (args[0].equalsIgnoreCase("on"))
+        boolean alloff = false;
+
+        if (args.length==1) {
+            // on, off or id (then on)
+            if (args[0].equalsIgnoreCase("on"))
                 add = true;
+            else if (args[0].equalsIgnoreCase("off"))
+                add = false;
+            else if (args[0].equals("alloff"))
+                alloff = true;
             else {
-                sender.sendMessage("Bad argument " + args[0] + ". Syntax should be: /redchips-debug on | off");
+                try {
+                    id = Integer.decode(args[0]);
+                    add = true;
+                } catch (NumberFormatException ne) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument: " + args[0] + ". Expecting on, off or a chip id.");
+                }
+            }
+        } else if (args.length==2) {
+            try {
+                id = Integer.decode(args[0]);
+            } catch (NumberFormatException ne) {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a chip id number.");
+                return;
+            }
+
+            if (args[1].equalsIgnoreCase("on"))
+                add = true;
+            else if (args[1].equalsIgnoreCase("off"))
+                add = false;
+            else {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument: " + args[1] + ". Expecting on or off.");
+                return;
             }
         }
 
-        Block target = new TargetBlock(player).getTargetBlock();
-        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
-
-        if (c==null) {
-            sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to debug.");
+        if (alloff) {
+            for (Circuit c : rc.getCircuitManager().getCircuits())
+                if (c.getDebuggers().contains(sender)) c.removeDebugger(sender);
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "You will not receive debug messages from any chip.");
         } else {
+            Circuit c;
+            if (id!=-1) {
+                if (rc.getCircuitManager().getCircuits().size()<=id || id<0) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad chip id " + id + ". Could only find " + rc.getCircuitManager().getCircuits().size() + " active chips.");
+                    return;
+                }
+                c = rc.getCircuitManager().getCircuits().get(id);
+            } else {
+                Player player = checkIsPlayer(sender);
+                if (player==null) return;
+                Block target = targetBlock(player);
+                c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to debug.");
+                    return;
+                }
+            }
+
             if (add) {
                 try {
-                    c.addDebugger(player);
+                    if (id!=-1 && !sender.isOp()) {
+                        sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You must have admin priviliges to debug a chip by id.");
+                        return;
+                    } else
+                        c.addDebugger(sender);
                 } catch (IllegalArgumentException ie) {
-                    ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getInfoColor() + ie.getMessage());
+                    sender.sendMessage(rc.getPrefsManager().getInfoColor() + ie.getMessage());
                     return;
                 }
                 sender.sendMessage(rc.getPrefsManager().getDebugColor() + "You are now a debugger of the " + c.getClass().getSimpleName() + " circuit.");
             } else {
                 try {
-                    c.removeDebugger(player);
+                    c.removeDebugger(sender);
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(rc.getPrefsManager().getInfoColor() + ie.getMessage());
                     return;
                 }
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "You will not receive any more debug messages ");
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "from the " + c.getClass().getSimpleName() + " circuit.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "You will not receive any more debug messages from the " + c.getClass().getSimpleName() + " circuit.");
             }
         }
     }
@@ -168,7 +210,7 @@ public class CommandHandler {
         Player player = checkIsPlayer(sender);
         if (player==null) return;
 
-        Block target = new TargetBlock(player).getTargetBlock();
+        Block target = targetBlock(player);
         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
         if (c==null) {
             player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to destroy.");
@@ -198,12 +240,12 @@ public class CommandHandler {
             if (player==null) return;
 
             if (!sender.isOp()) {
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getErrorColor() + "You must be an admin to remotely deactivate a circuit.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You must be an admin to remotely deactivate a circuit.");
             }
-            Block target = new TargetBlock(player).getTargetBlock();
+            Block target = targetBlock(player);
             c = rc.getCircuitManager().getCircuitByStructureBlock(target);
             if (c==null) {
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to deactivate.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to deactivate.");
                 return;
             }
         } else {
@@ -219,8 +261,9 @@ public class CommandHandler {
     public void handleRcType(CommandSender sender, String[] args) {
         Player player = checkIsPlayer(sender);
 
-        TargetBlock b = new TargetBlock(player);
-        Block block = b.getTargetBlock();
+        
+        Block block = targetBlock(player);
+
         BlockVector v = new BlockVector(block.getX(), block.getY(), block.getZ());
         rcTypeReceiver t = rc.rcTypeReceivers.get(v);
         if (t==null) {
@@ -234,7 +277,7 @@ public class CommandHandler {
     public void pinCommand(CommandSender sender) {
         Player player = checkIsPlayer(sender);
 
-        Block target = new TargetBlock(player).getTargetBlock();
+        Block target = targetBlock(player);
         sendPinInfo(target, player);
 
     }
@@ -249,13 +292,13 @@ public class CommandHandler {
             } else { // output pin
                 Circuit c = (Circuit)oo[0];
                 int i = (Integer)oo[1];
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
             }
         } else { // input pin
             for (InputPin io : inputList) {
                 Circuit c = io.getCircuit();
                 int i = io.getIndex();
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
             }
         }
     }
@@ -268,23 +311,23 @@ public class CommandHandler {
         if (args.length==0) {
             Player p = checkIsPlayer(sender);
             if (p==null) return;
-            Block target = new TargetBlock(p).getTargetBlock();
+            Block target = targetBlock(p);
             c = rc.getCircuitManager().getCircuitByStructureBlock(target);
             if (c==null) {
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to get info about.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to get info about.");
                 return;
             }
         } else {
             try {
                 int i = Integer.decode(args[0]);
                 if (i>=circuits.size()) {
-                    ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getErrorColor() + "Bad id. There are only " + circuits.size() + " active circuits.");
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad id. There are only " + circuits.size() + " active circuits.");
                     return;
                 }
 
                 c = rc.getCircuitManager().getCircuits().get(i);
             } catch (NumberFormatException ie) {
-                ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getErrorColor() + "Bad circuit id argument: " + args[0]);
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad circuit id argument: " + args[0]);
                 return;
             }
         }
@@ -310,22 +353,22 @@ public class CommandHandler {
         else disabled = "";
 
         String loc = c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ();
-        ChatFixUtil.sendCSMessage(sender, "");
-        ChatFixUtil.sendCSMessage(sender, infoColor + c.getCircuitClass() + " circuit" + disabled);
-        ChatFixUtil.sendCSMessage(sender, extraColor + "----------------------");
+        sender.sendMessage("");
+        sender.sendMessage(infoColor + c.getCircuitClass() + " circuit" + disabled);
+        sender.sendMessage(extraColor + "----------------------");
 
-        ChatFixUtil.sendCSMessage(sender, infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
-        ChatFixUtil.sendCSMessage(sender, infoColor + "id: " + extraColor + circuits.indexOf(c) + infoColor +
+        sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
+        sender.sendMessage(infoColor + "id: " + extraColor + circuits.indexOf(c) + infoColor +
                 " location: " + extraColor + loc + infoColor + " world: " + extraColor + c.world.getName());
 
-        ChatFixUtil.sendCSMessage(sender, infoColor + "input states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length));
-        ChatFixUtil.sendCSMessage(sender, infoColor + "output states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length));
+        sender.sendMessage(infoColor + "input states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length));
+        sender.sendMessage(infoColor + "output states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length));
 
         String signargs = "";
         for (String arg : c.args)
             signargs += arg + " ";
 
-        ChatFixUtil.sendCSMessage(sender, infoColor + "sign args: " + extraColor + signargs);
+        sender.sendMessage(infoColor + "sign args: " + extraColor + signargs);
         
         Map<String,String> internalState = c.saveState();
         if (!internalState.isEmpty()) {
@@ -343,28 +386,43 @@ public class CommandHandler {
         }
     }
 
-    public void resetCircuit(CommandSender sender) {
-        Player player = checkIsPlayer(sender);
-        if (player==null) return;
+    public void resetCircuit(CommandSender sender, String[] args) {
+        Circuit c;
 
-        Block target = new TargetBlock(player).getTargetBlock();
-        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
-        if (c==null) {
-            player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to reset.");
-        } else {
-            Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
-            List<Player> debuggers = c.getDebuggers();
-            rc.getCircuitManager().destroyCircuit(c, sender);
-            Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
-            rc.getCircuitManager().checkForCircuit(a, player);
-
-            Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
-            if (newCircuit!=null) {
-                for (Player d : debuggers) newCircuit.addDebugger(d);
-                player.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + c.getCircuitClass() + " circuit is reactivated.");
+        if (args.length>0) {
+            try {
+                int id = Integer.decode(args[0]);
+                c = rc.getCircuitManager().getCircuits().get(id);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Invalid circuit id: " + id + ". Found " + rc.getCircuitManager().getCircuits().size() + " circuits.");
+                    return;
+                }
+            } catch (NumberFormatException ne) {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a number.");
+                return;
             }
+        } else {
+            Player player = checkIsPlayer(sender);
+            if (player==null) return;
 
+            Block target = targetBlock(player);
+            c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+            if (c==null) {
+                player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to reset.");
+                return;
+            }
+        }
 
+        Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
+        List<CommandSender> debuggers = c.getDebuggers();
+        rc.getCircuitManager().destroyCircuit(c, sender);
+        Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
+        rc.getCircuitManager().checkForCircuit(a, sender);
+
+        Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
+        if (newCircuit!=null) {
+            for (CommandSender d : debuggers) newCircuit.addDebugger(d);
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + newCircuit.getCircuitClass() + " circuit is reactivated with new id " + rc.getCircuitManager().getCircuits().indexOf(newCircuit));
         }
     }
 
@@ -374,18 +432,18 @@ public class CommandHandler {
                 try {
                     page = Integer.decode(args[0]);
                 } catch (NumberFormatException ne) {
-                    ChatFixUtil.sendCSMessage(s, errorColor + "Invalid page number: " + args[0]);
+                    s.sendMessage(errorColor + "Invalid page number: " + args[0]);
                 }
             }
 
-            if (page<1) ChatFixUtil.sendCSMessage(s, errorColor + "Invalid page number: " + page);
-            else if (page>(Math.ceil(lines.length/MaxLines)+1)) ChatFixUtil.sendCSMessage(s, errorColor + "Invalid page number: " + page);
+            if (page<1) s.sendMessage(errorColor + "Invalid page number: " + page);
+            else if (page>(Math.ceil(lines.length/MaxLines)+1)) s.sendMessage(errorColor + "Invalid page number: " + page);
             else {
                 s.sendMessage("");
                 s.sendMessage(infoColor + title + ": ( page " + page + " / " + (int)(Math.ceil(lines.length/MaxLines)+1)  + " )");
                 s.sendMessage(infoColor + "----------------------");
                 for (int i=(page-1)*MaxLines; i<Math.min(lines.length, page*MaxLines); i++) {
-                    ChatFixUtil.sendCSMessage(s, lines[i]);
+                    s.sendMessage(lines[i]);
                 }
                 s.sendMessage(infoColor + "----------------------");
                 s.sendMessage("Use /" + commandName + " <page number> to see other pages.");
@@ -399,7 +457,7 @@ public class CommandHandler {
         for (TransmittingCircuit t : rc.transmitters) channels.add(t.getChannel());
         for (ReceivingCircuit r : rc.receivers) channels.add(r.getChannel());
         if (channels.isEmpty()) {
-            ChatFixUtil.sendCSMessage(sender, rc.getPrefsManager().getInfoColor() + "There are no registered channels.");
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no registered channels.");
         } else {
             sender.sendMessage("");
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Currently used broadcast channels:");
@@ -409,7 +467,7 @@ public class CommandHandler {
             for (String channel : channels) {
                 list += color + channel + ", ";
                 if (list.length()>50) {
-                    ChatFixUtil.sendCSMessage(sender, list.substring(0, list.length()-2));
+                    sender.sendMessage(list.substring(0, list.length()-2));
                     list = "";
                 }
                 if (color==ChatColor.WHITE)
@@ -420,5 +478,52 @@ public class CommandHandler {
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "------------------------------");
             sender.sendMessage("");
         }
+    }
+
+    public void commandHelp(CommandSender sender, String[] args) {
+        Map commands = (Map)rc.getDescription().getCommands();
+        ChatColor infoColor = rc.getPrefsManager().getInfoColor();
+        ChatColor errorColor = rc.getPrefsManager().getErrorColor();
+
+        if (args.length==0) {
+            sender.sendMessage("");
+            sender.sendMessage(infoColor + "RedstoneChips commands" + ":");
+            sender.sendMessage(infoColor + "----------------------");
+
+            for (Object command : commands.keySet()) {
+                sender.sendMessage(ChatColor.YELLOW + command.toString());
+            }
+
+            sender.sendMessage(infoColor + "----------------------");
+            sender.sendMessage("Use /rc-help <command name> for help on a specific command (omit the / sign).");
+            sender.sendMessage("");
+        } else {
+            Map commandMap = (Map)commands.get(args[0]);
+            if (commandMap==null) {
+                sender.sendMessage(errorColor + "Unknown rc command: " + args[0]);
+                return;
+            }
+
+            sender.sendMessage("");
+            sender.sendMessage(infoColor + "/" + args[0] + ":");
+            sender.sendMessage(infoColor + "----------------------");
+
+            sender.sendMessage(ChatColor.YELLOW+commandMap.get("description").toString());
+
+            sender.sendMessage(infoColor + "----------------------");
+            sender.sendMessage("");
+
+        }
+    }
+
+    static final HashSet<Byte> transparentMaterials = new HashSet<Byte>();
+    static {
+        transparentMaterials.add((byte)Material.AIR.getId());
+        transparentMaterials.add((byte)Material.WATER.getId());
+        transparentMaterials.add((byte)Material.STATIONARY_WATER.getId());
+    }
+
+    private Block targetBlock(Player player) {
+        return player.getTargetBlock(transparentMaterials, 100);
     }
 }

@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.util.ChatFixUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -30,14 +29,13 @@ public class PrefsManager {
     /**
      * enum of all the default preferences keys.
      */
-    public enum Prefs { chipBlockType, inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
+    public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
         enableDestroyCommand;
     };
 
     private RedstoneChips rc;
     private DumperOptions prefDump;
 
-    private Material chipBlockType;
     private Material inputBlockType;
     private Material outputBlockType;
     private Material interfaceBlockType;
@@ -90,7 +88,6 @@ public class PrefsManager {
                 inputBlockType = findMaterial(prefs.get(Prefs.inputBlockType.name()));
                 outputBlockType = findMaterial(prefs.get(Prefs.outputBlockType.name()));
                 interfaceBlockType = findMaterial(prefs.get(Prefs.interfaceBlockType.name()));
-                chipBlockType = findMaterial(prefs.get(Prefs.chipBlockType.name()));
             } catch (IllegalArgumentException ie) {
                 rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
             }
@@ -166,7 +163,7 @@ public class PrefsManager {
         sender.sendMessage(getInfoColor() + rc.getDescription().getName() + " " + rc.getDescription().getVersion() + " preferences:");
         sender.sendMessage(getInfoColor() + "-----------------------------");
         for (String line : split)
-            ChatFixUtil.sendCSMessage(sender, line);
+            sender.sendMessage(line);
         sender.sendMessage(getInfoColor() + "-----------------------------");
         sender.sendMessage("");
     }
@@ -185,14 +182,6 @@ public class PrefsManager {
      */
     public Material getOutputBlockType() {
         return outputBlockType;
-    }
-
-    /**
-     *
-     * @return The current chip block type preference value.
-     */
-    public Material getChipBlockType() {
-        return chipBlockType;
     }
 
     /**

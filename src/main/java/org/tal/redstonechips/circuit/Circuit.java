@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
-import org.tal.redstonechips.util.ChatFixUtil;
 
 /**
  * Represents a RedstoneChips circuit.
@@ -63,9 +63,9 @@ public abstract class Circuit {
     public World world;
 
     /**
-     * List of players that will receive debug messages from this circuit.
+     * List of command senders that will receive debug messages from this circuit.
      */
-    private List<Player> debuggers;
+    private List<CommandSender> debuggers;
 
     /**
      * The current state of each input bit. Should be used only for monitoring. Do not change its value.
@@ -84,19 +84,19 @@ public abstract class Circuit {
 
     /**
      *
-     * @param player The player that activated the circuit. Used for sending error or status messages after activation.
+     * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
      * @param args The sign arguments of this circuit. Stored in the args field.
      * @return result of call to abstract Circuit.init() method.
      */
-    public final boolean initCircuit(Player player, String[] args, RedstoneChips rc) {
+    public final boolean initCircuit(CommandSender sender, String[] args, RedstoneChips rc) {
         this.redstoneChips = rc;
-        debuggers = new ArrayList<Player>();
+        debuggers = new ArrayList<CommandSender>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
         this.args = args;
 
         updateInputBits();
-        boolean result = init(player, args);
+        boolean result = init(sender, args);
         if (result!=false) {
             if (isStateless()) {
                 for (int i=0; i<inputs.length; i++)
@@ -141,11 +141,11 @@ public abstract class Circuit {
     /**
      * Called when right-clicking the sign or when the plugin reads circuit data from file after restarting the server.
      * 
-     * @param player The player that right-clicked the sign, or null if called on startup.
+     * @param sender The command sender that activated the chip, or null if called on startup.
      * @param args Any words on the sign after the circuit type.
      * @return true if the init was successful, false if an error occurred.
      */
-    protected abstract boolean init(Player player, String[] args);
+    protected abstract boolean init(CommandSender sender, String[] args);
 
     /**
      * Called when the plugin needs to save the circuits state to disk.
@@ -233,25 +233,24 @@ public abstract class Circuit {
 
 
     /**
-     * Useful method for posting error messages. Sends an error message to the requested player using the error chat color as
-     * set in the preferences file. If player is null the message is sent to the console logger as a warning.
-     * @param player The Player to send the message to.
+     * Useful method for posting error messages. Sends an error message to the requested command sender using the error chat color as
+     * set in the preferences file. If sender is null the message is sent to the console logger as a warning.
+     * @param sender The command sender to send the message to.
      * @param message The error message.
      */
-    protected void error(Player player, String message) {
-        if (player!=null) ChatFixUtil.sendCSMessage(player, redstoneChips.getPrefsManager().getErrorColor() + message);
+    protected void error(CommandSender sender, String message) {
+        if (sender!=null) sender.sendMessage(redstoneChips.getPrefsManager().getErrorColor() + message);
         else Logger.getLogger("Minecraft").warning(redstoneChips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
     /**
-     * Useful method for posting info messages. Sends an info message to the requested player using the info chat color as
-     * set in the preferences file. If player is null the message is simply ignored.
-     * @param player The Player to send the message to.
+     * Useful method for posting info messages. Sends an info message to the requested command sender using the info chat color as
+     * set in the preferences file. If sender is null the message is simply ignored.
+     * @param sender The CommandSender to send the message to.
      * @param message The error message.
      */
-    protected void info(Player player, String message) {
-        if (player!=null) ChatFixUtil.sendCSMessage(player, redstoneChips.getPrefsManager().getInfoColor() + message);
-        //else Logger.getLogger("Minecraft").info(redchips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
+    protected void info(CommandSender sender, String message) {
+        if (sender!=null) sender.sendMessage(redstoneChips.getPrefsManager().getInfoColor() + message);
     }
 
     /**
@@ -261,29 +260,31 @@ public abstract class Circuit {
      * @param message The error message.
      */
     protected void debug(String message) {
-        for (Player p : debuggers)
-            ChatFixUtil.sendCSMessage(p, redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + ": " + message);
+        int id = redstoneChips.getCircuitManager().getCircuits().indexOf(this);
+        
+        for (CommandSender s : debuggers)
+            s.sendMessage(redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
     }
 
     /**
-     * Adds the player as a debugger for the circuit.
+     * Adds the command sender as a debugger for the circuit.
      *
-     * @param d The player to add.
+     * @param d The command sender to add.
      * @throws IllegalArgumentException If the player is already in the debuggers list.
      */
-    public void addDebugger(Player d) throws IllegalArgumentException {
+    public void addDebugger(CommandSender d) throws IllegalArgumentException {
         if (debuggers.contains(d)) throw new IllegalArgumentException("You are already debugging this circuit.");
         debuggers.add(d);
     }
 
     /**
-     * Removes the player from the debuggers list.
+     * Removes the command sender from the debuggers list.
      *
-     * @param d The player
+     * @param d The command sender.
      * @return
      * @throws IllegalArgumentException
      */
-    public void removeDebugger(Player d) throws IllegalArgumentException {
+    public void removeDebugger(CommandSender d) throws IllegalArgumentException {
         if (!debuggers.contains(d)) throw new IllegalArgumentException("You are not listed as a debugger of this circuit.");
         debuggers.remove(d);
     }
@@ -320,7 +321,7 @@ public abstract class Circuit {
      *
      * @return The circuit's debuggers list.
      */
-    public List<Player> getDebuggers() {
+    public List<CommandSender> getDebuggers() {
         return debuggers;
     }
 

@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.circuit.InputPin;
-import org.tal.redstonechips.util.ChatFixUtil;
 import org.tal.redstonechips.util.ChunkLocation;
 
 /**
@@ -68,14 +67,14 @@ public class CircuitManager {
         }
     }
 
-    public void checkForCircuit(Block signBlock, Player player) {
+    public void checkForCircuit(Block signBlock, CommandSender sender) {
         if (signBlock.getType()==Material.WALL_SIGN) {
             Sign sign = (Sign)signBlock.getState();
 
             // first check if its already registered
             Circuit check = this.getCircuitByActivationBlock(signBlock);
             if (check!=null) {
-                player.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
                 return;
             }
 
@@ -92,12 +91,17 @@ public class CircuitManager {
             BlockFace direction = findSignDirection(signBlock.getData());
             Block firstChipBlock = signBlock.getFace(direction);
 
-            if (firstChipBlock.getType()==rc.getPrefsManager().getChipBlockType()) {
+            if (isTypeAllowed(firstChipBlock.getType())) {
+                Material chipMaterial = firstChipBlock.getType();
+
                 structure.add(firstChipBlock);
                 try {
-                    scanBranch(firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
+                    scanBranch(chipMaterial, firstChipBlock, direction, inputs, outputs, interfaceBlocks, structure);
                 } catch (IllegalArgumentException ie) {
-                    player.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
+                    return;
+                } catch (StackOverflowError se) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "If you're trying to build a redstone chip, your chip is way too big.");
                     return;
                 }
 
@@ -136,20 +140,20 @@ public class CircuitManager {
 
                         c.args = args;
                         
-                        if (c.initCircuit(player, args, rc)) {
+                        if (c.initCircuit(sender, args, rc)) {
                             this.addCircuitLookups(c);
                             circuits.add(c);
 
                             ChatColor infoColor = rc.getPrefsManager().getInfoColor();
                             ChatColor debugColor = rc.getPrefsManager().getDebugColor();
-                            ChatFixUtil.sendCSMessage(player, infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + infoColor + " circuit:");
-                            ChatFixUtil.sendCSMessage(player, debugColor + "> " + ChatColor.WHITE + inputs.size() + debugColor + " input"
+                            sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + infoColor + " circuit:");
+                            sender.sendMessage(debugColor + "> " + ChatColor.WHITE + inputs.size() + debugColor + " input"
                                     + (inputs.size()!=1?"s":"") + ", " + ChatColor.YELLOW + outputs.size() + debugColor + " output"
                                     + (outputs.size()!=1?"s":"") + " and " + ChatColor.BLUE + interfaceBlocks.size() + debugColor
                                     + " interface block" + (interfaceBlocks.size()!=1?"s":"") + ".");
                             return;
                         } else {
-                            ChatFixUtil.sendCSMessage(player, rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
+                            sender.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
                             return;
                         }
                     } catch (IllegalArgumentException ex) {
@@ -170,39 +174,39 @@ public class CircuitManager {
         for (Circuit c : circuits) c.circuitDestroyed();
     }
 
-    private void scanBranch(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void scanBranch(Material chipMaterial, Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         // look in every horizontal direction for inputs, outputs or interface blocks.
         checkAttachedIO(origin, direction, inputs, outputs, interfaces, structure);
 
         // look in every direction, inculding up and down for more chip blocks.
-        checkAttachedChipBlock(origin, direction, inputs, outputs, interfaces, structure);
+        checkAttachedChipBlock(chipMaterial, origin, direction, inputs, outputs, interfaces, structure);
     }
 
-    private void checkAttachedChipBlock(Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkAttachedChipBlock(Material chipMaterial, Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         // look for chip blocks to the right
-        checkForChipBlockOnSideFace(origin, getRightFace(direction), inputs, outputs, interfaces, structure);
+        checkForChipBlockOnSideFace(chipMaterial, origin, getRightFace(direction), inputs, outputs, interfaces, structure);
 
         // look for chip blocks to the left
-        checkForChipBlockOnSideFace(origin, getLeftFace(direction), inputs, outputs, interfaces, structure);
+        checkForChipBlockOnSideFace(chipMaterial, origin, getLeftFace(direction), inputs, outputs, interfaces, structure);
         
         // look for chip blocks in original direction
-        checkForChipBlockOnSideFace(origin, direction, inputs, outputs, interfaces, structure);
+        checkForChipBlockOnSideFace(chipMaterial, origin, direction, inputs, outputs, interfaces, structure);
         
         // look backwards. Structure should already contain this block unless last checked block was below or above.
-        checkForChipBlockOnSideFace(origin, getOppositeFace(direction), inputs, outputs, interfaces, structure);
+        checkForChipBlockOnSideFace(chipMaterial, origin, getOppositeFace(direction), inputs, outputs, interfaces, structure);
 
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
         Block up = origin.getFace(BlockFace.UP);
-        if (!structure.contains(up) && up.getType()==rc.getPrefsManager().getChipBlockType()) {
+        if (!structure.contains(up) && up.getType()==chipMaterial) {
             structure.add(up);
-            scanBranch(up, direction, inputs, outputs, interfaces, structure);
+            scanBranch(chipMaterial, up, direction, inputs, outputs, interfaces, structure);
         }
 
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
         Block down = origin.getFace(BlockFace.DOWN);
-        if (!structure.contains(down) && down.getType()==rc.getPrefsManager().getChipBlockType()) {
+        if (!structure.contains(down) && down.getType()==chipMaterial) {
             structure.add(down);
-            scanBranch(down, direction, inputs, outputs, interfaces, structure);
+            scanBranch(chipMaterial, down, direction, inputs, outputs, interfaces, structure);
         }
     }
 
@@ -252,12 +256,12 @@ public class CircuitManager {
         else return ret;
     }
 
-    private void checkForChipBlockOnSideFace(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
+    private void checkForChipBlockOnSideFace(Material chipMaterial, Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         Block b = origin.getFace(face);
         if (!structure.contains(b)) {
-            if (b.getType()==rc.getPrefsManager().getChipBlockType()) {
+            if (b.getType()==chipMaterial) {
                 structure.add(b);
-                scanBranch(b, face, inputs, outputs, interfaces, structure);
+                scanBranch(chipMaterial, b, face, inputs, outputs, interfaces, structure);
             }
         }
     }
@@ -308,12 +312,12 @@ public class CircuitManager {
         return args;
     }
 
-    public void checkCircuitDestroyed(Block b, Player p) {
+    public void checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(new BlockVector(b.getX(), b.getY(), b.getZ()));
 
         if (destroyed!=null && circuits.contains(destroyed)) {
-            if (p!=null) p.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
-            destroyCircuit(destroyed, p);
+            if (s!=null) s.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
+            destroyCircuit(destroyed, s);
         }
     }
 
@@ -426,9 +430,9 @@ public class CircuitManager {
         if (destroyer==null) dName = "an unknown cause";
         if (destroyer!=null && destroyer instanceof Player) dName = ((Player)destroyer).getDisplayName();
         else dName = "an unknown command sender";
-        for (Player p : destroyed.getDebuggers()) {
-            if (!p.equals(destroyer)) {
-                ChatFixUtil.sendCSMessage(p, rc.getPrefsManager().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " +
+        for (CommandSender s : destroyed.getDebuggers()) {
+            if (!s.equals(destroyer)) {
+                s.sendMessage(rc.getPrefsManager().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " +
                         rc.getPrefsManager().getErrorColor() + "deactivated " + rc.getPrefsManager().getDebugColor() + "by " + dName +
                         rc.getPrefsManager().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
             }
@@ -451,5 +455,12 @@ public class CircuitManager {
                 c.updateOutputLevers();
             }
         }
+    }
+
+    private boolean isTypeAllowed(Material material) {
+        return material!=rc.getPrefsManager().getInputBlockType() &&
+                material!=rc.getPrefsManager().getOutputBlockType() &&
+                material!=rc.getPrefsManager().getInterfaceBlockType() &&
+                material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
 }

@@ -1,6 +1,6 @@
 package org.tal.redstonechips.circuit;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
@@ -38,17 +38,17 @@ public abstract class BitSetCircuit extends Circuit {
     protected abstract void bitSetChanged(int bitSetIdx, BitSet7 set);
 
     @Override
-    public boolean init(Player player, String[] args) {
+    public boolean init(CommandSender sender, String[] args) {
         // number of inputs must be an integer multiple of num of outputs
         if (outputs.length==0) {
-            error(player, "Expecting at least 1 output pin.");
+            error(sender, "Expecting at least 1 output pin.");
             return false;
         }
 
         if ((inputs.length % outputs.length)==0) {
             int inBitSetCount = inputs.length / outputs.length;
             wordlength = outputs.length;
-            info(player, "Creating a bit-set circuit with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
+            info(sender, "Creating a bit-set circuit with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
             inputBitSets = new BitSet7[inBitSetCount];
             for (int i=0; i<inBitSetCount; i++) {
                 inputBitSets[i] = new BitSet7(wordlength);
@@ -57,7 +57,7 @@ public abstract class BitSetCircuit extends Circuit {
 
             return true;
         } else {
-            error(player, "Invalid number of inputs (" + inputs.length + "). Number of inputs must be a multiple of the number of outputs.");
+            error(sender, "Invalid number of inputs (" + inputs.length + "). Number of inputs must be a multiple of the number of outputs.");
             return false;
         }
 

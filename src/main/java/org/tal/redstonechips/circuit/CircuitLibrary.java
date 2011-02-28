@@ -20,37 +20,17 @@ import org.tal.redstonechips.RedstoneChips;
  *
  * @author Tal Eisenberg
  */
-public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex {
+public abstract class CircuitLibrary implements CircuitIndex {
 
-    private static final String rcName = "RedstoneChips";
-
-    /**
-     * Local reference to the minecraft logger.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft");
+    public static final String rcName = "RedstoneChips";
 
     /**
      * Local reference to the RedstoneChips plugin. It's value is set in the plugin's onEnable() method.
      */
-    protected RedstoneChips redstoneChips;
+    public RedstoneChips redstoneChips;
 
-    public CircuitLibrary(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, folder, plugin, cLoader);
-
+    public CircuitLibrary() {
         RedstoneChips.addCircuitLibrary(this);
-    }
-
-    @Override
-    public void onDisable() {
-        logger.info(getDescription().getName() + " " + getDescription().getVersion() + " disabled.");
-    }
-
-    @Override
-    public void onEnable() {
-        Plugin p = getServer().getPluginManager().getPlugin(rcName);
-        if (p==null) {
-            logger.warning(getDescription().getName() + " " + getDescription().getVersion() + ": Required plugin " + rcName + " is missing.");
-        }
     }
 
     @Override
