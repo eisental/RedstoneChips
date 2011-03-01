@@ -28,6 +28,30 @@ Interface blocks are the lapis blocks placed on the "roof".
 
 ![pixel circuit](/RedstoneChips/images/pixel2.png)
 
+Destroying a Chip
+-----------------
+You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /redchips-deactivate command
+while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
+__Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the IC to stop functioning.
+__Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
+
+Plugin commands
+----------------
+- `/rc-list` - Prints a list of active chips including their id numbers and locations.
+- `/rc-classes` - Prints a list of installed circuit classes.
+- `/rc-prefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
+      To change a specific value use /rc-prefs <pref key> <new value>.
+- `/rc-debug` - Register yourself to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use `/rc-debug off` or `/rc-debug <chip id> off`. To stop receiving debug messages from any circuit use `/rc-debug alloff`
+- `/rc-pin` - Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
+      source to use.
+- `/rc-destroy` - Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/rc-prefs enableDestroyCommand true`.
+- `/rc-break` - Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+- `/rc-type` - Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
+- `/rc-reset` - Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
+- `/rc-channels` - Prints a list of currently used wireless broadcast channels.
+- `/rc-info` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+- `/rc-help` - Prints a list or description of all RedstoneChips commands. Use `/rc-help <command name>` to get help about a specific command.
+
 Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
 To be able to understand the pin numbering of more complex structures you need to understand how the plugin detects and scans the structure once you right-click the circuit sign. It scans the circuit block by block starting at the sign. The pins are numbered as the circuit structure is scanned, therefore when the structure is a straight line the counting starts at the sign and onwards. When more than one dimension is used the plugin will scan according to the following rules:
@@ -44,30 +68,6 @@ To be able to understand the pin numbering of more complex structures you need t
 One very important thing to note is that the recursive scanning process work by branches. It will continue going from block to block in one direction even when chip blocks are found in other directions. Only when it reaches a dead end it will go back to try the other branches.
 
 The exact algorithm can be found at the [CircuitManager](http://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/CircuitManager.java) class. Specifically `CircuitManager.checkForCircuit()`
-
-Destroying a Chip
------------------
-You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /redchips-deactivate command
-while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
-__Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the IC to stop functioning.
-__Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
-
-Plugin commands
-----------------
-- `/rc-list` - Prints a list of active chips including their id numbers and locations.
-- `/rc-classes` - Prints a list of installed circuit classes.
-- `/rc-prefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
-      To change a specific value use /rc-prefs <pref key> <new value>.
-- `/rc-debug` - Register yourself to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use /rc-debug off or /rc-debug <chip id> off. To stop receiving debug messages from any circuit use /rc-debug alloff
-- `/rc-pin` - Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
-      source to use.
-- `/rc-destroy` - Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use /rc-prefs enableDestroyCommand true.
-- `/rc-break` - Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
-- `/rc-type` - Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
-- `/rc-reset` - Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
-- `/rc-channels` - Prints a list of currently used wireless broadcast channels.
-- `/rc-info` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
-- `/rc-help` - Prints a list or description of all RedstoneChips commands. Use /rc-help <command name> to get help about a specific command.
 
 Preference keys
 ---------------
