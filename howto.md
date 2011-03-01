@@ -40,8 +40,8 @@ Plugin commands
 - `/rc-list` - Prints a list of active chips including their id numbers and locations.
 - `/rc-classes` - Prints a list of installed circuit classes.
 - `/rc-prefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
-      To change a specific value use /rc-prefs <pref key> <new value>.
-- `/rc-debug` - Register yourself to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use `/rc-debug off` or `/rc-debug <chip id> off`. To stop receiving debug messages from any circuit use `/rc-debug alloff`
+      To change a specific value use `/rc-prefs <pref key> <new value>`.
+- `/rc-debug` - Register yourself to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using `/rc-debug <chip id>` if you have admin priviliges. To stop receiving debug messages from the chip use `/rc-debug off` or `/rc-debug <chip id> off`. To stop receiving debug messages from any circuit use `/rc-debug alloff`
 - `/rc-pin` - Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
       source to use.
 - `/rc-destroy` - Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/rc-prefs enableDestroyCommand true`.
