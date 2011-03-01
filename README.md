@@ -23,7 +23,7 @@ Installation
 Changelog
 ----------
 #### RedstoneChips 0.82 (28/02/11)
-- Every chip can now use a different block as a chip block. The chip's block type is determined by the block type the sign is attached to. This means 
+- Every chip can now use a different block as a chip block. The chip's block type is determined by the block type the sign is attached to. 
 - /rc-debug can be used with a circuit id number and /rc-debug alloff can be used to stop receiving debug messages from all circuits.
 - Uses the new Bukkit Player.getTargetBlock().
 - Supports /rc-reset with circuit id as an argument; New /rc-help command for some info about RC commands.
