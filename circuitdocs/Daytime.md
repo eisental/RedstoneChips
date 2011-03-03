@@ -7,16 +7,13 @@ A circuit for getting the current either real or game time.
 Use 'earthtime' as 1st sign argument to sync with real world time or use 'gametime' to sync with game ticks. 
 The 2nd sign arguments determines the time field that will be sent to the chip's outputs.
 
-These are valid time field values for earthtime:
-- `hour` - Real day hour. Between 0-23.
-- `minute` - Minute of real hour. Between 0-59.
-- `second` - Second of real minute. Between 0-59.
-- `secondofday` - Second of real day. Between 0-86399.
-
-These are the valid time field values for gametime:
-- `hour` - Current game time in hours. Between 0-23. Each hour lasts a 1000 ticks. 
-- `tick` - Game tick of current hour. Between 0-1000.
-- `tickofday` - Current game time in ticks. Between 0-23999.
+Possible time field argument values:
+- `tick` - In earthtime, equivalent to secondofday. In gametime, the current game tick, between 0-23999.
+- `second` - In earthtime, current second between 0-60. In gametime it's equivalent to `tick`.
+- `secondofday` - In earthtime, current second of day, between 0-86399. In gametime, equivalent to `tick`.
+- `minute` - Current minute, between 0-60.
+- `minuteofday` - Current minute of day, between 0-1439.
+- `hour` - Current hour, between 0-23.
 
 The chip will update its outputs once the clock pin is triggered according to the current time.
 
