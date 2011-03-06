@@ -177,8 +177,6 @@ public abstract class Circuit {
      * @param state The new state of the output.
      */
     protected void sendOutput(int outIdx, boolean state) {
-        if (outputBits.get(outIdx)==state) return; // nothing to update.
-
         outputBits.set(outIdx, state);
         changeLeverState(getOutputBlock(outIdx), state);
     }

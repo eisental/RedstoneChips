@@ -186,7 +186,6 @@ public class RedstoneChips extends JavaPlugin {
         }
 
         prefsManager.loadPrefs();
-        circuitManager.setCircuitList(circuitPersistence.loadCircuits());
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
@@ -200,6 +199,16 @@ public class RedstoneChips extends JavaPlugin {
 
         String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
         logg.info(msg);
+
+        if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+            }})==-1) {
+            logg.warning("Couldn't schedule circuit loading. Multiworld support might not work.");
+            circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+        }
+
     }
 
     @Override
