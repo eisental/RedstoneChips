@@ -333,7 +333,7 @@ public class CommandHandler {
         }
 
         /*
-         * print circuit (inputs disabled)
+         * 50: print circuit  (inputs disabled)
          * --------------
          * 4 input pins, 2 output pins and 6 interface blocks.
          * id: 50, location: x,y,z, world: world
@@ -354,12 +354,12 @@ public class CommandHandler {
 
         String loc = c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ();
         sender.sendMessage("");
-        sender.sendMessage(infoColor + c.getCircuitClass() + " circuit" + disabled);
+        sender.sendMessage(extraColor + Integer.toString(circuits.indexOf(c)) + ": " + infoColor + c.getCircuitClass() + " circuit" + disabled);
         sender.sendMessage(extraColor + "----------------------");
 
         sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
-        sender.sendMessage(infoColor + "id: " + extraColor + circuits.indexOf(c) + infoColor +
-                " location: " + extraColor + loc + infoColor + " world: " + extraColor + c.world.getName());
+        sender.sendMessage(infoColor +
+                "location: " + extraColor + loc + infoColor + " world: " + extraColor + c.world.getName());
 
         sender.sendMessage(infoColor + "input states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length));
         sender.sendMessage(infoColor + "output states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length));
@@ -422,7 +422,7 @@ public class CommandHandler {
         Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
         if (newCircuit!=null) {
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + newCircuit.getCircuitClass() + " circuit is reactivated with new id " + rc.getCircuitManager().getCircuits().indexOf(newCircuit));
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + newCircuit.getCircuitClass() + "circuit (" + + rc.getCircuitManager().getCircuits().indexOf(newCircuit) + ") is reactivated.");
         }
     }
 

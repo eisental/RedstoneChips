@@ -60,6 +60,18 @@ public class RedstoneChips extends JavaPlugin {
     public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
 
     /**
+     * Used to prevent saving state more than once per game tick.
+     */
+    private boolean dontSaveCircuits = false;
+
+    private Runnable dontSaveCircuitsReset = new Runnable() {
+        @Override
+        public void run() {
+            dontSaveCircuits = false;
+        }
+    };
+
+    /**
      * Tells the plugin to add a list of circuit classes to the circuit loader.
      * @param circuitClasses An array of Class objects that extend the Circuit class.
      */
@@ -86,6 +98,8 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        saveCircuits();
+
         circuitManager.destroyCircuits();
 
         PluginDescriptionFile desc = this.getDescription();
@@ -153,8 +167,7 @@ public class RedstoneChips extends JavaPlugin {
             @Override
             public void onWorldSaved(WorldEvent event) {
                 if (event.getWorld()==getServer().getWorlds().get(0)) {
-                    log(Level.INFO, "Saving circuits state to file.");
-                    circuitPersistence.saveCircuits(circuitManager.getCircuits());
+                    saveCircuits();
                 }
             }
         };
@@ -211,6 +224,15 @@ public class RedstoneChips extends JavaPlugin {
 
     }
 
+    public void saveCircuits() {
+        if (!dontSaveCircuits) {
+            log(Level.INFO, "Saving circuits state to file.");
+            dontSaveCircuits = true;
+            circuitPersistence.saveCircuits(circuitManager.getCircuits());
+            getServer().getScheduler().scheduleSyncDelayedTask(this, dontSaveCircuitsReset, 1);
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("rc-list")) {
@@ -248,6 +270,9 @@ public class RedstoneChips extends JavaPlugin {
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-channels")) {
             commandHandler.listBroadcastChannels(sender);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-save")) {
+            saveCircuits();
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
             commandHandler.commandHelp(sender, args);
