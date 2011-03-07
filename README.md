@@ -16,7 +16,7 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 Installation
 ------------
 * Download [RedsoneChips-0.83.zip](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.83.zip).
-* Download [BasicCircuits-0.83.jar](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.83.jar) jar file.
+* Download [BasicCircuits-0.83.jar](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.83.jar).
 * Unzip RedstoneChips-0.83.zip and copy RedstoneChips-beta.jar and BasicCircuits-0.83.jar to the plugins folder of your craftbukkit installation, keeping their original filenames.
 
 Changelog
