@@ -48,8 +48,8 @@ address {margin:0 0 1.5em;font-style:italic;}
 del {color:#666;}
 pre {margin:0 0;white-space:pre;}
 pre, code, tt {font:1em 'andale mono', 'lucida console', monospace;line-height:1.5;}
-li ul, li ol {margin:0; font-size: 1.4em;}
-ul, ol {margin:0 1.5em 1.5em 0;padding-left:3.333em; font-size: 1em;}
+li ul, li ol {margin:0; font-size: 1em;}
+ul, ol {margin:0 1.5em 1.5em 0;padding-left:3.333em; font-size: 1.2em;}
 ul {list-style-type:disc;}
 ol {list-style-type:decimal;}
 dl {margin:0 0 1.5em 0;}
