@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -69,6 +70,9 @@ public class CircuitManager {
 
     public void checkForCircuit(Block signBlock, CommandSender sender) {
         if (signBlock.getType()==Material.WALL_SIGN) {
+            BlockState state = signBlock.getState();
+            if (!(state instanceof Sign)) return;
+
             Sign sign = (Sign)signBlock.getState();
 
             // first check if its already registered
