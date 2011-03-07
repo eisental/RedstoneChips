@@ -272,10 +272,14 @@ public class RedstoneChips extends JavaPlugin {
             commandHandler.listBroadcastChannels(sender);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-save")) {
-            saveCircuits();
+            if (sender.isOp())
+                saveCircuits();
+            else sender.sendMessage(prefsManager.getErrorColor() + "Only ops (admins) are allowed to use this command.");
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-load")) {
-            circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+            if (sender.isOp())
+                circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+            else sender.sendMessage(prefsManager.getErrorColor() + "Only ops (admins) are allowed to use this command.");
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
             commandHandler.commandHelp(sender, args);

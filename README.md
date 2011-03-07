@@ -22,6 +22,12 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.83 (07/03/11)
+- Changed maven version to beta so I won't need to recompile every circuit library whenever there's a new RedstoneChips version. This means that the jar filename is changed to RedstoneChips-beta.jar and it will stay that way on the next versions as well.
+- Works with multiworld plugins. Using same fix as ControllerBlock, thanks @Hell_Fire
+- Saves circuits also when the plugin is disabled. You can use the reload command without losing changes.
+- New rc-save and rc-load commands.
+
 #### RedstoneChips 0.82 (28/02/11)
 - Every chip can now use a different block as a chip block. The chip's block type is determined by the block type the sign is attached to. 
 - /rc-debug can be used with a circuit id number and /rc-debug alloff can be used to stop receiving debug messages from all circuits.
