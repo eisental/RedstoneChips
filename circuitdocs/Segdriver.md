@@ -14,6 +14,10 @@ The segdriver will print hex a,b,c,d,e and f letters for input values 10-15.
 on [Wikipeda](http://en.wikipedia.org/wiki/7_segment_display)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/segdriver.java)
+
+![7-segment display using pixel circuits](/RedstoneChips/images/sevensegment.png "7-segment display using pixel circuits")
+
+7-segment display using pixel circuits.
     
 * * *
 
@@ -26,10 +30,8 @@ on [Wikipeda](http://en.wikipedia.org/wiki/7_segment_display)
 1. `   segdriver   `
 
 
-![7-segment display using pixel circuits](/RedstoneChips/images/sevensegment.png "7-segment display using pixel circuits")
-7-segment display using pixel circuits.
-
 ![Clock, counter, segdriver connected to 7 transmitters controlling the display digit in the back.](/RedstoneChips/images/sevensegment2.png "Clock, counter, segdriver connected to 7 transmitters controlling the display digit in the back.")
+
 Clock, counter, segdriver connected to 7 transmitters controlling the display digit in the back.
 
 __Version history:__ Added to BasicCircuits 0.83
