@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.circuit.ReceivingCircuit;
 import org.tal.redstonechips.circuit.TransmittingCircuit;
@@ -87,7 +86,7 @@ public class CommandHandler {
     public void prefsCommand(String[] args, CommandSender sender) {
             if (args.length==0) { // list preferences
                 rc.getPrefsManager().printYaml(sender, rc.getPrefsManager().getPrefs());
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /redchips-prefs <name> <value> to make changes.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /rc-prefs <name> <value> to make changes.");
             } else if (args.length==1) { // show one key value pair
                 Object o = rc.getPrefsManager().getPrefs().get(args[0]);
                 if (o==null) sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Unknown preferences key: " + args[0]);
@@ -116,7 +115,7 @@ public class CommandHandler {
                 sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Saving changes...");
                 rc.getPrefsManager().savePrefs();
             } else {
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad redchips-prefs syntax.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad rc-prefs syntax.");
             }
 
     }
@@ -265,8 +264,8 @@ public class CommandHandler {
         
         Block block = targetBlock(player);
 
-        BlockVector v = new BlockVector(block.getX(), block.getY(), block.getZ());
-        rcTypeReceiver t = rc.rcTypeReceivers.get(v);
+        Location l = block.getLocation();
+        rcTypeReceiver t = rc.rcTypeReceivers.get(l);
         if (t==null) {
             player.sendMessage(rc.getPrefsManager().getErrorColor() + "You must point towards a typing block (a terminal circuit's interface block for example) to type.");
         } else {

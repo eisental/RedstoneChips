@@ -254,7 +254,7 @@ public class RedstoneChips extends JavaPlugin {
             boolean enableDestroyCommand = (Boolean)prefsManager.getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
             if (enableDestroyCommand) {
                 commandHandler.destroyCommand(sender);
-            } else sender.sendMessage(prefsManager.getErrorColor()+"/rc-destroy is disabled. You can enable it using /redchips-prefs enableDestroyCommand true");
+            } else sender.sendMessage(prefsManager.getErrorColor()+"/rc-destroy is disabled. You can enable it using /rc-prefs enableDestroyCommand true");
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-break")) {
             commandHandler.deactivateCommand(sender, args);

@@ -8,5 +8,5 @@ infoColor: GREEN
 errorColor: RED
 debugColor: AQUA
 
-## enable or disable /redchips-destroy
+## enable or disable /rc-destroy
 enableDestroyCommand: false
