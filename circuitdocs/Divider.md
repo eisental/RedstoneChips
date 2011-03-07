@@ -9,6 +9,8 @@ If an optional constant argument is added to the sign text, the IC will divide t
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/divider.java)
 
+For a detailed example of building a chip that uses a variable number of input bit sets read the [AND gate documentation](And).
+ 
 * * *
 
 

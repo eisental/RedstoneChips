@@ -20,7 +20,7 @@ There are 3 possible sign arguments (See below for the correct ordering), max, m
 
 
 #### I/O setup 
-- Should have 2 inputs and any number of outputs.
+- Should up to 3 inputs and any number of outputs.
 - input 0 (inc): When set to high the counter output is incremented or decremented by 1.
 - input 1 (reset): Sets the output of the counter to its initial state.
 - input 2 (direction): Controls the counter direction. When on, the counter will count up. When off, the counter will count down.

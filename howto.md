@@ -22,7 +22,6 @@ Simple [adder](/RedstoneChips/circuitdocs/Adder.html) circuit. Input and output 
 ![adder circuit](/RedstoneChips/images/adder.jpg)
 
 
-
 A [pixel](/RedstoneChips/circuitdocs/Pixel.html) circuit with a more complex structure. Input and output order is a bit harder to find out.  
 Interface blocks are the lapis blocks placed on the "roof".
 
@@ -51,6 +50,9 @@ Plugin commands
 - `/rc-channels` - Prints a list of currently used wireless broadcast channels.
 - `/rc-info` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
 - `/rc-help` - Prints a list or description of all RedstoneChips commands. Use `/rc-help <command name>` to get help about a specific command.
+- `/rc-save` - Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
+- `/rc-load` - Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
+
 
 Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
@@ -82,5 +84,5 @@ Preference keys
 - `errorColor` - Color of error messages (`RED` by default)
 - `debugColor` - Color of debug messages (`AQUA` by default)
 
-##### Permissions
+##### Other 
 - `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).

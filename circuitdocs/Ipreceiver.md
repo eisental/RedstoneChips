@@ -20,7 +20,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 * Must have 1 input clock pin.
 
 #### Sign text
-1. `   receiver   `
+1. `   ipreceiver   `
 2. `  <port> ` (NOT optional)
 3. ` <incoming address>...<incoming address> `
 

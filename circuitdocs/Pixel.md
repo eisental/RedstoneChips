@@ -3,7 +3,7 @@ layout: main
 title: pixel
 ---
 
-Changes dye color of any wool block placed in a 3x3x3 cube around the interface block.
+Changes dye color of any wool block placed in a 3x3x3 cube around the interface block. 
 
 When the clock pin (input 0) is set to HIGH, the circuit will update wool color according to the value of the input pins.  
 
@@ -16,8 +16,9 @@ When the last sign argument is a broadcast channel name (i.e. not a color name).
 In this operation mode it's possible to use a transmitter to set the pixel's color wirelessly. The transmitted bits should not include a clock value, starting at bit 0 with the pixel color or index. You can build the chip without any inputs in this mode.
 
 
-It's possible to build the chip without a clock pin if only 1 data pin is used.  
+It's possible to build the chip without a clock pin when only 1 data pin is used.  
 
+Note that wool blocks that are not attached directly or indirectly (through other wool blocks) to an interface block will not be colored even if they are within range.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pixel.java)
 

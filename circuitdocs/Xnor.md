@@ -3,9 +3,9 @@ layout: main
 title: nor gate
 ---
 
-An XOR gate with any number of bit sets. Each bit set can be of any size.
+An XNOR gate with any number of bit sets. Each bit set can be of any size.
 
-[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/xor.java)
+[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/xnor.java)
 
 For a detailed example of building a chip that uses a variable number of input bit sets read the [AND gate documentation](And).
 
@@ -17,8 +17,8 @@ For a detailed example of building a chip that uses a variable number of input b
 * The number of input pins can be any multiple of the number of outputs.
 
 #### Sign text
-1. `   xor   `
+1. `   xnor   `
 
-__Version history:__ Added to BasicCircuits 0.1
+__Version history:__ Added to BasicCircuits 0.83
 
 

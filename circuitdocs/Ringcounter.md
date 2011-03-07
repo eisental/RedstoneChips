@@ -3,7 +3,7 @@ layout: main
 title: ringcounter
 ---
 
-A ring counter chip. Whenever input pin 0 goes from low to high, the counter increments its value by 1 and sets the corresponding output
+A ring decimal counter chip. Whenever input pin 0 goes from low to high, the counter increments its value by 1 and sets the corresponding output
 to high. Once the last output has been reached, the counter turns on the first output.
 Setting the reset pin (input pin 1) from low to high, turns off all the counter outputs and sets the counter to turn the 1st output on the next trigger.
 
