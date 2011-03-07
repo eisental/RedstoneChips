@@ -2,10 +2,10 @@ package org.tal.redstonechips.circuit;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.util.BlockVector;
 
 /**
  * Represents an input pin of a Circuit. Used for finding out if redstone current change in a block
@@ -16,9 +16,9 @@ import org.bukkit.util.BlockVector;
  */
 public class InputPin {
     private Circuit circuit;
-    private BlockVector inputBlock;
+    private Location inputBlock;
     private int index;
-    private Map<BlockVector, Boolean> powerBlocks;
+    private Map<Location, Boolean> powerBlocks;
 
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
@@ -30,13 +30,13 @@ public class InputPin {
      * @param loc The physical location of the input pin.
      * @param index The input pin's order index in the circuit.
      */
-    public InputPin(Circuit circuit, BlockVector inputBlock, int index) {
+    public InputPin(Circuit circuit, Location inputBlock, int index) {
         this.inputBlock = inputBlock;
         this.circuit = circuit;
         this.index = index;
 
         // assuming circuit already has its structure block set up.
-        powerBlocks = new HashMap<BlockVector, Boolean>();
+        powerBlocks = new HashMap<Location, Boolean>();
 
         addPowerBlock(BlockFace.UP);
         addPowerBlock(BlockFace.NORTH);
@@ -55,7 +55,7 @@ public class InputPin {
      *
      * @return The location of the input pin block (the iron block by default).
      */
-    public BlockVector getInputBlock() { return inputBlock; }
+    public Location getInputBlock() { return inputBlock; }
 
     /**
      *
@@ -88,14 +88,13 @@ public class InputPin {
         else 
             state = false;
 
-        if (!partOfStructure(b)) powerBlocks.put(new BlockVector(b.getX(), b.getY(), b.getZ()), state);
+        if (!partOfStructure(b)) powerBlocks.put(b.getLocation(), state);
     }
 
     private boolean partOfStructure(Block b) {
-        for (BlockVector v : circuit.structure) {
-            if (v.getBlockX()==b.getX() && v.getBlockY()==b.getY() && v.getBlockZ()==b.getZ()) {
+        for (Location l : circuit.structure) {
+            if (b.getLocation().equals(l))
                 return true;
-            }
         }
 
         return false;
@@ -109,8 +108,9 @@ public class InputPin {
      * @throws IllegalArgumentException If the block in the provided location is not a power block of the input.
      */
     public void updateValue(Block block, boolean newVal) throws IllegalArgumentException {
-        BlockVector v = new BlockVector(block.getX(), block.getY(), block.getZ());
-        if (!powerBlocks.containsKey(v))
+        Location l = block.getLocation();
+
+        if (!powerBlocks.containsKey(l))
             throw new IllegalArgumentException("Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
         else {
             long curTick = circuit.world.getFullTime();
@@ -119,7 +119,7 @@ public class InputPin {
                 if (changesInTickCount>FeedbackDetectionCount) abortFeedbackLoop();
             } else changesInTickCount = 1;
 
-            powerBlocks.put(v, newVal);
+            powerBlocks.put(l, newVal);
 
             lastRedstoneChangeTick = curTick;
         }
@@ -130,7 +130,7 @@ public class InputPin {
      *
      * @return The power blocks surrounding this input pin.
      */
-    public Iterable<BlockVector> getPowerBlocks() {
+    public Iterable<Location> getPowerBlocks() {
         return powerBlocks.keySet();
     }
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -215,8 +216,8 @@ public class CommandHandler {
         if (c==null) {
             player.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to destroy.");
         } else {
-            for (BlockVector v : c.structure)
-                c.world.getBlockAt(v.getBlockX(), v.getBlockY(), v.getBlockZ()).setType(Material.AIR);
+            for (Location l : c.structure)
+                c.world.getBlockAt(l).setType(Material.AIR);
 
             rc.getCircuitManager().destroyCircuit(c, sender);
             player.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + c.getCircuitClass() + " chip is destroyed.");

@@ -4,7 +4,6 @@
   <groupId>org.tal</groupId>
   <artifactId>RedstoneChips</artifactId>
   <packaging>jar</packaging>
-  <version>0.83</version>
   <name>RedstoneChips</name>
   <url>http://maven.apache.org</url>
   <repositories>
@@ -49,4 +48,5 @@
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
+    <version>beta</version>
 </project>

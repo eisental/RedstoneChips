@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,6 @@ import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.circuit.ReceivingCircuit;
 import org.tal.redstonechips.circuit.TransmittingCircuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
@@ -55,7 +55,7 @@ public class RedstoneChips extends JavaPlugin {
 
     private static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
-    public Map<BlockVector, rcTypeReceiver> rcTypeReceivers = new HashMap<BlockVector, rcTypeReceiver>();
+    public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
     public List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
     public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
 
@@ -324,7 +324,7 @@ public class RedstoneChips extends JavaPlugin {
      * @param typingBlock The block to point towards while typing.
      * @param circuit The circuit that will receive the typed text.
      */
-    public void registerRcTypeReceiver(BlockVector typingBlock, rcTypeReceiver circuit) {
+    public void registerRcTypeReceiver(Location typingBlock, rcTypeReceiver circuit) {
         rcTypeReceivers.put(typingBlock, circuit);
     }
 
@@ -333,9 +333,9 @@ public class RedstoneChips extends JavaPlugin {
      * @param circuit The rcTypeReceiver to remove.
      */
     public void removeRcTypeReceiver(rcTypeReceiver circuit) {
-        for (BlockVector v : rcTypeReceivers.keySet()) {
-            if (rcTypeReceivers.get(v)==circuit)
-                rcTypeReceivers.remove(v);
+        for (Location l : rcTypeReceivers.keySet()) {
+            if (rcTypeReceivers.get(l)==circuit)
+                rcTypeReceivers.remove(l);
         }
     }
 

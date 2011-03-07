@@ -6,11 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
@@ -39,23 +38,23 @@ public abstract class Circuit {
     /**
      * Output blocks. List of lever block locations.
      */
-    public BlockVector[] outputs;
+    public Location[] outputs;
 
     /**
      * Contains the location of any block that is part of this circuit. When any block in this array is broken the circuit is destroyed.
      * This includes the sign block, chip blocks, input blocks, output blocks and output lever blocks.
      */
-    public BlockVector[] structure;
+    public Location[] structure;
 
     /**
      * Interface block locations. Used for interaction points with the "physical" world.
      */
-    public BlockVector[] interfaceBlocks;
+    public Location[] interfaceBlocks;
 
     /**
      * The location of the sign block that was used to activate the circuit.
      */
-    public BlockVector activationBlock;
+    public Location activationBlock;
 
     /**
      * Reference to the minecraft World this circuit was built in.
@@ -330,8 +329,8 @@ public abstract class Circuit {
      * @return The lever block of the specific output index.
      */
     protected Block getOutputBlock(int outputIdx) {
-        BlockVector v = outputs[outputIdx];
-        return world.getBlockAt(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+        Location l = outputs[outputIdx];
+        return world.getBlockAt(l);
     }
 
     /**
@@ -341,8 +340,8 @@ public abstract class Circuit {
      * @return The input block (the iron block by default) of the specific input index.
      */
     protected Block getInputBlock(int inputIdx) {
-        BlockVector v = inputs[inputIdx].getInputBlock();
-        return world.getBlockAt(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+        Location l = inputs[inputIdx].getInputBlock();
+        return world.getBlockAt(l);
     }
 
     /**

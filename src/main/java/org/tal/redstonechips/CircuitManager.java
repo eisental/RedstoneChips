@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -22,7 +23,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.util.BlockVector;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 
@@ -36,10 +36,10 @@ public class CircuitManager {
     private List<Circuit> circuits;
 
     private Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
-    private Map<BlockVector, List<InputPin>> inputLookupMap = new HashMap<BlockVector, List<InputPin>>();
-    private Map<BlockVector, Object[]> outputLookupMap = new HashMap<BlockVector, Object[]>();
-    private Map<BlockVector, Circuit> structureLookupMap = new HashMap<BlockVector, Circuit>();
-    private Map<BlockVector, Circuit> activationLookupMap = new HashMap<BlockVector, Circuit>();
+    private Map<Location, List<InputPin>> inputLookupMap = new HashMap<Location, List<InputPin>>();
+    private Map<Location, Object[]> outputLookupMap = new HashMap<Location, Object[]>();
+    private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
+    private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
     public CircuitManager(RedstoneChips plugin) {
         rc = plugin;
@@ -50,7 +50,7 @@ public class CircuitManager {
         boolean oldVal = (e.getOldCurrent()>0);
         if (newVal==oldVal) return; // not a change
 
-        List<InputPin> inputList = inputLookupMap.get(new BlockVector(e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ()));
+        List<InputPin> inputList = inputLookupMap.get(e.getBlock().getLocation());
         if (inputList==null) return;
         for (InputPin inputPin : inputList) {
             inputPin.updateValue(e.getBlock(), newVal);
@@ -115,30 +115,26 @@ public class CircuitManager {
                     try {
                         Circuit c = rc.getCircuitLoader().getCircuitInstance(sign.getLine(0).trim());
                         c.world = signBlock.getWorld();
-                        c.activationBlock = new BlockVector(signBlock.getX(), signBlock.getY(), signBlock.getZ());
+                        c.activationBlock = signBlock.getLocation();
 
-                        c.structure = new BlockVector[structure.size()];
+                        c.structure = new Location[structure.size()];
                         for (int i=0; i<structure.size(); i++) {
-                            BlockVector v = new BlockVector(structure.get(i).getX(), structure.get(i).getY(), structure.get(i).getZ());
-                            c.structure[i] = v;
+                            c.structure[i] = structure.get(i).getLocation();
                         }
 
                         c.inputs = new InputPin[inputs.size()];
                         for (int i=0; i<inputs.size(); i++) {
-                            BlockVector v = new BlockVector(inputs.get(i).getX(), inputs.get(i).getY(), inputs.get(i).getZ());
-                            c.inputs[i] = new InputPin(c, v, i);
+                            c.inputs[i] = new InputPin(c, inputs.get(i).getLocation(), i);
                         }
 
-                        c.outputs = new BlockVector[outputs.size()];
+                        c.outputs = new Location[outputs.size()];
                         for (int i=0; i<outputs.size(); i++) {
-                            BlockVector v = new BlockVector(outputs.get(i).getX(), outputs.get(i).getY(), outputs.get(i).getZ());
-                            c.outputs[i] = v;
+                            c.outputs[i] = outputs.get(i).getLocation();
                         }
 
-                        c.interfaceBlocks = new BlockVector[interfaceBlocks.size()];
+                        c.interfaceBlocks = new Location[interfaceBlocks.size()];
                         for (int i=0; i<interfaceBlocks.size(); i++) {
-                            BlockVector v = new BlockVector(interfaceBlocks.get(i).getX(), interfaceBlocks.get(i).getY(), interfaceBlocks.get(i).getZ());
-                            c.interfaceBlocks[i] = v;
+                            c.interfaceBlocks[i] = interfaceBlocks.get(i).getLocation();
                         }
 
 
@@ -317,7 +313,7 @@ public class CircuitManager {
     }
 
     public void checkCircuitDestroyed(Block b, CommandSender s) {
-        Circuit destroyed = structureLookupMap.get(new BlockVector(b.getX(), b.getY(), b.getZ()));
+        Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.contains(destroyed)) {
             if (s!=null) s.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
@@ -331,11 +327,11 @@ public class CircuitManager {
     }
 
     public Circuit getCircuitByStructureBlock(Block structureBlock) {
-        return this.structureLookupMap.get(new BlockVector(structureBlock.getX(), structureBlock.getY(), structureBlock.getZ()));
+        return this.structureLookupMap.get(structureBlock.getLocation());
     }
 
     public Circuit getCircuitByActivationBlock(Block activationBlock) {
-        return this.activationLookupMap.get(new BlockVector(activationBlock.getX(), activationBlock.getY(), activationBlock.getZ()));
+        return this.activationLookupMap.get(activationBlock.getLocation());
     }
 
     void setCircuitList(List<Circuit> circuits) {
@@ -348,11 +344,11 @@ public class CircuitManager {
     }
 
     public List<InputPin> lookupInputBlock(Block inputBlock) {
-        return this.inputLookupMap.get(new BlockVector(inputBlock.getX(), inputBlock.getY(), inputBlock.getZ()));
+        return this.inputLookupMap.get(inputBlock.getLocation());
     }
 
     public Object[] lookupOutputBlock(Block outputBlock) {
-        return this.outputLookupMap.get(new BlockVector(outputBlock.getX(), outputBlock.getY(), outputBlock.getZ()));
+        return this.outputLookupMap.get(outputBlock.getLocation());
     }
 
     private void addCircuitLookups(Circuit c) {
@@ -373,11 +369,11 @@ public class CircuitManager {
         activationLookupMap.put(c.activationBlock, c);
 
         for (int i=0; i<c.inputs.length; i++) {
-            for (BlockVector v : c.inputs[i].getPowerBlocks()) {
-                if (!inputLookupMap.containsKey(v))
-                    inputLookupMap.put(v, new ArrayList<InputPin>());
+            for (Location l : c.inputs[i].getPowerBlocks()) {
+                if (!inputLookupMap.containsKey(l))
+                    inputLookupMap.put(l, new ArrayList<InputPin>());
 
-                inputLookupMap.get(v).add(c.inputs[i]);
+                inputLookupMap.get(l).add(c.inputs[i]);
             }
         }
 
@@ -390,15 +386,15 @@ public class CircuitManager {
     }
 
     private void removeCircuitLookups(Circuit c) {
-        for (BlockVector v : c.structure)
-            structureLookupMap.remove(v);
+        for (Location l : c.structure)
+            structureLookupMap.remove(l);
 
-        for (BlockVector v : c.outputs)
-            outputLookupMap.remove(v);
+        for (Location l : c.outputs)
+            outputLookupMap.remove(l);
 
-        List<BlockVector> inputBlocksToRemove = new ArrayList<BlockVector>();
-        for (BlockVector v : inputLookupMap.keySet()) {
-            List<InputPin> pins = inputLookupMap.get(v);
+        List<Location> inputBlocksToRemove = new ArrayList<Location>();
+        for (Location l : inputLookupMap.keySet()) {
+            List<InputPin> pins = inputLookupMap.get(l);
             List<InputPin> toRemove = new ArrayList<InputPin>();
             for (InputPin pin : pins) {
                 if (pin.getCircuit()==c)
@@ -407,10 +403,10 @@ public class CircuitManager {
 
             pins.removeAll(toRemove);
             if (pins.isEmpty())
-                inputBlocksToRemove.add(v);
+                inputBlocksToRemove.add(l);
         }
-        for (BlockVector v : inputBlocksToRemove)
-            inputLookupMap.remove(v);
+        for (Location l : inputBlocksToRemove)
+            inputLookupMap.remove(l);
         
         activationLookupMap.remove(c.activationBlock);
 
@@ -421,8 +417,8 @@ public class CircuitManager {
         circuits.remove(destroyed);
         removeCircuitLookups(destroyed);
 
-        for (BlockVector v : destroyed.outputs) {
-            Block output = destroyed.world.getBlockAt(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+        for (Location l : destroyed.outputs) {
+            Block output = destroyed.world.getBlockAt(l);
 
             if (output.getType()==Material.LEVER) {
                 // turn lever off
