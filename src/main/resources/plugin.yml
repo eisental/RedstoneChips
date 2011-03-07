@@ -36,7 +36,9 @@ commands:
   rc-info:
     description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
   rc-save:
-    description: Saves all circuit data to file.
+    description: Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save.
+  rc-load:
+    description: Reloads circuit data from file. Will reset any changes since last save. 
   rc-help:
     description: Prints a list or description of all RedstoneChips commands. Use /rc-help <command name> to get help about a specific command.
 

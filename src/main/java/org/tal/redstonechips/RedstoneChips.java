@@ -274,6 +274,9 @@ public class RedstoneChips extends JavaPlugin {
         } else if (cmd.getName().equalsIgnoreCase("rc-save")) {
             saveCircuits();
             return true;
+        } else if (cmd.getName().equalsIgnoreCase("rc-load")) {
+            circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+            return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
             commandHandler.commandHelp(sender, args);
             return true;
