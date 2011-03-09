@@ -5,12 +5,7 @@
 
 package org.tal.redstonechips.circuit;
 
-import java.io.File;
 import java.util.logging.Logger;
-import org.bukkit.Server;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.RedstoneChips;
 
@@ -20,9 +15,8 @@ import org.tal.redstonechips.RedstoneChips;
  *
  * @author Tal Eisenberg
  */
-public abstract class CircuitLibrary implements CircuitIndex {
-
-    public static final String rcName = "RedstoneChips";
+public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex {
+    public static final Logger logger = Logger.getLogger("Minecraft");
 
     /**
      * Local reference to the RedstoneChips plugin. It's value is set in the plugin's onEnable() method.
@@ -34,10 +28,21 @@ public abstract class CircuitLibrary implements CircuitIndex {
     }
 
     @Override
-    public void onRedstoneChipsEnable() { }
-
-    @Override
     public void setRedstoneChipsInstance(RedstoneChips instance) {
         this.redstoneChips = instance;
+    }
+
+
+    @Override
+    public void onRedstoneChipsEnable() {
+    }
+
+    @Override
+    public void onEnable() {
+    }
+
+    @Override
+    public void onDisable() {
+
     }
 }

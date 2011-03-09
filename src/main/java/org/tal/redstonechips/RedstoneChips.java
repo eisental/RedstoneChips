@@ -174,9 +174,14 @@ public class RedstoneChips extends JavaPlugin {
 
         PluginDescriptionFile desc = this.getDescription();
 
-        // load circuit classes
-        for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
+        for (CircuitIndex lib : circuitLibraries) {
             lib.setRedstoneChipsInstance(this);
+            lib.onRedstoneChipsEnable();
+        }
+
+        // load circuit classes
+        for (CircuitIndex lib : circuitLibraries) {
+
             
             String libMsg = desc.getName() + ": Loading " + lib.getClass().getSimpleName() + " > ";
             Class[] classes = lib.getCircuitClasses();
@@ -194,9 +199,6 @@ public class RedstoneChips extends JavaPlugin {
             }
         }
 
-        for (CircuitIndex lib : RedstoneChips.circuitLibraries) {
-            lib.onRedstoneChipsEnable();
-        }
 
         prefsManager.loadPrefs();
 
