@@ -15,12 +15,16 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* Download [RedstoneChips-beta.jar](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-beta.jar).
-* Download [BasicCircuits-0.83.jar](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.83.jar).
-* Copy RedstoneChips-beta.jar and BasicCircuits-0.83.jar to the plugins folder of your craftbukkit installation. If you change the RedstoneChips-beta.jar file name the plugin will not work.
+* Download [RedstoneChips-0.84.jar](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-0.84.jar).
+* Download [BasicCircuits-0.84.jar](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-0.84.jar).
+* Copy both jar files to the plugins folder of your craftbukkit installation. 
 
 Changelog
 ----------
+#### RedstoneChips 0.84 (10/03/11)
+- New circuit library interface mechanism (again). Plugin jar file can be renamed to anything now. 
+
+
 #### RedstoneChips 0.83 (07/03/11)
 - Changed maven version to beta so I won't need to recompile every circuit library whenever there's a new RedstoneChips version. This means that the jar filename is changed to RedstoneChips-beta.jar and it will stay that way on the next versions as well.
 - Works with multiworld plugins. Using same fix as ControllerBlock, thanks @Hell_Fire
