@@ -20,13 +20,8 @@ public interface CircuitIndex {
     public Class[] getCircuitClasses();
 
     /**
-     * Called by the RedstoneChips plugin immediately after finishing loading circuit classes from every circuit library.
+     * Called by the RedstoneChips plugin before starting to load circuit classes.
      */
-    public void onRedstoneChipsEnable();
+    public void onRedstoneChipsEnable(RedstoneChips instance);
 
-    /**
-     * Called by the RedstoneChips plugin on the beginning of its onEnable() method.
-     * @param instance Plugin reference.
-     */
-    public void setRedstoneChipsInstance(RedstoneChips instance);
 }

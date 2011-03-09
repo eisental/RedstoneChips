@@ -3,7 +3,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.tal</groupId>
   <artifactId>RedstoneChips</artifactId>
-  <packaging>jar</packaging>
   <name>RedstoneChips</name>
   <url>http://maven.apache.org</url>
   <repositories>
@@ -21,17 +20,7 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
-      </plugin>
-      <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-                <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                    </manifest>
-                </archive>
-            </configuration>
+        <version>2.3.2</version>
       </plugin>
     </plugins>
   </build>
@@ -48,5 +37,6 @@
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
-    <version>beta</version>
+    <version>0.84</version>
+    <packaging>jar</packaging>
 </project>

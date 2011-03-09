@@ -18,23 +18,12 @@ import org.tal.redstonechips.RedstoneChips;
 public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex {
     public static final Logger logger = Logger.getLogger("Minecraft");
 
-    /**
-     * Local reference to the RedstoneChips plugin. It's value is set in the plugin's onEnable() method.
-     */
-    public RedstoneChips redstoneChips;
-
     public CircuitLibrary() {
         RedstoneChips.addCircuitLibrary(this);
     }
 
     @Override
-    public void setRedstoneChipsInstance(RedstoneChips instance) {
-        this.redstoneChips = instance;
-    }
-
-
-    @Override
-    public void onRedstoneChipsEnable() {
+    public void onRedstoneChipsEnable(RedstoneChips instance) {
     }
 
     @Override

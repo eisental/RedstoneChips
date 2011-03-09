@@ -4,8 +4,11 @@ import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +29,14 @@ public class CircuitPersistence {
     private RedstoneChips rc;
 
     public final static String circuitsFileName = "redstonechips.circuits";
+    private boolean madeBackup = false;
 
     public CircuitPersistence(RedstoneChips plugin) {
         rc = plugin;
     }
 
     public List<Circuit> loadCircuits() {
-        File file = new File(rc.getDataFolder(), circuitsFileName);
+        File file = getCircuitsFile();
         if (!file.exists()) { // create empty file if doesn't already exist
             try {
                 file.createNewFile();
@@ -54,10 +58,13 @@ public class CircuitPersistence {
                         circuits.add(c);
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
+                        backupCircuitsFile();
                     } catch (InstantiationException ex) {
                         rc.log(Level.WARNING, ex.toString());
+                        backupCircuitsFile();
                     } catch (IllegalAccessException ex) {
                         rc.log(Level.WARNING, ex.toString());
+                        backupCircuitsFile();
                     }
                 }
             }
@@ -65,6 +72,7 @@ public class CircuitPersistence {
             rc.log(Level.SEVERE, "Circuits file '" + file + "' was not found.");
         }
 
+        madeBackup = false;
         return circuits;
     }
 
@@ -173,4 +181,37 @@ public class CircuitPersistence {
 
         return inputs.toArray(new InputPin[inputs.size()]);
     }
+
+    private void backupCircuitsFile() {
+        if (madeBackup) return;
+
+        try {
+            File original = getCircuitsFile();
+            File backup = new File(original.getParentFile(), circuitsFileName + ".BACKUP");
+            rc.log(Level.INFO, "An error occurred while loading circuits state. To make sure you won't lose any circuit data, a backup copy of "
+                + circuitsFileName + " is being created. The backup can be found at " + backup.getPath());
+            copy(original, backup);
+        } catch (IOException ex) {
+            rc.log(Level.SEVERE, "Error while trying to write backup file: " + ex);
+        }
+        madeBackup = true;
+    }
+
+    private File getCircuitsFile() {
+        return new File(rc.getDataFolder(), circuitsFileName);
+    }
+
+    void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+}
 }

@@ -56,7 +56,7 @@ public class CircuitManager {
             inputPin.updateValue(e.getBlock(), newVal);
             inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getPinValue());
 
-            if (e.getBlock().getType()==Material.STONE_BUTTON) { // manually reset the button after 1 sec.
+            if (e.getBlock().getType()==Material.STONE_BUTTON && e.getNewCurrent()>0) { // manually reset the button after 1 sec.
                 final BlockRedstoneEvent buttonEvent = new BlockRedstoneEvent(e.getBlock(), e.getNewCurrent(), 0);
                 rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
                     @Override

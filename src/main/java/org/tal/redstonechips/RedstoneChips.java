@@ -41,7 +41,7 @@ import org.tal.redstonechips.circuit.rcTypeReceiver;
  */
 public class RedstoneChips extends JavaPlugin {
     private static final Logger logg = Logger.getLogger("Minecraft");
-
+    
     private BlockListener rcBlockListener;
     private EntityListener rcEntityListener;
     private PlayerListener rcPlayerListener;
@@ -118,7 +118,7 @@ public class RedstoneChips extends JavaPlugin {
         rcBlockListener = new BlockListener() {
             @Override
             public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-                circuitManager.redstoneChange((BlockRedstoneEvent)event);
+                circuitManager.redstoneChange(event);
             }
 
             @Override
@@ -174,9 +174,9 @@ public class RedstoneChips extends JavaPlugin {
 
         PluginDescriptionFile desc = this.getDescription();
 
+        // initalize registered circuit libraries giving them a reference to the plugin.
         for (CircuitIndex lib : circuitLibraries) {
-            lib.setRedstoneChipsInstance(this);
-            lib.onRedstoneChipsEnable();
+            lib.onRedstoneChipsEnable(this);
         }
 
         // load circuit classes
