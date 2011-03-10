@@ -24,7 +24,6 @@ Changelog
 #### RedstoneChips 0.84 (10/03/11)
 - New circuit library interface mechanism (again). Plugin jar file can be renamed to anything now. 
 
-
 #### RedstoneChips 0.83 (07/03/11)
 - Changed maven version to beta so I won't need to recompile every circuit library whenever there's a new RedstoneChips version. This means that the jar filename is changed to RedstoneChips-beta.jar and it will stay that way on the next versions as well.
 - Works with multiworld plugins. Using same fix as ControllerBlock, thanks @Hell_Fire
