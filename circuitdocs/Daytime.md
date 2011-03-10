@@ -5,7 +5,7 @@ title: daytime
 
 A circuit for getting the current either real or game time. 
 Use 'earthtime' as 1st sign argument to sync with real world time or use 'gametime' to sync with game ticks. 
-The 2nd sign arguments determines the time field that will be sent to the chip's outputs.
+The 2nd sign argument determines the time field that will be sent to the chip's outputs.
 
 Possible time field argument values:
 - `tick` - In earthtime, equivalent to secondofday. In gametime, the current game tick, between 0-23999.
@@ -14,6 +14,9 @@ Possible time field argument values:
 - `minute` - Current minute, between 0-60.
 - `minuteofday` - Current minute of day, between 0-1439.
 - `hour` - Current hour, between 0-23.
+
+A 3rd optional sign argument determines the world the chip will get the current time from. Enter any world name to use that world's time instead of the time in the world the 
+chip was built in.
 
 The chip will update its outputs once the clock pin is triggered according to the current time.
 
@@ -34,5 +37,5 @@ Using 5 outputs leaves the chip enough bits to output the unmapped value ranging
 1. `   daytime   `
 2. `   [earthtime/gametime]   ` (optional, defaults to gametime)
 3. `   [time field]   ` (optional, gametime defaults to tick, earthtime defaults to second)
-
+4. `   [world]    ` (optional, defaults to the world the chip is built in) 
 __Version history:__ Added to SensorLibrary 0.2
