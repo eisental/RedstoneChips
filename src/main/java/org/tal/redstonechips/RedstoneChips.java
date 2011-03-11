@@ -181,8 +181,6 @@ public class RedstoneChips extends JavaPlugin {
 
         // load circuit classes
         for (CircuitIndex lib : circuitLibraries) {
-
-            
             String libMsg = desc.getName() + ": Loading " + lib.getClass().getSimpleName() + " > ";
             Class[] classes = lib.getCircuitClasses();
             if (classes != null && classes.length>0) {
@@ -271,7 +269,7 @@ public class RedstoneChips extends JavaPlugin {
             commandHandler.printCircuitInfo(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-channels")) {
-            commandHandler.listBroadcastChannels(sender);
+            commandHandler.listBroadcastChannels(sender, args);
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-save")) {
             if (sender.isOp())
@@ -348,6 +346,11 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
 
+    /**
+     * Registers a ReceivingCircuit so other transmitters can find it.
+     *
+     * @param r A ReceivingCircuit
+     */
     public void addReceiver(ReceivingCircuit r) {
         receivers.add(r);
 
@@ -358,18 +361,35 @@ public class RedstoneChips extends JavaPlugin {
 
     }
 
+    /**
+     * Removes the ReceivingCircuit from the receiver list.
+     *
+     * @param r A ReceivingCircuit
+     */
     public void removeReceiver(ReceivingCircuit r) {
         receivers.remove(r);
     }
 
+    /**
+     *
+     * @return a List of all transmitters on the server.
+     */
     public List<TransmittingCircuit> getTransmitters() {
         return transmitters;
     }
 
+    /**
+     *
+     * @return a List of all receivers on the server.
+     */
     public List<ReceivingCircuit> getReceivers() {
         return receivers;
     }
 
+    /**
+     * Registers a TransmittingCircuit so other receivers can fin
+     * @param t
+     */
     public void addTransmitter(TransmittingCircuit t) {
         transmitters.add(t);
     }

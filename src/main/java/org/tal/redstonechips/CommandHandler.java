@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -452,31 +452,35 @@ public class CommandHandler {
 
     }
 
-    public void listBroadcastChannels(CommandSender sender) {
-        SortedSet<String> channels = new TreeSet<String>();
-        for (TransmittingCircuit t : rc.transmitters) channels.add(t.getChannel());
-        for (ReceivingCircuit r : rc.receivers) channels.add(r.getChannel());
+    public void listBroadcastChannels(CommandSender sender, String[] args) {
+        SortedMap<String, Integer[]> channels = new TreeMap<String, Integer[]>();
+
+        for (TransmittingCircuit t : rc.transmitters) {
+            if (channels.containsKey(t.getChannel()))
+                channels.get(t.getChannel())[0] += 1;
+            else
+                channels.put(t.getChannel(), new Integer[] {1,0});
+        }
+
+        for (ReceivingCircuit r : rc.receivers) {
+            if (channels.containsKey(r.getChannel()))
+                channels.get(r.getChannel())[1] += 1;
+            else
+                channels.put(r.getChannel(), new Integer[] {0,1});
+        }
+
         if (channels.isEmpty()) {
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no registered channels.");
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active broadcast channels.");
         } else {
-            sender.sendMessage("");
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Currently used broadcast channels:");
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "------------------------------");
-            String list = "";
-            ChatColor color = ChatColor.WHITE;
-            for (String channel : channels) {
-                list += color + channel + ", ";
-                if (list.length()>50) {
-                    sender.sendMessage(list.substring(0, list.length()-2));
-                    list = "";
-                }
-                if (color==ChatColor.WHITE)
-                    color = ChatColor.YELLOW;
-                else color = ChatColor.WHITE;
+            String[] lines = new String[channels.size()];
+            int idx = 0;
+            for (String channel : channels.keySet()) {
+                Integer[] counts = channels.get(channel);
+                lines[idx] = ChatColor.YELLOW + channel + ChatColor.WHITE + " - " + counts[0] + " transmitters, " + counts[1] + " receivers.";
+                idx++;
+
             }
-            if (!list.isEmpty()) sender.sendMessage(list.substring(0, list.length()-2));
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "------------------------------");
-            sender.sendMessage("");
+            pageMaker(sender, args, "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
         }
     }
 
