@@ -48,8 +48,18 @@ public class CommandHandler {
 
             for (int i=0; i<lines.length; i++) {
                 Circuit c = circuits.get(i);
+                StringBuilder builder = new StringBuilder();
+                for (String arg : c.args) {
+                    builder.append(arg);
+                    builder.append(" ");
+                }
+
+                String cargs = builder.toString();
+                if (cargs.length()>30) cargs = cargs.substring(0, 27) + "...";
+
                 lines[i] = i + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " + 
-                        c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ();
+                        c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ() + " "
+                        + cargs;
             }
             pageMaker(p, args, title, commandName, lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
         }
@@ -190,7 +200,14 @@ public class CommandHandler {
                     } else
                         c.addDebugger(sender);
                 } catch (IllegalArgumentException ie) {
-                    sender.sendMessage(rc.getPrefsManager().getInfoColor() + ie.getMessage());
+                    try {
+                        c.removeDebugger(sender);
+                    } catch (IllegalArgumentException me) {
+                        sender.sendMessage(rc.getPrefsManager().getInfoColor() + me.getMessage());
+                        return;
+                    }
+                    sender.sendMessage(rc.getPrefsManager().getInfoColor() + "You will not receive any more debug messages from the " + c.getClass().getSimpleName() + " circuit.");
+
                     return;
                 }
                 sender.sendMessage(rc.getPrefsManager().getDebugColor() + "You are now a debugger of the " + c.getClass().getSimpleName() + " circuit.");
@@ -292,13 +309,15 @@ public class CommandHandler {
             } else { // output pin
                 Circuit c = (Circuit)oo[0];
                 int i = (Integer)oo[1];
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": output pin " + ChatColor.YELLOW + i + rc.getPrefsManager().getInfoColor() + " (" + (c.getOutputBits().get(i)?"on":"off") + ")");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.YELLOW + "output pin "
+                        + i + " - " + (c.getOutputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));
             }
         } else { // input pin
             for (InputPin io : inputList) {
                 Circuit c = io.getCircuit();
                 int i = io.getIndex();
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": input pin " + ChatColor.YELLOW + i + " (" + (c.getInputBits().get(i)?"on":"off") + ")");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.WHITE + "input pin "
+                        + i + " - " + (c.getInputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));
             }
         }
     }
@@ -436,17 +455,17 @@ public class CommandHandler {
                 }
             }
 
-            if (page<1) s.sendMessage(errorColor + "Invalid page number: " + page);
-            else if (page>(Math.ceil(lines.length/MaxLines)+1)) s.sendMessage(errorColor + "Invalid page number: " + page);
+            int pageCount = (int)(Math.ceil(lines.length/(float)MaxLines));
+            if (page<1 || page>pageCount) s.sendMessage(errorColor + "Invalid page number: " + page + ". Expecting 1-" + pageCount);
             else {
                 s.sendMessage("");
-                s.sendMessage(infoColor + title + ": ( page " + page + " / " + (int)(Math.ceil(lines.length/MaxLines)+1)  + " )");
+                s.sendMessage(infoColor + title + ": " + (pageCount>1?"( page " + page + " / " + pageCount  + " )":""));
                 s.sendMessage(infoColor + "----------------------");
                 for (int i=(page-1)*MaxLines; i<Math.min(lines.length, page*MaxLines); i++) {
                     s.sendMessage(lines[i]);
                 }
                 s.sendMessage(infoColor + "----------------------");
-                s.sendMessage("Use /" + commandName + " <page number> to see other pages.");
+                if (pageCount>1) s.sendMessage("Use /" + commandName + " <page number> to see other pages.");
                 s.sendMessage("");
             }
 

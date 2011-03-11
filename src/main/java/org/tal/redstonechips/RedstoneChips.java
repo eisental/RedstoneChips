@@ -340,10 +340,15 @@ public class RedstoneChips extends JavaPlugin {
      * @param circuit The rcTypeReceiver to remove.
      */
     public void removeRcTypeReceiver(rcTypeReceiver circuit) {
+        List<Location> toremove = new ArrayList<Location>();
+
         for (Location l : rcTypeReceivers.keySet()) {
             if (rcTypeReceivers.get(l)==circuit)
-                rcTypeReceivers.remove(l);
+                toremove.add(l);
         }
+
+        for (Location l : toremove)
+            rcTypeReceivers.remove(l);
     }
 
     /**
