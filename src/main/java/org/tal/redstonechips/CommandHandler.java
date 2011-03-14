@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips;
 
+import java.util.ArrayList;
 import org.tal.redstonechips.circuit.Circuit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import java.util.TreeMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,29 +41,62 @@ public class CommandHandler {
     }
 
     public void listActiveCircuits(CommandSender p, String[] args) {
+        World world = null;
+
         List<Circuit> circuits = rc.getCircuitManager().getCircuits();
+
+        boolean oneWorld = true;
+        if (args.length>0) {
+            if (!args[0].equalsIgnoreCase("all")) {
+                world = rc.getServer().getWorld(args[0]);
+            } else oneWorld = false;
+        }
+
+        if (oneWorld && world==null && (p instanceof Player)) {
+            // use player world as default.
+            world = ((Player)p).getWorld();
+        }
+
         if (circuits.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
         else {
-            String title = "Active redstone circuits";
+            String title = " active IC(s) in ";
             String commandName = "rc-list";
-            String[] lines = new String[circuits.size()];
+            List<String> lines = new ArrayList<String>();
+            for (Circuit c : circuits) {
+                if (world==null || c.world.getName().equals(world.getName())) {
+                    StringBuilder builder = new StringBuilder();
+                    for (String arg : c.args) {
+                        builder.append(arg);
+                        builder.append(" ");
+                    }
 
-            for (int i=0; i<lines.length; i++) {
-                Circuit c = circuits.get(i);
-                StringBuilder builder = new StringBuilder();
-                for (String arg : c.args) {
-                    builder.append(arg);
-                    builder.append(" ");
-                }
+                    String cargs = "";
+                    if (builder.length()>0) cargs = "[ " + builder.toString().substring(0, builder.length()-1) + " ]";
+                    if (cargs.length()>30) cargs = "[ " + cargs.substring(0, 27) + "... ]";
 
-                String cargs = builder.toString();
-                if (cargs.length()>30) cargs = cargs.substring(0, 27) + "...";
-
-                lines[i] = i + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " + 
-                        c.activationBlock.getX() + ", " + c.activationBlock.getY() + ", " + c.activationBlock.getZ() + " "
-                        + cargs;
+                    String sworld = "";
+                    if (world==null) sworld = c.world.getName() + " ";
+                    lines.add(circuits.indexOf(c) + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " 
+                            + c.activationBlock.getX() + "," + c.activationBlock.getY() + "," + c.activationBlock.getZ()
+                            + " " + sworld + cargs);
+                } 
             }
-            pageMaker(p, args, title, commandName, lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
+
+            if (lines.isEmpty()) {
+                p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits on world " + world.getName() + ".");
+                return;
+            }
+
+            String page = null;
+            if (args.length>1) page = args[1];
+            else if (world==null && args.length>0) page = args[0];
+
+            if (world==null) title += "all worlds";
+            else title +="world " + world.getName();
+            title = lines.size() + title;
+            
+            pageMaker(p, page, title, commandName, lines.toArray(new String[lines.size()]),
+                    rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
         }
 
     }
@@ -445,13 +480,13 @@ public class CommandHandler {
         }
     }
 
-    public static void pageMaker(CommandSender s, String[] args, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
+    public static void pageMaker(CommandSender s, String spage, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
             int page = 1;
-            if (args.length>0) {
+            if (spage!=null) {
                 try {
-                    page = Integer.decode(args[0]);
+                    page = Integer.decode(spage);
                 } catch (NumberFormatException ne) {
-                    s.sendMessage(errorColor + "Invalid page number: " + args[0]);
+                    //s.sendMessage(errorColor + "Invalid page number: " + args[args.length-1]);
                 }
             }
 
@@ -499,7 +534,7 @@ public class CommandHandler {
                 idx++;
 
             }
-            pageMaker(sender, args, "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
+            pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
         }
     }
 

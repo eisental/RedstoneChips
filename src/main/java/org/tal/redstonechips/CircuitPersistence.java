@@ -116,7 +116,6 @@ public class CircuitPersistence {
     private Circuit parseCircuitMap(Map<String,Object> map) throws InstantiationException, IllegalAccessException {
         String className = (String)map.get("class");
         World world = findWorld((String)map.get("world"));
-
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
         c.world = world;
         c.activationBlock = getLocation(world, (List<Integer>)map.get("activationBlock"));
@@ -154,10 +153,10 @@ public class CircuitPersistence {
     }
 
     private World findWorld(String worldName) {
-        for (World w : rc.getServer().getWorlds())
-            if (w.getName().equals(worldName)) return w;
+        World w = rc.getServer().getWorld(worldName);
 
-        throw new IllegalArgumentException("World " + worldName + " was not found on the server.");
+        if (w!=null) return w;
+        else throw new IllegalArgumentException("World " + worldName + " was not found on the server.");
     }
 
     private Location getLocation(World w, List<Integer> coords) {
