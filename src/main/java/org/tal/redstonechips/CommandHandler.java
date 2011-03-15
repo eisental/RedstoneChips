@@ -293,9 +293,12 @@ public class CommandHandler {
 
             if (!sender.isOp()) {
                 sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You must be an admin to remotely deactivate a circuit.");
+                return;
             }
+
             Block target = targetBlock(player);
             c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+
             if (c==null) {
                 sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to point at a block of the circuit you wish to deactivate.");
                 return;
@@ -303,7 +306,10 @@ public class CommandHandler {
         } else {
             if (idx<rc.getCircuitManager().getCircuits().size()) {
                 c = rc.getCircuitManager().getCircuits().get(idx);
-            } else sender.sendMessage(rc.getPrefsManager().getErrorColor() + "There's no activated circuit with id " + idx);
+            } else {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "There's no activated circuit with id " + idx);
+                return;
+            }
         }
 
         rc.getCircuitManager().destroyCircuit(c, sender);

@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.material.MaterialData;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -36,9 +38,9 @@ public class PrefsManager {
     private RedstoneChips rc;
     private DumperOptions prefDump;
 
-    private Material inputBlockType;
-    private Material outputBlockType;
-    private Material interfaceBlockType;
+    private MaterialData inputBlockType;
+    private MaterialData outputBlockType;
+    private MaterialData interfaceBlockType;
 
     private ChatColor infoColor;
     private ChatColor errorColor;
@@ -85,9 +87,9 @@ public class PrefsManager {
             loadMissingPrefs();
 
             try {
-                inputBlockType = findMaterial(prefs.get(Prefs.inputBlockType.name()));
-                outputBlockType = findMaterial(prefs.get(Prefs.outputBlockType.name()));
-                interfaceBlockType = findMaterial(prefs.get(Prefs.interfaceBlockType.name()));
+                inputBlockType = findMaterial(prefs.get(Prefs.inputBlockType.name()).toString());
+                outputBlockType = findMaterial(prefs.get(Prefs.outputBlockType.name()).toString());
+                interfaceBlockType = findMaterial(prefs.get(Prefs.interfaceBlockType.name()).toString());
             } catch (IllegalArgumentException ie) {
                 rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
             }
@@ -172,7 +174,7 @@ public class PrefsManager {
      *
      * @return The current input block type preference value.
      */
-    public Material getInputBlockType() {
+    public MaterialData getInputBlockType() {
         return inputBlockType;
     }
 
@@ -180,7 +182,7 @@ public class PrefsManager {
      *
      * @return The current output block type preference value.
      */
-    public Material getOutputBlockType() {
+    public MaterialData getOutputBlockType() {
         return outputBlockType;
     }
 
@@ -188,7 +190,7 @@ public class PrefsManager {
      *
      * @return The current interface block type preference value.
      */
-    public Material getInterfaceBlockType() {
+    public MaterialData getInterfaceBlockType() {
         return interfaceBlockType;
     }
 
@@ -224,33 +226,38 @@ public class PrefsManager {
         return prefs;
     }
 
-    private static Material findMaterial(Object m) throws IllegalArgumentException {
-        if (m instanceof String) {
-            Material material = findMaterial((String)m);
-            if (material==null) throw new IllegalArgumentException("Unknown material name: " + m);
-            else return material;
-        } else if (m instanceof Integer) {
-            Material material = Material.getMaterial((Integer)m);
-            if (material==null) throw new IllegalArgumentException("Unknown material type id: " + m);
-            else return material;
-        }  else
-            throw new IllegalArgumentException("Invalid material: " + m);
-    }
-
-    public static Material findMaterial(String m) throws IllegalArgumentException {
+    public static MaterialData findMaterial(String m) throws IllegalArgumentException {
         try {
             // try to parse as int type id.
             int i = Integer.decode(m);
-            Material material = Material.getMaterial(i);
+            MaterialData material = new MaterialData(Material.getMaterial(i), (byte)-1);
             if (material==null) throw new IllegalArgumentException("Unknown material type id: " + m);
             else return material;
         } catch (NumberFormatException ne) {
+            // try material:data
+            int colonIdx = m.indexOf(':');
+            if (colonIdx!=-1) {
+                String smat = m.substring(0, colonIdx);
+                String sdata = m.substring(colonIdx+1);
+                Material material = findMaterial(smat).getItemType();
+
+                try {
+                    byte data = Byte.decode(sdata);
+                    return new MaterialData(material, data);
+                } catch (NumberFormatException le) {
+                    if (material==Material.WOOL) {
+                        // try as dye color
+                        DyeColor color = DyeColor.valueOf(sdata.toUpperCase());
+                        return new MaterialData(material, color.getData());
+                    } else throw new IllegalArgumentException("Bad data value: " + m);
+                }
+            }
             // try as material name
             for (Material material : Material.values()) {
                 if (material.name().equals(m.toUpperCase()))
-                    return material;
+                    return new MaterialData(material, (byte)-1);
                 else if(material.name().replaceAll("_", "").equals(m.toUpperCase()))
-                    return material;
+                    return new MaterialData(material, (byte)-1);
             }
 
             throw new IllegalArgumentException("Unknown material name: " + m);

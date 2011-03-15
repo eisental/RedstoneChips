@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -223,15 +222,18 @@ public class CircuitManager {
     private void checkForIO(Block origin, BlockFace face, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
         Block b = origin.getFace(face);
         if (!structure.contains(b)) {
-            if (b.getType()==rc.getPrefsManager().getInputBlockType()) {
+            if (b.getType()==rc.getPrefsManager().getInputBlockType().getItemType()
+                    && (b.getData()==rc.getPrefsManager().getInputBlockType().getData() || rc.getPrefsManager().getInputBlockType().getData()==-1)) {
                 structure.add(b);
                 inputs.add(b);
-            } else if (b.getType()==rc.getPrefsManager().getOutputBlockType()) {
+            } else if (b.getType()==rc.getPrefsManager().getOutputBlockType().getItemType()
+                    && (b.getData()==rc.getPrefsManager().getOutputBlockType().getData() || rc.getPrefsManager().getOutputBlockType().getData()==-1)) {
                 structure.add(b);
                 Block o = findLeverAround(b);
                 structure.add(o);
                 outputs.add(o);
-            } else if (b.getType()==rc.getPrefsManager().getInterfaceBlockType()) {
+            } else if (b.getType()==rc.getPrefsManager().getInterfaceBlockType().getItemType()
+                    && (b.getData()==rc.getPrefsManager().getInterfaceBlockType().getData() || rc.getPrefsManager().getInterfaceBlockType().getData()==-1)) {
                 structure.add(b);
                 interfaces.add(b);
             }
@@ -459,9 +461,9 @@ public class CircuitManager {
     }
 
     private boolean isTypeAllowed(Material material) {
-        return material!=rc.getPrefsManager().getInputBlockType() &&
-                material!=rc.getPrefsManager().getOutputBlockType() &&
-                material!=rc.getPrefsManager().getInterfaceBlockType() &&
+        return material!=rc.getPrefsManager().getInputBlockType().getItemType() &&
+                material!=rc.getPrefsManager().getOutputBlockType().getItemType() &&
+                material!=rc.getPrefsManager().getInterfaceBlockType().getItemType() &&
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
 }
