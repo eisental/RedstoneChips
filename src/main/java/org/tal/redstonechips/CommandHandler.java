@@ -43,7 +43,7 @@ public class CommandHandler {
     public void listActiveCircuits(CommandSender p, String[] args) {
         World world = null;
 
-        List<Circuit> circuits = rc.getCircuitManager().getCircuits();
+        TreeMap<Integer, Circuit> sorted = new TreeMap<Integer, Circuit>(rc.getCircuitManager().getCircuits());
 
         boolean oneWorld = true;
         if (args.length>0) {
@@ -57,12 +57,13 @@ public class CommandHandler {
             world = ((Player)p).getWorld();
         }
 
-        if (circuits.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
+        if (sorted.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
         else {
             String title = " active IC(s) in ";
             String commandName = "rc-list";
             List<String> lines = new ArrayList<String>();
-            for (Circuit c : circuits) {
+            for (Integer id : sorted.keySet()) {
+                Circuit c = sorted.get(id);
                 if (world==null || c.world.getName().equals(world.getName())) {
                     StringBuilder builder = new StringBuilder();
                     for (String arg : c.args) {
@@ -71,14 +72,17 @@ public class CommandHandler {
                     }
 
                     String cargs = "";
-                    if (builder.length()>0) cargs = "[ " + builder.toString().substring(0, builder.length()-1) + " ]";
-                    if (cargs.length()>30) cargs = "[ " + cargs.substring(0, 27) + "... ]";
+                    if (builder.length()>0) cargs = builder.toString().substring(0, builder.length()-1);
+                    
+                    if(cargs.length() > 20) cargs = cargs.substring(0, 17) + "...";
+                    cargs = "[ " + cargs + " ]";
+
 
                     String sworld = "";
                     if (world==null) sworld = c.world.getName() + " ";
-                    lines.add(circuits.indexOf(c) + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ " 
+                    lines.add(c.id + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ "
                             + c.activationBlock.getX() + "," + c.activationBlock.getY() + "," + c.activationBlock.getZ()
-                            + " " + sworld + cargs);
+                            + " " + sworld + rc.getPrefsManager().getInfoColor() + cargs);
                 } 
             }
 
@@ -88,8 +92,8 @@ public class CommandHandler {
             }
 
             String page = null;
-            if (args.length>1) page = args[1];
-            else if (world==null && args.length>0) page = args[0];
+            if (args.length>1) page = args[args.length-1];
+            else if (args.length>0) page = args[0];
 
             if (world==null) title += "all worlds";
             else title +="world " + world.getName();
@@ -205,7 +209,7 @@ public class CommandHandler {
         }
 
         if (alloff) {
-            for (Circuit c : rc.getCircuitManager().getCircuits())
+            for (Circuit c : rc.getCircuitManager().getCircuits().values())
                 if (c.getDebuggers().contains(sender)) c.removeDebugger(sender);
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "You will not receive debug messages from any chip.");
         } else {
@@ -313,7 +317,7 @@ public class CommandHandler {
         }
 
         rc.getCircuitManager().destroyCircuit(c, sender);
-        sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + c.getCircuitClass() + " circuit is now deactivated.");
+        sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefsManager().getInfoColor() + " circuit is now deactivated.");
     }
 
     public void handleRcType(CommandSender sender, String[] args) {
@@ -365,7 +369,7 @@ public class CommandHandler {
 
 
     public void printCircuitInfo(CommandSender sender, String[] args) {
-        List<Circuit> circuits = rc.getCircuitManager().getCircuits();
+        HashMap<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
 
         Circuit c;
         if (args.length==0) {
@@ -414,7 +418,7 @@ public class CommandHandler {
 
         String loc = c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ();
         sender.sendMessage("");
-        sender.sendMessage(extraColor + Integer.toString(circuits.indexOf(c)) + ": " + infoColor + c.getCircuitClass() + " circuit" + disabled);
+        sender.sendMessage(extraColor + Integer.toString(c.id) + ": " + infoColor + c.getCircuitClass() + " circuit" + disabled);
         sender.sendMessage(extraColor + "----------------------");
 
         sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
@@ -475,14 +479,16 @@ public class CommandHandler {
 
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         List<CommandSender> debuggers = c.getDebuggers();
+        int id = c.id;
+
         rc.getCircuitManager().destroyCircuit(c, sender);
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, sender);
-
         Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
+        newCircuit.id = id;
         if (newCircuit!=null) {
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + newCircuit.getCircuitClass() + "circuit (" + + rc.getCircuitManager().getCircuits().indexOf(newCircuit) + ") is reactivated.");
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefsManager().getInfoColor() + " circuit is reactivated.");
         }
     }
 

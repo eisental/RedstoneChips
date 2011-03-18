@@ -82,6 +82,11 @@ public abstract class Circuit {
     protected boolean inputsDisabled = false;
 
     /**
+     * The circuits id. Set by CircuitManager.
+     */
+    public int id = -1;
+
+    /**
      *
      * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
      * @param args The sign arguments of this circuit. Stored in the args field.
@@ -257,9 +262,7 @@ public abstract class Circuit {
      *
      * @param message The error message.
      */
-    protected void debug(String message) {
-        int id = redstoneChips.getCircuitManager().getCircuits().indexOf(this);
-        
+    protected void debug(String message) {        
         for (CommandSender s : debuggers)
             s.sendMessage(redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
     }

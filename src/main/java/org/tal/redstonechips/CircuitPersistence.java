@@ -35,7 +35,7 @@ public class CircuitPersistence {
         rc = plugin;
     }
 
-    public List<Circuit> loadCircuits() {
+    public HashMap<Integer, Circuit> loadCircuits() {
         File file = getCircuitsFile();
         if (!file.exists()) { // create empty file if doesn't already exist
             try {
@@ -47,7 +47,7 @@ public class CircuitPersistence {
 
         Yaml yaml = new Yaml();
 
-        List<Circuit> circuits = new ArrayList<Circuit>();
+        HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
 
         try {
             List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(new FileInputStream(file));
@@ -55,7 +55,8 @@ public class CircuitPersistence {
                 for (Map<String,Object> circuitMap : circuitsList) {
                     try {
                         Circuit c = parseCircuitMap(circuitMap);
-                        circuits.add(c);
+                        if (c.id==-1) c.id = circuits.size();
+                        circuits.put(c.id, c);
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                         backupCircuitsFile();
@@ -76,7 +77,7 @@ public class CircuitPersistence {
         return circuits;
     }
 
-    public void saveCircuits(List<Circuit> circuits) {
+    public void saveCircuits(HashMap<Integer, Circuit> circuits) {
         File file = new File(rc.getDataFolder(), circuitsFileName);
 
         DumperOptions options = new DumperOptions();
@@ -89,7 +90,7 @@ public class CircuitPersistence {
             rc.log(Level.WARNING, "No circuits were found. There was probably a loading error.");
             return;
         }
-        for (Circuit c : circuits)
+        for (Circuit c : circuits.values())
             circuitMaps.add(this.circuitToMap(c));
         
         try {
@@ -110,6 +111,8 @@ public class CircuitPersistence {
         map.put("structure", makeBlockListsList(c.structure));
         map.put("signArgs", c.args);
         map.put("state", c.saveState());
+        map.put("id", c.id);
+
         return map;
     }
 
@@ -125,6 +128,7 @@ public class CircuitPersistence {
         c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);
         List<String> signArgs = (List<String>)map.get("signArgs");
         c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
+        if (map.containsKey("id")) c.id = (Integer)map.get("id");
         c.loadState((Map<String,String>)map.get("state"));
         return c;
     }
@@ -200,7 +204,7 @@ public class CircuitPersistence {
         return new File(rc.getDataFolder(), circuitsFileName);
     }
 
-    void copy(File src, File dst) throws IOException {
+    private void copy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);
 

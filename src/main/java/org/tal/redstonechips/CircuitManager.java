@@ -33,7 +33,7 @@ import org.tal.redstonechips.util.ChunkLocation;
 public class CircuitManager {
     private RedstoneChips rc;
     
-    private List<Circuit> circuits;
+    private HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
 
     private Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
     private Map<Location, List<InputPin>> inputLookupMap = new HashMap<Location, List<InputPin>>();
@@ -78,7 +78,7 @@ public class CircuitManager {
             // first check if its already registered
             Circuit check = this.getCircuitByActivationBlock(signBlock);
             if (check!=null) {
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated (" + check.id + ").");
                 return;
             }
 
@@ -142,11 +142,12 @@ public class CircuitManager {
                         
                         if (c.initCircuit(sender, args, rc)) {
                             this.addCircuitLookups(c);
-                            circuits.add(c);
+                            c.id = generateId();
+                            circuits.put(c.id, c);
 
                             ChatColor infoColor = rc.getPrefsManager().getInfoColor();
                             ChatColor debugColor = rc.getPrefsManager().getDebugColor();
-                            sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + infoColor + " circuit:");
+                            sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + " (" + c.id + ") " + infoColor + "circuit:");
                             sender.sendMessage(debugColor + "> " + ChatColor.WHITE + inputs.size() + debugColor + " input"
                                     + (inputs.size()!=1?"s":"") + ", " + ChatColor.YELLOW + outputs.size() + debugColor + " output"
                                     + (outputs.size()!=1?"s":"") + " and " + ChatColor.BLUE + interfaceBlocks.size() + debugColor
@@ -171,7 +172,7 @@ public class CircuitManager {
     }
 
     public void destroyCircuits() {
-        for (Circuit c : circuits) c.circuitDestroyed();
+        for (Circuit c : circuits.values()) c.circuitDestroyed();
     }
 
     private void scanBranch(Material chipMaterial, Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
@@ -318,14 +319,14 @@ public class CircuitManager {
     public void checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
-        if (destroyed!=null && circuits.contains(destroyed)) {
-            if (s!=null) s.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + " chip.");
+        if (destroyed!=null && circuits.containsValue(destroyed)) {
+            if (s!=null) s.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
             destroyCircuit(destroyed, s);
         }
     }
 
 
-    public List<Circuit> getCircuits() {
+    public HashMap<Integer, Circuit> getCircuits() {
         return circuits;
     }
 
@@ -337,10 +338,10 @@ public class CircuitManager {
         return this.activationLookupMap.get(activationBlock.getLocation());
     }
 
-    void setCircuitList(List<Circuit> circuits) {
+    void setCircuitMap(HashMap<Integer, Circuit> circuits) {
         this.circuits = circuits;
 
-        for (Circuit c : circuits)
+        for (Circuit c : circuits.values())
             addCircuitLookups(c);
 
         rc.log(Level.INFO, circuits.size() + " active circuits");
@@ -417,7 +418,7 @@ public class CircuitManager {
 
     public void destroyCircuit(Circuit destroyed, CommandSender destroyer) {
         destroyed.circuitDestroyed();
-        circuits.remove(destroyed);
+        circuits.remove(destroyed.id);
         removeCircuitLookups(destroyed);
 
         for (Location l : destroyed.outputs) {
@@ -443,7 +444,7 @@ public class CircuitManager {
     }
 
     public void checkDebuggerQuit(Player player) {
-        for (Circuit c : circuits) {
+        for (Circuit c : circuits.values()) {
             if (c.getDebuggers().contains(player)) {
                 c.getDebuggers().remove(player);
             }
@@ -465,5 +466,14 @@ public class CircuitManager {
                 material!=rc.getPrefsManager().getOutputBlockType().getItemType() &&
                 material!=rc.getPrefsManager().getInterfaceBlockType().getItemType() &&
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
+    }
+
+    public int generateId() {
+        int i = 0;
+
+        if (circuits!=null)
+            while(circuits.containsKey(i)) { i++;}
+
+        return i;
     }
 }

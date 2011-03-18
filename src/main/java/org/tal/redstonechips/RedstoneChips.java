@@ -216,10 +216,10 @@ public class RedstoneChips extends JavaPlugin {
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             @Override
             public void run() {
-                circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+                circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
             }})==-1) {
             logg.warning("Couldn't schedule circuit loading. Multiworld support might not work.");
-            circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+            circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
         }
 
     }
@@ -278,7 +278,7 @@ public class RedstoneChips extends JavaPlugin {
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-load")) {
             if (sender.isOp())
-                circuitManager.setCircuitList(circuitPersistence.loadCircuits());
+                circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
             else sender.sendMessage(prefsManager.getErrorColor() + "Only ops (admins) are allowed to use this command.");
             return true;
         } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
