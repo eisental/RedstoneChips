@@ -9,9 +9,9 @@ The 2nd sign argument determines the time field that will be sent to the chip's 
 
 Possible time field argument values:
 - `tick` - In earthtime, equivalent to secondofday. In gametime, the current game tick, between 0-23999.
-- `second` - In earthtime, current second between 0-60. In gametime it's equivalent to `tick`.
+- `second` - In earthtime, current second between 0-59. In gametime it's equivalent to `tick`.
 - `secondofday` - In earthtime, current second of day, between 0-86399. In gametime, equivalent to `tick`.
-- `minute` - Current minute, between 0-60.
+- `minute` - Current minute, between 0-59.
 - `minuteofday` - Current minute of day, between 0-1439.
 - `hour` - Current hour, between 0-23.
 
@@ -22,7 +22,7 @@ The chip will update its outputs once the clock pin is triggered according to th
 
 If the chip is not built with enough output pins to output the whole range of values for the time field it's using, the output is mapped accordingly.
 For example, If you build a daytime chip that uses the hour time field with only 1 output bit, hours 0-11 will output 0 while hours 12-23 will cause it to output 1.
-Using 5 outputs leaves the chip enough bits to output the unmapped value ranging between 0-24.
+Using 5 outputs leaves the chip enough bits to output the unmapped value ranging between 0-23.
 
 [source code](https://github.com/eisental/SensorLibrary/blob/master/src/main/java/org/tal/sensorlibrary/daytime.java)
     
