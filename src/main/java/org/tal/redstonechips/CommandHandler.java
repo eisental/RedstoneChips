@@ -160,6 +160,7 @@ public class CommandHandler {
                     rc.getPrefsManager().printYaml(sender, map);
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
+                    return;
                 }
                 sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Saving changes...");
                 rc.getPrefsManager().savePrefs();

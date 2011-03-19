@@ -63,6 +63,7 @@ public class PrefsManager {
         Yaml yaml = new Yaml();
 
         defaults = (Map<String, Object>) yaml.load(getClass().getResourceAsStream(defaultsFileName));
+        prefs = new HashMap<String, Object>();
     }
 
     /**
@@ -82,30 +83,17 @@ public class PrefsManager {
 
         try {
             Yaml yaml = new Yaml(prefDump);
-            prefs = (Map<String, Object>)yaml.load(new FileInputStream(propFile));
-            if (prefs==null) prefs = new HashMap<String, Object>();
-            loadMissingPrefs();
+            Map<String,Object> loadedPrefs = (Map<String, Object>)yaml.load(new FileInputStream(propFile));
+            if (loadedPrefs==null) loadedPrefs = new HashMap<String, Object>();
+            loadMissingPrefs(loadedPrefs);
 
-            try {
-                inputBlockType = findMaterial(prefs.get(Prefs.inputBlockType.name()).toString());
-                outputBlockType = findMaterial(prefs.get(Prefs.outputBlockType.name()).toString());
-                interfaceBlockType = findMaterial(prefs.get(Prefs.interfaceBlockType.name()).toString());
-            } catch (IllegalArgumentException ie) {
-                rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
-            }
-
-
-            try {
-                infoColor = ChatColor.valueOf((String)prefs.get(Prefs.infoColor.name()));
-                errorColor = ChatColor.valueOf((String)prefs.get(Prefs.errorColor.name()));
-                debugColor = ChatColor.valueOf((String)prefs.get(Prefs.debugColor.name()));
-            } catch (IllegalArgumentException ie) {
-                rc.log(Level.SEVERE, "While loading preferences: " + ie.getMessage());
-            }
+            applyPrefs(loadedPrefs);
 
             yaml.dump(prefs, new FileWriter(propFile));
         } catch (IOException ex) {
             rc.log(Level.WARNING, ex.toString());
+        } catch (IllegalArgumentException ie) {
+            rc.log(Level.WARNING, "While loading preferences: " + ie.toString());
         }
     }
 
@@ -130,8 +118,6 @@ public class PrefsManager {
         } catch (IOException ex) {
             rc.log(Level.SEVERE, ex.toString());
         }
-
-        loadPrefs();
     }
 
     /**
@@ -146,9 +132,12 @@ public class PrefsManager {
         Yaml y = new Yaml(prefDump);
         Map<String,Object> map = (Map<String,Object>)y.load(yaml);
         for (String key : map.keySet()) {
-            if (prefs.containsKey(key)) prefs.put(key, map.get(key));
-            else throw new IllegalArgumentException("Unknown preferences key: " + key);
+            if (!prefs.containsKey(key)) 
+                throw new IllegalArgumentException("Unknown preferences key: " + key);
         }
+
+        applyPrefs(map);
+        
         return map;
     }
 
@@ -264,10 +253,10 @@ public class PrefsManager {
         }
     }
 
-    private void loadMissingPrefs() {
+    private void loadMissingPrefs(Map<String,Object> loadedPrefs) {
         for (String key : defaults.keySet()) {
-            if (!prefs.containsKey(key))
-                prefs.put(key, defaults.get(key));
+            if (!loadedPrefs.containsKey(key))
+                loadedPrefs.put(key, defaults.get(key));
         }
     }
 
@@ -289,6 +278,22 @@ public class PrefsManager {
         // check if pref is missing
         if (prefs!=null && !prefs.containsKey(key))
             prefs.put(key, defaultValue);
+    }
+
+    private void applyPrefs(Map<String, Object> loadedPrefs) throws IllegalArgumentException {
+        Map toapply = new HashMap<String, Object>();
+        toapply.putAll(prefs);
+        toapply.putAll(loadedPrefs);
+
+        inputBlockType = findMaterial(toapply.get(Prefs.inputBlockType.name()).toString());
+        outputBlockType = findMaterial(toapply.get(Prefs.outputBlockType.name()).toString());
+        interfaceBlockType = findMaterial(toapply.get(Prefs.interfaceBlockType.name()).toString());
+
+        infoColor = ChatColor.valueOf((String)toapply.get(Prefs.infoColor.name()));
+        errorColor = ChatColor.valueOf((String)toapply.get(Prefs.errorColor.name()));
+        debugColor = ChatColor.valueOf((String)toapply.get(Prefs.debugColor.name()));
+
+        prefs.putAll(toapply);
     }
 
 }
