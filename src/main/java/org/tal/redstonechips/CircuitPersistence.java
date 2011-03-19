@@ -190,7 +190,8 @@ public class CircuitPersistence {
 
         try {
             File original = getCircuitsFile();
-            File backup = new File(original.getParentFile(), circuitsFileName + ".BACKUP");
+            File backup = getBackupFileName(original.getParentFile());
+
             rc.log(Level.INFO, "An error occurred while loading circuits state. To make sure you won't lose any circuit data, a backup copy of "
                 + circuitsFileName + " is being created. The backup can be found at " + backup.getPath());
             copy(original, backup);
@@ -217,4 +218,16 @@ public class CircuitPersistence {
         in.close();
         out.close();
 }
+
+    private File getBackupFileName(File parentFile) {
+        String ext = ".BACKUP";
+        File backup;
+        int idx = 0;
+
+        do {
+            backup = new File(parentFile, circuitsFileName + ext + idx);
+            idx++;
+        } while (backup.exists());
+        return backup;
+    }
 }
