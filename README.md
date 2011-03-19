@@ -21,6 +21,19 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.86 (19/03/11)
+- Wool color or any other block with data value can be used as an indicator block (input/output/interface). For example: /rc-prefs inputBlockType wool:silver will now work.
+- `/rc-list` will now show only the circuits in the current world by default. Using `/rc-list all` would show circuits in all worlds and display each circuit's world.
+- `/rc-list` shows each circuits sign arguments (or at least part of them).
+- `/rc-channels` shows how many receivers and transmitters are communicating on each broadcast channel.
+- Using /rc-debug on a circuit you're already debugging will turn debug for the circuit off.
+- Added hex values and changed the message format of input-change debug messages
+- Changed the circuit id system. Circuits will keep their id numbers after rc-reset or server restart.
+- New backup redstonechips.circuits files won't overwrite older ones.
+- Invalid pref values entered using /rc-prefs are now caught properly.
+- Some command format changes and bug fixes.
+- Fixed a little bug when removing rc-type circuits.
+
 #### RedstoneChips 0.84 (10/03/11)
 - New circuit library interface mechanism (again). Plugin jar file can be renamed to anything now. 
 - The plugin will now backup the circuits file when it encounters a loading error.
