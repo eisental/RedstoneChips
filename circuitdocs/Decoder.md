@@ -8,7 +8,7 @@ Decodes a binary number, setting the output pin that corresponds to the input va
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Decoder)
 
-[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/encoder.java)
+[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/decoder.java)
 
 * * *
 
