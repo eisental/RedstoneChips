@@ -2,6 +2,7 @@ package org.tal.redstonechips;
 
 import java.io.File;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.WorldEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
@@ -16,10 +17,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockRightClickEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerEvent;
@@ -122,11 +123,6 @@ public class RedstoneChips extends JavaPlugin {
             }
 
             @Override
-            public void onBlockRightClick(BlockRightClickEvent event) {
-                circuitManager.checkForCircuit(event.getBlock(), event.getPlayer());
-            }
-
-            @Override
             public void onBlockBreak(BlockBreakEvent event) {
                 if (!event.isCancelled())
                     circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
@@ -155,17 +151,23 @@ public class RedstoneChips extends JavaPlugin {
             public void onPlayerQuit(PlayerEvent event) {
                 circuitManager.checkDebuggerQuit(event.getPlayer());
             }
+
+            @Override
+            public void onPlayerInteract(PlayerInteractEvent event) {
+                if (event.getAction()==Action.RIGHT_CLICK_BLOCK)
+                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer());
+            }
         };
 
         rcWorldListener = new WorldListener() {
 
             @Override
-            public void onChunkLoaded(ChunkLoadEvent event) {
+            public void onChunkLoad(ChunkLoadEvent event) {
                 circuitManager.checkUpdateOutputLevers(event.getChunk());
             }
 
             @Override
-            public void onWorldSaved(WorldEvent event) {
+            public void onWorldSave(WorldEvent event) {
                 if (event.getWorld()==getServer().getWorlds().get(0)) {
                     saveCircuits();
                 }
@@ -202,13 +204,13 @@ public class RedstoneChips extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.BLOCK_RIGHTCLICKED, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
-        pm.registerEvent(Type.CHUNK_LOADED, rcWorldListener, Priority.Monitor, this);
-        pm.registerEvent(Type.WORLD_SAVED, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
+        pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
 
         String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
         logg.info(msg);
