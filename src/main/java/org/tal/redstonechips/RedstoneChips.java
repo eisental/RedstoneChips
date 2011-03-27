@@ -3,7 +3,6 @@ package org.tal.redstonechips;
 import java.io.File;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.WorldEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +22,11 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldListener;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -148,7 +148,7 @@ public class RedstoneChips extends JavaPlugin {
         rcPlayerListener = new PlayerListener() {
 
             @Override
-            public void onPlayerQuit(PlayerEvent event) {
+            public void onPlayerQuit(PlayerQuitEvent event) {
                 circuitManager.checkDebuggerQuit(event.getPlayer());
             }
 
@@ -167,7 +167,7 @@ public class RedstoneChips extends JavaPlugin {
             }
 
             @Override
-            public void onWorldSave(WorldEvent event) {
+            public void onWorldSave(WorldSaveEvent event) {
                 if (event.getWorld()==getServer().getWorlds().get(0)) {
                     saveCircuits();
                 }

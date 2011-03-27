@@ -128,10 +128,14 @@ public abstract class Circuit {
         if (inputBits.get(idx)==newVal) return;
 
         inputBits.set(idx, newVal);
-        int intgr = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
-        if (hasDebuggers()) debug("input " + idx + " state change: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
-                Integer.toHexString(intgr) + " (" + intgr + ")");
         inputChange(idx, newVal);
+        
+        int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
+        int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
+        if (hasDebuggers()) debug("input " + idx + " is " + (newVal?"on":"off")+ ". i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
+                Integer.toHexString(inputInt) + " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
+                Integer.toHexString(outputInt));
+
     }
 
 
