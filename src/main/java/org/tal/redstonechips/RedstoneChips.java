@@ -194,7 +194,7 @@ public class RedstoneChips extends JavaPlugin {
                 
                 this.addCircuitClasses(classes);
             } else {
-                libMsg = libMsg + "No circuit classes were loaded.";
+                libMsg += "No circuit classes were loaded.";
                 logg.info(libMsg);
             }
         }
