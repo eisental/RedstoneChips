@@ -34,4 +34,14 @@ public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex 
     public void onDisable() {
 
     }
+
+    @Override
+    public String getName() {
+        return this.getDescription().getName();
+    }
+
+    @Override
+    public String getVersion() {
+        return this.getDescription().getVersion();
+    }
 }

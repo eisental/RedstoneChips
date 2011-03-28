@@ -179,6 +179,12 @@ public abstract class Circuit {
     public void circuitDestroyed() {}
 
     /**
+     * Called when the circuit is shutdown. Typically when the server shutsdown or the plugin is disabled and before a circuit is 
+     * destroyed.
+     */
+    public void circuitShutdown() {}
+    
+    /**
      * Sets the physical state of one of the outputs.
      * Changes the data byte of the selected output block to make the lever turn on or off.
      *

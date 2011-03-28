@@ -101,7 +101,7 @@ public class RedstoneChips extends JavaPlugin {
     public void onDisable() {
         saveCircuits();
 
-        circuitManager.destroyCircuits();
+        circuitManager.shutdownCircuits();
 
         PluginDescriptionFile desc = this.getDescription();
         String msg = desc.getName() + " " + desc.getVersion() + " disabled.";
@@ -183,7 +183,7 @@ public class RedstoneChips extends JavaPlugin {
 
         // load circuit classes
         for (CircuitIndex lib : circuitLibraries) {
-            String libMsg = desc.getName() + ": Loading " + lib.getClass().getSimpleName() + " > ";
+            String libMsg = desc.getName() + ": Loading " + lib.getName() + " " + lib.getVersion() + " > ";
             Class[] classes = lib.getCircuitClasses();
             if (classes != null && classes.length>0) {
                 for (Class c : classes)

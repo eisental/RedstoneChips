@@ -24,4 +24,15 @@ public interface CircuitIndex {
      */
     public void onRedstoneChipsEnable(RedstoneChips instance);
 
+    /**
+     * 
+     * @return the index name
+     */
+    public String getName();
+
+    /**
+     *
+     * @return the index version
+     */
+    public String getVersion();
 }

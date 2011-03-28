@@ -161,8 +161,8 @@ public class CircuitManager {
         }
     }
 
-    public void destroyCircuits() {
-        for (Circuit c : circuits.values()) c.circuitDestroyed();
+    public void shutdownCircuits() {
+        for (Circuit c : circuits.values()) c.circuitShutdown();
     }
 
     private void scanBranch(Material chipMaterial, Block origin, BlockFace direction, List<Block> inputs, List<Block> outputs, List<Block> interfaces, List<Block> structure) {
@@ -407,6 +407,7 @@ public class CircuitManager {
     }
 
     public void destroyCircuit(Circuit destroyed, CommandSender destroyer) {
+        destroyed.circuitShutdown();
         destroyed.circuitDestroyed();
         circuits.remove(destroyed.id);
         removeCircuitLookups(destroyed);
