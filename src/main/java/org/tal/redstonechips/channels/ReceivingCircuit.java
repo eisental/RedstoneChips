@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.channels;
 
 import org.tal.redstonechips.util.BitSet7;
 
@@ -12,9 +12,6 @@ import org.tal.redstonechips.util.BitSet7;
  *
  * @author Tal Eisenberg
  */
-public interface ReceivingCircuit {
-
-    public void receive(BitSet7 bits);
-
-    public String getChannel();
+public abstract class ReceivingCircuit extends WirelessCircuit {
+    public abstract void receive(BitSet7 bits);
 }

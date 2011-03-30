@@ -30,8 +30,9 @@ import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.tal.redstonechips.circuit.ReceivingCircuit;
-import org.tal.redstonechips.circuit.TransmittingCircuit;
+import org.tal.redstonechips.channels.BroadcastChannel;
+import org.tal.redstonechips.channels.ReceivingCircuit;
+import org.tal.redstonechips.channels.TransmittingCircuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
 
 
@@ -57,8 +58,9 @@ public class RedstoneChips extends JavaPlugin {
     private static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
     public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
-    public List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
-    public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
+    public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
+    //public List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
+    //public List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
 
     /**
      * Used to prevent saving state more than once per game tick.
@@ -354,60 +356,71 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * Registers a ReceivingCircuit so other transmitters can find it.
-     *
-     * @param r A ReceivingCircuit
+     * Adds the receiving circuit to listen on a channel and returns the BroadcastChannel object that the receiver
+     * was added to. If a BroadcastChannel by that name was not found a new one is created.
+     * 
+     * @param r The receiving circuit.
+     * @param channelName Name of the receiver's channel.
+     * @return The channel that the receiver was added to.
      */
-    public void addReceiver(ReceivingCircuit r) {
-        receivers.add(r);
+    public BroadcastChannel registerReceiver(ReceivingCircuit r, String channelName) {
+        BroadcastChannel channel = getChannelByName(channelName);
+        channel.addReceiver(r);
 
-        // find already existing transmitters for this channel
-        for (TransmittingCircuit t : transmitters) {
-            if (t.getChannel()!=null && t.getChannel().equals(r.getChannel())) t.addReceiver(r);
+        return channel;
+    }
+
+    /**
+     * Adds the transmitter circuit to a channel and returns the BroadcastChannel object that the transmitter
+     * was added to. If a BroadcastChannel by that name was not found a new one is created.
+     *
+     * @param r The receiving circuit.
+     * @param channelName Name of the receiver's channel.
+     * @return The channel that the receiver was added to.
+     */
+    public BroadcastChannel registerTransmitter(TransmittingCircuit t, String channelName) {
+        BroadcastChannel channel = getChannelByName(channelName);
+        channel.addTransmitter(t);
+
+        return channel;
+    }
+
+    private BroadcastChannel getChannelByName(String name) {
+        BroadcastChannel channel;
+        if (broadcastChannels.containsKey(name))
+            channel = broadcastChannels.get(name);
+        else {
+            channel = new BroadcastChannel(name);
+            broadcastChannels.put(name, channel);
         }
 
+        return channel;
     }
 
-    /**
-     * Removes the ReceivingCircuit from the receiver list.
-     *
-     * @param r A ReceivingCircuit
-     */
-    public void removeReceiver(ReceivingCircuit r) {
-        receivers.remove(r);
+    public boolean removeTransmitter(TransmittingCircuit t) {
+        BroadcastChannel channel = t.getChannel();
+        boolean res = channel.removeTransmitter(t);
+        if (channel.isDeserted())
+            broadcastChannels.remove(channel.name);
+
+        return res;
     }
 
-    /**
-     *
-     * @return a List of all transmitters on the server.
-     */
-    public List<TransmittingCircuit> getTransmitters() {
-        return transmitters;
-    }
+    public boolean removeReceiver(ReceivingCircuit r) {
+        BroadcastChannel channel = r.getChannel();
+        if (channel==null) return false;
+        
+        boolean res = channel.removeReceiver(r);
+        if (channel.isDeserted())
+            broadcastChannels.remove(channel.name);
 
-    /**
-     *
-     * @return a List of all receivers on the server.
-     */
-    public List<ReceivingCircuit> getReceivers() {
-        return receivers;
-    }
-
-    /**
-     * Registers a TransmittingCircuit so other receivers can fin
-     * @param t
-     */
-    public void addTransmitter(TransmittingCircuit t) {
-        transmitters.add(t);
-    }
-
-    public void removeTransmitter(TransmittingCircuit t) {
-        transmitters.remove(t);
+        return res;
     }
 
     @Override
     public File getDataFolder() {
         return new File(super.getDataFolder().getParentFile(), getDescription().getName());
     }
+
 
 }

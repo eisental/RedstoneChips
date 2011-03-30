@@ -31,7 +31,7 @@ commands:
     description: Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using
       the chip's id number as an argument if you have admin priviliges.
   rc-channels:
-    description: Prints a list of currently used wireless broadcast channels.
+    description: Prints a list of currently used wireless broadcast channels. Use /rc-channels <channel name> to get more info about a specific channel.
   rc-info:
     description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
   rc-save:

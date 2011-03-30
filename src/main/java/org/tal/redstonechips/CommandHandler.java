@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -22,9 +21,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.channels.BroadcastChannel;
 import org.tal.redstonechips.circuit.InputPin;
-import org.tal.redstonechips.circuit.ReceivingCircuit;
-import org.tal.redstonechips.circuit.TransmittingCircuit;
+import org.tal.redstonechips.channels.ReceivingCircuit;
+import org.tal.redstonechips.channels.TransmittingCircuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
 import org.tal.redstonechips.util.BitSetUtils;
 
@@ -98,9 +98,11 @@ public class CommandHandler {
             if (world==null) title += "all worlds";
             else title +="world " + world.getName();
             title = lines.size() + title;
-            
+
+            p.sendMessage("");
             pageMaker(p, page, title, commandName, lines.toArray(new String[lines.size()]),
                     rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
+            p.sendMessage("");
         }
 
     }
@@ -506,7 +508,6 @@ public class CommandHandler {
             int pageCount = (int)(Math.ceil(lines.length/(float)MaxLines));
             if (page<1 || page>pageCount) s.sendMessage(errorColor + "Invalid page number: " + page + ". Expecting 1-" + pageCount);
             else {
-                s.sendMessage("");
                 s.sendMessage(infoColor + title + ": " + (pageCount>1?"( page " + page + " / " + pageCount  + " )":""));
                 s.sendMessage(infoColor + "----------------------");
                 for (int i=(page-1)*MaxLines; i<Math.min(lines.length, page*MaxLines); i++) {
@@ -514,40 +515,29 @@ public class CommandHandler {
                 }
                 s.sendMessage(infoColor + "----------------------");
                 if (pageCount>1) s.sendMessage("Use /" + commandName + " <page number> to see other pages.");
-                s.sendMessage("");
             }
 
     }
 
     public void listBroadcastChannels(CommandSender sender, String[] args) {
-        SortedMap<String, Integer[]> channels = new TreeMap<String, Integer[]>();
-
-        for (TransmittingCircuit t : rc.transmitters) {
-            if (channels.containsKey(t.getChannel()))
-                channels.get(t.getChannel())[0] += 1;
-            else
-                channels.put(t.getChannel(), new Integer[] {1,0});
-        }
-
-        for (ReceivingCircuit r : rc.receivers) {
-            if (channels.containsKey(r.getChannel()))
-                channels.get(r.getChannel())[1] += 1;
-            else
-                channels.put(r.getChannel(), new Integer[] {0,1});
-        }
-
-        if (channels.isEmpty()) {
+        if (rc.broadcastChannels.isEmpty()) {
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active broadcast channels.");
         } else {
-            String[] lines = new String[channels.size()];
-            int idx = 0;
-            for (String channel : channels.keySet()) {
-                Integer[] counts = channels.get(channel);
-                lines[idx] = ChatColor.YELLOW + channel + ChatColor.WHITE + " - " + counts[0] + " transmitters, " + counts[1] + " receivers.";
-                idx++;
+            if (args.length>0 && rc.broadcastChannels.containsKey(args[0])) {
+                printChannelInfo(sender, args[0]);
+            } else {
+                String[] lines = new String[rc.broadcastChannels.size()];
+                int idx = 0;
+                for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+                    lines[idx] = ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers.";
+                    idx++;
+                }
 
+                sender.sendMessage("");
+                pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
+                sender.sendMessage("Use /rc-channels <channel name> for more info about that channel.");
+                sender.sendMessage("");
             }
-            pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
         }
     }
 
@@ -596,5 +586,49 @@ public class CommandHandler {
 
     private Block targetBlock(Player player) {
         return player.getTargetBlock(transparentMaterials, 100);
+    }
+
+    private void printChannelInfo(CommandSender sender, String channelName) {
+        ChatColor infoColor = rc.getPrefsManager().getInfoColor();
+        ChatColor errorColor = rc.getPrefsManager().getErrorColor();
+        ChatColor extraColor = ChatColor.YELLOW;
+
+        BroadcastChannel channel = rc.broadcastChannels.get(channelName);
+        if (channel==null) {
+            sender.sendMessage(errorColor + "Channel " + channelName + " doesn't exist.");
+        } else {
+            String sTransmitters = "";
+            for (TransmittingCircuit t : channel.getTransmitters()) {
+                String range = "[";
+                if (t.getLength()>1)
+                    range += "bits " + t.getStartBit() + "-" + (t.getLength()+t.getStartBit()-1) + "]";
+                else range += "bit " + t.getStartBit() + "]";
+
+                sTransmitters += t.getCircuitClass() + " (" + t.id + ") " + range + ", ";
+            }
+
+            String sReceivers = "";
+            for (ReceivingCircuit r : channel.getReceivers()) {
+                String range = "[";
+                if (r.getLength()>1)
+                    range += "bits " + r.getStartBit() + "-" + (r.getLength()+r.getStartBit()-1) + "]";
+                else range += "bit " + r.getStartBit() + "]";
+                sReceivers += r.getCircuitClass() + " (" + r.id + ") " + range + ", ";
+            }
+
+            sender.sendMessage("");
+            sender.sendMessage(extraColor + channel.name + ":");
+            sender.sendMessage(extraColor + "----------------------");
+
+            sender.sendMessage(infoColor + "last broadcast: " + extraColor + BitSetUtils.bitSetToBinaryString(channel.bits, 0, channel.getLength()) + infoColor + " length: " + extraColor + channel.getLength());
+
+            if (!sTransmitters.isEmpty())
+                sender.sendMessage(infoColor + "transmitters: " + extraColor + sTransmitters.substring(0, sTransmitters.length()-2));
+            if (!sReceivers.isEmpty())
+                sender.sendMessage(infoColor + "receivers: " + extraColor + sReceivers.substring(0, sReceivers.length()-2));
+
+        }
+
+
     }
 }
