@@ -132,9 +132,17 @@ public abstract class Circuit {
         
         int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
         int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
-        if (hasDebuggers()) debug("input " + idx + " is " + (newVal?"on":"off")+ ". i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
-                Integer.toHexString(inputInt) + " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
-                Integer.toHexString(outputInt));
+
+        String i = "i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
+                Integer.toHexString(inputInt);
+
+        String o;
+        if (outputs.length>0)
+            o = " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
+                Integer.toHexString(outputInt);
+        else o = "";
+
+        if (hasDebuggers()) debug("input " + idx + " is " + (newVal?"on":"off")+ ". " + i + o);
 
     }
 

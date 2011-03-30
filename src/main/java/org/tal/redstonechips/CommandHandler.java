@@ -428,8 +428,11 @@ public class CommandHandler {
         sender.sendMessage(infoColor +
                 "location: " + extraColor + loc + infoColor + " world: " + extraColor + c.world.getName());
 
-        sender.sendMessage(infoColor + "input states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length));
-        sender.sendMessage(infoColor + "output states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length));
+        if (c.inputs.length>0)
+            sender.sendMessage(infoColor + "input states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length));
+
+        if (c.outputs.length>0)
+            sender.sendMessage(infoColor + "output states: " + extraColor + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length));
 
         String signargs = "";
         for (String arg : c.args)
@@ -529,7 +532,7 @@ public class CommandHandler {
                 String[] lines = new String[rc.broadcastChannels.size()];
                 int idx = 0;
                 for (BroadcastChannel channel : rc.broadcastChannels.values()) {
-                    lines[idx] = ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers.";
+                    lines[idx] = ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers.";
                     idx++;
                 }
 
