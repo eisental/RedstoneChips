@@ -21,6 +21,16 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.87 (30/03/11)
+- Complete rewrite of the broadcast channels system.
+- transmitters and receivers can work with a selected part of the broadcast channel. Use <channel name>:<start bit> as the channel sign arg to set the 1st bit in the channel 
+the circuit will work on.
+- `/rc-channels` now displays the number of bits used by each channel.
+- `/rc-channels <channel name>` prints additional information about a specific channel.
+- Using plugin name and version on circuit library load message
+- Sepearated between circuit shutdown, which happens each time the plugin is disabled, and circuit destroy - when the circuit is permanently removed from the circuit list.
+- Updated for craftbukkit #602.
+
 #### RedstoneChips 0.86 (19/03/11)
 - Wool color or any other block with data value can be used as an indicator block (input/output/interface). For example: /rc-prefs inputBlockType wool:silver will now work.
 - `/rc-list` will now show only the circuits in the current world by default. Using `/rc-list all` would show circuits in all worlds and display each circuit's world.
