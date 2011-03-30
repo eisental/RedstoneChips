@@ -16,7 +16,7 @@ D-flipflop on [Wikipeda](http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_
 
 #### I/O setup 
 * Can have any number of outputs.
-* Requires 2 more inputs than outputs. 1 clock pin, 1 reset pin, and any number of data pins.
+* Requires 2 more inputs than outputs. 1 clock pin, 1 reset pin, and the same number of data pins as there are outputs.
 
 #### Sign text
 1. `   dregister   `

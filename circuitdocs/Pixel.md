@@ -43,7 +43,8 @@ Note that wool blocks that are not attached directly or indirectly (through othe
 - 13: Green
 - 14: Red
 - 15: Black
-    
+
+
 #### I/O setup 
 * Inputs: 1 clock pin (input 0) and 1-4 data pins. Clock pin can be omitted when only 1 data pin is used.
 * No outputs.
