@@ -47,7 +47,7 @@ Plugin commands
 - `/rc-break` - Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
 - `/rc-type` - Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
 - `/rc-reset` - Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
-- `/rc-channels` - Prints a list of currently used wireless broadcast channels.
+- `/rc-channels` - Prints a list of currently used wireless broadcast channels. Use `/rc-channels <channel name>` to get more info about a specific channel.
 - `/rc-info` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
 - `/rc-help` - Prints a list or description of all RedstoneChips commands. Use `/rc-help <command name>` to get help about a specific command.
 - `/rc-save` - Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
