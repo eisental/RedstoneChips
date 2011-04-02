@@ -41,6 +41,8 @@ public class CircuitManager {
     private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
     private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
+    private final static String SIGN_COLOR = "4";
+
     public CircuitManager(RedstoneChips plugin) {
         rc = plugin;
     }
@@ -142,6 +144,17 @@ public class CircuitManager {
                                     + (inputs.size()!=1?"s":"") + ", " + ChatColor.YELLOW + outputs.size() + debugColor + " output"
                                     + (outputs.size()!=1?"s":"") + " and " + ChatColor.BLUE + interfaceBlocks.size() + debugColor
                                     + " interface block" + (interfaceBlocks.size()!=1?"s":"") + ".");
+
+                        // color the sign to indicate it's working
+                        String line = sign.getLine(0);
+                        if (!line.startsWith("¤" + SIGN_COLOR)) {
+                            if (line.startsWith("¤"))
+                                line = line.substring(2);
+
+                            sign.setLine(0, "¤" + SIGN_COLOR + line + " #" + c.id);
+                            sign.update();
+                        }
+
                             return;
                         } else {
                             sender.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
@@ -432,6 +445,19 @@ public class CircuitManager {
                         rc.getPrefsManager().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
             }
         }
+
+        // remove sign color and id
+        Sign sign = (Sign)destroyed.activationBlock.getBlock().getState();
+        String line = sign.getLine(0);
+        if (line.startsWith("¤")) {
+            int idSLength = (" #" + destroyed.id).length();
+            System.out.println("line.length=" + line.length() + " idSLength=" + idSLength);
+            sign.setLine(0, line.substring(2, line.length()-idSLength));
+            sign.update();
+        }
+
+
+
     }
 
     public void checkDebuggerQuit(Player player) {

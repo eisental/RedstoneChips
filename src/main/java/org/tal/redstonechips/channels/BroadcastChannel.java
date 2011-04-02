@@ -136,6 +136,7 @@ public class BroadcastChannel {
     }
 
     private void transmitToReceiver(ReceivingCircuit r) {
-        r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getLength()));
+        if (r.getLength()!=0)
+            r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getLength()));
     }
 }

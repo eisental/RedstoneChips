@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;

@@ -490,9 +490,10 @@ public class CommandHandler {
         rc.getCircuitManager().destroyCircuit(c, sender);
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, sender);
-        Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
-        newCircuit.id = id;
+        Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);        
+        
         if (newCircuit!=null) {
+            newCircuit.id = id;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefsManager().getInfoColor() + " circuit is reactivated.");
         }
