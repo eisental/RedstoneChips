@@ -32,7 +32,7 @@ public class PrefsManager {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        enableDestroyCommand;
+        signColor, rightClickToActivate, enableDestroyCommand;
     };
 
     private RedstoneChips rc;
@@ -45,6 +45,10 @@ public class PrefsManager {
     private ChatColor infoColor;
     private ChatColor errorColor;
     private ChatColor debugColor;
+
+    private String signColor;
+
+    private boolean rightClickToActivate;
 
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
@@ -200,6 +204,17 @@ public class PrefsManager {
     }
 
     /**
+     * 
+     * @return The current sign activation color code. A hex value between 0-f.
+     */
+    public String getSignColor() {
+        return signColor;
+    }
+
+    public boolean getRightClickToActivate() {
+        return rightClickToActivate;
+    }
+    /**
      *
      * @return The current debug chat message color preference value.
      */
@@ -292,6 +307,10 @@ public class PrefsManager {
         infoColor = ChatColor.valueOf((String)toapply.get(Prefs.infoColor.name()));
         errorColor = ChatColor.valueOf((String)toapply.get(Prefs.errorColor.name()));
         debugColor = ChatColor.valueOf((String)toapply.get(Prefs.debugColor.name()));
+
+        signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
+        
+        rightClickToActivate = Boolean.parseBoolean(toapply.get(Prefs.rightClickToActivate.name()).toString());
 
         prefs.putAll(toapply);
     }

@@ -1,45 +1,60 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.87
+version: 0.88
 author: eisental
 description: Core plugin for integrated redstone circuits 
 website: eisental.github.com/RedstoneChips
 commands:
-  rc-list:
+  rclist:
     description: Prints a list of active chips including their id numbers and locations.
-    usage: /<command>
-  rc-classes:
+  rcclasses:
     description: Prints a list of installed circuit classes.
-    usage: /<command>
-  rc-prefs:
+  rcprefs:
     description: Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
-      To change a specific value use /rc-prefs <pref key> <new value>.
-  rc-debug:
+      To change a specific value use /rcprefs <pref key> <new value>.
+  rcdebug:
     description: Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish
-      to debug or by using /rc-debug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use /rc-debug off or /rc-debug <chip id> off. To stop receiving debug messages from all circuits use /rc-debug alloff
-  rc-pin:
+      to debug or by using /rcdebug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use /rcdebug off or /rcdebug <chip id> off. To stop receiving debug messages from all circuits use /rcdebug alloff
+  rcpin:
     description: Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
       source to use.
-  rc-destroy:
+  rcactivate:
+    description: Activates a circuit. Point the circuit sign and execute the command. To activate a circuit built with different
+      input, output or interface block types then set in the preferences use /rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType> .
+  rcdestroy:
     description: Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter
-                 the command. This command is disabled by default. To enable it use /rc-prefs enableDestroyCommand true.
-  rc-break:
+                 the command. This command is disabled by default. To enable it use /rcprefs enableDestroyCommand true.
+  rcbreak:
     description: Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
-  rc-type:
+  rctype:
     description: Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
-  rc-reset:
+  rcreset:
     description: Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using
       the chip's id number as an argument if you have admin priviliges.
-  rc-channels:
-    description: Prints a list of currently used wireless broadcast channels. Use /rc-channels <channel name> to get more info about a specific channel.
-  rc-info:
+  rcchannels:
+    description: Prints a list of currently used wireless broadcast channels. Use /rcchannels <channel name> to get more info about a specific channel.
+  rcinfo:
     description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
-  rc-save:
+  rccuboid:
+    description: A command for mass editing circuits in a cuboid. To define a cuboid type /rccuboid and left-click on two opposite corners of
+      your cuboid. After it's defined you can execute any of the following commands.
+        /rccuboid activate - Activate any circuits whose sign is inside the region.
+        /rccuboid activate <input type> <output type> <interface block type> - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks.
+        Once the circuit is activated the i/o blocks are replaced to the currently used types.
+        /rccuboid forceblocks - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
+        /rccuboid break - Deactivate every active circuit in the cuboid.
+        /rccuboid destroy - Deactivates and removes blocks of every active circuit in the cuboid.
+        /rccuboid reset - Reset every active circuit in the cuboid.
+  rcarg:
+    description: Allow for making changes to the circuits sign arg. Causes the circuit to reset. Use by pointing at the circuit sign before running the command.
+      To change the value of a sign argument type /rcarg followed by a list of arguments as they appear on the sign or use /rcarg <arg number>:<arg value>.
+      The argment count starts at 0. You can use /rcarg with any number of arguments, for ex. /rcarg 1:15 2:mod 6 will set 1st arg to '6', 2nd arg to '15' and 3rd arg to 'mod'.
+  rcsave:
     description: Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save.
-  rc-load:
+  rcload:
     description: Reloads circuit data from file. Will reset any changes since last save. 
-  rc-help:
-    description: Prints a list or description of all RedstoneChips commands. Use /rc-help <command name> to get help about a specific command.
+  rchelp:
+    description: Prints a list or description of all RedstoneChips commands. Use /rchelp <command name> to get help about a specific command.
 
 
 

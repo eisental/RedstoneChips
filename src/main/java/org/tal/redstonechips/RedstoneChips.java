@@ -156,8 +156,14 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onPlayerInteract(PlayerInteractEvent event) {
-                if (event.getAction()==Action.RIGHT_CLICK_BLOCK)
-                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer());
+                if ((event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate()) ||
+                        (event.getAction()==Action.RIGHT_CLICK_BLOCK && prefsManager.getRightClickToActivate()))
+                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(),
+                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
+
+                if (event.getAction()==Action.RIGHT_CLICK_BLOCK && !event.getPlayer().getItemInHand().getType().isBlock()) {
+                    commandHandler.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
+                }
             }
         };
 
@@ -239,56 +245,47 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("rc-list")) {
+        if (cmd.getName().equalsIgnoreCase("rclist")) {
             commandHandler.listActiveCircuits(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-classes")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcclasses")) {
             commandHandler.listCircuitClasses(sender);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-prefs")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcprefs")) {
             commandHandler.prefsCommand(args, sender);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-debug")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcdebug")) {
             commandHandler.debugCommand(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-pin")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcpin")) {
             commandHandler.pinCommand(sender);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-destroy")) {
-            boolean enableDestroyCommand = (Boolean)prefsManager.getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
-            if (enableDestroyCommand) {
-                commandHandler.destroyCommand(sender);
-            } else sender.sendMessage(prefsManager.getErrorColor()+"/rc-destroy is disabled. You can enable it using /rc-prefs enableDestroyCommand true");
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-break")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcactivate")) {
+            commandHandler.activateCommand(sender, args);
+        } else if (cmd.getName().equalsIgnoreCase("rcdestroy")) {
+            commandHandler.destroyCommand(sender);
+        } else if (cmd.getName().equalsIgnoreCase("rcbreak")) {
             commandHandler.deactivateCommand(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-type")) {
+        } else if (cmd.getName().equalsIgnoreCase("rctype")) {
             commandHandler.handleRcType(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-reset")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcreset")) {
             commandHandler.resetCircuit(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-info")) {
-            commandHandler.printCircuitInfo(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-channels")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcinfo")) {
+            commandHandler.infoCommand(sender, args);
+        } else if (cmd.getName().equalsIgnoreCase("rcchannels")) {
             commandHandler.listBroadcastChannels(sender, args);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-save")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcarg")) {
+            commandHandler.argumentCommand(sender, args);
+        } else if (cmd.getName().equalsIgnoreCase("rccuboid")) {
+            commandHandler.cuboidCommand(sender, args);
+        } else if (cmd.getName().equalsIgnoreCase("rcsave")) {
             if (sender.isOp())
                 saveCircuits();
             else sender.sendMessage(prefsManager.getErrorColor() + "Only ops (admins) are allowed to use this command.");
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-load")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcload")) {
             if (sender.isOp())
                 circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
             else sender.sendMessage(prefsManager.getErrorColor() + "Only ops (admins) are allowed to use this command.");
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("rc-help")) {
+        } else if (cmd.getName().equalsIgnoreCase("rchelp")) {
             commandHandler.commandHelp(sender, args);
-            return true;
         } else return false;
+
+        return true;
     }
 
     void log(Level level, String message) {

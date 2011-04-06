@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
+import org.bukkit.material.Lever;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
@@ -80,7 +81,7 @@ public abstract class Circuit {
     /**
      * When set to true any input changes will be ignored.
      */
-    protected boolean inputsDisabled = false;
+    protected boolean inputsDisabled;
 
     /**
      * The circuits id. Set by CircuitManager.
@@ -98,6 +99,7 @@ public abstract class Circuit {
         debuggers = new ArrayList<CommandSender>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
+        inputsDisabled = false;
         this.args = args;
 
         updateInputBits();
@@ -406,4 +408,46 @@ public abstract class Circuit {
      * @return true if the circuit's inputs are disabled.
      */
     public boolean isDisabled() { return inputsDisabled; }
+
+    public void forceIOBlockMaterials() {
+        int inputType = redstoneChips.getPrefsManager().getInputBlockType().getItemTypeId();
+        byte inputData = redstoneChips.getPrefsManager().getInputBlockType().getData();
+
+        int outputType = redstoneChips.getPrefsManager().getOutputBlockType().getItemTypeId();
+        byte outputData = redstoneChips.getPrefsManager().getOutputBlockType().getData();
+
+        int interfaceType = redstoneChips.getPrefsManager().getInterfaceBlockType().getItemTypeId();
+        byte interfaceData = redstoneChips.getPrefsManager().getInterfaceBlockType().getData();
+
+        for (InputPin i : inputs) {
+            i.getInputBlock().getBlock().setTypeIdAndData(inputType, inputData, false);
+        }
+
+        for (Location o : outputs) {
+            Block leverBlock = o.getBlock();
+            Lever l = new Lever(leverBlock.getType(), leverBlock.getData());
+            Block b = leverBlock.getFace(l.getAttachedFace());
+            b.setTypeIdAndData(outputType, outputData, false);
+        }
+
+        for (Location t : interfaceBlocks) {
+            t.getBlock().setTypeIdAndData(interfaceType, interfaceData, false);
+        }
+    }
+
+    public void updateCircuitSign(boolean activated) {
+        Sign sign = (Sign)activationBlock.getBlock().getState();
+        String line;
+        if (activated) {
+            String signColor = redstoneChips.getPrefsManager().getSignColor();            
+            line = (char)167 + signColor + this.getCircuitClass();
+        } else {
+            line = this.getCircuitClass();
+        }
+
+        if (!line.equals(sign.getLine(0))) {
+            sign.setLine(0, line);
+            sign.update();
+        } 
+    }
 }

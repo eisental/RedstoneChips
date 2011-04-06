@@ -57,6 +57,7 @@ public class CircuitPersistence {
                         Circuit c = parseCircuitMap(circuitMap);
                         if (c.id==-1) c.id = circuits.size();
                         circuits.put(c.id, c);
+                        c.updateCircuitSign(true);
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                         backupCircuitsFile();
@@ -65,6 +66,9 @@ public class CircuitPersistence {
                         backupCircuitsFile();
                     } catch (IllegalAccessException ex) {
                         rc.log(Level.WARNING, ex.toString());
+                        backupCircuitsFile();
+                    } catch (Throwable t) {
+                        rc.log(Level.SEVERE, t.toString());
                         backupCircuitsFile();
                     }
                 }
