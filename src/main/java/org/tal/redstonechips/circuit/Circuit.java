@@ -168,20 +168,25 @@ public abstract class Circuit {
     protected abstract boolean init(CommandSender sender, String[] args);
 
     /**
-     * Called when the plugin needs to save the circuits state to disk.
+     * Called when the plugin needs to save the circuits state to disk or when using /rc-info.
      * The circuit should return a map containing any data needed to bring the circuit back to its current state
      * after a server restart.
      *
      * @return Map containing state data.
      */
-    public Map<String,String> saveState() { return new HashMap<String,String>(); }
+    public Map<String,String> getInternalState() { return new HashMap<String,String>(); }
+
+    /**
+     * Called whenever the plugin is requested to save it's data. 
+     */
+    public void save() { }
 
     /**
      * Called when the plugin loads a circuit from disk after a server restart.
      *
      * @param state Map containing state data that was read from file. should hold the same data that was returned by saveState()
      */
-    public void loadState(Map<String,String> state) {}
+    public void setInternalState(Map<String,String> state) {}
 
     /**
      * Called when the circuit is physically destroyed.
@@ -409,7 +414,7 @@ public abstract class Circuit {
      */
     public boolean isDisabled() { return inputsDisabled; }
 
-    public void forceIOBlockMaterials() {
+    public void fixIOBlocks() {
         int inputType = redstoneChips.getPrefsManager().getInputBlockType().getItemTypeId();
         byte inputData = redstoneChips.getPrefsManager().getInputBlockType().getData();
 

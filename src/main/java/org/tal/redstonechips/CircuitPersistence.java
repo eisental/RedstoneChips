@@ -94,8 +94,11 @@ public class CircuitPersistence {
             rc.log(Level.WARNING, "No circuits were found. There was probably a loading error.");
             return;
         }
-        for (Circuit c : circuits.values())
+        
+        for (Circuit c : circuits.values()) {
             circuitMaps.add(this.circuitToMap(c));
+            c.save();
+        }
         
         try {
             yaml.dump(circuitMaps, new FileWriter(file));
@@ -114,7 +117,7 @@ public class CircuitPersistence {
         map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
         map.put("structure", makeBlockListsList(c.structure));
         map.put("signArgs", c.args);
-        map.put("state", c.saveState());
+        map.put("state", c.getInternalState());
         map.put("id", c.id);
 
         return map;
@@ -133,7 +136,7 @@ public class CircuitPersistence {
         List<String> signArgs = (List<String>)map.get("signArgs");
         c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
         if (map.containsKey("id")) c.id = (Integer)map.get("id");
-        c.loadState((Map<String,String>)map.get("state"));
+        c.setInternalState((Map<String,String>)map.get("state"));
         return c;
     }
 

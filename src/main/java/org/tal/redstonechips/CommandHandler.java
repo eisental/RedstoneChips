@@ -308,7 +308,7 @@ public class CommandHandler {
 
         sender.sendMessage(infoColor + "sign args: " + extraColor + signargs);
 
-        Map<String,String> internalState = c.saveState();
+        Map<String,String> internalState = c.getInternalState();
         if (!internalState.isEmpty()) {
             sender.sendMessage(infoColor + "internal state:");
             for (String key : internalState.keySet())
@@ -587,6 +587,34 @@ public class CommandHandler {
         rc.getCircuitManager().resetCircuit(c, sender);
     }
 
+    public void fixIOBlocksCommand(CommandSender sender, String[] args) {
+        Circuit c;
+
+        if (args.length>0) { // use circuit id.
+            if (!sender.isOp()) {
+                sender.sendMessage("Only ops (admins) are allowed to use this command with a circuit id.");
+                return;
+            }
+
+            try {
+                int id = Integer.decode(args[0]);
+                c = rc.getCircuitManager().getCircuits().get(id);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Invalid circuit id: " + id + ".");
+                    return;
+                }
+            } catch (NumberFormatException ne) {
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a number.");
+                return;
+            }
+        } else { // use targeted circuit
+            c = findTargetCircuit(sender);
+            if (c==null) return;
+        }
+
+        c.fixIOBlocks();
+    }
+
     public void argumentCommand(CommandSender sender, String[] args) {
         Player player = checkIsPlayer(sender);
         if (player==null) return;
@@ -713,17 +741,17 @@ public class CommandHandler {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
                     rc.getCircuitManager().destroyCircuit(c, sender, true);
-            } else if (args[0].equalsIgnoreCase("forceblocks")) {
+            } else if (args[0].equalsIgnoreCase("fixioblocks")) {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
-                    c.forceIOBlockMaterials();
+                    c.fixIOBlocks();
             } else if (args[0].equalsIgnoreCase("clear")) {
                 playerCuboids.remove(p);
                 definingCuboids.remove(p);
                 sender.sendMessage("The cuboid is cleared.");
             }
 
-            long delta = System.nanoTime()/start;
+            long delta = System.nanoTime()-start;
             String timing = String.format( "%.3fms", (float)delta / 1000000d );
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid command finished in " + timing + ".");
 

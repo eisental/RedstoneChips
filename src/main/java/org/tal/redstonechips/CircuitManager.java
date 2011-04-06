@@ -217,7 +217,7 @@ public class CircuitManager {
         checkForChipBlockOnSideFace(params);
 
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
-        Block up = params.origin.getFace(BlockFace.UP);
+        Block up = origin.getFace(BlockFace.UP);
 
         if (!params.structure.contains(up) && up.getType()==params.chipMaterial) {
             params.structure.add(up);
@@ -227,7 +227,7 @@ public class CircuitManager {
         }
 
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
-        Block down = params.origin.getFace(BlockFace.DOWN);
+        Block down = origin.getFace(BlockFace.DOWN);
 
         if (!params.structure.contains(down) && down.getType()==params.chipMaterial) {
             params.structure.add(down);
@@ -285,6 +285,21 @@ public class CircuitManager {
         }
     }
 
+    private void checkForChipBlockOnSideFace(ScanParameters params) {
+        Block b = params.origin.getFace(params.direction);
+        if (!params.structure.contains(b)) {
+            if (b.getType()==params.chipMaterial) {
+                params.structure.add(b);
+                Block origin = params.origin;
+                params.origin = b;
+
+                scanBranch(params);
+
+                params.origin = origin;
+            }
+        }
+    }
+
     private Block findLeverAround(Block b) {
         Block up = b.getFace(BlockFace.UP);
         Block north = b.getFace(BlockFace.NORTH);
@@ -302,17 +317,6 @@ public class CircuitManager {
         if (leverCount>1) throw new IllegalArgumentException("An output block has more than one lever connected to it.");
         else if (leverCount==0) throw new IllegalArgumentException("A lever is missing from one or more outputs.");
         else return ret;
-    }
-
-    private void checkForChipBlockOnSideFace(ScanParameters params) {
-        Block b = params.origin.getFace(params.direction);
-        if (!params.structure.contains(b)) {
-            if (b.getType()==params.chipMaterial) {
-                params.structure.add(b);
-                params.origin = b;
-                scanBranch(params);
-            }
-        }
     }
 
     private static BlockFace getLeftFace(BlockFace direction) {

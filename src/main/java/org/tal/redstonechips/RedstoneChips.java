@@ -273,6 +273,8 @@ public class RedstoneChips extends JavaPlugin {
             commandHandler.argumentCommand(sender, args);
         } else if (cmd.getName().equalsIgnoreCase("rccuboid")) {
             commandHandler.cuboidCommand(sender, args);
+        } else if (cmd.getName().equalsIgnoreCase("rcfixioblocks")) {
+            commandHandler.fixIOBlocksCommand(sender, args);
         } else if (cmd.getName().equalsIgnoreCase("rcsave")) {
             if (sender.isOp())
                 saveCircuits();
