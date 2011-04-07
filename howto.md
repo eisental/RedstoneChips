@@ -102,6 +102,5 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 
 ##### Other 
 - `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).
-## sign activation color
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
 - `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
