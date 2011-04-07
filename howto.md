@@ -37,34 +37,34 @@ __Power tools__, however, will not cause it to decativate and can result in "pha
 Plugin commands
 ----------------
 
-- `/rclist` - Prints a list of active chips including their id numbers and locations.
-- `/rcclasses` - Prints a list of installed circuit classes.
-- `/rcprefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
+- `/rclist` Prints a list of active chips including their id numbers and locations.
+- `/rcclasses` Prints a list of installed circuit classes.
+- `/rcprefs` Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
       To change a specific value use `/rcprefs <pref key> <new value>`.
-- `/rcdebug` - Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use `/rcdebug off` or `/rcdebug <chip id>` off. To stop receiving debug messages from all circuits use `/rcdebug alloff`.
-- `/rcpin` - Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
+- `/rcdebug` Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use `/rcdebug off` or `/rcdebug <chip id>` off. To stop receiving debug messages from all circuits use `/rcdebug alloff`.
+- `/rcpin` Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
       source to use.
-- `/rcactivate` - Activates a circuit. Point at the circuit sign and execute the command. To activate a circuit built with other
+- `/rcactivate` Activates a circuit. Point at the circuit sign and execute the command. To activate a circuit built with other
       input, output and interface block types than set in the preferences use `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`.
-- `/rcdestroy` - Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
-- `/rcbreak` - Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
-- `/rctype` - Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
-- `/rcreset` - Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
-- `/rcfixioblocks` - Updates all input, output, and interface blocks of a circuit to match the currently used block types.
-- `/rcarg` - Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by pointing at the circuit you want to edit and running `/rcarg <arg number> <arg value>`. `[arg number]` is the argument number you want to change, starting with argument no. 1. To add a new argument use `/rcarg add <arg value>`. To remove an argument use `/rcarg clear <arg number>`.
-- `/rcsel` -  command for mass editing circuits within a selection cuboid. To define a selection type `/rcsel` and right-click on two opposite corners of
+- `/rcdestroy` Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
+- `/rcbreak` Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+- `/rctype` Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
+- `/rcreset` Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
+- `/rcfixioblocks` Updates all input, output, and interface blocks of a circuit to match the currently used block types.
+- `/rcarg` Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by pointing at the circuit you want to edit and running `/rcarg <arg number> <arg value>`. `[arg number]` is the argument number you want to change, starting with argument no. 1. To add a new argument use `/rcarg add <arg value>`. To remove an argument use `/rcarg clear <arg number>`.
+- `/rcsel`  command for mass editing circuits within a selection cuboid. To define a selection type `/rcsel` and right-click on two opposite corners of
       your cuboid. Once it's defined you can execute any of the following       
-	- `/rcsel activate` - Activate any circuits whose sign is inside the region.
-	- `/rcsel activate <input type> <output type> <interface block type>` - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o 	blocks. Once the circuit is activated the i/o blocks are replaced to the currently used types.
-	- `/rcsel fixioblocks` - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
-	- `/rcsel break` - Deactivate every active circuit in the cuboid.
-	- `/rcsel destroy` - Deactivates and removes blocks of every active circuit in the cuboid.
-	- `/rcsel reset` - Reset every active circuit in the cuboid.              
-- `/rcchannels` - Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
-- `/rcinfo` - Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
-- `/rchelp` - Prints a list or description of all RedstoneChips commands. Use `/rchelp <command name>` to get help about a specific command.
-- `/rcsave` - Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
-- `/rcload` - Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
+	- `/rcsel activate` Activate any circuits whose sign is inside the region.
+	- `/rcsel activate <input type> <output type> <interface block type>` Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o 	blocks. Once the circuit is activated the i/o blocks are replaced to the currently used types.
+	- `/rcsel fixioblocks` Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
+	- `/rcsel break` Deactivate every active circuit in the cuboid.
+	- `/rcsel destroy` Deactivates and removes blocks of every active circuit in the cuboid.
+	- `/rcsel reset` Reset every active circuit in the cuboid.              
+- `/rcchannels` Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
+- `/rcinfo` Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+- `/rchelp` Prints a list or description of all RedstoneChips commands. Use `/rchelp <command name>` to get help about a specific command.
+- `/rcsave` Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
+- `/rcload` Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
 
 
 Chip detection scanning rules (for the advanced RC user...)
