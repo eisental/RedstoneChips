@@ -615,7 +615,9 @@ public class CommandHandler {
         c.fixIOBlocks();
     }
 
-    public void argumentCommand(CommandSender sender, String[] args) {
+    public void argumentCommand(CommandSender sender, String[] cmdArgs) {
+        int idx;
+
         Player player = checkIsPlayer(sender);
         if (player==null) return;
 
@@ -626,47 +628,100 @@ public class CommandHandler {
             return;
         }
 
-        if (args.length<2) {
-            player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad syntax. Expecting /rcarg <arg number> <arg value>.");
+        if (cmdArgs.length<2) {
+            player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad syntax. Expecting /rcarg [arg number] <arg value>.");
             return;
         }
 
-        try {
-            int idx = Integer.decode(args[0]);
+        if (cmdArgs[0].equalsIgnoreCase("clear")) {
+            int clearIdx;
+
+            try {
+                clearIdx = Integer.decode(cmdArgs[1]) - 1;
+            } catch (NumberFormatException ne) {
+                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument number: " + cmdArgs[1]);
+                return;
+            }
+
+            if (clearIdx>=c.args.length || clearIdx<0) {
+                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Argument number out of bounds: " + (clearIdx+1));
+                return;
+            }
+
+            String[] tempArgs = new String[c.args.length-1];
+            int tempIdx = 0;
+            for (int i=0; i<c.args.length; i++) {
+                if (i!=clearIdx) {
+                    tempArgs[tempIdx] = c.args[i];
+                    tempIdx++;
+                }
+            }
+
+            player.sendMessage(rc.getPrefsManager().getInfoColor() + "Removing argument #" + (clearIdx+1) + ": " + c.args[clearIdx]);
+
+            c.args = tempArgs;
+        } else {
+            if (cmdArgs[0].equalsIgnoreCase("add")) idx = c.args.length;
+            else {
+                try {            
+                    idx = Integer.decode(cmdArgs[0]) - 1;
+                } catch (NumberFormatException ne) {
+                    player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument number: " + cmdArgs[0]);
+                    return;
+                }
+            }
 
             String arg = "";
-            for (int i=1; i<args.length; i++) arg += args[i] + " ";
-            arg = arg.substring(0, arg.length()-1);
+
+            for (int i=1; i<cmdArgs.length; i++) {
+                arg += cmdArgs[i] + " ";
+            }
+            if (!arg.isEmpty()) arg = arg.substring(0, arg.length()-1);
 
             if (idx>c.args.length || idx<0) {
-                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Argument number out of bounds: " + idx);
+                player.sendMessage(rc.getPrefsManager().getErrorColor() + "Argument number out of bounds: " + (idx+1));
+                return;
             } else {
                 if (idx==c.args.length) {
                     // add to last
+                    player.sendMessage(rc.getPrefsManager().getInfoColor() + "Adding argument #" + (idx+1) + ": " + arg);
                     String[] tempArgs = new String[c.args.length+1];
                     System.arraycopy(c.args, 0, tempArgs, 0, c.args.length);
                     tempArgs[tempArgs.length-1] = arg;
+                    c.args = tempArgs;
                 } else {
+                    player.sendMessage(rc.getPrefsManager().getInfoColor() + "Setting argument #" + (idx+1) + " to " + arg + " (was " + c.args[idx] + ").");
                     c.args[idx] = arg;
                 }
-
-                Sign sign = (Sign)c.activationBlock.getBlock().getState();
-
-                for (int i=0; i<c.args.length; i++) {
-                    String a = c.args[i];
-
-                    //if (c.args.length>3) // try to word wrap the args putting more than 1 per line.
-                        //TODO: do something
-                    //else // put each arg on a separate line
-                      //  sign.setLine(i,a);
-
-                }
-
-
             }
-        } catch (NumberFormatException ne) {
-            player.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad argument number: " + args[0]);
         }
+
+        final Sign sign = (Sign)c.activationBlock.getBlock().getState();
+        String line = "";
+        int curLine = 1;
+
+        for (int i=0; i<c.args.length; i++) {
+            String a = c.args[i];
+            String added = line + " " + a;
+            if (added.length()>13 && curLine!=3) {
+                sign.setLine(curLine, line);
+                line = a;
+                curLine++;
+            } else line = added;
+        }
+
+        sign.setLine(curLine, line);
+
+
+        rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
+            @Override
+            public void run() {
+                sign.update();
+            }
+        });
+        sign.update();
+
+        rc.getCircuitManager().resetCircuit(c, sender);
     }
 
     public void cuboidCommand(CommandSender sender, String[] args) {
@@ -769,7 +824,7 @@ public class CommandHandler {
             } else if (coords.size()==2) {
                 p.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid defined: " + coords.get(0).getBlockX() + "," + coords.get(0).getBlockY() + "," + coords.get(0).getBlockZ()
                         + " to " + coords.get(1).getBlockX() + "," + coords.get(1).getBlockY() + "," + coords.get(1).getBlockZ());
-                p.sendMessage(rc.getPrefsManager().getInfoColor() + "You can now use any of the /rcsel commands. Type /rcsel clear to clear your cuboid.");
+                p.sendMessage(rc.getPrefsManager().getInfoColor() + "You can now use any of the /rcsel commands. Type /rcsel clear to clear your selection.");
                 definingCuboids.remove(p);
             }
 

@@ -48,9 +48,9 @@ commands:
         /rcsel destroy - Deactivates and removes blocks of every active circuit in the cuboid.
         /rcsel reset - Reset every active circuit in the cuboid.
   rcarg:
-    description: Allow for making changes to the circuits sign arg. Causes the circuit to reset. Use by pointing at the circuit sign before running the command.
-      To change the value of a sign argument type /rcarg followed by a list of arguments as they appear on the sign or use /rcarg <arg number>:<arg value>.
-      The argment count starts at 0. You can use /rcarg with any number of arguments, for ex. /rcarg 1:15 2:mod 6 will set 1st arg to '6', 2nd arg to '15' and 3rd arg to 'mod'.
+    description: Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by
+      pointing at the circuit you want to edit and running /rcarg <arg number> <arg value>. [arg number] is the argument number you want to change, starting with argument 1. 
+      To add a new argument use /rcarg add <arg value>. To remove an argument use /rcarg clear <arg number>.
   rcsave:
     description: Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save.
   rcload:
