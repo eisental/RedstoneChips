@@ -37,16 +37,16 @@ commands:
     description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
   rcfixioblocks:
     description: Updates all input, output, and interface blocks of a circuit to match the currently used block types.
-  rccuboid:
-    description: A command for mass editing circuits in a cuboid. To define a cuboid type /rccuboid and left-click on two opposite corners of
-      your cuboid. After it's defined you can execute any of the following commands.
-        /rccuboid activate - Activate any circuits whose sign is inside the region.
-        /rccuboid activate <input type> <output type> <interface block type> - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks.
+  rcsel:
+    description: A command for mass editing circuits within a selection cuboid. To define a selection type /rcsel and right-click on two opposite corners of
+      your cuboid. Once it's defined you can execute any of the following commands.
+        /rcsel activate - Activate any circuits whose sign is inside the region.
+        /rcsel activate <input type> <output type> <interface block type> - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks.
         Once the circuit is activated the i/o blocks are replaced to the currently used types.
-        /rccuboid fixioblocks - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
-        /rccuboid break - Deactivate every active circuit in the cuboid.
-        /rccuboid destroy - Deactivates and removes blocks of every active circuit in the cuboid.
-        /rccuboid reset - Reset every active circuit in the cuboid.
+        /rcsel fixioblocks - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
+        /rcsel break - Deactivate every active circuit in the cuboid.
+        /rcsel destroy - Deactivates and removes blocks of every active circuit in the cuboid.
+        /rcsel reset - Reset every active circuit in the cuboid.
   rcarg:
     description: Allow for making changes to the circuits sign arg. Causes the circuit to reset. Use by pointing at the circuit sign before running the command.
       To change the value of a sign argument type /rcarg followed by a list of arguments as they appear on the sign or use /rcarg <arg number>:<arg value>.

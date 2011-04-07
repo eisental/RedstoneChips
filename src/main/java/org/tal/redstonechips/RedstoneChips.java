@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -161,7 +162,7 @@ public class RedstoneChips extends JavaPlugin {
                     circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(),
                             prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
 
-                if (event.getAction()==Action.RIGHT_CLICK_BLOCK && !event.getPlayer().getItemInHand().getType().isBlock()) {
+                if (event.getAction()==Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType()==Material.AIR)) {
                     commandHandler.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
                 }
             }
@@ -271,7 +272,7 @@ public class RedstoneChips extends JavaPlugin {
             commandHandler.listBroadcastChannels(sender, args);
         } else if (cmd.getName().equalsIgnoreCase("rcarg")) {
             commandHandler.argumentCommand(sender, args);
-        } else if (cmd.getName().equalsIgnoreCase("rccuboid")) {
+        } else if (cmd.getName().equalsIgnoreCase("rcsel")) {
             commandHandler.cuboidCommand(sender, args);
         } else if (cmd.getName().equalsIgnoreCase("rcfixioblocks")) {
             commandHandler.fixIOBlocksCommand(sender, args);

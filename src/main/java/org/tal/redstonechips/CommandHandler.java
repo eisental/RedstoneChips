@@ -675,7 +675,7 @@ public class CommandHandler {
 
         if (args.length==0) {
             if (playerCuboids.containsKey(p))
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Clearing previous cuboid coordinates.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Clearing previous selection coordinates.");
 
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid. Right-clicking while holding a block in hand is ignored.");
             definingCuboids.add(p);
@@ -684,7 +684,7 @@ public class CommandHandler {
             long start = System.nanoTime();
             List<Location> cuboid = playerCuboids.get(p);
             if (cuboid==null) {
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to first define a cuboid. Use /rccuboid with no arguments and left-click two opposite corners to define.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to first define a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
             }
             if (args[0].equalsIgnoreCase("activate")) {
                 MaterialData inputBlockType, outputBlockType, interfaceBlockType;
@@ -695,7 +695,7 @@ public class CommandHandler {
                     interfaceBlockType = rc.getPrefsManager().getInterfaceBlockType();
                 } else {
                     if (args.length!=4) {
-                        p.sendMessage("Bad syntax. Expecting /rccuboid activate [inputBlockType] [outputBlockType] [interfaceBlockType]");
+                        p.sendMessage("Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <interfaceBlockType>]");
                         return;
                     }
                     try {
@@ -748,12 +748,12 @@ public class CommandHandler {
             } else if (args[0].equalsIgnoreCase("clear")) {
                 playerCuboids.remove(p);
                 definingCuboids.remove(p);
-                sender.sendMessage("The cuboid is cleared.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "The cuboid is cleared.");
             }
 
             long delta = System.nanoTime()-start;
             String timing = String.format( "%.3fms", (float)delta / 1000000d );
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid command finished in " + timing + ".");
+            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Mass edit finished in " + timing + ".");
 
         }
     }
@@ -769,7 +769,7 @@ public class CommandHandler {
             } else if (coords.size()==2) {
                 p.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid defined: " + coords.get(0).getBlockX() + "," + coords.get(0).getBlockY() + "," + coords.get(0).getBlockZ()
                         + " to " + coords.get(1).getBlockX() + "," + coords.get(1).getBlockY() + "," + coords.get(1).getBlockZ());
-                p.sendMessage(rc.getPrefsManager().getInfoColor() + "You can now use any of the /rccuboid commands. Type /rccuboid clear to clear your cuboid.");
+                p.sendMessage(rc.getPrefsManager().getInfoColor() + "You can now use any of the /rcsel commands. Type /rcsel clear to clear your cuboid.");
                 definingCuboids.remove(p);
             }
 
