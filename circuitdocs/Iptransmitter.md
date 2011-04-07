@@ -10,7 +10,7 @@ You can use it together with ipreceiver to send and receive bits between minecra
 Set your message in the input data pins, then set the send pin (input 0) on to send the message.
 An iptransmitter with only 1 input is also possible. In that case whenever the input changes its state the new value is sent.
 
-To change the range of authorized port numbers, use `/rc-prefs iptransmitter.ports <range>`.
+To change the range of authorized port numbers, use `/rcprefs iptransmitter.ports <range>`.
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 

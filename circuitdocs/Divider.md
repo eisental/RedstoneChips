@@ -4,11 +4,10 @@ title: divider
 ---
 
 Performs an arithmetic division on any number of bit sets and outputs the result as a binary number.
-The 1st sign argument should note how many bits each input number is using.
-If an optional constant argument is added to the sign text, the IC will divide the result by the constant.
+The 1st sign argument should note how many bits each input number is using. If an optional constant argument is added to the sign text, the IC will divide the result by the constant.
 
-Using a 3rd sign argument with the word `round` will cause the result to be rounded to the closest integer, otherwise the result is truncated, effectively always rounded downwards. 
-Using a 3rd argument with the word `mod` makes the divider run in modulus mode. In this mode the division result is truncated as usual and output to the 1st wordlength number of output pins, while the modulus remainder is output to the next output pins. The remainder requires a maximum of wordlength-1 number of output pins. 
+Using a 3rd sign argument with the word `round` will cause the result to be rounded to the closest integer, otherwise the result is truncated, effectively always rounded down. 
+Using a 3rd argument with the word `mod` makes the divider run in modulus mode. In this mode the division result is truncated as usual and sent out to the 1st wordlength number of output pins, while the modulus remainder is output to any extra output pins. 
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/divider.java)
 

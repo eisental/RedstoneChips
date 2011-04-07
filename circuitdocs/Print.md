@@ -23,7 +23,7 @@ This mode requires an extra clear pin after the clock pin. When the clear pin is
 and in addition requires a scroll pin. When the scroll pin is triggered the part of the text displayed on the sign is updated to start with the next character.
 Connecting a clock to this pin create a scrolling effect. Once the end of the buffered text is reached the sign will continue scrolling from its 1st character again.
 
-It's possible to directly edit the text on the output signs by pointing at the circuit's activation sign and entering the `/rc-type <sign text>` command.
+It's possible to directly edit the text on the output signs by pointing at the circuit's activation sign and entering the `/rctype <sign text>` command.
 If the circuit is using add or scroll mode the new text will be added to the previous sign text.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/print.java)
