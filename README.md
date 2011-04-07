@@ -21,6 +21,18 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.88 (07/04/11)
+- New /rcsel command for mass editing circuits in a cuboid. It's possible to use it for activating, destroying reseting or fixing i/o block types of circuits.
+- New /rcactivate command for activating circuits possibly with different i/o block types than currently set.
+- New /rcarg command for editing/adding/clearing sign arguments of a circuit.
+- New /rcfixioblocks command for changing input, output and interface block types of a circuit to match the current setting. 
+- Active circuits will have their class name colored (in red by default). It's possible to change the color using the signColor preference key.
+- Removed dashes from command names. /rc-debug becomes /rcdebug, /rc-info becomes /rcinfo, etc.
+- Circuit activation is now done by LEFT-clicking the circuit's sign. A preference key can be set to revert back to right-click.
+- Any kind of loading error will now trigger a circuits file backup.
+- Added hex representation of input and output states in /rcinfo.
+- Fixed bug where receivers with 0 outputs were allowed and caused an exception.
+
 #### RedstoneChips 0.87 (30/03/11)
 - Complete rewrite of the broadcast channels system.
 - transmitters and receivers can work with a selected part of the broadcast channel. Use <channel name>:<start bit> as the channel sign arg to set the 1st bit in the channel 
