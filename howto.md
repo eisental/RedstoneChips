@@ -36,6 +36,7 @@ __Power tools__, however, will not cause it to decativate and can result in "pha
 
 Plugin commands
 ----------------
+
 - `/rclist` - Prints a list of active chips including their id numbers and locations.
 - `/rcclasses` - Prints a list of installed circuit classes.
 - `/rcprefs` - Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
@@ -52,15 +53,14 @@ Plugin commands
 - `/rcfixioblocks` - Updates all input, output, and interface blocks of a circuit to match the currently used block types.
 - `/rcarg` - Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by pointing at the circuit you want to edit and running `/rcarg <arg number> <arg value>`. `[arg number]` is the argument number you want to change, starting with argument no. 1. To add a new argument use `/rcarg add <arg value>`. To remove an argument use `/rcarg clear <arg number>`.
 - `/rcsel` -  command for mass editing circuits within a selection cuboid. To define a selection type `/rcsel` and right-click on two opposite corners of
-      your cuboid. Once it's defined you can execute any of the following commands.
-       
-       
-       - `/rcsel activate` - Activate any circuits whose sign is inside the region.
-       - `/rcsel activate <input type> <output type> <interface block type>` - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks. Once the circuit is activated the i/o blocks are replaced to the currently used types.
-       - `/rcsel fixioblocks` - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
-       - `/rcsel break` - Deactivate every active circuit in the cuboid.
-       - `/rcsel destroy` - Deactivates and removes blocks of every active circuit in the cuboid.
-       - `/rcsel reset` - Reset every active circuit in the cuboid.
+      your cuboid. Once it's defined you can execute any of the following 
+      
+- `/rcsel activate` - Activate any circuits whose sign is inside the region.
+- `/rcsel activate <input type> <output type> <interface block type>` - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks. Once the circuit is activated the i/o blocks are replaced to the currently used types.
+- `/rcsel fixioblocks` - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
+- `/rcsel break` - Deactivate every active circuit in the cuboid.
+- `/rcsel destroy` - Deactivates and removes blocks of every active circuit in the cuboid.
+- `/rcsel reset` - Reset every active circuit in the cuboid.
        
        
 - `/rcchannels` - Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
