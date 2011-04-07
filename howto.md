@@ -52,6 +52,12 @@ Plugin commands
 - `/rcreset` Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
 - `/rcfixioblocks` Updates all input, output, and interface blocks of a circuit to match the currently used block types.
 - `/rcarg` Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by pointing at the circuit you want to edit and running `/rcarg <arg number> <arg value>`. `[arg number]` is the argument number you want to change, starting with argument no. 1. To add a new argument use `/rcarg add <arg value>`. To remove an argument use `/rcarg clear <arg number>`.
+- `/rcchannels` Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
+- `/rcinfo` Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+- `/rchelp` Prints a list or description of all RedstoneChips commands. Use `/rchelp <command name>` to get help about a specific command.
+- `/rcsave` Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
+- `/rcload` Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
+
 - `/rcsel`  command for mass editing circuits within a selection cuboid. To define a selection type `/rcsel` and right-click on two opposite corners of
       your cuboid. Once it's defined you can execute any of the following       
 	- `/rcsel activate` Activate any circuits whose sign is inside the region.
@@ -60,11 +66,6 @@ Plugin commands
 	- `/rcsel break` Deactivate every active circuit in the cuboid.
 	- `/rcsel destroy` Deactivates and removes blocks of every active circuit in the cuboid.
 	- `/rcsel reset` Reset every active circuit in the cuboid.              
-- `/rcchannels` Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
-- `/rcinfo` Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
-- `/rchelp` Prints a list or description of all RedstoneChips commands. Use `/rchelp <command name>` to get help about a specific command.
-- `/rcsave` Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
-- `/rcload` Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
 
 
 Chip detection scanning rules (for the advanced RC user...)
