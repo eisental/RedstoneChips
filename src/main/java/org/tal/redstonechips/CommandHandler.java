@@ -753,7 +753,7 @@ public class CommandHandler {
                     sender.sendMessage(infoColor + "No selection defined and WorldEdit is not installed or doesn't have a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
                     return;
                 }
-            } else sender.sendMessage(ChatColor.DARK_PURPLE + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");
+            } else sender.sendMessage(infoColor + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");
 
             if (args[0].equalsIgnoreCase("activate")) {
                 MaterialData inputBlockType, outputBlockType, interfaceBlockType;

@@ -367,9 +367,7 @@ public class CircuitManager {
 
     private String getClassFromSign(Sign sign) {
         String line = sign.getLine(0);
-        if (line.charAt(0)==(char)167)
-            line = line.substring(2);
-
+        line = line.replaceAll("\\xA7\\d", "");
         return line;
     }
 
