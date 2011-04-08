@@ -5,6 +5,8 @@
 
 package org.tal.redstonechips;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.tal.redstonechips.circuit.Circuit;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,6 +26,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
+import org.bukkit.plugin.Plugin;
 import org.tal.redstonechips.channels.BroadcastChannel;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.channels.ReceivingCircuit;
@@ -39,7 +43,7 @@ public class CommandHandler {
     private final static int MaxLines = 15;
 
     private List<Player> definingCuboids = new ArrayList<Player>();
-    private Map<Player,List<Location>> playerCuboids = new HashMap<Player,List<Location>>();
+    private Map<Player,Location[]> playerCuboids = new HashMap<Player,Location[]>();
 
     static final HashSet<Byte> transparentMaterials = new HashSet<Byte>();
     static {
@@ -734,13 +738,23 @@ public class CommandHandler {
 
             sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid. Right-clicking while holding a block in hand is ignored.");
             definingCuboids.add(p);
-            playerCuboids.put(p, new ArrayList<Location>());
+            playerCuboids.put(p, new Location[2]);
         } else {
+            ChatColor infoColor = ChatColor.AQUA;
+            
             long start = System.nanoTime();
-            List<Location> cuboid = playerCuboids.get(p);
-            if (cuboid==null) {
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "You need to first define a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
-            }
+            Location[] cuboid = playerCuboids.get(p);
+            if (cuboid==null || cuboid[0]==null || cuboid[1]==null) {
+                // try to use worldedit selection instead
+                if (isWorldEditInstalled()) {
+                    cuboid = getWorldEditSelection(p);
+                    sender.sendMessage(infoColor + "No selection defined. Using WorldEdit selection instead.");
+                } else {
+                    sender.sendMessage(infoColor + "No selection defined and WorldEdit is not installed or doesn't have a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
+                    return;
+                }
+            } else sender.sendMessage(ChatColor.DARK_PURPLE + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");
+
             if (args[0].equalsIgnoreCase("activate")) {
                 MaterialData inputBlockType, outputBlockType, interfaceBlockType;
 
@@ -750,7 +764,7 @@ public class CommandHandler {
                     interfaceBlockType = rc.getPrefsManager().getInterfaceBlockType();
                 } else {
                     if (args.length!=4) {
-                        p.sendMessage("Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <interfaceBlockType>]");
+                        p.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <interfaceBlockType>]");
                         return;
                     }
                     try {
@@ -763,43 +777,52 @@ public class CommandHandler {
                     }
                 }
 
-                int lowx = Math.min(cuboid.get(0).getBlockX(), cuboid.get(1).getBlockX());
-                int highx = Math.max(cuboid.get(0).getBlockX(), cuboid.get(1).getBlockX());
+                int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
+                int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
 
-                int lowy = Math.min(cuboid.get(0).getBlockY(), cuboid.get(1).getBlockY());
-                int highy = Math.max(cuboid.get(0).getBlockY(), cuboid.get(1).getBlockY());
+                int lowy = Math.min(cuboid[0].getBlockY(), cuboid[1].getBlockY());
+                int highy = Math.max(cuboid[0].getBlockY(), cuboid[1].getBlockY());
 
-                int lowz = Math.min(cuboid.get(0).getBlockZ(), cuboid.get(1).getBlockZ());
-                int highz = Math.max(cuboid.get(0).getBlockZ(), cuboid.get(1).getBlockZ());
+                int lowz = Math.min(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
+                int highz = Math.max(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
 
                 int wallSignId = Material.WALL_SIGN.getId();
+
+                int count = 0;
 
                 for (int x=lowx; x<=highx; x++) {
                     for (int y=lowy; y<=highy; y++) {
                         for (int z=lowz; z<=highz; z++) {
-                            Block b = cuboid.get(0).getWorld().getBlockAt(x, y, z);
+                            Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
                             if (b.getTypeId()==wallSignId) {
-                                rc.getCircuitManager().checkForCircuit(b, sender, inputBlockType, outputBlockType, interfaceBlockType);
+                                if (rc.getCircuitManager().checkForCircuit(b, sender, inputBlockType, outputBlockType, interfaceBlockType)>=0)
+                                    count++;
                             }
                         }
                     }
                 }
+                
+                sender.sendMessage(infoColor + "Activated " + count + " circuit(s).");
             } else if (args[0].equalsIgnoreCase("reset")) {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
                     rc.getCircuitManager().resetCircuit(c, sender);
+                sender.sendMessage(infoColor + "Reset " + circuits.size() + " circuit(s).");
             } else if (args[0].equalsIgnoreCase("break")) {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
                     rc.getCircuitManager().destroyCircuit(c, sender, false);
+                sender.sendMessage(infoColor + "Deactivated " + circuits.size() + " circuit(s).");
             } else if (args[0].equalsIgnoreCase("destroy")) {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
                     rc.getCircuitManager().destroyCircuit(c, sender, true);
+                sender.sendMessage(infoColor + "Destroyed " + circuits.size() + " circuit(s).");
             } else if (args[0].equalsIgnoreCase("fixioblocks")) {
                 List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
                 for (Circuit c : circuits)
                     c.fixIOBlocks();
+                sender.sendMessage(infoColor + "Fixed i/o blocks of " + circuits.size() + " circuit(s).");
             } else if (args[0].equalsIgnoreCase("clear")) {
                 playerCuboids.remove(p);
                 definingCuboids.remove(p);
@@ -808,26 +831,25 @@ public class CommandHandler {
 
             long delta = System.nanoTime()-start;
             String timing = String.format( "%.3fms", (float)delta / 1000000d );
-            sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Mass edit finished in " + timing + ".");
+            sender.sendMessage(infoColor + "Mass edit finished in " + timing + ".");
 
         }
     }
 
     public void cuboidLocation(Player p, Location point) {
         if (definingCuboids.contains(p)) {
-            List<Location> coords = playerCuboids.get(p);
-            if (coords.size()>=2) return;
+            Location[] coords = playerCuboids.get(p);
 
-            coords.add(point);
-            if (coords.size()==1) {
-                p.sendMessage(rc.getPrefsManager().getInfoColor() + "1st cuboid corner selected.");
-            } else if (coords.size()==2) {
-                p.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid defined: " + coords.get(0).getBlockX() + "," + coords.get(0).getBlockY() + "," + coords.get(0).getBlockZ()
-                        + " to " + coords.get(1).getBlockX() + "," + coords.get(1).getBlockY() + "," + coords.get(1).getBlockZ());
+            if (coords[0]==null && coords[1]==null) {
+                coords[0] = point;
+                p.sendMessage(rc.getPrefsManager().getInfoColor() + "1st selection corner selected.");
+            } else if (coords[0] != null && coords[1] == null) {
+                coords[1] = point;
+                p.sendMessage(rc.getPrefsManager().getInfoColor() + "Cuboid defined: " + coords[0].getBlockX() + "," + coords[0].getBlockY() + "," + coords[0].getBlockZ()
+                        + " to " + coords[1].getBlockX() + "," + coords[1].getBlockY() + "," + coords[1].getBlockZ());
                 p.sendMessage(rc.getPrefsManager().getInfoColor() + "You can now use any of the /rcsel commands. Type /rcsel clear to clear your selection.");
                 definingCuboids.remove(p);
             }
-
         }
     }
 
@@ -881,15 +903,15 @@ public class CommandHandler {
         return player.getTargetBlock(transparentMaterials, 100);
     }
 
-    private List<Circuit> findActiveCircuitsInCuboid(CommandSender s, List<Location> cuboid) {
-        int lowx = Math.min(cuboid.get(0).getBlockX(), cuboid.get(1).getBlockX());
-        int highx = Math.max(cuboid.get(0).getBlockX(), cuboid.get(1).getBlockX());
+    private List<Circuit> findActiveCircuitsInCuboid(CommandSender s, Location[] cuboid) {
+        int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
+        int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
 
-        int lowy = Math.min(cuboid.get(0).getBlockY(), cuboid.get(1).getBlockY());
-        int highy = Math.max(cuboid.get(0).getBlockY(), cuboid.get(1).getBlockY());
+        int lowy = Math.min(cuboid[0].getBlockY(), cuboid[1].getBlockY());
+        int highy = Math.max(cuboid[0].getBlockY(), cuboid[1].getBlockY());
 
-        int lowz = Math.min(cuboid.get(0).getBlockZ(), cuboid.get(1).getBlockZ());
-        int highz = Math.max(cuboid.get(0).getBlockZ(), cuboid.get(1).getBlockZ());
+        int lowz = Math.min(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
+        int highz = Math.max(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
 
         List<Circuit> result = new ArrayList<Circuit>();
 
@@ -907,5 +929,48 @@ public class CommandHandler {
         }
 
         return result;
+    }
+
+    private boolean isWorldEditInstalled() {
+        return rc.getServer().getPluginManager().getPlugin("WorldEdit")!=null;
+    }
+    private Location[] getWorldEditSelection(Player player) {
+        Plugin worldEdit = rc.getServer().getPluginManager().getPlugin("WorldEdit");
+        if (worldEdit == null) {
+            return null;
+        }
+
+        // get access to WorldEditPlugin.getSelection(Player player);
+        Method getSelectionMethod = null;
+        for (Method m : worldEdit.getClass().getMethods()) {
+            if (m.getName().equals("getSelection") && m.getParameterTypes().length==1 && m.getParameterTypes()[0]==Player.class) {
+                getSelectionMethod = m;
+            }
+        }
+
+        if (getSelectionMethod!=null) {
+            try {
+                // try to get the current selection.
+                Object selection = getSelectionMethod.invoke(worldEdit, player);
+                if (selection==null) return null;
+
+                // getting two opposite corners of selection.
+                Location[] ret = new Location[2];
+                ret[0] = (Location)selection.getClass().getMethod("getMinimumPoint").invoke(selection);
+                ret[1] = (Location)selection.getClass().getMethod("getMaximumPoint").invoke(selection);
+
+                return ret;
+            } catch (IllegalAccessException ex) {
+                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
+            } catch (IllegalArgumentException ex) {
+                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
+            } catch (InvocationTargetException ex) {
+                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
+            } catch (NoSuchMethodException ex) {
+                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
+            }
+        }
+
+        return null;
     }
 }

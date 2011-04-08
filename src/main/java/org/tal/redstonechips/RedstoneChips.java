@@ -421,6 +421,4 @@ public class RedstoneChips extends JavaPlugin {
     public File getDataFolder() {
         return new File(super.getDataFolder().getParentFile(), getDescription().getName());
     }
-
-
 }
