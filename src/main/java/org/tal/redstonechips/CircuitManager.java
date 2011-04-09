@@ -516,7 +516,7 @@ public class CircuitManager {
         return true;
     }
 
-    public void resetCircuit(Circuit c, CommandSender reseter) {
+    public boolean resetCircuit(Circuit c, CommandSender reseter) {
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         List<CommandSender> debuggers = c.getDebuggers();
         int id = c.id;
@@ -531,8 +531,10 @@ public class CircuitManager {
             newCircuit.id = id;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
             reseter.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefsManager().getInfoColor() + " circuit is reactivated.");
+            return true;
+        } else {
+            return false;
         }
-
     }
 
     public void checkDebuggerQuit(Player player) {

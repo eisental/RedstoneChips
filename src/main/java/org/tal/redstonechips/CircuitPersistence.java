@@ -61,15 +61,19 @@ public class CircuitPersistence {
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                         backupCircuitsFile();
+                        ie.printStackTrace();
                     } catch (InstantiationException ex) {
-                        rc.log(Level.WARNING, ex.toString());
+                        rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
                         backupCircuitsFile();
+                        ex.printStackTrace();
                     } catch (IllegalAccessException ex) {
-                        rc.log(Level.WARNING, ex.toString());
+                        rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
                         backupCircuitsFile();
+                        ex.printStackTrace();
                     } catch (Throwable t) {
-                        rc.log(Level.SEVERE, t.toString());
+                        rc.log(Level.SEVERE, t.toString() + ". Ignoring circuit.");
                         backupCircuitsFile();
+                        t.printStackTrace();
                     }
                 }
             }

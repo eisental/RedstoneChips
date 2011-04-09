@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.material.Lever;
@@ -441,7 +442,12 @@ public abstract class Circuit {
     }
 
     public void updateCircuitSign(boolean activated) {
-        Sign sign = (Sign)activationBlock.getBlock().getState();
+        BlockState state = activationBlock.getBlock().getState();
+        if (!(state instanceof Sign)) {
+            throw new IllegalArgumentException("Circuit " + id + " has no activation sign or its activation sign has moved.");
+        }
+
+        Sign sign = (Sign)state;
         String line;
         if (activated) {
             String signColor = redstoneChips.getPrefsManager().getSignColor();            
