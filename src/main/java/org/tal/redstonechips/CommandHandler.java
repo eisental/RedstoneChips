@@ -683,7 +683,6 @@ public class CommandHandler {
                 sign.update();
             }
         });
-        sign.update();
     }
 
     private String[] editArgs(CommandSender sender, String[] args, String index, String value) {
@@ -768,9 +767,9 @@ public class CommandHandler {
                 // try to use worldedit selection instead
                 if (isWorldEditInstalled()) {
                     cuboid = getWorldEditSelection(p);
-                    sender.sendMessage(infoColor + "No selection defined. Using WorldEdit selection instead.");
+                    sender.sendMessage(infoColor + "No /rcsel selection defined. Using WorldEdit selection instead.");
                 } else {
-                    sender.sendMessage(infoColor + "No selection defined and WorldEdit is not installed or doesn't have a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
+                    sender.sendMessage(infoColor + "No /rcsel selection defined and WorldEdit is not installed or doesn't have a selection. Use /rcsel with no arguments and right-click two opposite corners to define.");
                     return;
                 }
             } else sender.sendMessage(infoColor + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");

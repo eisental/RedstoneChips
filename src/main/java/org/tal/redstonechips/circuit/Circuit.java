@@ -447,7 +447,8 @@ public abstract class Circuit {
             throw new IllegalArgumentException("Circuit " + id + " has no activation sign or its activation sign has moved.");
         }
 
-        Sign sign = (Sign)state;
+        final Sign sign = (Sign)state;
+
         String line;
         if (activated) {
             String signColor = redstoneChips.getPrefsManager().getSignColor();            
@@ -458,7 +459,13 @@ public abstract class Circuit {
 
         if (!line.equals(sign.getLine(0))) {
             sign.setLine(0, line);
-            sign.update();
+            redstoneChips.getServer().getScheduler().scheduleSyncDelayedTask(redstoneChips, new Runnable() {
+                @Override
+                public void run() {
+                    sign.update();
+                }
+            });
+
         } 
     }
 }
