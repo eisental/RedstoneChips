@@ -50,7 +50,11 @@ public class CircuitPersistence {
         HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
 
         try {
+            rc.log(Level.INFO, "Loading file...");
+            long start = System.nanoTime();
             List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(new FileInputStream(file));
+
+            rc.log(Level.INFO, "Activating circuits...");
             if (circuitsList!=null) {
                 for (Map<String,Object> circuitMap : circuitsList) {
                     try {
@@ -58,6 +62,7 @@ public class CircuitPersistence {
                         if (c.id==-1) c.id = circuits.size();
                         circuits.put(c.id, c);
                         c.updateCircuitSign(true);
+
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                         backupCircuitsFile();
@@ -76,7 +81,14 @@ public class CircuitPersistence {
                         t.printStackTrace();
                     }
                 }
+
+                System.out.println();
             }
+
+            long delta = System.nanoTime() - start;
+            String timing = String.format( "%.3fms", delta / 1000000d );
+            rc.log(Level.INFO, "Done. Loaded " + circuits.size() + " chips in " + timing + ".");
+
         } catch (FileNotFoundException ex) {
             rc.log(Level.SEVERE, "Circuits file '" + file + "' was not found.");
         }

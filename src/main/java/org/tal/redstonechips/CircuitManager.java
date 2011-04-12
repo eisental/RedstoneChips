@@ -398,8 +398,6 @@ public class CircuitManager {
 
         for (Circuit c : circuits.values())
             addCircuitLookups(c);
-
-        rc.log(Level.INFO, circuits.size() + " active circuits");
     }
 
     public List<InputPin> lookupInputBlock(Block inputBlock) {
@@ -546,14 +544,24 @@ public class CircuitManager {
         }
     }
 
-    public void checkUpdateOutputLevers(Chunk chunk) {
+    public void updateOnChunkLoad(Chunk chunk) {
         List<Circuit> circuitsInChunk = chunkLookupMap.get(ChunkLocation.fromChunk(chunk));
         if (circuitsInChunk!=null) {
             for (Circuit c : circuitsInChunk) {
-                c.updateOutputLevers();
+                c.circuitChunkLoaded();
             }
         }
     }
+
+    public void updateOnChunkUnload(Chunk chunk) {
+        List<Circuit> circuitsInChunk = chunkLookupMap.get(ChunkLocation.fromChunk(chunk));
+        if (circuitsInChunk!=null) {
+            for (Circuit c : circuitsInChunk) {
+                c.circuitChunkUnloaded();
+            }
+        }
+    }
+
 
     private boolean isTypeAllowed(Material material) {
         return material!=rc.getPrefsManager().getInputBlockType().getItemType() &&

@@ -73,7 +73,7 @@ public class CommandHandler {
             }
 
             sender.sendMessage(infoColor + "----------------------");
-            sender.sendMessage("Use /rc-help <command name> for help on a specific command (omit the / sign).");
+            sender.sendMessage("Use /rchelp <command name> for help on a specific command (omit the / sign).");
             sender.sendMessage("");
         } else {
             Map commandMap = (Map)commands.get(args[0]);
@@ -114,7 +114,7 @@ public class CommandHandler {
         if (sorted.isEmpty()) p.sendMessage(rc.getPrefsManager().getInfoColor() + "There are no active circuits.");
         else {
             String title = " active IC(s) in ";
-            String commandName = "rc-list";
+            String commandName = "rclist";
             List<String> lines = new ArrayList<String>();
             for (Integer id : sorted.keySet()) {
                 Circuit c = sorted.get(id);
@@ -203,8 +203,8 @@ public class CommandHandler {
                 }
 
                 sender.sendMessage("");
-                pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rc-channels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
-                sender.sendMessage("Use /rc-channels <channel name> for more info about that channel.");
+                pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rcchannels", lines, rc.getPrefsManager().getInfoColor(), rc.getPrefsManager().getErrorColor());
+                sender.sendMessage("Use /rcchannels <channel name> for more info about that channel.");
                 sender.sendMessage("");
             }
         }
@@ -323,7 +323,7 @@ public class CommandHandler {
     public void prefsCommand(String[] args, CommandSender sender) {
             if (args.length==0) { // list preferences
                 rc.getPrefsManager().printYaml(sender, rc.getPrefsManager().getPrefs());
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /rc-prefs <name> <value> to make changes.");
+                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Type /rcprefs <name> <value> to make changes.");
             } else if (args.length==1) { // show one key value pair
                 Object o = rc.getPrefsManager().getPrefs().get(args[0]);
                 if (o==null) sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Unknown preferences key: " + args[0]);
@@ -353,7 +353,7 @@ public class CommandHandler {
                 sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Saving changes...");
                 rc.getPrefsManager().savePrefs();
             } else {
-                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad rc-prefs syntax.");
+                sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad rcprefs syntax.");
             }
 
     }
@@ -404,7 +404,7 @@ public class CommandHandler {
         } else {
             Circuit c;
             if (id!=-1) {
-                if (rc.getCircuitManager().getCircuits().size()<=id || id<0) {
+                if (!rc.getCircuitManager().getCircuits().containsKey(id)) {
                     sender.sendMessage(rc.getPrefsManager().getErrorColor() + "Bad chip id " + id + ". Could only find " + rc.getCircuitManager().getCircuits().size() + " active chips.");
                     return;
                 }

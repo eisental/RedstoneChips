@@ -1,11 +1,13 @@
 package org.tal.redstonechips.circuit;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -90,6 +92,13 @@ public abstract class Circuit {
     public int id = -1;
 
     /**
+     * Set by CircuitManager to true when the activation sign's chunk is loaded and false when it's unloaded.
+     */
+    public boolean chunkLoaded;
+
+    private Point chunkCoords;
+
+    /**
      *
      * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
      * @param args The sign arguments of this circuit. Stored in the args field.
@@ -97,6 +106,12 @@ public abstract class Circuit {
      */
     public final boolean initCircuit(CommandSender sender, String[] args, RedstoneChips rc) {
         this.redstoneChips = rc;
+
+        Chunk chunk = world.getChunkAt(activationBlock);
+        chunkCoords = new Point(chunk.getX(), chunk.getZ());
+        chunkLoaded = world.isChunkLoaded(chunk);
+
+        System.out.println("c-"+ id + " chunkLoaded = " + chunkLoaded);
         debuggers = new ArrayList<CommandSender>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
@@ -169,7 +184,7 @@ public abstract class Circuit {
     protected abstract boolean init(CommandSender sender, String[] args);
 
     /**
-     * Called when the plugin needs to save the circuits state to disk or when using /rc-info.
+     * Called when the plugin needs to save the circuits state to disk or when using /rcinfo.
      * The circuit should return a map containing any data needed to bring the circuit back to its current state
      * after a server restart.
      *
@@ -209,6 +224,10 @@ public abstract class Circuit {
      * @param state The new state of the output.
      */
     protected void sendOutput(int outIdx, boolean state) {
+        chunkLoaded = world.isChunkLoaded(chunkCoords.x, chunkCoords.y);
+
+        if (!chunkLoaded && redstoneChips.getPrefsManager().getFreezeOnChunkUnload()) return;
+
         outputBits.set(outIdx, state);
         changeLeverState(getOutputBlock(outIdx), state);
     }
@@ -376,14 +395,19 @@ public abstract class Circuit {
     }
 
     /**
-     * Causes the circuit to update the state of its output levers according to the current values
+     * Called when the circuit chunk is loaded. Causes the circuit to update the state of its output levers according to the current values
      * in outputBits.
      */
-    public void updateOutputLevers() {
+    public void circuitChunkLoaded() {
         for (int i=0; i<outputs.length; i++)
             changeLeverState(getOutputBlock(i), outputBits.get(i));
+
+        chunkLoaded = true;
     }
 
+    public void circuitChunkUnloaded() {
+        chunkLoaded = false;
+    }
 
     /**
      * Update the inputBits BitSet according to the current input pin values.
@@ -459,12 +483,14 @@ public abstract class Circuit {
 
         if (!line.equals(sign.getLine(0))) {
             sign.setLine(0, line);
-            redstoneChips.getServer().getScheduler().scheduleSyncDelayedTask(redstoneChips, new Runnable() {
-                @Override
-                public void run() {
-                    sign.update();
-                }
-            });
+            if (chunkLoaded) {
+                redstoneChips.getServer().getScheduler().scheduleSyncDelayedTask(redstoneChips, new Runnable() {
+                    @Override
+                    public void run() {
+                        sign.update();
+                    }
+                });
+            }
 
         } 
     }

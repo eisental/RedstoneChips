@@ -3,6 +3,7 @@ package org.tal.redstonechips;
 import java.io.File;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +102,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable() {        
         saveCircuits();
 
         circuitManager.shutdownCircuits();
@@ -172,7 +173,13 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onChunkLoad(ChunkLoadEvent event) {
-                circuitManager.checkUpdateOutputLevers(event.getChunk());
+                circuitManager.updateOnChunkLoad(event.getChunk());
+            }
+
+            @Override
+            public void onChunkUnload(ChunkUnloadEvent event) {
+                if (!event.isCancelled())
+                    circuitManager.updateOnChunkUnload(event.getChunk());
             }
 
             @Override
@@ -219,16 +226,18 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
         pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
         pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.CHUNK_UNLOAD, rcWorldListener, Priority.Monitor, this);
         pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
 
         String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
         logg.info(msg);
 
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
-            }})==-1) {
+                @Override
+                public void run() {
+                    circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
+                }})==-1) {
+
             logg.warning("Couldn't schedule circuit loading. Multiworld support might not work.");
             circuitManager.setCircuitMap(circuitPersistence.loadCircuits());
         }
@@ -236,7 +245,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     public void saveCircuits() {
-        if (!dontSaveCircuits) {
+        if (!dontSaveCircuits && circuitPersistence!=null) {
             log(Level.INFO, "Saving circuits state to file.");
             dontSaveCircuits = true;
             circuitPersistence.saveCircuits(circuitManager.getCircuits());
@@ -330,7 +339,7 @@ public class RedstoneChips extends JavaPlugin {
 
     /**
      * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
-     * the /rc-type command the rcTypeReceiver circuit will receive the typed text.
+     * the /rctype command the rcTypeReceiver circuit will receive the typed text.
      * 
      * @param typingBlock The block to point towards while typing.
      * @param circuit The circuit that will receive the typed text.
@@ -340,7 +349,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * The rcTypeReceiver will no longer receive /rc-type commands.
+     * The rcTypeReceiver will no longer receive /rctype commands.
      * @param circuit The rcTypeReceiver to remove.
      */
     public void removeRcTypeReceiver(rcTypeReceiver circuit) {
@@ -399,6 +408,8 @@ public class RedstoneChips extends JavaPlugin {
 
     public boolean removeTransmitter(TransmittingCircuit t) {
         BroadcastChannel channel = t.getChannel();
+        if (channel==null) return false;
+        
         boolean res = channel.removeTransmitter(t);
         if (channel.isDeserted())
             broadcastChannels.remove(channel.name);

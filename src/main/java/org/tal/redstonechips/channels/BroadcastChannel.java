@@ -119,8 +119,8 @@ public class BroadcastChannel {
      * @param length The length of the message.
      */
     public void transmit(BitSet7 tbits, int startBit, int length) {
-        for (int i=startBit; i<startBit+length; i++)
-            bits.set(i, tbits.get(i-startBit));
+        for (int i=0; i<length; i++)
+            bits.set(i+startBit, tbits.get(i));
 
         for (ReceivingCircuit r : receivers) {
             transmitToReceiver(r);
