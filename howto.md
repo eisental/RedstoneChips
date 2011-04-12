@@ -10,7 +10,7 @@ Building a Chip
 - Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each block has to be attached to a chip block. Changes in redstone current will be sensed on any side or on top of the input blocks. 
 - The circuit outputs its bits by setting levers on and off. Attach __levers__ to any side or on top of each output block.
 - Some circuits, such as the [synth](/RedstoneChips/circuitdocs/Synth.html) circuit require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a chip block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
-- Last but not least, go back to your circuit sign and __right-click__ it to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated: > a input(s), b output(s), and c interface block(s)'. 
+- Last but not least, go back to your circuit sign and __left-click__ it to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated: > a input(s), b output(s), and c interface block(s)'. 
 
 The order of your input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. See "Chip detection scanning rules" below, for information on predicting the order of pins in more complex structures.
 
