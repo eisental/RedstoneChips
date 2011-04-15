@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.tal.redstonechips.circuit.InputPin;
+import org.tal.redstonechips.util.ChunkLocation;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -31,11 +32,23 @@ public class CircuitPersistence {
     public final static String circuitsFileName = "redstonechips.circuits";
     private boolean madeBackup = false;
 
+    /**
+     * Used to prevent saving state more than once per game tick.
+     */
+    private boolean dontSaveCircuits = false;
+
+    private Runnable dontSaveCircuitsReset = new Runnable() {
+        @Override
+        public void run() {
+            dontSaveCircuits = false;
+        }
+    };
+
     public CircuitPersistence(RedstoneChips plugin) {
         rc = plugin;
     }
 
-    public HashMap<Integer, Circuit> loadCircuits() {
+    public void loadCircuits() {
         File file = getCircuitsFile();
         if (!file.exists()) { // create empty file if doesn't already exist
             try {
@@ -47,21 +60,16 @@ public class CircuitPersistence {
 
         Yaml yaml = new Yaml();
 
-        HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
-
         try {
-            rc.log(Level.INFO, "Loading file...");
-            long start = System.nanoTime();
+            rc.log(Level.INFO, "Reading circuits file...");
             List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(new FileInputStream(file));
 
             rc.log(Level.INFO, "Activating circuits...");
             if (circuitsList!=null) {
                 for (Map<String,Object> circuitMap : circuitsList) {
                     try {
-                        Circuit c = parseCircuitMap(circuitMap);
-                        if (c.id==-1) c.id = circuits.size();
-                        circuits.put(c.id, c);
-                        c.updateCircuitSign(true);
+
+                        compileCircuitFromMap(circuitMap);
 
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
@@ -81,36 +89,33 @@ public class CircuitPersistence {
                         t.printStackTrace();
                     }
                 }
-
-                System.out.println();
             }
 
-            long delta = System.nanoTime() - start;
-            String timing = String.format( "%.3fms", delta / 1000000d );
-            rc.log(Level.INFO, "Done. Loaded " + circuits.size() + " chips in " + timing + ".");
+            rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
 
         } catch (FileNotFoundException ex) {
             rc.log(Level.SEVERE, "Circuits file '" + file + "' was not found.");
         }
 
         madeBackup = false;
-        return circuits;
     }
 
-    public void saveCircuits(HashMap<Integer, Circuit> circuits) {
-        File file = new File(rc.getDataFolder(), circuitsFileName);
+    public void saveCircuits() {
+        if (dontSaveCircuits) return;
+        
+        rc.getCircuitManager().checkCircuitsIntegrity();
 
+        Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
+        rc.log(Level.INFO, "Saving " + circuits.size() + " circuits state to file...");
+        dontSaveCircuits = true;
+        rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
+
+        File file = new File(rc.getDataFolder(), circuitsFileName);
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
         Yaml yaml = new Yaml(options);
-
         List<Map<String,Object>> circuitMaps = new ArrayList<Map<String,Object>>();
 
-        if (circuits==null) {
-            rc.log(Level.WARNING, "No circuits were found. There was probably a loading error.");
-            return;
-        }
-        
         for (Circuit c : circuits.values()) {
             circuitMaps.add(this.circuitToMap(c));
             c.save();
@@ -128,6 +133,7 @@ public class CircuitPersistence {
         map.put("class", c.getCircuitClass());
         map.put("world", c.world.getName());
         map.put("activationBlock", makeBlockList(c.activationBlock));
+        map.put("chunk", makeChunksList(c.circuitChunks));
         map.put("inputs", makeInputPinsList(c.inputs));
         map.put("outputs", makeBlockListsList(c.outputs));
         map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
@@ -139,7 +145,8 @@ public class CircuitPersistence {
         return map;
     }
 
-    private Circuit parseCircuitMap(Map<String,Object> map) throws InstantiationException, IllegalAccessException {
+    private Circuit compileCircuitFromMap(Map<String,Object> map) throws InstantiationException, IllegalAccessException {
+
         String className = (String)map.get("class");
         World world = findWorld((String)map.get("world"));
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
@@ -149,11 +156,21 @@ public class CircuitPersistence {
         c.interfaceBlocks = getLocationArray(world, (List<List<Integer>>)map.get("interfaces"));
         c.structure = getLocationArray(world, (List<List<Integer>>)map.get("structure"));
         c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);
-        List<String> signArgs = (List<String>)map.get("signArgs");
-        c.initCircuit(null, signArgs.toArray(new String[signArgs.size()]), rc);
-        if (map.containsKey("id")) c.id = (Integer)map.get("id");
-        c.setInternalState((Map<String,String>)map.get("state"));
-        return c;
+
+        if (map.containsKey("chunks")) {
+            c.circuitChunks = getChunkLocations(world, (List<List<Integer>>)map.get("chunks"));
+        } else {
+            c.circuitChunks = rc.getCircuitManager().findCircuitChunks(c);
+        }
+
+        List<String> argsList = (List<String>)map.get("signArgs");
+        String[] signArgs = argsList.toArray(new String[argsList.size()]);
+
+        int id = -1;
+        if (map.containsKey("id")) id = (Integer)map.get("id");
+
+        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>0) return c;
+        else return null;
     }
 
     private List<Integer> makeBlockList(Location l) {
@@ -161,6 +178,18 @@ public class CircuitPersistence {
         list.add(l.getBlockX());
         list.add(l.getBlockY());
         list.add(l.getBlockZ());
+
+        return list;
+    }
+
+    private Object makeChunksList(ChunkLocation[] locs) {
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        for (ChunkLocation l : locs) {
+            List<Integer> loc = new ArrayList<Integer>();
+            loc.add(l.getX());
+            loc.add(l.getZ());
+            list.add(loc);
+        }
 
         return list;
     }
@@ -188,6 +217,16 @@ public class CircuitPersistence {
 
     private Location getLocation(World w, List<Integer> coords) {
         return new Location(w, coords.get(0), coords.get(1), coords.get(2));
+    }
+
+    private ChunkLocation[] getChunkLocations(World world, List<List<Integer>> locs) {
+        List<ChunkLocation> ret = new ArrayList<ChunkLocation>();
+
+        for (List<Integer> loc : locs) {
+            ret.add(new ChunkLocation(loc.get(0), loc.get(1), world));
+        }
+
+        return ret.toArray(new ChunkLocation[ret.size()]);
     }
 
     private Location[] getLocationArray(World w, List<List<Integer>> list) {

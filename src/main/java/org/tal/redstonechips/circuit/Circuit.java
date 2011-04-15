@@ -1,14 +1,14 @@
 package org.tal.redstonechips.circuit;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -18,6 +18,7 @@ import org.bukkit.material.Lever;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
+import org.tal.redstonechips.util.ChunkLocation;
 
 /**
  * Represents a RedstoneChips circuit.
@@ -91,12 +92,14 @@ public abstract class Circuit {
      */
     public int id = -1;
 
-    /**
-     * Set by CircuitManager to true when the activation sign's chunk is loaded and false when it's unloaded.
-     */
-    public boolean chunkLoaded;
+    private boolean chunksLoaded;
 
-    private Point chunkCoords;
+    private boolean chunksEverLoaded = false;
+
+    /**
+     * Set to the chunk coordinates of the circuit's activation block
+     */
+    public ChunkLocation[] circuitChunks;
 
     /**
      *
@@ -107,23 +110,30 @@ public abstract class Circuit {
     public final boolean initCircuit(CommandSender sender, String[] args, RedstoneChips rc) {
         this.redstoneChips = rc;
 
-        Chunk chunk = world.getChunkAt(activationBlock);
-        chunkCoords = new Point(chunk.getX(), chunk.getZ());
-        chunkLoaded = world.isChunkLoaded(chunk);
-
-        System.out.println("c-"+ id + " chunkLoaded = " + chunkLoaded);
         debuggers = new ArrayList<CommandSender>();
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
         inputsDisabled = false;
         this.args = args;
 
-        updateInputBits();
+        chunksLoaded = false;
+        for (ChunkLocation chunk : circuitChunks) {
+            if (chunk.isChunkLoaded()) { 
+                chunksLoaded = true;
+                break;
+            }
+        }
+
         boolean result = init(sender, args);
+
+        if (chunksLoaded) {
+            chunksEverLoaded = true;
+            updateInputBits();
+        }
+
         if (result!=false) {
-            if (isStateless()) {
-                for (int i=0; i<inputs.length; i++)
-                    this.inputChange(i, inputBits.get(i));
+            if (isStateless() && chunksLoaded) {
+                runInputLogic();
             }
         }
 
@@ -140,7 +150,7 @@ public abstract class Circuit {
      */
     public void redstoneChange(int idx, boolean newVal) {
         if (inputsDisabled) {
-            debug(redstoneChips.getPrefsManager().getErrorColor() + "Inputs are disabled.");
+            debug(redstoneChips.getPrefs().getErrorColor() + "Inputs are disabled.");
             return;
         }
 
@@ -148,20 +158,22 @@ public abstract class Circuit {
 
         inputBits.set(idx, newVal);
         inputChange(idx, newVal);
-        
-        int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
-        int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
 
-        String i = "i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
-                Integer.toHexString(inputInt);
+        if (hasDebuggers()) {
+            int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
+            int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
 
-        String o;
-        if (outputs.length>0)
-            o = " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
-                Integer.toHexString(outputInt);
-        else o = "";
+            String i = "i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
+                    Integer.toHexString(inputInt);
 
-        if (hasDebuggers()) debug("input " + idx + " is " + (newVal?"on":"off")+ ". " + i + o);
+            String o;
+            if (outputs.length>0)
+                o = " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
+                    Integer.toHexString(outputInt);
+            else o = "";
+
+            debug("input " + idx + " is " + (newVal?"on":"off")+ ". " + i + o);
+        }
 
     }
 
@@ -215,7 +227,7 @@ public abstract class Circuit {
      * destroyed.
      */
     public void circuitShutdown() {}
-    
+
     /**
      * Sets the physical state of one of the outputs.
      * Changes the data byte of the selected output block to make the lever turn on or off.
@@ -224,11 +236,8 @@ public abstract class Circuit {
      * @param state The new state of the output.
      */
     protected void sendOutput(int outIdx, boolean state) {
-        chunkLoaded = world.isChunkLoaded(chunkCoords.x, chunkCoords.y);
-
-        if (!chunkLoaded && redstoneChips.getPrefsManager().getFreezeOnChunkUnload()) return;
-
         outputBits.set(outIdx, state);
+
         changeLeverState(getOutputBlock(outIdx), state);
     }
 
@@ -288,7 +297,7 @@ public abstract class Circuit {
      * @param message The error message.
      */
     protected void error(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(redstoneChips.getPrefsManager().getErrorColor() + message);
+        if (sender!=null) sender.sendMessage(redstoneChips.getPrefs().getErrorColor() + message);
         else Logger.getLogger("Minecraft").warning(redstoneChips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
     }
 
@@ -299,7 +308,7 @@ public abstract class Circuit {
      * @param message The error message.
      */
     protected void info(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(redstoneChips.getPrefsManager().getInfoColor() + message);
+        if (sender!=null) sender.sendMessage(redstoneChips.getPrefs().getInfoColor() + message);
     }
 
     /**
@@ -310,7 +319,7 @@ public abstract class Circuit {
      */
     protected void debug(String message) {        
         for (CommandSender s : debuggers)
-            s.sendMessage(redstoneChips.getPrefsManager().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
+            s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
     }
 
     /**
@@ -395,18 +404,33 @@ public abstract class Circuit {
     }
 
     /**
-     * Called when the circuit chunk is loaded. Causes the circuit to update the state of its output levers according to the current values
+     * Called when any of the circuit's chunks has loaded. Causes the circuit to update the state of its output levers according to the current values
      * in outputBits.
      */
     public void circuitChunkLoaded() {
+        chunksLoaded = true;
+
+        if (!chunksEverLoaded) {
+            // first time the circuit is loaded we need to load values into the output register.
+            chunksEverLoaded = true;
+            
+            for (InputPin i : inputs) 
+                i.refreshPowerBlocks();
+            
+            this.updateInputBits();
+            if (isStateless())
+                this.runInputLogic();
+        }
+
         for (int i=0; i<outputs.length; i++)
             changeLeverState(getOutputBlock(i), outputBits.get(i));
-
-        chunkLoaded = true;
     }
 
-    public void circuitChunkUnloaded() {
-        chunkLoaded = false;
+    /**
+     * Called when all of the circuit's chunks have unloaded.
+     */
+    public void circuitChunksUnloaded() {
+        chunksLoaded = false;
     }
 
     /**
@@ -439,51 +463,82 @@ public abstract class Circuit {
      */
     public boolean isDisabled() { return inputsDisabled; }
 
-    public void fixIOBlocks() {
-        int inputType = redstoneChips.getPrefsManager().getInputBlockType().getItemTypeId();
-        byte inputData = redstoneChips.getPrefsManager().getInputBlockType().getData();
+    public int fixIOBlocks() {
+        int blockCount = 0;
 
-        int outputType = redstoneChips.getPrefsManager().getOutputBlockType().getItemTypeId();
-        byte outputData = redstoneChips.getPrefsManager().getOutputBlockType().getData();
+        int inputType = redstoneChips.getPrefs().getInputBlockType().getItemTypeId();
+        byte inputData = redstoneChips.getPrefs().getInputBlockType().getData();
 
-        int interfaceType = redstoneChips.getPrefsManager().getInterfaceBlockType().getItemTypeId();
-        byte interfaceData = redstoneChips.getPrefsManager().getInterfaceBlockType().getData();
+        int outputType = redstoneChips.getPrefs().getOutputBlockType().getItemTypeId();
+        byte outputData = redstoneChips.getPrefs().getOutputBlockType().getData();
+
+        int interfaceType = redstoneChips.getPrefs().getInterfaceBlockType().getItemTypeId();
+        byte interfaceData = redstoneChips.getPrefs().getInterfaceBlockType().getData();
+
+        List<ChunkLocation> chunksToUnload = new ArrayList<ChunkLocation>();
+        for (ChunkLocation chunk : circuitChunks)
+            if (!chunk.isChunkLoaded()) chunksToUnload.add(chunk);
 
         for (InputPin i : inputs) {
-            i.getInputBlock().getBlock().setTypeIdAndData(inputType, inputData, false);
+            ChunkLocation chunk = ChunkLocation.fromLocation(i.getInputBlock());
+            if (!chunk.isChunkLoaded() && !chunksToUnload.contains(chunk)) chunksToUnload.add(chunk);
+            Block input = i.getInputBlock().getBlock();
+
+            if (input.getTypeId()!=inputType || input.getData()!=inputData) {
+                input.setTypeIdAndData(inputType, inputData, false);
+                blockCount++;
+            }
         }
 
         for (Location o : outputs) {
+            // output chunks
             Block leverBlock = o.getBlock();
             Lever l = new Lever(leverBlock.getType(), leverBlock.getData());
-            Block b = leverBlock.getFace(l.getAttachedFace());
-            b.setTypeIdAndData(outputType, outputData, false);
+            Block output = leverBlock.getFace(l.getAttachedFace());
+
+            if (output.getTypeId()!=outputType || output.getData()!=outputData) {
+                output.setTypeIdAndData(outputType, outputData, false);
+                blockCount++;
+            }
         }
 
         for (Location t : interfaceBlocks) {
-            t.getBlock().setTypeIdAndData(interfaceType, interfaceData, false);
+            ChunkLocation chunk = ChunkLocation.fromLocation(t);
+            if (!chunk.isChunkLoaded() && !chunksToUnload.contains(chunk)) chunksToUnload.add(chunk);
+            Block tb = t.getBlock();
+
+            if (tb.getTypeId()!=interfaceType || tb.getData()!=interfaceData) {
+                tb.setTypeIdAndData(interfaceType, interfaceData, false);
+                blockCount++;
+            }
         }
+
+        for (ChunkLocation chunk : chunksToUnload)
+            chunk.unloadChunk();
+
+        return blockCount;
     }
 
     public void updateCircuitSign(boolean activated) {
+        if (!chunksLoaded) return;
+        
         BlockState state = activationBlock.getBlock().getState();
-        if (!(state instanceof Sign)) {
-            throw new IllegalArgumentException("Circuit " + id + " has no activation sign or its activation sign has moved.");
-        }
+        if (!(state instanceof Sign)) return;
 
         final Sign sign = (Sign)state;
-
+        if (sign==null) return;
         String line;
         if (activated) {
-            String signColor = redstoneChips.getPrefsManager().getSignColor();            
+            String signColor = redstoneChips.getPrefs().getSignColor();
             line = (char)167 + signColor + this.getCircuitClass();
         } else {
             line = this.getCircuitClass();
         }
 
-        if (!line.equals(sign.getLine(0))) {
-            sign.setLine(0, line);
-            if (chunkLoaded) {
+        try {
+            if (!line.equals(sign.getLine(0))) {
+                sign.setLine(0, line);
+
                 redstoneChips.getServer().getScheduler().scheduleSyncDelayedTask(redstoneChips, new Runnable() {
                     @Override
                     public void run() {
@@ -491,7 +546,45 @@ public abstract class Circuit {
                     }
                 });
             }
+        } catch (NullPointerException ne) { }
+    }
 
-        } 
+    public boolean isCircuitChunkLoaded() {
+        return chunksLoaded;
+    }
+
+    private void runInputLogic() {
+        for (int i=0; i<inputs.length; i++)
+            this.inputChange(i, inputBits.get(i));
+    }
+
+    public boolean checkIntegrity() {
+        List<Location> checked = new ArrayList<Location>();
+
+        for (Location o : outputs) {
+            // expect lever
+            if (world.getBlockTypeIdAt(o)!=Material.LEVER.getId()) {
+                redstoneChips.log(Level.WARNING, "Circuit " + id + ": Output lever is missing at " + o.getBlockX() + "," + o.getBlockY() + ", " + o.getBlockZ() + ".");
+                return false;
+            } else
+                checked.add(o);
+        }
+
+        if (world.getBlockTypeIdAt(activationBlock)!=Material.WALL_SIGN.getId()) {
+            redstoneChips.log(Level.WARNING, "Circuit " + id + ": Sign is missing at " + activationBlock.getBlockX() + "," + activationBlock.getBlockY() + ", " + activationBlock.getBlockZ() + ".");
+            return false;
+        } else
+            checked.add(activationBlock);
+
+        for (Location s : structure) {
+            if (!checked.contains(s)) {
+                if (world.getBlockTypeIdAt(s)==Material.AIR.getId()) {
+                    redstoneChips.log(Level.WARNING, "Circuit " + id + ": Chip block is missing at " + s.getBlockX() + "," + s.getBlockY() + ", " + s.getBlockZ() + ".");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -54,7 +54,7 @@ public class CircuitLoader {
         else return (Circuit) c.newInstance();
     }
 
-    Map<String, Class> getCircuitClasses() {
+    public Map<String, Class> getCircuitClasses() {
         return circuitClasses;
     }
 

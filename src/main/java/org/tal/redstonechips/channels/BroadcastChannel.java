@@ -38,6 +38,8 @@ public class BroadcastChannel {
      * @param r The receiving circuit.
      */
     public void addReceiver(ReceivingCircuit r) {
+        if (receivers.contains(r)) return;
+
         receivers.add(r);
         if (r.getStartBit()+r.getLength()>length)
             length = r.getStartBit()+r.getLength();        
@@ -60,6 +62,8 @@ public class BroadcastChannel {
      * @param r The transmitting circuit.
      */
     public void addTransmitter(TransmittingCircuit t) {
+        if (transmitters.contains(t)) return;
+        
         transmitters.add(t);
         if (t.getStartBit()+t.getLength()>length)
             length = t.getStartBit()+t.getLength();

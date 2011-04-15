@@ -5,7 +5,6 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
 /**
  * Represents an input pin of a Circuit. Used for finding out if redstone current change in a block
@@ -38,11 +37,11 @@ public class InputPin {
         // assuming circuit already has its structure block set up.
         powerBlocks = new HashMap<Location, Boolean>();
 
-        addPowerBlock(BlockFace.UP);
-        addPowerBlock(BlockFace.NORTH);
-        addPowerBlock(BlockFace.EAST);
-        addPowerBlock(BlockFace.SOUTH);
-        addPowerBlock(BlockFace.WEST);
+        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()+1, inputBlock.getBlockZ()));
+        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX()+1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
+        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX()-1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
+        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()+1));
+        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()-1));
     }
 
     /**
@@ -76,24 +75,33 @@ public class InputPin {
         return ret;
     }
 
-    private void addPowerBlock(BlockFace direction) {
-        Block in = circuit.world.getBlockAt(inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ());
-        Block b = in.getFace(direction);
+    private void addPowerBlock(Location loc) {
 
-        boolean state;
-        if (b.getType()==Material.REDSTONE_WIRE)
-            state = b.getData()>0;
-        else if (b.getType()==Material.LEVER)
-            state = (b.getData()&8) == 8;
-        else 
-            state = false;
+        if (!partOfStructure(loc)) {
+            boolean state = false;
 
-        if (!partOfStructure(b)) powerBlocks.put(b.getLocation(), state);
+            int type = circuit.world.getBlockTypeIdAt(loc);
+            if (type==Material.REDSTONE_WIRE.getId()) {
+                byte data = circuit.world.getBlockAt(loc).getData();
+                state = data>0;
+            } else if (type == Material.LEVER.getId()) {
+                byte data = circuit.world.getBlockAt(loc).getData();
+                state = (data&8) == 8;
+            } else {
+                state = false;
+            }
+
+            if (circuit.isCircuitChunkLoaded()) {
+
+            }
+            
+            powerBlocks.put(loc, state);
+        }
     }
 
-    private boolean partOfStructure(Block b) {
+    private boolean partOfStructure(Location b) {
         for (Location l : circuit.structure) {
-            if (b.getLocation().equals(l))
+            if (b.equals(l))
                 return true;
         }
 
@@ -145,5 +153,27 @@ public class InputPin {
         }
 
         circuit.disableInputs();
+    }
+
+    public void refreshPowerBlocks() {
+        for (Location l : this.powerBlocks.keySet())
+            powerBlocks.put(l, findPowerBlockState(l));
+    }
+
+    public boolean findPowerBlockState(Location loc) {
+        boolean state = false;
+
+        int type = circuit.world.getBlockTypeIdAt(loc);
+        if (type==Material.REDSTONE_WIRE.getId()) {
+            byte data = circuit.world.getBlockAt(loc).getData();
+            state = data>0;
+        } else if (type == Material.LEVER.getId()) {
+            byte data = circuit.world.getBlockAt(loc).getData();
+            state = (data&8) == 8;
+        } else {
+            state = false;
+        }
+
+        return state;
     }
 }

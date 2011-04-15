@@ -5,7 +5,6 @@
 
 package org.tal.redstonechips;
 
-import org.bukkit.Chunk;
 import org.tal.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,127 +60,143 @@ public class CircuitManager {
 
     public int checkForCircuit(Block signBlock, CommandSender sender,
             MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
-        if (signBlock.getType()==Material.WALL_SIGN) {
-            BlockState state = signBlock.getState();
-            if (!(state instanceof Sign)) return -1;
 
-            Sign sign = (Sign)signBlock.getState();
+        if (signBlock.getType()!=Material.WALL_SIGN) return -1;
 
-            String signClass = getClassFromSign(sign);
+        BlockState state = signBlock.getState();
+        if (!(state instanceof Sign)) return -1;
 
-            // first check if its already registered
-            Circuit check = this.getCircuitByActivationBlock(signBlock);
-            if (check!=null) {
-                sender.sendMessage(rc.getPrefsManager().getInfoColor() + "Circuit is already activated (" + check.id + ").");
-                return -1;
-            }
+        Sign sign = (Sign)signBlock.getState();
+        String signClass = getClassFromSign(sign);
 
-            // then check if the sign text points to a known circuit type
-            if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -1;
-
-            List<Block> inputs = new ArrayList<Block>();
-            List<Block> outputs = new ArrayList<Block>();
-            List<Block> structure = new ArrayList<Block>();
-            List<Block> interfaceBlocks = new ArrayList<Block>();
-
-            structure.add(signBlock);
-            
-            BlockFace direction = findSignDirection(signBlock.getData());
-            Block firstChipBlock = signBlock.getFace(direction);
-
-            if (isTypeAllowed(firstChipBlock.getType())) {
-                Material chipMaterial = firstChipBlock.getType();
-
-                structure.add(firstChipBlock);
-                try {
-                    ScanParameters params = new ScanParameters();
-                    params.chipMaterial = chipMaterial;
-                    params.inputBlockType = inputBlockType;
-                    params.outputBlockType = outputBlockType;
-                    params.interfaceBlockType = interfaceBlockType;
-                    params.origin = firstChipBlock;
-                    params.inputs = inputs;
-                    params.outputs = outputs;
-                    params.interfaces = interfaceBlocks;
-                    params.structure = structure;
-                    params.direction = direction;
-                    scanBranch(params);
-                } catch (IllegalArgumentException ie) {
-                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + ie.getMessage());
-                    return -1;
-                } catch (StackOverflowError se) {
-                    sender.sendMessage(rc.getPrefsManager().getErrorColor() + "If you're trying to build a redstone chip, your chip is way too big.");
-                    return -1;
-                }
-
-                if (outputs.size()>0 || inputs.size()>0 || interfaceBlocks.size()>0) {
-                    String[] args = getArgsFromSign(sign);
-
-                    try {
-                        Circuit c = rc.getCircuitLoader().getCircuitInstance(signClass);
-                        c.world = signBlock.getWorld();
-                        c.activationBlock = signBlock.getLocation();
-
-                        c.structure = new Location[structure.size()];
-                        for (int i=0; i<structure.size(); i++) {
-                            c.structure[i] = structure.get(i).getLocation();
-                        }
-
-                        c.inputs = new InputPin[inputs.size()];
-                        for (int i=0; i<inputs.size(); i++) {
-                            c.inputs[i] = new InputPin(c, inputs.get(i).getLocation(), i);
-                        }
-
-                        c.outputs = new Location[outputs.size()];
-                        for (int i=0; i<outputs.size(); i++) {
-                            c.outputs[i] = outputs.get(i).getLocation();
-                        }
-
-                        c.interfaceBlocks = new Location[interfaceBlocks.size()];
-                        for (int i=0; i<interfaceBlocks.size(); i++) {
-                            c.interfaceBlocks[i] = interfaceBlocks.get(i).getLocation();
-                        }
-
-
-                        c.args = args;
-                        
-                        if (c.initCircuit(sender, args, rc)) {
-                            this.addCircuitLookups(c);
-                            c.id = generateId();
-                            circuits.put(c.id, c);
-
-                            ChatColor infoColor = rc.getPrefsManager().getInfoColor();
-                            ChatColor debugColor = rc.getPrefsManager().getDebugColor();
-                            sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + " (" + c.id + ") " + infoColor + "circuit:");
-                            sender.sendMessage(debugColor + "> " + ChatColor.WHITE + inputs.size() + debugColor + " input"
-                                    + (inputs.size()!=1?"s":"") + ", " + ChatColor.YELLOW + outputs.size() + debugColor + " output"
-                                    + (outputs.size()!=1?"s":"") + " and " + ChatColor.BLUE + interfaceBlocks.size() + debugColor
-                                    + " interface block" + (interfaceBlocks.size()!=1?"s":"") + ".");
-
-                            c.updateCircuitSign(true);
-
-                            return c.id;
-                        } else {
-                            sender.sendMessage(rc.getPrefsManager().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
-                            return -2;
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        // unknown circuit name. shouldn't happen at this stage.
-                        return -1;
-                    } catch (InstantiationException ex) {
-                        ex.printStackTrace();
-                        rc.log(Level.WARNING, ex.toString());
-                        return -1;
-                    } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
-                        rc.log(Level.WARNING, ex.toString());
-                        return -1;
-                    }
-                }
-            }
+        // first check if its already registered
+        Circuit check = this.getCircuitByActivationBlock(signBlock);
+        if (check!=null) {
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Circuit is already activated (" + check.id + ").");
+            return -2;
         }
 
-        return -1;
+        // then check if the sign text points to a known circuit type
+        if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -2;
+
+        List<Block> inputs = new ArrayList<Block>();
+        List<Block> outputs = new ArrayList<Block>();
+        List<Block> structure = new ArrayList<Block>();
+        List<Block> interfaceBlocks = new ArrayList<Block>();
+
+        structure.add(signBlock);
+
+        BlockFace direction = findSignDirection(signBlock.getData());
+        Block firstChipBlock = signBlock.getFace(direction);
+
+        if (!isTypeAllowed(firstChipBlock.getType())) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + "You can't build a redstone chip using this material (" + firstChipBlock.getType().name() + "). It's either doesn't work as a chip block or it already has another function as an i/o block.");
+            return -1;
+        }
+
+        Material chipMaterial = firstChipBlock.getType();
+        structure.add(firstChipBlock);
+
+        try {
+            ScanParameters params = new ScanParameters();
+            params.chipMaterial = chipMaterial;
+            params.inputBlockType = inputBlockType;
+            params.outputBlockType = outputBlockType;
+            params.interfaceBlockType = interfaceBlockType;
+            params.origin = firstChipBlock;
+            params.inputs = inputs;
+            params.outputs = outputs;
+            params.interfaces = interfaceBlocks;
+            params.structure = structure;
+            params.direction = direction;
+            scanBranch(params);
+        } catch (IllegalArgumentException ie) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
+            return -2;
+        } catch (StackOverflowError se) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + "If you're trying to build a redstone chip, your chip is way too big.");
+            return -2;
+        }
+
+        if (outputs.isEmpty() && inputs.isEmpty() && interfaceBlocks.isEmpty()) return -1;
+
+        String[] args = getArgsFromSign(sign);
+
+        Circuit c;
+
+        try {
+            c = rc.getCircuitLoader().getCircuitInstance(signClass);
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+            rc.log(Level.WARNING, ex.toString());
+            return -2;
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+            rc.log(Level.WARNING, ex.toString());
+            return -2;
+        } catch (IllegalArgumentException ex) {
+            // unknown circuit name. shouldn't happen at this stage.
+            return -2;
+        }
+
+        c.world = signBlock.getWorld();
+
+        c.activationBlock = signBlock.getLocation();
+
+        c.structure = new Location[structure.size()];
+        for (int i=0; i<structure.size(); i++) {
+            c.structure[i] = structure.get(i).getLocation();
+        }
+
+        c.inputs = new InputPin[inputs.size()];
+        for (int i=0; i<inputs.size(); i++) {
+            c.inputs[i] = new InputPin(c, inputs.get(i).getLocation(), i);
+        }
+
+        c.outputs = new Location[outputs.size()];
+        for (int i=0; i<outputs.size(); i++) {
+            c.outputs[i] = outputs.get(i).getLocation();
+        }
+
+        c.interfaceBlocks = new Location[interfaceBlocks.size()];
+        for (int i=0; i<interfaceBlocks.size(); i++) {
+            c.interfaceBlocks[i] = interfaceBlocks.get(i).getLocation();
+        }
+
+        c.circuitChunks = findCircuitChunks(c);
+
+        c.args = args;
+
+        return this.activateCircuit(c, sender, args, -1);
+    }
+
+    public int activateCircuit(Circuit c, CommandSender sender, String[] signargs, int id) {
+        if (c.initCircuit(sender, signargs, rc)) {
+            this.addCircuitLookups(c);
+
+            if (id<0)
+                c.id = generateId();
+            else c.id = id;
+            circuits.put(c.id, c);
+
+            if (sender != null) {
+                ChatColor infoColor = rc.getPrefs().getInfoColor();
+                ChatColor debugColor = rc.getPrefs().getDebugColor();
+                sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + " (" + c.id + ") " + infoColor + "circuit:");
+                sender.sendMessage(debugColor + "> " + ChatColor.WHITE + c.inputs.length + debugColor + " input"
+                        + (c.inputs.length!=1?"s":"") + ", " + ChatColor.YELLOW + c.outputs.length + debugColor + " output"
+                        + (c.outputs.length!=1?"s":"") + " and " + ChatColor.AQUA + c.interfaceBlocks.length + debugColor
+                        + " interface block" + (c.interfaceBlocks.length!=1?"s":"") + ".");
+            }
+
+            c.updateCircuitSign(true);
+
+            return c.id;
+        } else {
+            if (sender!=null)
+                sender.sendMessage(rc.getPrefs().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
+            return -2;
+        }
     }
 
     public void shutdownCircuits() {
@@ -375,7 +390,7 @@ public class CircuitManager {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.containsValue(destroyed)) {
-            if (s!=null) s.sendMessage(rc.getPrefsManager().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
+            if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
             destroyCircuit(destroyed, s, false);
         }
     }
@@ -395,9 +410,6 @@ public class CircuitManager {
 
     void setCircuitMap(HashMap<Integer, Circuit> circuits) {
         this.circuits = circuits;
-
-        for (Circuit c : circuits.values())
-            addCircuitLookups(c);
     }
 
     public List<InputPin> lookupInputBlock(Block inputBlock) {
@@ -409,18 +421,11 @@ public class CircuitManager {
     }
 
     private void addCircuitLookups(Circuit c) {
-        List<Chunk> usedChunks = new ArrayList<Chunk>();
-
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
 
         for (int i=0; i<c.outputs.length; i++) {
             outputLookupMap.put(c.outputs[i], new Object[]{c, i});
-
-            Chunk outputChunk = c.world.getBlockAt(c.outputs[i].getBlockX(), c.outputs[i].getBlockY(), c.outputs[i].getBlockZ()).getChunk();
-
-            if (!usedChunks.contains(outputChunk))
-                usedChunks.add(outputChunk);
         }
 
         activationLookupMap.put(c.activationBlock, c);
@@ -434,11 +439,10 @@ public class CircuitManager {
             }
         }
 
-        for (Chunk chunk : usedChunks) {
-            ChunkLocation cl = ChunkLocation.fromChunk(chunk);
-            if (!chunkLookupMap.containsKey(cl))
-                chunkLookupMap.put(cl, new ArrayList<Circuit>());
-            chunkLookupMap.get(cl).add(c);
+        for (ChunkLocation chunk : c.circuitChunks) {
+            if (!chunkLookupMap.containsKey(chunk))
+                chunkLookupMap.put(chunk, new ArrayList<Circuit>());
+            chunkLookupMap.get(chunk).add(c);
         }
     }
 
@@ -467,13 +471,29 @@ public class CircuitManager {
         
         activationLookupMap.remove(c.activationBlock);
 
+        List<ChunkLocation> emptyChunks = new ArrayList<ChunkLocation>();
+
+        for (ChunkLocation loc : c.circuitChunks) {
+            if (chunkLookupMap.containsKey(loc)) {
+                List<Circuit> ccircuits = chunkLookupMap.get(loc);
+
+                if (ccircuits!=null) {
+                    ccircuits.remove(c);
+                    if (ccircuits.isEmpty())
+                        emptyChunks.add(loc);
+                }
+            }
+        }
+        
+        for (ChunkLocation loc : emptyChunks)
+           chunkLookupMap.remove(loc);
     }
 
     public boolean destroyCircuit(Circuit destroyed, CommandSender destroyer, boolean destroyBlocks) {
         if (destroyBlocks) {
-            boolean enableDestroyCommand = (Boolean)rc.getPrefsManager().getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
+            boolean enableDestroyCommand = (Boolean)rc.getPrefs().getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
             if (!enableDestroyCommand) {
-                destroyer.sendMessage(rc.getPrefsManager().getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
+                destroyer.sendMessage(rc.getPrefs().getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
                 return false;
             }
 
@@ -505,9 +525,9 @@ public class CircuitManager {
         else dName = "an unknown command sender";
         for (CommandSender s : destroyed.getDebuggers()) {
             if (!s.equals(destroyer)) {
-                s.sendMessage(rc.getPrefsManager().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " +
-                        rc.getPrefsManager().getErrorColor() + "deactivated " + rc.getPrefsManager().getDebugColor() + "by " + dName +
-                        rc.getPrefsManager().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
+                s.sendMessage(rc.getPrefs().getDebugColor() + "A " + destroyed.getCircuitClass() + " circuit you were debugging was " +
+                        rc.getPrefs().getErrorColor() + "deactivated " + rc.getPrefs().getDebugColor() + "by " + dName +
+                        rc.getPrefs().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
             }
         }
 
@@ -522,13 +542,13 @@ public class CircuitManager {
         rc.getCircuitManager().destroyCircuit(c, reseter, false);
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, reseter,
-                rc.getPrefsManager().getInputBlockType(), rc.getPrefsManager().getOutputBlockType(), rc.getPrefsManager().getInterfaceBlockType());
+                rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
         Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
 
         if (newCircuit!=null) {
             newCircuit.id = id;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
-            reseter.sendMessage(rc.getPrefsManager().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefsManager().getInfoColor() + " circuit is reactivated.");
+            reseter.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefs().getInfoColor() + " circuit is reactivated.");
             return true;
         } else {
             return false;
@@ -544,8 +564,9 @@ public class CircuitManager {
         }
     }
 
-    public void updateOnChunkLoad(Chunk chunk) {
-        List<Circuit> circuitsInChunk = chunkLookupMap.get(ChunkLocation.fromChunk(chunk));
+    public void updateOnChunkLoad(ChunkLocation chunk) {
+        List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
+
         if (circuitsInChunk!=null) {
             for (Circuit c : circuitsInChunk) {
                 c.circuitChunkLoaded();
@@ -553,20 +574,101 @@ public class CircuitManager {
         }
     }
 
-    public void updateOnChunkUnload(Chunk chunk) {
-        List<Circuit> circuitsInChunk = chunkLookupMap.get(ChunkLocation.fromChunk(chunk));
+    public void updateOnChunkUnload(ChunkLocation chunk) {
+        List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
         if (circuitsInChunk!=null) {
             for (Circuit c : circuitsInChunk) {
-                c.circuitChunkUnloaded();
+                // if all of the circuit's chunks are unloaded we call the method.
+                boolean call = true;
+
+                for (ChunkLocation loc : c.circuitChunks)
+                    if (loc.isChunkLoaded())
+                        call = false;
+
+                if (call) c.circuitChunksUnloaded();
             }
         }
     }
 
+    /**
+     * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity()
+     * for more info.
+     */
+    public void checkCircuitsIntegrity() {
+        if (circuits==null) return;
+
+        List<Integer> invalidIds = new ArrayList<Integer>();
+
+        List<ChunkLocation> unloadedChunks = new ArrayList<ChunkLocation>();
+
+        for (Circuit c : circuits.values()) {
+            for (ChunkLocation chunk : c.circuitChunks) {
+                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                    unloadedChunks.add(chunk);
+            }
+
+            // we also might need to load/unload some chunks that don't have outputs in them
+            for (Location s : c.structure) {
+                ChunkLocation chunk = ChunkLocation.fromLocation(s);
+                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                    unloadedChunks.add(chunk);
+            }
+        }
+
+        for (ChunkLocation unloaded : unloadedChunks)
+            unloaded.loadChunk();
+
+        for (Circuit c : circuits.values()) {
+            if (!c.checkIntegrity()) {
+                invalidIds.add(c.id);
+            }
+        }
+
+        String msg;
+        if (invalidIds.isEmpty())
+            msg = "All circuits are intact.";
+        else {
+            String ids = "";
+
+            for (int i : invalidIds) {
+                Circuit c = circuits.get(i);
+                String details = "("  + c.getCircuitClass() + " @ " + c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ() + " on " + c.world.getName() + ")";
+                this.destroyCircuit(circuits.get(i), null, false);
+                ids += i + " " + details + ", ";
+            }
+
+            ids = ids.substring(0, ids.length()-2);
+
+            msg = "Deactivated " + invalidIds.size() + " damaged circuits: " + ids;
+        }
+
+        for (ChunkLocation chunk : unloadedChunks) {
+            chunk.unloadChunk();
+        }
+
+        rc.log(Level.INFO, "Done checking circuits. " + msg);
+    }
+
+    ChunkLocation[] findCircuitChunks(Circuit c) {
+        List<ChunkLocation> circuitChunks = new ArrayList<ChunkLocation>();
+
+        circuitChunks.add(ChunkLocation.fromLocation(c.activationBlock));
+
+        for (int i=0; i<c.outputs.length; i++) {
+            ChunkLocation chunk = ChunkLocation.fromLocation(c.outputs[i]);
+
+            if (!circuitChunks.contains(chunk))
+                circuitChunks.add(chunk);
+
+        }
+
+        return circuitChunks.toArray(new ChunkLocation[circuitChunks.size()]);
+    }
 
     private boolean isTypeAllowed(Material material) {
-        return material!=rc.getPrefsManager().getInputBlockType().getItemType() &&
-                material!=rc.getPrefsManager().getOutputBlockType().getItemType() &&
-                material!=rc.getPrefsManager().getInterfaceBlockType().getItemType() &&
+        return material!=rc.getPrefs().getInputBlockType().getItemType() &&
+                material!=rc.getPrefs().getOutputBlockType().getItemType() &&
+                material!=rc.getPrefs().getInterfaceBlockType().getItemType() &&
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
 

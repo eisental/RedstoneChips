@@ -3,60 +3,142 @@ main: org.tal.redstonechips.RedstoneChips
 version: 0.88
 author: eisental
 description: Core plugin for integrated redstone circuits 
-website: eisental.github.com/RedstoneChips
+website: http://eisental.github.com/RedstoneChips
 commands:
   rclist:
-    description: Prints a list of active chips including their id numbers and locations.
+    description: Prints a list of active chips.
+    usage:
+      /rclist [world-name|all] [page-number]
+
+      The command without any arguments will list all circuits in the current world or, when used from the server console, circuits
+      in all worlds.
+
+      Use /rclist all as a player to see a list of all circuits on the server
+
+      Use /rclist <world-name> to list all circuits in a specific world.
   rcclasses:
     description: Prints a list of installed circuit classes.
+    usage:
   rcprefs:
-    description: Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
-      To change a specific value use /rcprefs <pref key> <new value>.
+    description: Allows to see and change the plugin's preferences.
+    usage:
+      /rcprefs [pref key] [new value]
+
+      Use the command with no arguments to list all preferences values.
+      To change a preference value use /rcprefs <pref key> <new value>.
   rcdebug:
-    description: Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish
-      to debug or by using /rcdebug <chip id> if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use /rcdebug off or /rcdebug <chip id> off. To stop receiving debug messages from all circuits use /rcdebug alloff
+    description: Register yourself as a debugger of a chip.
+    usage:
+      /rcdebug [chip-id|off|alloff]
+
+      Use by either pointing at the circuit you wish to debug or by using /rcdebug <chip id> if you have admin priviliges.
+      
+      To stop receiving debug messages from the chip use the same command again or use /rcdebug off or /rcdebug <chip id> off.
+      
+      To stop receiving debug messages from all circuits use /rcdebug alloff.
   rcpin:
-    description: Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
-      source to use.
+    description: Prints information about a chip pin.
+    usage:
+      Point towards an output lever or input redstone source to use.
+
+      Prints the pin number (starting with 0), pin type (input/output), and current state (on/off) of the pin.
   rcactivate:
-    description: Activates a circuit. Point the circuit sign and execute the command. To activate a circuit built with different
-      input, output or interface block types then set in the preferences use /rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType> .
+    description: Activates a circuit.
+    usage:
+      Point the circuit sign and execute the command.
+      To activate a circuit built with different input, output or interface block types then set in the preferences use /rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType> .
   rcdestroy:
-    description: Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter
-                 the command. This command is disabled by default. To enable it use /rcprefs enableDestroyCommand true.
+    description: Destroys a circuit and removes its blocks.
+    usage:
+      Point at a block of the circuit you wish to destroy and enter the command.
+      This command is disabled by default. To enable it use /rcprefs enableDestroyCommand true.
   rcbreak:
-    description: Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+    description: Deactivates a circuit without removing its blocks.
+    usage:
+      /rcbreak [circuit-id]
+
+      Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
   rctype:
-    description: Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
+    description: Used for sending data to supporting circuits.
+    usage:
+      /rctype [...]
+
+      Check the relevant circuit documentation for more information about usage.
   rcreset:
-    description: Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using
-      the chip's id number as an argument if you have admin priviliges.
+    description: Rescans and reactivates a circuit.
+    usage:
+      /rcreset [circuit-id]
+
+      Use by pointing towards the circuit or by using the chip's id number as an argument if you have op priviliges.
+      Reset a circuit to scan for new i/o blocks or sign arguments and apply any changes.
   rcchannels:
-    description: Prints a list of currently used wireless broadcast channels. Use /rcchannels <channel name> to get more info about a specific channel.
+    description: Prints a list of all wireless broadcast channels.
+    usage:
+      /rcchannels [channel-name|page]
+      
+      Use a channel name as an argument to print info about that channel.
   rcinfo:
-    description: Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
+    description: Prints a lot of useful information about a chip.
+    usage:
+      /rcinfo [circuit-id]
+
+      Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
   rcfixioblocks:
-    description: Updates all input, output, and interface blocks of a circuit to match the currently used block types.
+    description: Replace i/o blocks using incorrect materials.
+    usage:
+      /rcfixioblocks [circuit-id]
+
+      Use by pointing at the circuit you want to fix or, if you have op priviliges, use a circuit id as an argument.
+      Any i/o blocks using a different block type than set in the plugin's preferences are replaced to the correct material.
   rcsel:
-    description: A command for mass editing circuits within a selection cuboid. To define a selection type /rcsel and right-click on two opposite corners of
-      your cuboid. Once it's defined you can execute any of the following commands.
-        /rcsel activate - Activate any circuits whose sign is inside the region.
-        /rcsel activate <input type> <output type> <interface block type> - Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o blocks.
+    description: Mass editing circuits within a selection cuboid.
+    usage:
+      To define a selection type /rcsel and right-click on two opposite corners of your cuboid.
+      When no selection is defined /rcsel will try to use WorldEdit's current selection. 
+      
+      When either types of selections are defined you can execute any of the following commands.
+
+      - /rcsel activate - Activate any circuits whose sign is inside the selection region.
+
+      - /rcsel activate <input type> <output type> <interface block type> - Activate any circuits whose sign is inside the selection using these block types for detecting i/o blocks.
         Once the circuit is activated the i/o blocks are replaced to the currently used types.
-        /rcsel fixioblocks - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
-        /rcsel break - Deactivate every active circuit in the cuboid.
-        /rcsel destroy - Deactivates and removes blocks of every active circuit in the cuboid.
-        /rcsel reset - Reset every active circuit in the cuboid.
+
+      - /rcsel fixioblocks - Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
+
+      - /rcsel break - Deactivate every active circuit in the selection.
+
+      - /rcsel destroy - Deactivates and removes blocks of every active circuit in the selection.
+
+      - /rcsel reset - Reset every active circuit in the selection.
+
+      - /rcsel list - Lists all active circuits in the selection.
   rcarg:
-    description: Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by
-      pointing at the circuit you want to edit and running /rcarg <arg number> <arg value>. [arg number] is the argument number you want to change, starting with argument 1. 
-      To add a new argument use /rcarg add <arg value>. To remove an argument use /rcarg clear <arg number>.
+    description: Replace, add or clear circuit sign arguments.
+    usage:
+      /rcarg <arg-number|add|clear> <arg-value>...<arg-number|add|clear> <arg-value>
+
+      Use by pointing at the circuit you want to edit and execute the command.
+
+      To change an existing argument value use /rcarg <arg-number> <arg-value>, where arg-number is the
+      sign argument number, starting to count with 1 and arg-value is the new value for this argument.
+
+      To add an argument as the last argument use /rcarg add <arg-value>.
+
+      To remove an argument use /rcarg clear <arg-number>
+
+      You can make changes to more than 1 argument by typing additional command arguments, for ex. /rcarg 1 val clear 2
+      will set the 1st argument to val and remove the 2nd argument.
   rcsave:
-    description: Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save.
+    description: Saves all circuit data to file.
+    usage:
+      Makes sure all circuits are intact and saves their current state to the plugin's circuits file.
+
+      Should not be used unless there's a problem with the automatic data save.
   rcload:
-    description: Reloads circuit data from file. Will reset any changes since last save. 
+    description: Reloads circuit data from file.
+    usage:
+      This will reset any changes made to the circuits state since the last save occured.
   rchelp:
-    description: Prints a list or description of all RedstoneChips commands. Use /rchelp <command name> to get help about a specific command.
-
-
-
+    description: Prints a list or description of all RC commands.
+    usage:
+      Use /rchelp <command name> to get help about a specific command.

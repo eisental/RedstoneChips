@@ -1,6 +1,7 @@
 package org.tal.redstonechips.util;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 /**
@@ -27,6 +28,10 @@ public class ChunkLocation {
         return new ChunkLocation(chunk.getX(), chunk.getZ(), chunk.getWorld());
     }
 
+    public static ChunkLocation fromLocation(Location location) {
+        return new ChunkLocation(location.getBlockX() >> 4, location.getBlockZ() >> 4, location.getWorld());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ChunkLocation)) return false;
@@ -35,6 +40,10 @@ public class ChunkLocation {
         return (that.x==this.x && that.z==this.z && that.world.getId()==this.world.getId());
     }
 
+    public int getX() { return x; }
+    public int getZ() { return z; }
+    public World getWorld() { return world; }
+    
     @Override
     public int hashCode() {
         int hash = 7;
@@ -42,5 +51,26 @@ public class ChunkLocation {
         hash = 29 * hash + this.z;
         hash = 29 * hash + (this.world != null ? this.world.hashCode() : 0);
         return hash;
+    }
+
+    public Chunk getChunk() {
+        return world.getChunkAt(x, z);
+    }
+
+    public boolean isChunkLoaded() {
+        return world.isChunkLoaded(x, z);
+    }
+
+    public void unloadChunk() {
+        world.unloadChunk(x, z, true);
+    }
+
+    public void loadChunk() {
+        world.loadChunk(x, z);
+    }
+
+    @Override
+    public String toString() {
+        return "ChunkLocation:x=" + x + ",z=" + z + "world=" + world.getName();
     }
 }
