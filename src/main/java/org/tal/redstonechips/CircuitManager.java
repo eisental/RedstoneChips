@@ -580,7 +580,6 @@ public class CircuitManager {
             for (Circuit c : circuitsInChunk) {
                 // if all of the circuit's chunks are unloaded we call the method.
                 boolean call = true;
-
                 for (ChunkLocation loc : c.circuitChunks)
                     if (loc.isChunkLoaded())
                         call = false;

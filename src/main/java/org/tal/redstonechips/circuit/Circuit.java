@@ -408,6 +408,8 @@ public abstract class Circuit {
      * in outputBits.
      */
     public void circuitChunkLoaded() {
+        if (chunksLoaded) return;
+
         chunksLoaded = true;
 
         if (!chunksEverLoaded) {

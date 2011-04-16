@@ -47,6 +47,10 @@ public class BitSetUtils {
         return signed;
     }
 
+    public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
+        return bitSetToBinaryString(b, startBit, length, 4);
+    }
+
     /**
      * Convert a BitSet to a binary representation string.
      * Converting each bit into "0" or "1".
@@ -54,12 +58,20 @@ public class BitSetUtils {
      * @param b BitSet to convert
      * @param startBit Start converting from this bit. Treat it as the least significant bit.
      * @param length Number of bits to read from the BitSet after the startBit.
+     * @param wordlength When greater than 0, a space character is added each wordlength number of digits.
      * @return Binary representation String of the BitSet.
      */
-    public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
-        String ret = "";
-        for (int i=length+startBit-1; i>=startBit; i--) ret += (b.get(i)?"1":"0");
-        return ret;
+    public static String bitSetToBinaryString(BitSet7 b, int startBit, int length, int wordlength) {
+        StringBuilder ret = new StringBuilder();
+
+        for (int i=length+startBit-1; i>=startBit; i--) {
+            ret.append(b.get(i)?"1":"0");
+            
+            if (wordlength>0 && i>0 && i % wordlength==0)
+                ret.append(' ');
+        }
+
+        return ret.toString();
     }
 
     /**

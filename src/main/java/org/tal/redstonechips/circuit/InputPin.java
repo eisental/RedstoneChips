@@ -91,10 +91,6 @@ public class InputPin {
                 state = false;
             }
 
-            if (circuit.isCircuitChunkLoaded()) {
-
-            }
-            
             powerBlocks.put(loc, state);
         }
     }
