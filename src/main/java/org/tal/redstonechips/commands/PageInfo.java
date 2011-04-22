@@ -23,7 +23,7 @@ public class PageInfo {
 
     boolean isNewCommand(String commandName, String[] args) {
         if (!commandName.equalsIgnoreCase(lastCommandName)) return true;
-
+        if (lastArgs==null && args!=null) return false;
         if (args.length!=lastArgs.length) return true;
         
         for (int i=0; i<args.length; i++) if (!args[i].equalsIgnoreCase(lastArgs[i])) return true;
