@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips;
 
@@ -32,7 +28,7 @@ public class PrefsManager {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        signColor, rightClickToActivate, enableDestroyCommand, freezeOnChunkUnload;
+        signColor, rightClickToActivate, enableDestroyCommand;
     };
 
     private RedstoneChips rc;
@@ -48,7 +44,6 @@ public class PrefsManager {
 
     private String signColor;
     private boolean rightClickToActivate;
-    private boolean freezeOnChunkUnload;
 
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
@@ -221,14 +216,6 @@ public class PrefsManager {
 
     /**
      *
-     * @return Whether active circuits in unloaded chunks should remain active or not.
-     */
-    public boolean getFreezeOnChunkUnload() {
-        return freezeOnChunkUnload;
-    }
-
-    /**
-     *
      * @return The current debug chat message color preference value.
      */
     public ChatColor getDebugColor() {
@@ -324,8 +311,6 @@ public class PrefsManager {
         signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
         
         rightClickToActivate = Boolean.parseBoolean(toapply.get(Prefs.rightClickToActivate.name()).toString());
-
-        freezeOnChunkUnload = Boolean.parseBoolean(toapply.get(Prefs.freezeOnChunkUnload.name()).toString());
 
         prefs.putAll(toapply);
     }

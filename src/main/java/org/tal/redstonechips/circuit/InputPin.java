@@ -158,16 +158,17 @@ public class InputPin {
 
     public boolean findPowerBlockState(Location loc) {
         boolean state = false;
+        Block b = loc.getBlock();
 
-        int type = circuit.world.getBlockTypeIdAt(loc);
-        if (type==Material.REDSTONE_WIRE.getId()) {
-            byte data = circuit.world.getBlockAt(loc).getData();
-            state = data>0;
-        } else if (type == Material.LEVER.getId()) {
-            byte data = circuit.world.getBlockAt(loc).getData();
+        if (b.getType()==Material.REDSTONE_WIRE) {
+            state = b.getData()>0;
+        } else if (b.getType() == Material.LEVER) {
+            byte data = b.getData();
             state = (data&8) == 8;
-        } else {
+        } else if (b.getType() == Material.REDSTONE_TORCH_OFF) {
             state = false;
+        } else if (b.getType() == Material.REDSTONE_TORCH_ON) {
+            state = true;
         }
 
         return state;

@@ -1,11 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.commands;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,22 +58,34 @@ public class CommandUtils {
         return player.getTargetBlock(transparentMaterials, 100);
     }
 
-    public static void pageMaker(CommandSender s, String spage, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, spage, title, commandName, lines, infoColor, errorColor, MaxLines);
+
+    public static Map<CommandSender, PageInfo> playerPages = new HashMap<CommandSender, PageInfo>();
+
+    public static void pageMaker(CommandSender s, String title, String commandName, String[] args, String[] lines, ChatColor infoColor, ChatColor errorColor) {
+        CommandUtils.pageMaker(s, title, commandName, args, lines, infoColor, errorColor, MaxLines);
     }
 
-    public static void pageMaker(CommandSender s, String spage, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor, int maxLines) {
-        maxLines = maxLines - 3;
-        int page = 1;
-        if (spage!=null) {
-            try {
-                page = Integer.decode(spage);
-            } catch (NumberFormatException ne) {
-                //s.sendMessage(errorColor + "Invalid page number: " + args[args.length-1]);
-            }
-        }
+    public static void pageMaker(CommandSender s, String title, String commandName, String[] args, String[] lines, ChatColor infoColor, ChatColor errorColor, int maxLines) {
+        maxLines = maxLines - 4;
+        int page;
 
         int pageCount = (int)(Math.ceil(lines.length/(float)maxLines));
+        if (playerPages.containsKey(s)) {
+            PageInfo pageInfo = playerPages.get(s);
+            if (pageInfo.isNewCommand(commandName, args)) {
+                pageInfo.lastCommandName = commandName;
+                pageInfo.lastArgs = args;
+                pageInfo.page = 1;
+                pageInfo.pageCount = pageCount;
+            } 
+
+            page = pageInfo.page;
+        } else {
+            page = 1;
+            playerPages.put(s, new PageInfo(commandName, args, pageCount));
+        }
+
+
         if (page<1 || page>pageCount) s.sendMessage(errorColor + "Invalid page number: " + page + ". Expecting 1-" + pageCount);
         else {
             s.sendMessage(infoColor + title + ": " + (pageCount>1?"( page " + page + " / " + pageCount  + " )":""));
@@ -84,7 +94,7 @@ public class CommandUtils {
                 s.sendMessage(lines[i]);
             }
             s.sendMessage(infoColor + "----------------------");
-            if (pageCount>1) s.sendMessage("Use " + ChatColor.YELLOW + (s instanceof Player?"/":"") + commandName + " <page number>" + ChatColor.WHITE + " to see other pages.");
+            if (pageCount>1) s.sendMessage("Use " + ChatColor.YELLOW + (s instanceof Player?"/":"") + "rcp [page#|next|prev|last]" + ChatColor.WHITE + " to see other pages.");
         }
     }
 

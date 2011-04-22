@@ -1,10 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.commands;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,33 +22,33 @@ public class RCclasses extends RCCommand {
         
         if (circuitClasses.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");
         else {
-            printClassesList(sender, circuitClasses);
+            printClassesList(sender, args, circuitClasses);
         }
 
         return true;
     }
 
-    private void printClassesList(CommandSender sender, Map<String, Class> circuitClasses) {
+    private void printClassesList(CommandSender sender, String[] args, Map<String, Class> circuitClasses) {
         List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
         Collections.sort(names);
-        sender.sendMessage("");
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "Installed circuit classes:");
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "-----------------------");
+
+        List<String> lines = new ArrayList<String>();
+
         String list = "";
         ChatColor color = ChatColor.WHITE;
         for (String name : names) {
             list += color + name + ", ";
             if (list.length()>50) {
-                sender.sendMessage(list.substring(0, list.length()-2));
+                lines.add(list.substring(0, list.length()-2));
                 list = "";
             }
-            if (color==ChatColor.WHITE)
-                color = ChatColor.YELLOW;
+            
+            if (color==ChatColor.WHITE) color = ChatColor.YELLOW;
             else color = ChatColor.WHITE;
         }
-        if (!list.isEmpty()) sender.sendMessage(list.substring(0, list.length()-2));
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "----------------------");
-        sender.sendMessage("");
+
+        if (!list.isEmpty()) 
+            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", args, lines.toArray(new String[lines.size()]), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 
 }

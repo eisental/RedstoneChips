@@ -1,6 +1,7 @@
 package org.tal.redstonechips;
 
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
@@ -46,6 +47,7 @@ import org.tal.redstonechips.commands.RChelp;
 import org.tal.redstonechips.commands.RCinfo;
 import org.tal.redstonechips.commands.RClist;
 import org.tal.redstonechips.commands.RCload;
+import org.tal.redstonechips.commands.RCp;
 import org.tal.redstonechips.commands.RCpin;
 import org.tal.redstonechips.commands.RCprefs;
 import org.tal.redstonechips.commands.RCreset;
@@ -79,10 +81,10 @@ public class RedstoneChips extends JavaPlugin {
     public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
 
     private RCsel rcsel = new RCsel();
-    private RCCommand[] commands = new RCCommand[] {
+    public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave()
+        new RCtype(), new RCload(), new RCsave(), new RCp()
     };
 
     @Override
@@ -157,8 +159,17 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onBlockBreak(BlockBreakEvent event) {
-                if (!event.isCancelled())
+                if (!event.isCancelled()) {
                     circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
+                    circuitManager.checkCircuitInputChanged(event.getBlock(), event.getPlayer(), true);
+                }
+            }
+
+            @Override
+            public void onBlockPlace(BlockPlaceEvent event) {
+                if (!event.isCancelled()) {
+                    circuitManager.checkCircuitInputChanged(event.getBlock(), event.getPlayer(), false);
+                }
             }
 
             @Override
@@ -222,6 +233,7 @@ public class RedstoneChips extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
+        pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
         pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
         pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);

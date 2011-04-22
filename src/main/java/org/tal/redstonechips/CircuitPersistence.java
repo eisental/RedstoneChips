@@ -156,7 +156,7 @@ public class CircuitPersistence {
         c.interfaceBlocks = getLocationArray(world, (List<List<Integer>>)map.get("interfaces"));
         c.structure = getLocationArray(world, (List<List<Integer>>)map.get("structure"));
         c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);
-
+        
         if (map.containsKey("chunks")) {
             c.circuitChunks = getChunkLocations(world, (List<List<Integer>>)map.get("chunks"));
         } else {
@@ -169,7 +169,12 @@ public class CircuitPersistence {
         int id = -1;
         if (map.containsKey("id")) id = (Integer)map.get("id");
 
-        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>0) return c;
+        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>0) {
+            if (map.containsKey("state"))
+                c.setInternalState((Map<String, String>)map.get("state"));
+            
+            return c;
+        }
         else return null;
     }
 

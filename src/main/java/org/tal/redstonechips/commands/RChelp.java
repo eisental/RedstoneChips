@@ -1,10 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -28,14 +26,14 @@ public class RChelp extends RCCommand {
         } else {
             Map commandMap = (Map)commands.get(args[0]);
             if (commandMap==null) {
-                printCommandList(sender, commands, args[0], infoColor, errorColor);
-            } else printCommandHelp(sender, args[0], commandMap, infoColor);
+                printCommandList(sender, commands, args, infoColor, errorColor);
+            } else printCommandHelp(sender, args, commandMap, infoColor, errorColor);
         }
 
         return true;
     }
 
-    private void printCommandList(CommandSender sender, Map commands, String page, ChatColor infoColor, ChatColor errorColor) {
+    private void printCommandList(CommandSender sender, Map commands, String[] args, ChatColor infoColor, ChatColor errorColor) {
         String[] lines = new String[commands.size()];
 
         int i = 0;
@@ -45,25 +43,23 @@ public class RChelp extends RCCommand {
             i++;
         }
 
-        CommandUtils.pageMaker(sender, page, "RedstoneChips commands", "rchelp", lines, infoColor, errorColor, CommandUtils.MaxLines-2);
+        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", args, lines, infoColor, errorColor, CommandUtils.MaxLines-1);
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 
-    private void printCommandHelp(CommandSender sender, String name, Map commandMap, ChatColor infoColor) {
-        sender.sendMessage("");
-        sender.sendMessage(infoColor + "/" + name + ":");
-        sender.sendMessage(infoColor + "----------------------");
+    private void printCommandHelp(CommandSender sender, String[] args, Map commandMap, ChatColor infoColor, ChatColor errorColor) {
+        List<String> lines = new ArrayList<String>();
 
-        sender.sendMessage(ChatColor.YELLOW+commandMap.get("description").toString());
+        lines.add(ChatColor.YELLOW+commandMap.get("description").toString());
         if (commandMap.containsKey("usage") && commandMap.get("usage")!=null) {
             String[] usage = commandMap.get("usage").toString().split("\\n");
             sender.sendMessage("");
 
             for (String line : usage)
-                sender.sendMessage(line.toString());
+                lines.add(line.toString());
         }
-        sender.sendMessage(infoColor + "----------------------");
-        sender.sendMessage("");
+
+        CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", args, lines.toArray(new String[lines.size()]), infoColor, errorColor);
     }
 
 }

@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.circuit;
 
 import org.tal.redstonechips.RedstoneChips;
 
 /**
- * An interface used for enabling the circuit library to inform RedstoneChips of all the Circuit classes it provides.
+ * An interface that enables a circuit library to inform RedstoneChips of all the Circuit classes it provides.
  * 
  * @author Tal Eisenberg
  */

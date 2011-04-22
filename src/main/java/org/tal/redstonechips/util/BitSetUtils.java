@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.util;
 
@@ -144,10 +140,11 @@ public class BitSetUtils {
      */
     public static Map<String,String> bitSetToMap(Map<String,String> map, String key, BitSet7 bits, int length) {
         String sbits = "";
-        for (int i=0; i<length; i++)
+        for (int i=length-1; i>=0; i--)
             sbits += (bits.get(i)?"1":"0");
 
         map.put(key, sbits);
+
         return map;
     }
 
@@ -162,9 +159,10 @@ public class BitSetUtils {
         BitSet7 bits = new BitSet7(sbits.length());
         if (sbits==null) return null;
 
-        for (int i=0; i<sbits.length(); i++) {
-            bits.set(i, (sbits.charAt(i)=='1'));
+        for (int i=sbits.length()-1; i>=0; i--) {
+            bits.set(sbits.length()-1-i, (sbits.charAt(i)=='1'));
         }
+
         return bits;
     }
 }

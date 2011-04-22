@@ -219,7 +219,7 @@ public class UnitParser {
                 retval += parse(compound.nextToken());
             return retval;
         }
-        Matcher m = ParsingAid.NUMBER_PATTERN.matcher(val);
+        Matcher m = ParsingUtils.NUMBER_PATTERN.matcher(val);
         double value = -1;
         String unit = "";
         

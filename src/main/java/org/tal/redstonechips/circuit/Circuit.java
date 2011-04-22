@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -94,8 +93,6 @@ public abstract class Circuit {
 
     private boolean chunksLoaded;
 
-    private boolean chunksEverLoaded = false;
-
     /**
      * Set to the chunk coordinates of the circuit's activation block
      */
@@ -117,25 +114,28 @@ public abstract class Circuit {
         this.args = args;
 
         chunksLoaded = false;
+
+        List<ChunkLocation> chunksToUnload = new ArrayList<ChunkLocation>();
+
         for (ChunkLocation chunk : circuitChunks) {
             if (chunk.isChunkLoaded()) { 
                 chunksLoaded = true;
-                break;
-            }
+            } else chunksToUnload.add(chunk);
         }
 
+        for (ChunkLocation chunk : chunksToUnload)
+            chunk.loadChunk();
+
+        updateInputBits();
+        
         boolean result = init(sender, args);
 
-        if (chunksLoaded) {
-            chunksEverLoaded = true;
-            updateInputBits();
+        if (result!=false && isStateless()) {
+            runInputLogic();
         }
 
-        if (result!=false) {
-            if (isStateless() && chunksLoaded) {
-                runInputLogic();
-            }
-        }
+        for (ChunkLocation chunk : chunksToUnload)
+            if (chunk.isChunkLoaded()) chunk.unloadChunk();
 
         return result;
     }
@@ -298,7 +298,7 @@ public abstract class Circuit {
      */
     protected void error(CommandSender sender, String message) {
         if (sender!=null) sender.sendMessage(redstoneChips.getPrefs().getErrorColor() + message);
-        else Logger.getLogger("Minecraft").warning(redstoneChips.getDescription().getName() + ": " + this.getClass().getSimpleName() + "> " + message);
+        else redstoneChips.log(Level.WARNING, this.getClass().getSimpleName() + "> " + message);
     }
 
     /**
@@ -411,18 +411,9 @@ public abstract class Circuit {
         if (chunksLoaded) return;
 
         chunksLoaded = true;
-
-        if (!chunksEverLoaded) {
-            // first time the circuit is loaded we need to load values into the output register.
-            chunksEverLoaded = true;
-            
-            for (InputPin i : inputs) 
-                i.refreshPowerBlocks();
-            
-            this.updateInputBits();
-            if (isStateless())
-                this.runInputLogic();
-        }
+        
+        for (InputPin i : inputs)
+            i.refreshPowerBlocks();
 
         for (int i=0; i<outputs.length; i++)
             changeLeverState(getOutputBlock(i), outputBits.get(i));
@@ -439,8 +430,10 @@ public abstract class Circuit {
      * Update the inputBits BitSet according to the current input pin values.
      */
     public void updateInputBits() {
-        for (int i=0; i<inputs.length; i++)
+        for (int i=0; i<inputs.length; i++) {
+            inputs[i].refreshPowerBlocks();
             inputBits.set(i, inputs[i].getPinValue());
+        }
     }
 
     /**

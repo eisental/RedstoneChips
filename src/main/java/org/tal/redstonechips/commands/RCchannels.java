@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.tal.redstonechips.commands;
 
@@ -35,7 +31,7 @@ public class RCchannels extends RCCommand {
                 }
 
                 sender.sendMessage("");
-                CommandUtils.pageMaker(sender, (args.length>0?args[0]:null), "Active wireless broadcast channels", "rcchannels", lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 2);
+                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), args, lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
                 sender.sendMessage("Use " + ChatColor.YELLOW + "/rcchannels <channel name>" + ChatColor.WHITE + " for more info about it.");
             }
         }

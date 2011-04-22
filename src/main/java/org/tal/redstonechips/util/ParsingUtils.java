@@ -34,7 +34,7 @@ import javax.swing.KeyStroke;
  *
  * @author Tal Eisenberg
  */
-public class ParsingAid {
+public class ParsingUtils {
     public final static Pattern NUMBER_PATTERN = Pattern.compile("^[-+]?\\d*\\.?\\d*");
     public final static Pattern INTEGER_PATTERN = Pattern.compile("^[-+]?\\d*");
     public final static Pattern SYMBOLNAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_$]*$");
@@ -257,6 +257,13 @@ public class ParsingAid {
             backSpcSign = true;            
             return '|';
         }
+    }
+
+    public static String arrayToString(String[] args, String delimiter) {
+        StringBuilder b = new StringBuilder();
+        for (String arg : args) { b.append(args); b.append(delimiter); }
+
+        return b.substring(0, b.length()-delimiter.length());
     }
 
 }
