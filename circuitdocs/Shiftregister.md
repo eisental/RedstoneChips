@@ -3,15 +3,13 @@ layout: main
 title: shiftregister
 ---
 
-A SIPO shift register. Can be built with any wordlength determined by the number of output pins.
-Each time the clock input is set to high, the register shifts one bit to the left and it's first bit is set to the current state of the data pin.
+A SIPO (Serial-In-Parallel-Out) shift register. Can be built with any word size determined by the number of output pins.
+Each time the clock input is turned on, the register shifts one bit to the left and it's first bit is set to the current state of the data pin.
 An optional reset pin can be added. When it's triggered the register is cleared.
  
 on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/shiftregister.java)
-
-
 
 * * *
 

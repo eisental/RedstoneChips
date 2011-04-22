@@ -22,7 +22,7 @@ The channel name can specify a start bit using the syntax `<channel name>:<start
 
 #### Sign text
 1. `   transmitter   `
-2. ` <broadcast channel> ` (NOT optional)
+2. ` <broadcast channel>[:<start bit>] ` (NOT optional) (The channel name is not optional)
 
 ![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
 

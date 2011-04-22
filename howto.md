@@ -1,6 +1,6 @@
 ---
 layout: main
-title: RedstoneChips Usage Guide
+title: How-To Guide
 ---
 
 Building a Chip
@@ -33,40 +33,162 @@ You can destroy a chip by breaking any of its structure blocks, including the ou
 while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
 __Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the IC to stop functioning.
 __Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
+When the plugin saves it's circuits states it will deactivate any circuit that any of it's blocks were broken.
 
 Plugin commands
 ----------------
 
-- `/rclist` Prints a list of active chips including their id numbers and locations.
-- `/rcclasses` Prints a list of installed circuit classes.
-- `/rcprefs` Allows to see and change the plugin's preferences. Use the command with no arguments to list all preferences values.
-      To change a specific value use `/rcprefs <pref key> <new value>`.
-- `/rcdebug` Registers the executing player to receive debug messages from a chip. Use by either pointing towards the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges. To stop receiving debug messages from the chip use the same command again or use `/rcdebug off` or `/rcdebug <chip id>` off. To stop receiving debug messages from all circuits use `/rcdebug alloff`.
-- `/rcpin` Prints information about a chip pin - it's pin number, type and current state. Point towards an output lever or input redstone
-      source to use.
-- `/rcactivate` Activates a circuit. Point at the circuit sign and execute the command. To activate a circuit built with other
-      input, output and interface block types than set in the preferences use `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`.
-- `/rcdestroy` Destroys a circuit and turns all of its blocks into air. Point at a block of the circuit you wish to destroy and enter the command. This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
-- `/rcbreak` Deactivates a circuit without removing its blocks. Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
-- `/rctype` Used for sending text or numbers to supporting circuits. Check the relevant circuit documentation for more information.
-- `/rcreset` Reactivates a circuit, applying any changes made to the sign with sign edit commands. Use by pointing towards the circuit or by using the chip's id number as an argument if you have admin priviliges.
-- `/rcfixioblocks` Updates all input, output, and interface blocks of a circuit to match the currently used block types.
-- `/rcarg` Replaces an argument of an active circuit or adds a new argument and resets the circuit to use the new value. Use by pointing at the circuit you want to edit and running `/rcarg <arg number> <arg value>`. `[arg number]` is the argument number you want to change, starting with argument no. 1. To add a new argument use `/rcarg add <arg value>`. To remove an argument use `/rcarg clear <arg number>`.
-- `/rcchannels` Prints a list of currently used wireless broadcast channels. Use `/rcchannels <channel name>` to get more info about a specific channel.
-- `/rcinfo` Prints a lot of useful information about a chip. Point at a block of the chip you wish to get info about or use the chip's id number as an argument.
-- `/rchelp` Prints a list or description of all RedstoneChips commands. Use `/rchelp <command name>` to get help about a specific command.
-- `/rcsave` Saves all circuit data to file. Should not be used unless there's a problem with the automatic data save. Can only be used by ops.
-- `/rcload` Reloads circuit data from file. Will reset any changes since last save. Can only be used by ops.
+###/rclist
+####Prints a list of active chips.
 
-- `/rcsel`  command for mass editing circuits within a selection cuboid. To define a selection type `/rcsel` and right-click on two opposite corners of
-      your cuboid. Once it's defined you can execute any of the following       
-	- `/rcsel activate` Activate any circuits whose sign is inside the region.
-	- `/rcsel activate <input type> <output type> <interface block type>` Activate any circuits whose sign is inside the cuboid using these block types for detecting i/o 	blocks. Once the circuit is activated the i/o blocks are replaced to the currently used types.
-	- `/rcsel fixioblocks` Update the i/o blocks of any activated circuit in the cuboid to use the currently used i/o block types.
-	- `/rcsel break` Deactivate every active circuit in the cuboid.
-	- `/rcsel destroy` Deactivates and removes blocks of every active circuit in the cuboid.
-	- `/rcsel reset` Reset every active circuit in the cuboid.              
+usage: `/rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;…]`
 
+The command without any arguments will list all circuits in the current world or, when used from the server console, circuits
+in all worlds.
+
+Use `/rclist` all as a player to see a list of all circuits on the server
+Use `/rclist <world-name>` to list all circuits in a specific world.
+
+To show only specific kind of circuits you can use a filter. There are several filter types.
+`location: <x>,<y>,<z>,[radius]` - Show only circuits in a radius around the location.
+`location: this, [radius]` - Uses your current location.
+`chunk: <x>,<z>` - Show only circuits in the specified chunk. `chunk: this` will use your current chunk
+`class: <class-name>` - Show only circuits of the specified class. You can use partial class names.
+You can combine different filters by separating them with a semicolon (;). You can also use partial filter type names.
+
+Examples:
+  `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
+  `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
+
+
+###/rcclasses
+####Prints a list of installed circuit classes.
+usage: `/rcclasses`
+
+###/rcarg
+####Replace, add or clear circuit sign arguments.
+usage: `/rcarg <arg-number|add|clear> <arg-value>...<arg-number|add|clear> <arg-value>`
+
+Use by pointing at the circuit you want to edit and execute the command. To change an existing argument value use `/rcarg <arg-number> <arg-value>`, 
+where arg-number is the sign argument number, starting to count with 1 and arg-value is the new value for this argument.
+
+To add an argument as the last argument use `/rcarg add <arg-value>`.
+To remove an argument use `/rcarg clear <arg-number>`
+
+You can make changes to more than 1 argument by typing additional command arguments, for ex. `/rcarg 1 val clear 2`
+will set the 1st argument to val and remove the 2nd argument.
+
+###/rcdebug
+####Register yourself as a debugger of a chip.
+usage: `/rcdebug [chip-id|off|alloff]`
+
+Use by either pointing at the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges.
+      
+To stop receiving debug messages from the chip use the same command again or use `/rcdebug off` or `/rcdebug <chip id> off`.
+To stop receiving debug messages from all circuits use `/rcdebug alloff`.
+
+
+###/rcpin
+####Prints information about a chip pin.
+usage: `/rcpin`
+
+Point towards an output lever or input redstone source to use.
+Prints the pin number (starting with 0), pin type (input/output), and current state (on/off) of the pin.
+
+###/rcactivate
+####Activates a circuit.
+usage: `/rcactivate [<inputBlockType> >outputBlockType> <interfaceBlockType>]
+
+Point the circuit sign and execute the command.
+To activate a circuit built with different input, output or interface block types then set in the preferences use `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`
+      
+###/rcdestroy
+####Destroys a circuit and removes its blocks.
+usage: `/rcdestroy`
+
+Point at a block of the circuit you wish to destroy and enter the command.
+This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
+
+###/rcbreak
+####Deactivates a circuit without removing its blocks.
+usage: `/rcbreak [circuit-id]`
+
+Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+
+###/rcreset
+####Rescans and reactivates a circuit.
+usage: `/rcreset [circuit-id|all]`
+
+Use by pointing towards the circuit or by using the chip's id number as an argument if you have op priviliges.
+Reset a circuit to scan for new i/o blocks or sign arguments and apply any changes.
+
+Running `/rcreset all` will reset all active circuits. Use with caution!
+
+###/rcfixioblocks
+####Replace i/o blocks using incorrect materials.
+usage: `/rcfixioblocks [circuit-id]`
+
+Use by pointing at the circuit you want to fix or, if you have op priviliges, use a circuit id as an argument.
+Any i/o blocks using a different block type than set in the plugin's preferences are replaced to the correct material.
+
+###/rcsel
+####Mass editing circuits within a selection cuboid.
+usage: `/rcsel [command]`
+
+To define a selection type /rcsel and right-click on two opposite corners of your cuboid.
+When no selection is defined /rcsel will try to use WorldEdit's current selection.       
+
+When either types of selection are defined you can execute any of the following commands.
+
+`/rcsel activate [<input type> <output type> <interface block type>]`, `/rcsel fixioblocks`,
+`/rcsel break`, `/rcsel destroy`, `/rcsel reset` - These work the same as their single circuit counterparts.
+`/rcsel list` - Lists all circuits in the selection
+`/rcsel clear` - Clears the current selection.
+
+###/rcchannels
+####Prints a list of all wireless broadcast channels.
+usage: `/rcchannels [channel-name]`
+      
+Use a channel name as an argument to print info about that channel.
+
+###/rcinfo
+####Prints a lot of useful information about a chip.
+usage: `/rcinfo [circuit-id]`
+
+Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
+
+###/rchelp
+####Prints a list or description of all RC commands.
+usage: `/rchelp [command name]
+
+Use `/rchelp` to list all the plugin commands.
+Use `/rchelp <command name>` to get help about a specific command.
+
+###/rcp
+####Moves to a different page when run after using a command with paging.
+usage: `/rcp [page #|prev|next|last]`
+      
+Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
+
+###/rcprefs
+####Allows to see and change the plugin's preferences.
+usage: `/rcprefs [pref key] [new value]`
+
+Use the command with no arguments to list all preferences values.
+To change a preference value use `/rcprefs <pref key> <new value>`.
+
+###/rcsave
+####Saves all circuit data to file.
+usage: `/rcsave`
+
+Makes sure all circuits are intact and saves their current state to the plugin's circuits file.
+Should not be used unless there's a problem with the automatic data save.
+
+###/rcload
+####Reloads circuit data from file.
+usage: `/rcload`
+
+This command will reload circuit states from file, resetting any changes made since last save.
 
 Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
@@ -87,13 +209,14 @@ The exact algorithm can be found at the [CircuitManager](http://github.com/eisen
 
 Preference keys
 ---------------
+To change any of the preferences while playing, you can use the /rcprefs command. All values are stored in <craftbukkit folder>/plugins/RedstoneChips/preferences.yml.
 
 ##### Block types - these can be any material name or id. 
 - `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
 - `outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
 - `interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
 
-To add specific data values use `<material name/id>:<data value>` such as `wood:2` for example for birch wood. Using specific wool colors is also possible. For example Use `wool:yellow` for, well, yellow wool.
+To add specific data values use `<material name/id>:<data value>` such as `wood:2` for example for birch wood. Using specific wool colors is also possible, `wool:yellow` for example.
 
 ##### Message colors - these can be any chat color name.
 - `infoColor` - Color of info messages (`GREEN` by default)

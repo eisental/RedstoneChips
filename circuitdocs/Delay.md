@@ -12,7 +12,7 @@ A sign argument is used to set the delay duration. Possible values are any durat
 
 
 #### I/O setup 
-* Can have any number of input, output pairs. At least 1 pair is required.
+* Can have any number of input/output pairs. At least 1 pair is required.
 
 #### Sign text
 1. `   delay   `

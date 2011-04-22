@@ -11,7 +11,7 @@ Using a 3rd argument with the word `mod` makes the divider run in modulus mode. 
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/divider.java)
 
-For a detailed example of building a chip that uses a variable number of input bit sets read the [AND gate documentation](And).
+For a detailed example of building a chip that uses a variable number of input sets read the [AND gate documentation](And).
  
 * * *
 

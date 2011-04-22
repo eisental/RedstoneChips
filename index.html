@@ -1,26 +1,26 @@
 ---
 layout: main
-title: RedstoneChips
+title: RedstoneChips - Redstone IC Bukkit plugin.
 ---
 
-<p><em>RedstoneChips</em> is a <a href="http://bukkit.org">Bukkit</a> plugin that allows you to build custom integrated redstone
-    circuits on your craftbukkit minecraft server. 
+<p><em>RedstoneChips</em> is a <a href="http://bukkit.org">Bukkit</a> plugin that enhances SMP minecraft allowing you to build custom redstone chips on your minecraft server. 
 </p>
+<img src="http://eisental.github.com/RedstoneChips/images/sevensegment2.png" class="bbCodeImage LbImage" alt="[IMG]" />
 <ul> 
 <li>Build music sequencers, wool graphic displays, motion detectors, light sensors, scrolling signs and much more.</li> 
 <li>Process binary numbers of any size using redstone and send them wirelessly all over your world or to other worlds or servers.</li> 
 <li>Build chips with any amount of inputs and outputs. From compact 1 input / 1 output to monster chips processing hundreds of bits.</li> 
-<li>Build your chip from around 40 different circuit classes (and counting) each supporting many input/output configurations.</li> 
 <li>Customize chips by adding arguments to the chip sign.</li> 
 <li>Use almost any structure you can imagine for your chips.</li> 
-<li>Infinitely expandable. Easily write your own circuit libraries to add new circuit classes.</li> 
-</ul><img src="http://eisental.github.com/RedstoneChips/images/sevensegment2.png" class="bbCodeImage LbImage" alt="[IMG]" />
+<li>Build your chip from more than 40 different circuit classes (and counting) each supporting many input/output configurations.</li> 
+<li>Infinitely expandable. Use any of the 3rd party circuit libraries and easily write your own libraries to add new circuit classes.</li> 
+</ul>
 <br/>
 <h2>Downloads</h2>
 <ul>
-<li><a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-beta.jar"><strong>RedstoneChips-0.88</strong></a> - The core plugin that handles the basics. You must install this plugin to be able to build chips.</li>
-<li><a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-beta.jar"><strong>BasicCircuits-0.88</strong></a> - The basic circuit library containing many different circuit types.</li>
-<li><a href="http://github.com/downloads/eisental/SensorLibrary/SensorLibrary-beta.jar"><strong>SensorLibrary-0.24</strong></a> - An optional circuit library for various sensor chips.</li>
+<li><a href="http://github.com/downloads/eisental/RedstoneChips/RedstoneChips-beta.jar"><strong>RedstoneChips-0.9</strong></a> - The core plugin that handles the basics. You must install this plugin to be able to build chips.</li>
+<li><a href="http://github.com/downloads/eisental/BasicCircuits/BasicCircuits-beta.jar"><strong>BasicCircuits-0.9</strong></a> - The basic circuit library containing most chip classes you might need.</li>
+<li><a href="http://github.com/downloads/eisental/SensorLibrary/SensorLibrary-beta.jar"><strong>SensorLibrary-0.25</strong></a> - An optional circuit library for various sensor chips.</li>
 </ul>
 <p>For help on building chips check the <a href="/RedstoneChips/howto.html">how-to</a> page. For a full documentation of available circuits in BasicCircuits and SensorLibrary check the <a href="/RedstoneChips/circuitdocs">circuitdocs</a>.</p>
 
@@ -33,15 +33,23 @@ title: RedstoneChips
 <h2>Installation</h2>
 
 <ul>
-<li>Download the latest craftbukkit release. The current version was tested on build #617. </li>
-<li>Download jar files above.</li>
+<li>Download the latest craftbukkit release. The current version was tested on builds #617-708 and supports Minecraft 1.5. </li>
+<li>Download jar files above and any optional 3rd party circuit libraries (see below).</li>
 <li>Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.</li>
 </ul>
 
 <p>On first run, the plugin will create a folder inside the craftbukkit plugins folder and a preferences.yml file inside it. The file redstonechip.circuits contains all the information required to reactivate the circuits after a server restart.
-You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the /rc-prefs command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
+You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the <code>/rcprefs</code> command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
 </p>
 
+<h2>3rd party circuit libraries</h2>
+These are plugins written by other people that add new chip types to choose from.
+<ul>
+<li><a href="http://forums.bukkit.org/threads/8248/">MobSensor</a> by @Richard Robertson - Specific mob detection circuits.</li>
+<li><a href="http://forums.bukkit.org/threads/543.8666/">SpeedCircuits</a> by @needspeed10 - reseter, copy, cringcounter, pulsar, chestset, commandex.</li>
+<li><a href="http://forums.bukkit.org/threads/556.10300/">MessageCircuit</a> by @Richard Robertson - a circuit that sends a player a message when any of its inputs receive power.</li>
+<li><a href="http://forums.bukkit.org/threads/11206/">ClockDisplay</a> by @Malkierian - Digital clock library.</li>
+</ul>
 
 <h2>Changelogs and source code</h2>
 

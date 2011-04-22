@@ -3,11 +3,11 @@ layout: main
 title: print
 ---
 
-Prints the data pins (inputs 1 and above) as text on a sign block when the clock pin (input 0) is set to high. 
-Any wall sign, attached to an interface block will be updated.
+Prints data on signs. Can print its data pins as text on a sign block when the clock pin (input 0) is set to high. 
+Any sign attached to an interface block will be updated. Signs must be attached before activating the chip and breaking any will cause the circuit to deactivate.
 
-The first sign argument sets the way the data is printed to the sign.
-* num - prints input bits as unsigned integer.
+The first sign argument sets the way the data from the chip's inputs is printed to the sign.
+* num - prints input bits as unsigned integer. This is the default data type.
 * signed - prints input bits as signed integer.
 * unsigned - same as 'num' 
 * ascii - prints an ascii character based on the integer value of the input bits.
@@ -15,8 +15,8 @@ The first sign argument sets the way the data is printed to the sign.
 * oct - same as 'unsigned' with octal representation.
 * bin - prints the incoming bits as a series of 0s and 1s.
 
-A second sign argument sets the display method.
-* replace - Whenever the clock pin is triggered any text already on the sign is replaced with the new data.
+A second sign argument sets the display mode.
+* replace - Whenever the clock pin is triggered any text already on the sign is replaced with the new data. This is the default display mode.
 * add - Whenever the clock pin is triggered the new data is added after the text that's already on the sign. When the sign is full the text is cleared. 
 This mode requires an extra clear pin after the clock pin. When the clear pin is triggered, the all text on the output sign is removed.
 * scroll - Works internally as the add mode but displays only a part of the buffered text on one sign line at each moment. This mode also uses a clear pin

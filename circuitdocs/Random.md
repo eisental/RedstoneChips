@@ -3,7 +3,8 @@ layout: main
 title: random
 ---
 
-When one of the input pins becomes high its corresponding output pin is randomly set (50% chance) to either high or low.
+A random value generator.
+When one of the input pins turns on its corresponding output pin is randomly set (50% chance) to either on or off.
 The chip can have any number of matching inputs and outputs. It's also possible to use 1 input pin to trigger any number of outputs simultaneously.
  
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/random.java)

@@ -2,7 +2,7 @@
 layout: main
 title: srnor
 ---
-A SR NOR latch.  When an input state changes from low to high, it's corresponding output pin is set to low while all other output pins are set to high.  This SR NOR latch can support any number of input, output pairs.
+A SR NOR latch.  When an input state changes from off to on, it's corresponding output pin is turned off while all other output pins are turned on. This SR NOR latch can support any number of input, output pairs.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/srnor.java)
 

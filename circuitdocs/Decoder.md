@@ -4,7 +4,7 @@ title: decoder
 ---
 
 Reverse operation of the [encoder](Encoder) chip.
-Decodes a binary number, setting the output pin that corresponds to the input value, on.
+Decodes a binary number, setting the output pin that corresponds to the input binary value, on.
 
 on [Wikipedia](http://en.wikipedia.org/wiki/Decoder)
 

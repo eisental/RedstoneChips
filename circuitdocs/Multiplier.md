@@ -3,7 +3,7 @@ layout: main
 title: multiplier
 ---
 
-Performs an arithmetic multiplication on any number of input bit sets and outputs the result as a binary number.
+Performs an arithmetic multiplication on any number of input sets and outputs the result as a binary number.
 The 1st sign argument should note how many bits each input number is using.
 If an optional constant argument is added to the sign text, the IC will multiply the result by the constant.
 

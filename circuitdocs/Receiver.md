@@ -13,11 +13,12 @@ The channel argument can specify a start bit using the syntax `<channel name>:<s
 * * *
 
 #### I/O setup 
-* Can have any number of outputs and no inputs. When more than 1 output is used, the 1st output is a clock output pin.
+* Can have any number of outputs and no inputs. 
+* When more than 1 output is used, the 1st output is a clock output pin.
 
 #### Sign text
 1. `   receiver   `
-2. `  <broadcast channel> ` (NOT optional)
+2. `  <broadcast channel>[:<start bit>] ` (The channel name is not optional)
 
 ![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
 

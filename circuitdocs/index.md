@@ -14,7 +14,7 @@ Here you can find documentation for circuit classes in both BasicCircuits and Se
 [flipflop](Flipflop.html), [dregister](Dregister.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html), [srnor](SRNor.html), [sram](Sram.html)
 
 ## combinational logic circuits
-[encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [router](Router.html), [comparator](Comparator.html), [repeater](Repeater.html)
+[encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [router](Router.html), [comparator](Comparator.html), [repeater](Repeater.html), [bintobcd](Bintobcd.html)
 
 ## sequential logic circuits
 [clock](Clock.html), [pulse](Pulse.html), [delay](Delay.html), [counter](Counter.html), [ringcounter](Ringcounter.html)
@@ -26,7 +26,7 @@ Here you can find documentation for circuit classes in both BasicCircuits and Se
 [print](Print.html), [pixel](Pixel.html), [synth](Synth.html), [segdriver](Segdriver.html)
 
 ## sensors
-[terminal](Terminal.html), [pirsensor](Pirsensor.html), [photocell](Photocell.html), [daytime](Daytime.html), [rangefinder](Rangefinder.html)
+[terminal](Terminal.html), [pirsensor](Pirsensor.html), [photocell](Photocell.html), [daytime](Daytime.html), [rangefinder](Rangefinder.html), [slotinput](Slotinput.html), [beacon](Beacon.html)
 
 
 
