@@ -133,7 +133,7 @@ public class RedstoneChips extends JavaPlugin {
                     circuitPersistence.loadCircuits();
                 }})==-1) {
 
-            logg.warning("Couldn't schedule circuit loading. Multiworld support might not work.");
+            log(Level.WARNING, "Couldn't schedule circuit loading. Multiworld support might not work.");
             circuitPersistence.loadCircuits();
         }
 

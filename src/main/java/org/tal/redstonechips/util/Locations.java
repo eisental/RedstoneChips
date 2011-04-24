@@ -46,10 +46,6 @@ public class Locations {
     }
 
     public static boolean isInRadius(Location origin, Location loc, float radius) {
-        double dx = origin.getX() - loc.getX();
-        double dy = origin.getY() - loc.getY();
-        double dz = origin.getZ() - loc.getZ();
-
         return Locations.distanceSquared(origin, loc) <= radius*radius;
     }
 

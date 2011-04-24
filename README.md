@@ -21,6 +21,48 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.9 (23/04/11)
+- Circuit input state will now update when a redstone source block is placed or removed from around the input block.
+- Redstone torches can also be used as an input source.
+- `/rcsel` now tries to use WorldEdit's selection when there's no `/rcsel` selection defined. 
+- `/rcarg` will undo the changes if they cause an error.
+- It's possible to change more than 1 argument using `/rcarg <arg index/add/clear> <arg value>…<arg index/add/clear> <arg value>`.
+- New `/rcsel list` command prints list of all active circuits in the selection.
+- `/rchelp` now uses pages and the command description looks a bit better. Many changes to the help content.
+- Fixed wrong number of lines used in `/rcchannels`.
+- Added filters to `/rclist` (see `/rchelp rclist`)
+- New page turning system. Using `/rcp [page#|prev|next|last]` after running a command with paging will run the command again displaying a new page.
+- `/rcclasses` uses the page maker.
+- Added `/reset all` command. Use with caution.
+- Many new lines of code making sure chunks don't get loaded unless necessary.
+- The coordinates of all chunks used by a circuit are saved in the circuits file and displayed in `/rcinfo`.
+- When saving circuit states each circuit is scanned to make sure it's structure is intact and deactivated if otherwise.
+- When trying to activate a circuit made of invalid block types a nice error message is displayed.
+- Binary numbers are displayed in text messages in words of 4 bit with a space between each.
+- Internal circuit state bitsets are now saved in little endian order (Should require a reset to every kind of register and some other circuits classes).
+- Circuit load console messages give some more details.
+- Circuit loading errors will now cause a stack trace print.
+
+bug fixes:
+
+- Circuit classes with a name longer than 13 characters are not loaded to work with MC1.5.
+- Fixed bug that caused an exception when trying to activate a sign with an empty 1st line
+- Fixed a bunch of /rc-* leftovers by removing the dash.
+- Fixed bug in /rcdebug by circuit id.
+- Fixed a bug where left-clicking an empty sign would throw an exception.
+- When deregistering a transmitter it makes sure the channel exists before trying to remove it.
+- Activation signs are only updated if their chunk is already loaded.
+
+internal changes (for library authors):
+
+- Renamed Circuit.updateOutputLevers() to Circuit.circuitChunkLoaded() and CircuitManager.checkUpdateOuptutLevers(Chunk chunk) to CircuitManager.updateOnChunkLoad(Chunk chunk).
+- Renamed RedstoneChips.getPrefsManager() to getPrefs().
+- Moved helper methods to their own classes.
+- Rewrote command handling to use a separate class for each command.
+- New field Circuit.chunkLoaded set to true when the circuit's chunk is loaded and set to false when it's unloaded.
+- Added method Circuit.circuitChunkUnloaded() that's called when the circuit's chunk is unloaded.
+
+
 #### RedstoneChips 0.88 (07/04/11)
 - New /rcsel command for mass editing circuits in a cuboid. It's possible to use it for activating, destroying reseting or fixing i/o block types of circuits.
 - New /rcactivate command for activating circuits possibly with different i/o block types than currently set.
