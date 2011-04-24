@@ -37,11 +37,11 @@ To set the memory at a certain address to a new value use `/rctype <address>:<va
 For example to set the 1st 5 words enter: `/rctype 0 5 16 7 9`. 
 Combining specific addresses is possible as well: `/rctype 0 6:8 5 16 7 9` will set the 1st 6 bits to [0,5,16,7,9,8].
 The word value can be typed in various formats:
-- hexadecimal - by using the # or 0x prefix. For ex. /rctype 6:#ff or /rctype 1:0x5a.
-- binary - by using the b prefix. For ex. /rctype b0001 b0010 b0100 b1000.
-- ascii - by typing any individual character. For ex. /rctype a d j. Note that you can't currently enter ascii values of digits (0-9) using this method.
+- hexadecimal - by using the `#` or `0x` prefix. For ex. `/rctype 6:#ff` or `/rctype 1:0x5a`.
+- binary - by using the b prefix. For ex. `/rctype b0001 b0010 b0100 b1000`.
+- ascii - by typing any individual character. For ex. `/rctype a d j`. Note that you can't currently enter ascii values of digits (0-9) using this method.
 
-Use /rctype ascii <ascii string> to enter a string of ascii characters. For ex. /rctype ascii Some text and some more text. Will save write 28 words into memory with the ascii codes of each input character.
+Use /rctype ascii <ascii string> to enter a string of ascii characters. For ex. `/rctype ascii Some text and some more text`. Will write 28 8bit words into memory with the ascii codes of each input character.
 
 The sram's memory data is stored in a separate file inside `<plugins folder>/RedstoneChips/` folder, when the plugin saves its data. The values are reloaded when the circuit is initalized. Once the circuit is destroyed or reset the memory file is deleted unless a memory id argument is used.
 A memory id sign argument can specify a permanent id for this memory chip. When used the plugin will never delete its memory data file and try to use an existing memory data file if one is found. Therefore `/rcreset` for ex., will not clear the memory data in this mode.
