@@ -59,8 +59,7 @@ Examples:
   `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
   `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
 
-
-###/rcclasses - Prints a list of installed circuit classes.
+###`/rcclasses` - Prints a list of installed circuit classes.
 usage: `/rcclasses`
 
 ###/rcarg - Replace, add or clear circuit sign arguments.
