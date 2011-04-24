@@ -60,12 +60,10 @@ Examples:
   `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
 
 
-###/rcclasses
-####Prints a list of installed circuit classes.
+###/rcclasses - Prints a list of installed circuit classes.
 usage: `/rcclasses`
 
-###/rcarg
-####Replace, add or clear circuit sign arguments.
+###/rcarg - Replace, add or clear circuit sign arguments.
 usage: `/rcarg <arg-number|add|clear> <arg-value>...<arg-number|add|clear> <arg-value>`
 
 Use by pointing at the circuit you want to edit and execute the command. To change an existing argument value use `/rcarg <arg-number> <arg-value>`, 
@@ -77,8 +75,7 @@ To remove an argument use `/rcarg clear <arg-number>`
 You can make changes to more than 1 argument by typing additional command arguments, for ex. `/rcarg 1 val clear 2`
 will set the 1st argument to val and remove the 2nd argument.
 
-###/rcdebug
-####Register yourself as a debugger of a chip.
+###/rcdebug - Register yourself as a debugger of a chip.
 usage: `/rcdebug [chip-id|off|alloff]`
 
 Use by either pointing at the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges.
@@ -87,35 +84,30 @@ To stop receiving debug messages from the chip use the same command again or use
 To stop receiving debug messages from all circuits use `/rcdebug alloff`.
 
 
-###/rcpin
-####Prints information about a chip pin.
+###/rcpin - Prints information about a chip pin.
 usage: `/rcpin`
 
 Point towards an output lever or input redstone source to use.
 Prints the pin number (starting with 0), pin type (input/output), and current state (on/off) of the pin.
 
-###/rcactivate
-####Activates a circuit.
+###/rcactivate - Activates a circuit.
 usage: `/rcactivate [<inputBlockType> >outputBlockType> <interfaceBlockType>]
 
 Point the circuit sign and execute the command.
 To activate a circuit built with different input, output or interface block types then set in the preferences use `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`
       
-###/rcdestroy
-####Destroys a circuit and removes its blocks.
+###/rcdestroy - Destroys a circuit and removes its blocks.
 usage: `/rcdestroy`
 
 Point at a block of the circuit you wish to destroy and enter the command.
 This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
 
-###/rcbreak
-####Deactivates a circuit without removing its blocks.
+###/rcbreak - Deactivates a circuit without removing its blocks.
 usage: `/rcbreak [circuit-id]`
 
 Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
 
-###/rcreset
-####Rescans and reactivates a circuit.
+###/rcreset - Rescans and reactivates a circuit.
 usage: `/rcreset [circuit-id|all]`
 
 Use by pointing towards the circuit or by using the chip's id number as an argument if you have op priviliges.
@@ -123,15 +115,13 @@ Reset a circuit to scan for new i/o blocks or sign arguments and apply any chang
 
 Running `/rcreset all` will reset all active circuits. Use with caution!
 
-###/rcfixioblocks
-####Replace i/o blocks using incorrect materials.
+###/rcfixioblocks - Replace i/o blocks using incorrect materials.
 usage: `/rcfixioblocks [circuit-id]`
 
 Use by pointing at the circuit you want to fix or, if you have op priviliges, use a circuit id as an argument.
 Any i/o blocks using a different block type than set in the plugin's preferences are replaced to the correct material.
 
-###/rcsel
-####Mass editing circuits within a selection cuboid.
+###/rcsel - Mass editing circuits within a selection cuboid.
 usage: `/rcsel [command]`
 
 To define a selection type /rcsel and right-click on two opposite corners of your cuboid.
@@ -144,47 +134,40 @@ When either types of selection are defined you can execute any of the following 
 `/rcsel list` - Lists all circuits in the selection
 `/rcsel clear` - Clears the current selection.
 
-###/rcchannels
-####Prints a list of all wireless broadcast channels.
+###/rcchannels - Prints a list of all wireless broadcast channels.
 usage: `/rcchannels [channel-name]`
       
 Use a channel name as an argument to print info about that channel.
 
-###/rcinfo
-####Prints a lot of useful information about a chip.
+###/rcinfo - Prints a lot of useful information about a chip.
 usage: `/rcinfo [circuit-id]`
 
 Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
 
-###/rchelp
-####Prints a list or description of all RC commands.
+###/rchelp - Prints a list or description of all RC commands.
 usage: `/rchelp [command name]
 
 Use `/rchelp` to list all the plugin commands.
 Use `/rchelp <command name>` to get help about a specific command.
 
-###/rcp
-####Moves to a different page when run after using a command with paging.
+###/rcp - Moves to a different page when run after using a command with paging.
 usage: `/rcp [page #|prev|next|last]`
       
 Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
 
-###/rcprefs
-####Allows to see and change the plugin's preferences.
+###/rcprefs - Allows to see and change the plugin's preferences.
 usage: `/rcprefs [pref key] [new value]`
 
 Use the command with no arguments to list all preferences values.
 To change a preference value use `/rcprefs <pref key> <new value>`.
 
-###/rcsave
-####Saves all circuit data to file.
+###/rcsave - Saves all circuit data to file.
 usage: `/rcsave`
 
 Makes sure all circuits are intact and saves their current state to the plugin's circuits file.
 Should not be used unless there's a problem with the automatic data save.
 
-###/rcload
-####Reloads circuit data from file.
+###/rcload - Reloads circuit data from file.
 usage: `/rcload`
 
 This command will reload circuit states from file, resetting any changes made since last save.
@@ -208,7 +191,7 @@ The exact algorithm can be found at the [CircuitManager](http://github.com/eisen
 
 Preference keys
 ---------------
-To change any of the preferences while playing, you can use the /rcprefs command. All values are stored in <craftbukkit folder>/plugins/RedstoneChips/preferences.yml.
+To change any of the preferences while playing, you can use the `/rcprefs` command. All values are stored in `<craftbukkit folder>/plugins/RedstoneChips/preferences.yml`.
 
 ##### Block types - these can be any material name or id. 
 - `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
