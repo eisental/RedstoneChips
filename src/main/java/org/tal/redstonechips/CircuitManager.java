@@ -18,6 +18,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Redstone;
 import org.tal.redstonechips.circuit.InputPin;
@@ -580,15 +581,23 @@ public class CircuitManager {
 
         int leverCount = 0;
         Block ret = null;
-        if (up.getType()==Material.LEVER) { leverCount++; ret = up; }
-        if (north.getType()==Material.LEVER) { leverCount++; ret = north; }
-        if (east.getType()==Material.LEVER) { leverCount++; ret = east; }
-        if (south.getType()==Material.LEVER) { leverCount++; ret = south; }
-        if (west.getType()==Material.LEVER) { leverCount++; ret = west; }
+
+        if (isLeverAttached(up, b)) { leverCount++; ret = up; }
+        if (isLeverAttached(north, b)) { leverCount++; ret = north; }
+        if (isLeverAttached(east, b)) { leverCount++; ret = east; }
+        if (isLeverAttached(south, b)) { leverCount++; ret = south; }
+        if (isLeverAttached(west, b)) { leverCount++; ret = west; }
 
         if (leverCount>1) throw new IllegalArgumentException("An output block has more than one lever connected to it.");
         else if (leverCount==0) throw new IllegalArgumentException("A lever is missing from one or more outputs.");
         else return ret;
+    }
+
+    private boolean isLeverAttached(Block lever, Block origin) {
+        if (lever.getType()!=Material.LEVER) return false;
+
+        Lever l = (Lever)lever.getState().getData();
+        return lever.getFace(l.getAttachedFace()).equals(origin);
     }
 
     private String[] getArgsFromSign(Sign sign) {
