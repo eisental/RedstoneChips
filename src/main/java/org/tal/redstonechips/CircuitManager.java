@@ -597,7 +597,10 @@ public class CircuitManager {
         if (lever.getType()!=Material.LEVER) return false;
 
         Lever l = (Lever)lever.getState().getData();
-        return lever.getFace(l.getAttachedFace()).equals(origin);
+        BlockFace face = l.getAttachedFace();
+
+        if (face==null) return true; // something is wrong with the map. assume it's attached...
+        else return lever.getFace(face).equals(origin);
     }
 
     private String[] getArgsFromSign(Sign sign) {
