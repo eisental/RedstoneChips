@@ -127,7 +127,7 @@ public class BroadcastChannel {
             bits.set(i+startBit, tbits.get(i));
 
         for (ReceivingCircuit r : receivers) {
-            transmitToReceiver(r);
+            transmitToReceiver(r, startBit, length);
         }
     }
 
@@ -139,8 +139,12 @@ public class BroadcastChannel {
         return receivers.isEmpty() && transmitters.isEmpty();
     }
 
-    private void transmitToReceiver(ReceivingCircuit r) {
-        if (r.getLength()!=0)
-            r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getLength()));
+    private void transmitToReceiver(ReceivingCircuit r, int startBit, int length) {
+        if (r.getLength()!=0) {
+            // only send to receiver if the change is in its bit range.
+            if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getLength()) ||
+                    (startBit<r.getStartBit() && startBit+length>r.getStartBit()))
+                        r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getLength()));
+        }
     }
 }

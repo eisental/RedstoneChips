@@ -28,7 +28,7 @@ public class PrefsManager {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        signColor, rightClickToActivate, enableDestroyCommand;
+        signColor, rightClickToActivate, enableDestroyCommand, maxInputChangesPerTick;
     };
 
     private RedstoneChips rc;
@@ -44,6 +44,7 @@ public class PrefsManager {
 
     private String signColor;
     private boolean rightClickToActivate;
+    private int maxInputChangesPerTick;
 
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
@@ -215,6 +216,14 @@ public class PrefsManager {
     }
 
     /**
+     * 
+     * @return The current maxInputChangesPerTick preference value.
+     */
+    public int getMaxInputChangesPerTick() {
+        return maxInputChangesPerTick;
+    }
+
+    /**
      *
      * @return The current debug chat message color preference value.
      */
@@ -311,6 +320,8 @@ public class PrefsManager {
         signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
         
         rightClickToActivate = Boolean.parseBoolean(toapply.get(Prefs.rightClickToActivate.name()).toString());
+
+        maxInputChangesPerTick = Integer.parseInt(toapply.get(Prefs.maxInputChangesPerTick.name()).toString());
 
         prefs.putAll(toapply);
     }

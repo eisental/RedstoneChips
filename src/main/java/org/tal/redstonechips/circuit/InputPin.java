@@ -21,7 +21,6 @@ public class InputPin {
 
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
-    private final static int FeedbackDetectionCount = 100;
 
     /**
      *
@@ -120,7 +119,7 @@ public class InputPin {
             long curTick = circuit.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;
-                if (changesInTickCount>FeedbackDetectionCount) abortFeedbackLoop();
+                if (changesInTickCount>circuit.redstoneChips.getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
             } else changesInTickCount = 1;
 
             powerBlocks.put(l, newVal);
