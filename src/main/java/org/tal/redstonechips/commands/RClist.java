@@ -47,7 +47,8 @@ public class RClist extends RCCommand {
                 try {
                     f.parseFilter(sender, tokenizeFilter(args[0]));
                 } catch (IllegalArgumentException ie) {
-                    sender.sendMessage(ie.getMessage());
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
+                    return true;
                 }
                 filters.add(f);
             }
