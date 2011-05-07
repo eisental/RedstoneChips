@@ -9,6 +9,7 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.tal.redstonechips.circuit.Circuit;
 
 /**
  *
@@ -18,7 +19,7 @@ public class RCclasses extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Map<String,Class> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
+        Map<String,Class<? extends Circuit>> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
         
         if (circuitClasses.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");
         else {
@@ -28,7 +29,7 @@ public class RCclasses extends RCCommand {
         return true;
     }
 
-    private void printClassesList(CommandSender sender, String[] args, Map<String, Class> circuitClasses) {
+    private void printClassesList(CommandSender sender, String[] args, Map<String, Class<? extends Circuit>> circuitClasses) {
         List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
         Collections.sort(names);
 

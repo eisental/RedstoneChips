@@ -32,16 +32,58 @@ import org.tal.redstonechips.util.Locations;
 public class CircuitManager {
 
 
-    class ScanParameters {
+    /**
+     * Used for passing argument when scanning recursively for chips.
+     */
+    private class ScanParameters {
+        /**
+         * The chip block material of the scanned chip.
+         */
         Material chipMaterial;
+
+        /**
+         * The input block material.
+         */
         MaterialData inputBlockType;
+
+        /**
+         * The output block material.
+         */
         MaterialData outputBlockType;
+
+        /**
+         * The interface block material.
+         */
         MaterialData interfaceBlockType;
+
+        /**
+         * The 1st block right after the activation sign. The block to which the sign is attached.
+         */
         Block origin;
+
+        /**
+         * The current scanning direction.
+         */
         BlockFace direction;
+
+        /**
+         * List of discovered input blocks.
+         */
         List<Block> inputs;
+
+        /**
+         * List of discovered output blocks.
+         */
         List<Block> outputs;
+
+        /**
+         * List of discovered interface blocks.
+         */
         List<Block> interfaces;
+
+        /**
+         * List of all discovered structure blocks. Includes any block that would break the circuit when broken.
+         */
         List<Block> structure;
     }
 
@@ -59,6 +101,12 @@ public class CircuitManager {
         rc = plugin;
     }
 
+    /**
+     * Checks if this redstone change event reports an input change in any circuit's input pins.
+     * When the new redstone state is different than the current the input pin is updated and the circuit is notified.
+     *
+     * @param e A redstone change event.
+     */
     public void redstoneChange(BlockRedstoneEvent e) {
         boolean newVal = (e.getNewCurrent()>0);
         boolean oldVal = (e.getOldCurrent()>0);
@@ -66,12 +114,21 @@ public class CircuitManager {
 
         List<InputPin> inputList = inputLookupMap.get(e.getBlock().getLocation());
         if (inputList==null) return;
-        for (InputPin inputPin : inputList) {
+        for (InputPin inputPin : inputList)
             inputPin.updateValue(e.getBlock(), newVal);
-            inputPin.getCircuit().redstoneChange(inputPin.getIndex(), inputPin.getPinValue());
-        }
+        
     }
 
+    /**
+     * Tries to detect a circuit starting at the specified activation sign block using the specified i/o block materials.
+     *
+     * @param signBlock The activation sign's block.
+     * @param sender The circuit activator.
+     * @param inputBlockType Input block material.
+     * @param outputBlockType Output block material.
+     * @param interfaceBlockType Interface block material.
+     * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
+     */
     public int checkForCircuit(Block signBlock, CommandSender sender,
             MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
 
@@ -184,6 +241,15 @@ public class CircuitManager {
         return this.activateCircuit(c, sender, args, -1);
     }
 
+    /**
+     * Activates an already set-up circuit.
+     *
+     * @param c The circuit to activate
+     * @param sender The activator.
+     * @param signargs The circuit's sign arguments.
+     * @param id The desired circuit id. When less than 0, a new id is generated.
+     * @return The circuit's id or -2 if an error occurred.
+     */
     public int activateCircuit(Circuit c, CommandSender sender, String[] signargs, int id) {
         if (c.initCircuit(sender, signargs, rc)) {
             this.addCircuitLookups(c);
@@ -213,6 +279,12 @@ public class CircuitManager {
         }
     }
 
+    /**
+     * Checks whether the block b is part of a circuit and if so deactivates the circuit.
+     *
+     * @param b The block that was broken.
+     * @param s The breaker. Can be null.
+     */
     public void checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
@@ -222,8 +294,15 @@ public class CircuitManager {
         }
     }
 
-    public final static Class redstoneClass = Redstone.class;
+    private final static Class redstoneClass = Redstone.class;
 
+    /**
+     * Called on block place and block break to see if any circuit's input pin's state is affected by the change.
+     *
+     * @param block The block that was placed or broken.
+     * @param player The player who placed or broke the block.
+     * @param isBroken True if the block was broken and false if it was placed.
+     */
     void checkCircuitInputChanged(Block block, Player player, boolean isBroken) {
         Class<? extends MaterialData> dataClass = block.getType().getData();
         if (dataClass!=null && redstoneClass.isAssignableFrom(dataClass)) {
@@ -231,15 +310,21 @@ public class CircuitManager {
             if (inputs!=null) {
                 for (InputPin pin : inputs) {
                     if (isBroken) pin.updateValue(block, false);
-                    else pin.updateValue(block, pin.findPowerBlockState(block.getLocation()));
-                    pin.getCircuit().redstoneChange(pin.getIndex(), pin.getPinValue());
-                    
+                    else pin.updateValue(block, InputPin.findBlockPowerState(block.getLocation()));                    
                 }
             }
 
         }
     }
 
+    /**
+     * Deactivates the specified circuit, possibly changing all of its structure blocks into air.
+     *
+     * @param destroyed The circuit that was destroyed.
+     * @param destroyer The circuit's destroyer.
+     * @param destroyBlocks True if the circuit's blocks should turn into air.
+     * @return true if successful.
+     */
     public boolean destroyCircuit(Circuit destroyed, CommandSender destroyer, boolean destroyBlocks) {
         if (destroyBlocks) {
             boolean enableDestroyCommand = (Boolean)rc.getPrefs().getPrefs().get(PrefsManager.Prefs.enableDestroyCommand.name());
@@ -285,6 +370,14 @@ public class CircuitManager {
         return true;
     }
 
+    /**
+     * Resets the specified circuit. First the circuit is destroyed and then reactivated. Any debuggers of the chip are copied over
+     * to the activated circuit.
+     *
+     * @param c The circuit to reset.
+     * @param reseter The reseter.
+     * @return true if the circuit was reactivated.
+     */
     public boolean resetCircuit(Circuit c, CommandSender reseter) {
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         List<CommandSender> debuggers = c.getDebuggers();
@@ -308,6 +401,11 @@ public class CircuitManager {
         }
     }
 
+    /**
+     * Called on every player quit event. Removes the quitting player from any debug lists.
+     *
+     * @param player The quitting player.
+     */
     public void checkDebuggerQuit(Player player) {
         for (Circuit c : circuits.values()) {
             if (c.getDebuggers().contains(player)) {
@@ -317,6 +415,11 @@ public class CircuitManager {
         }
     }
 
+    /**
+     * Called on every chunk load event. Finds any circuits in the loaded chunk and calls their .circuitChunkLoaded() method.
+     * 
+     * @param chunk The loaded chunk.
+     */
     public void updateOnChunkLoad(ChunkLocation chunk) {
         List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
 
@@ -327,6 +430,12 @@ public class CircuitManager {
         }
     }
 
+    /**
+     * Called on every chunk unload event. Finds any circuits in the unloaded chunks. When all of the chunks of a circuit are
+     * unloaded the circuits circuitChunksUnloaded() method is called.
+     *
+     * @param chunk The unloaded chunk.
+     */
     public void updateOnChunkUnload(ChunkLocation chunk) {
         List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
         if (circuitsInChunk!=null) {
@@ -343,8 +452,8 @@ public class CircuitManager {
     }
 
     /**
-     * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity()
-     * for more info.
+     * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity().
+     * Any unloaded circuit chunks are first loaded and then unloaded after the check is over.
      */
     public void checkCircuitsIntegrity() {
         if (circuits==null) return;
@@ -401,6 +510,12 @@ public class CircuitManager {
         rc.log(Level.INFO, "Done checking circuits. " + msg);
     }
 
+    /**
+     * Finds the circuit's chunks according to its activation block, output blocks, input power blocks and interface blocks.
+     *
+     * @param c The circuit to check.
+     * @return All chunks used by this circuit.
+     */
     public ChunkLocation[] findCircuitChunks(Circuit c) {
         List<ChunkLocation> circuitChunks = new ArrayList<ChunkLocation>();
 
@@ -432,22 +547,44 @@ public class CircuitManager {
         return circuitChunks.toArray(new ChunkLocation[circuitChunks.size()]);
     }
 
+    /**
+     * Calls Circuit.circuitShutdown on every activated circuit.
+     */
     public void shutdownCircuits() {
         for (Circuit c : circuits.values()) c.circuitShutdown();
     }
 
+    /**
+     *
+     * @return a map of all active circuits. The map keys are circuit ids.
+     */
     public HashMap<Integer, Circuit> getCircuits() {
         return circuits;
     }
 
+    /**
+     *
+     * @param structureBlock Any block that belongs to a chip.
+     * @return The circuit that the block is part of its structure.
+     */
     public Circuit getCircuitByStructureBlock(Block structureBlock) {
         return this.structureLookupMap.get(structureBlock.getLocation());
     }
 
+    /**
+     *
+     * @param activationBlock An activation sign of a chip.
+     * @return The circuit that uses this activation sign.
+     */
     public Circuit getCircuitByActivationBlock(Block activationBlock) {
         return this.activationLookupMap.get(activationBlock.getLocation());
     }
 
+    /**
+     * Sets the map of active circuits to a new one.
+     *
+     * @param circuits A new active circuits map. The map keys are circuit ids.
+     */
     void setCircuitMap(HashMap<Integer, Circuit> circuits) {
         this.circuits = circuits;
     }
@@ -698,6 +835,11 @@ public class CircuitManager {
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
 
+    /**
+     * Generates a circuit id.
+     * 
+     * @return a new unused circuit id.
+     */
     public int generateId() {
         int i = 0;
 

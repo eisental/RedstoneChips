@@ -139,13 +139,16 @@ public class BitSetUtils {
      * @return The same map object as the parameter.
      */
     public static Map<String,String> bitSetToMap(Map<String,String> map, String key, BitSet7 bits, int length) {
+        map.put(key, bitSetToString(bits, length));
+        return map;
+    }
+
+    public static String bitSetToString(BitSet7 bits, int length) {
         String sbits = "";
         for (int i=length-1; i>=0; i--)
             sbits += (bits.get(i)?"1":"0");
 
-        map.put(key, sbits);
-
-        return map;
+        return sbits;
     }
 
     /**
@@ -156,8 +159,12 @@ public class BitSetUtils {
      */
     public static BitSet7 mapToBitSet(Map<String, String> map, String key) {
         String sbits = map.get(key);
-        BitSet7 bits = new BitSet7(sbits.length());
         if (sbits==null) return null;
+        else return stringToBitSet(sbits);
+    }
+
+    public static BitSet7 stringToBitSet(String sbits) {
+        BitSet7 bits = new BitSet7(sbits.length());
 
         for (int i=sbits.length()-1; i>=0; i--) {
             bits.set(sbits.length()-1-i, (sbits.charAt(i)=='1'));

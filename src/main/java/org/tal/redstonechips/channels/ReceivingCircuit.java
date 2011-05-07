@@ -9,5 +9,10 @@ import org.tal.redstonechips.util.BitSet7;
  * @author Tal Eisenberg
  */
 public abstract class ReceivingCircuit extends WirelessCircuit {
+
+    /**
+     * Called when the receiving circuit receives a transmission.
+     * @param bits Transmitted bits.
+     */
     public abstract void receive(BitSet7 bits);
 }

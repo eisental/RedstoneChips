@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- *
  * @author Tal Eisenberg
  */
 public class CircuitLoader {
-    private Map<String,Class> circuitClasses = new HashMap<String,Class>();
+    private Map<String,Class<? extends Circuit>> circuitClasses = new HashMap<String,Class<? extends Circuit>>();
     private RedstoneChips rc;
 
     /**
-     * Maximum number of characters for class names to fit into the 1st line of a sign (13).
+     * Maximum number of characters for class names to fit into the 1st line of a sign excluding 2 color chars (13).
      */
     public final static int maxClassNameLength = 13;
 
@@ -52,6 +51,13 @@ public class CircuitLoader {
         return circuitClasses.remove(c.getSimpleName());
     }
 
+    /**
+     *
+     * @param name Circuit class name.
+     * @return A new empty instance of a circuit of the specified class.
+     * @throws InstantiationException if thrown by Class.newInstance().
+     * @throws IllegalAccessException if thrown by Class.newInstance().
+     */
     public Circuit getCircuitInstance(String name) throws InstantiationException, IllegalAccessException {
         Class c = this.circuitClasses.get(name);
         if (c==null) throw new IllegalArgumentException("Unknown circuit type: " + name);
@@ -62,7 +68,7 @@ public class CircuitLoader {
      *
      * @return a Map containing all registered circuit classes. The map's key is set to the circuit class name.
      */
-    public Map<String, Class> getCircuitClasses() {
+    public Map<String, Class<? extends Circuit>> getCircuitClasses() {
         return circuitClasses;
     }
 

@@ -184,6 +184,8 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onEntityExplode(EntityExplodeEvent event) {
+                if (event.isCancelled()) return;
+
                 for (Block b : event.blockList())
                     circuitManager.checkCircuitDestroyed(b, null);
             }
@@ -198,6 +200,8 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onPlayerInteract(PlayerInteractEvent event) {
+                if (event.isCancelled()) return;
+
                 if ((event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate()) ||
                         (event.getAction()==Action.RIGHT_CLICK_BLOCK && prefsManager.getRightClickToActivate()))
                     circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(),

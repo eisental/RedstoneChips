@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
- * Represents an input pin of a Circuit. Used for finding out if redstone current change in a block
+ * Represents an input pin of a circuit. Used for finding out if redstone current change in a block
  * should change an input value of a circuit.
  * The class keeps track of the surrounding blocks on the sides of the input location and the block on top of it.
  *
@@ -125,6 +125,8 @@ public class InputPin {
             powerBlocks.put(l, newVal);
 
             lastRedstoneChangeTick = curTick;
+
+            circuit.redstoneChange(getIndex(), getPinValue());
         }
 
     }
@@ -150,12 +152,20 @@ public class InputPin {
         circuit.disableInputs();
     }
 
+    /**
+     * refreshes the state of all power blocks according to their block state.
+     */
     public void refreshPowerBlocks() {
         for (Location l : this.powerBlocks.keySet())
-            powerBlocks.put(l, findPowerBlockState(l));
+            powerBlocks.put(l, InputPin.findBlockPowerState(l));
     }
 
-    public boolean findPowerBlockState(Location loc) {
+    /**
+     *
+     * @param loc The location of the block to check.
+     * @return true if the block is powered and false otherwise.
+     */
+    public static boolean findBlockPowerState(Location loc) {
         boolean state = false;
         Block b = loc.getBlock();
 

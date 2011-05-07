@@ -404,8 +404,8 @@ public abstract class Circuit {
     }
 
     /**
-     * Called when any of the circuit's chunks has loaded. Causes the circuit to update the state of its output levers according to the current values
-     * in outputBits.
+     * Called when any of the circuit's chunks has loaded. Causes the circuit to update the state of its output levers 
+     * according to the current values in outputBits.
      */
     public void circuitChunkLoaded() {
         if (chunksLoaded) return;
@@ -458,6 +458,10 @@ public abstract class Circuit {
      */
     public boolean isDisabled() { return inputsDisabled; }
 
+    /**
+     * Replaces the chip input, output and interface block materials to the currently set materials in the preferences.
+     * @return The number of blocks that were replaced.
+     */
     public int fixIOBlocks() {
         int blockCount = 0;
 
@@ -514,6 +518,10 @@ public abstract class Circuit {
         return blockCount;
     }
 
+    /**
+     * Updates the text of the 1st line of the circuit's activation sign.
+     * @param activated When true the class name is colored in the selected signColor preference key. When false the color is removed.
+     */
     public void updateCircuitSign(boolean activated) {
         if (!chunksLoaded) return;
         
@@ -544,6 +552,10 @@ public abstract class Circuit {
         } catch (NullPointerException ne) { }
     }
 
+    /**
+     *
+     * @return true if any of the circuit's chunks are loaded.
+     */
     public boolean isCircuitChunkLoaded() {
         return chunksLoaded;
     }
@@ -553,6 +565,13 @@ public abstract class Circuit {
             this.inputChange(i, inputBits.get(i));
     }
 
+    /**
+     * Checks whether all of the circuit's blocks are in place.
+     * Makes sure that each output lever block of lever material, checks that the activation sign is in place
+     * and that none of the circuit's structure blocks are air.
+     * 
+     * @return True if the test passed.
+     */
     public boolean checkIntegrity() {
         List<Location> checked = new ArrayList<Location>();
 

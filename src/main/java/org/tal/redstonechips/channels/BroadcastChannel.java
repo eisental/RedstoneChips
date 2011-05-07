@@ -5,7 +5,7 @@ import java.util.List;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
- * Represents a wireless broadcast channel which receivers and transmitters can communicate over.
+ * Represents a wireless broadcast channel that receivers and transmitters can communicate over.
  *
  * @author Tal Eisenberg
  */
