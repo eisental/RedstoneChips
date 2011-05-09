@@ -20,7 +20,9 @@ public class RCreset extends RCCommand {
 
         if (args.length>0) {
             if (args[0].equalsIgnoreCase("all")) {
-                resetAllCircuits(sender);
+                if (sender.isOp())
+                    resetAllCircuits(sender);
+                else sender.sendMessage(rc.getPrefs().getErrorColor() + "Only ops (admins) are allowed to use this command.");
                 return true;
             }
 

@@ -298,6 +298,6 @@ public class RCsel extends RCCommand {
             lines[i] = RClist.makeCircuitDescriptionLine(circuits.get(i), rc.getPrefs().getInfoColor());
         }
 
-        CommandUtils.pageMaker(sender, "Active circuits in selection", "rcsel", args, lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+        CommandUtils.pageMaker(sender, "Active circuits in selection", "rcsel", lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 }

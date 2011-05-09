@@ -108,7 +108,7 @@ public class RClist extends RCCommand {
 
         sender.sendMessage("");
 
-        CommandUtils.pageMaker(sender, title, "rclist", args, lines.toArray(new String[lines.size()]),
+        CommandUtils.pageMaker(sender, title, "rclist", lines.toArray(new String[lines.size()]),
                 rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 

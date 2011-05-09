@@ -43,7 +43,7 @@ public class RChelp extends RCCommand {
             i++;
         }
 
-        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", args, lines, infoColor, errorColor, CommandUtils.MaxLines-1);
+        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", lines, infoColor, errorColor, CommandUtils.MaxLines-1);
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 
@@ -59,7 +59,7 @@ public class RChelp extends RCCommand {
                 lines.add(line.toString());
         }
 
-        CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", args, lines.toArray(new String[lines.size()]), infoColor, errorColor);
+        CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", lines.toArray(new String[lines.size()]), infoColor, errorColor);
     }
 
 }

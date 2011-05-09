@@ -5,6 +5,7 @@
 
 package org.tal.redstonechips.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.util.ParsingUtils;
@@ -55,8 +56,8 @@ public class RCp extends RCCommand {
                     return true;
                 }
             } 
-            
-            rc.getCommand(pageInfo.lastCommandName).execute(sender, pageInfo.lastCommandName, pageInfo.lastArgs);
+
+            CommandUtils.pageMaker(sender, pageInfo.title, null, pageInfo.lines, pageInfo.infoColor, pageInfo.errorColor, pageInfo.linesPerPage);
             return true;
 
         } else {

@@ -55,23 +55,34 @@ public class Range {
 
     public Range(String range, Type type) throws IllegalArgumentException {
         int indexOfDots = range.indexOf("..");
-        if (indexOfDots==-1) throw new IllegalArgumentException("Invalid range format: " + range);
-        String sFirst = range.substring(0, indexOfDots).trim();
-        String sSecond = range.substring(indexOfDots+2).trim();
-        
-        try {
-            if (sFirst.length()>0) {
-                num1 = Double.parseDouble(sFirst);
+        if (indexOfDots==-1) {
+            try { // int number
+                int num = Integer.decode(range);
+                num1 = num;
+                num2 = num;
                 has1 = true;
-            } else if (type==Type.CLOSED_ONLY)
-                throw new IllegalArgumentException("Invalid range format:" + range + " (open range not allowed)");
-            if (sSecond.length()>0) {
-                num2 = Double.parseDouble(sSecond);
                 has2 = true;
-            } else if (type==Type.CLOSED_ONLY)
-                throw new IllegalArgumentException("Invalid range format:" + range + " (open range not allowed)");
-        } catch (NumberFormatException ne) {
-            throw new IllegalArgumentException("Invalid range format: " + range);
+            } catch (NumberFormatException ne) {
+                throw new IllegalArgumentException("Invalid range format: " + range);
+            }
+        } else {
+            String sFirst = range.substring(0, indexOfDots).trim();
+            String sSecond = range.substring(indexOfDots+2).trim();
+
+            try {
+                if (sFirst.length()>0) {
+                    num1 = Double.parseDouble(sFirst);
+                    has1 = true;
+                } else if (type==Type.CLOSED_ONLY)
+                    throw new IllegalArgumentException("Invalid range format:" + range + " (open range not allowed)");
+                if (sSecond.length()>0) {
+                    num2 = Double.parseDouble(sSecond);
+                    has2 = true;
+                } else if (type==Type.CLOSED_ONLY)
+                    throw new IllegalArgumentException("Invalid range format:" + range + " (open range not allowed)");
+            } catch (NumberFormatException ne) {
+                throw new IllegalArgumentException("Invalid range format: " + range);
+            }
         }
         
     }

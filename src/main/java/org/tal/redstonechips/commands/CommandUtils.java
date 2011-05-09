@@ -61,29 +61,22 @@ public class CommandUtils {
 
     public static Map<CommandSender, PageInfo> playerPages = new HashMap<CommandSender, PageInfo>();
 
-    public static void pageMaker(CommandSender s, String title, String commandName, String[] args, String[] lines, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, title, commandName, args, lines, infoColor, errorColor, MaxLines);
+    public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
+        CommandUtils.pageMaker(s, title, commandName, lines, infoColor, errorColor, MaxLines);
     }
 
-    public static void pageMaker(CommandSender s, String title, String commandName, String[] args, String[] lines, ChatColor infoColor, ChatColor errorColor, int maxLines) {
+    public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor, int maxLines) {
         maxLines = maxLines - 4;
         int page;
 
         int pageCount = (int)(Math.ceil(lines.length/(float)maxLines));
-        if (playerPages.containsKey(s)) {
-            PageInfo pageInfo = playerPages.get(s);
-            if (pageInfo.isNewCommand(commandName, args)) {
-                pageInfo.lastCommandName = commandName;
-                pageInfo.lastArgs = args;
-                pageInfo.page = 1;
-                pageInfo.pageCount = pageCount;
-            } 
-
-            page = pageInfo.page;
-        } else {
+        if (commandName!=null || !playerPages.containsKey(s)) {
             page = 1;
-            playerPages.put(s, new PageInfo(commandName, args, pageCount));
-        }
+            playerPages.put(s, new PageInfo(title, pageCount, lines, maxLines+4, infoColor, errorColor));
+        } else {
+            PageInfo pageInfo = playerPages.get(s);
+            page = pageInfo.page;
+        } 
 
 
         if (page<1 || page>pageCount) s.sendMessage(errorColor + "Invalid page number: " + page + ". Expecting 1-" + pageCount);

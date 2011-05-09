@@ -31,7 +31,7 @@ public class RCchannels extends RCCommand {
                 }
 
                 sender.sendMessage("");
-                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), args, lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
+                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
                 sender.sendMessage("Use " + ChatColor.YELLOW + "/rcchannels <channel name>" + ChatColor.WHITE + " for more info about it.");
             }
         }

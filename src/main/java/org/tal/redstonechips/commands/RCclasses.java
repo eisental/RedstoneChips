@@ -49,7 +49,7 @@ public class RCclasses extends RCCommand {
         }
 
         if (!list.isEmpty()) 
-            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", args, lines.toArray(new String[lines.size()]), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", lines.toArray(new String[lines.size()]), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 
 }
