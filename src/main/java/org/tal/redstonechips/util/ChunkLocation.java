@@ -62,11 +62,11 @@ public class ChunkLocation {
     }
 
     public boolean unloadChunk() {
-        return world.unloadChunk(x, z, true);
+        return world.unloadChunk(x, z);
     }
 
     public void loadChunk() {
-        world.loadChunk(x, z);
+        world.loadChunk(x, z, false);
     }
 
     @Override

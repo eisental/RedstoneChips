@@ -242,13 +242,16 @@ public abstract class Circuit {
     }
 
     private void changeLeverState(Block lever, boolean level) {
+        if (!world.isChunkLoaded(lever.getChunk())) return;
+        
         byte data = lever.getData();
         byte newData = (byte)(level? data | 0x8 : data & 0x7);
 
         try {
             lever.setData(newData);
         } catch (ConcurrentModificationException me) {
-            //Logger.getLogger("Minecraft").warning("We had another concurrent modification at sendoutput");
+            redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput");
+            me.printStackTrace();
         }
     }
 
