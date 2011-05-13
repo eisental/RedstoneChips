@@ -8,6 +8,12 @@ import java.util.Map;
  * @author Tal Eisenberg
  */
 public class BitSetUtils {
+    
+    /**
+     * An empty BitSet7 object. Useful for clearing all outputs without creating new objects.
+     */
+    public final static BitSet7 clearBitSet = new BitSet7();
+
     /**
      * Convert a BitSet to an unsigned integer.
      *

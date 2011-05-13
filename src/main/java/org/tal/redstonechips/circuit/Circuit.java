@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -157,24 +158,17 @@ public abstract class Circuit {
         if (inputBits.get(idx)==newVal) return;
 
         inputBits.set(idx, newVal);
-        inputChange(idx, newVal);
 
         if (hasDebuggers()) {
             int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
-            int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
 
-            String i = "i: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
+            String i = "inputs: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
                     Integer.toHexString(inputInt);
 
-            String o;
-            if (outputs.length>0)
-                o = " o: " + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
-                    Integer.toHexString(outputInt);
-            else o = "";
-
-            debug("input " + idx + " is " + (newVal?"on":"off")+ ". " + i + o);
+            debug(i+ ". input " + idx + " is " + (newVal?"on":"off")+ ". ");
         }
 
+        inputChange(idx, newVal);
     }
 
 
@@ -237,6 +231,17 @@ public abstract class Circuit {
      */
     protected void sendOutput(int outIdx, boolean state) {
         outputBits.set(outIdx, state);
+        if (hasDebuggers()) {
+            int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
+
+            String o;
+            if (outputs.length>0)
+                o = " outputs: " + ChatColor.YELLOW + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
+                    Integer.toHexString(outputInt);
+            else o = "";
+
+            debug(o + ". output " + outIdx + " is " + (state?"on":"off"));
+        }
 
         changeLeverState(getOutputBlock(outIdx), state);
     }
@@ -250,7 +255,7 @@ public abstract class Circuit {
         try {
             lever.setData(newData);
         } catch (ConcurrentModificationException me) {
-            redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput");
+            redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput.");
             me.printStackTrace();
         }
     }
@@ -279,6 +284,8 @@ public abstract class Circuit {
         for (int i=0; i<length; i++) {
             sendOutput(startOutIdx+i, bits.get(i));
         }
+
+        //sendOutput(startOutIdx+length-1, bits.get(length-1));
     }
 
     /**

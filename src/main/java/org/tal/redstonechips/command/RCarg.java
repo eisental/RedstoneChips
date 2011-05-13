@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.commands;
+package org.tal.redstonechips.command;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;

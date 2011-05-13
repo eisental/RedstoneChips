@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.channels;
+package org.tal.redstonechips.channel;
 
 /**
  * Represents a transmitting wireless circuit.

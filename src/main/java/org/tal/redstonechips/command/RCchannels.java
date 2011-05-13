@@ -1,12 +1,12 @@
 
-package org.tal.redstonechips.commands;
+package org.tal.redstonechips.command;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.channels.BroadcastChannel;
-import org.tal.redstonechips.channels.ReceivingCircuit;
-import org.tal.redstonechips.channels.TransmittingCircuit;
+import org.tal.redstonechips.channel.BroadcastChannel;
+import org.tal.redstonechips.channel.ReceivingCircuit;
+import org.tal.redstonechips.channel.TransmittingCircuit;
 import org.tal.redstonechips.util.BitSetUtils;
 
 /**

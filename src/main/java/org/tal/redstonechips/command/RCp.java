@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.tal.redstonechips.commands;
+package org.tal.redstonechips.command;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

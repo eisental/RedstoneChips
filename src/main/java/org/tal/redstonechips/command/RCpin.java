@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.commands;
+package org.tal.redstonechips.command;
 
 import java.util.List;
 import org.bukkit.ChatColor;
