@@ -87,24 +87,20 @@ public class RClist extends RCCommand {
 
         if (circuits.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active circuits that match the criteria.");
         else {
-            printCircuitList(sender, args, sorted.values());
+            printCircuitList(sender, sorted.values(), null);
         }
 
         return true;
     }
 
-    public void printCircuitList(CommandSender sender, String[] args, Iterable<Circuit> circuits) {
-        String title = " active IC(s)";
+    public void printCircuitList(CommandSender sender, Iterable<Circuit> circuits, String title) {
         List<String> lines = new ArrayList<String>();
         for (Circuit c : circuits) {
             lines.add(makeCircuitDescriptionLine(c, rc.getPrefs().getInfoColor()));
         }
 
-        String page = null;
-        if (args.length>1) page = args[args.length-1];
-        else if (args.length>0) page = args[0];
-
-        title = lines.size() + title;
+        if (title==null)
+            title = lines.size() + " active IC(s)";
 
         sender.sendMessage("");
 

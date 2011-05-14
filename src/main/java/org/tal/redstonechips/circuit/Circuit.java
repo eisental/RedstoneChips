@@ -73,6 +73,11 @@ public abstract class Circuit {
     private List<CommandSender> debuggers;
 
     /**
+     * List of command senders that will receive io debug messages from this circuit.
+     */
+    private List<CommandSender> iodebuggers;
+
+    /**
      * The current state of each input bit. Should be used only for monitoring. Do not change its value.
      */
     protected BitSet7 inputBits;
@@ -109,6 +114,8 @@ public abstract class Circuit {
         this.redstoneChips = rc;
 
         debuggers = new ArrayList<CommandSender>();
+        iodebuggers = new ArrayList<CommandSender>();
+
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
         inputsDisabled = false;
@@ -159,13 +166,13 @@ public abstract class Circuit {
 
         inputBits.set(idx, newVal);
 
-        if (hasDebuggers()) {
+        if (hasIODebuggers()) {
             int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
 
-            String i = "inputs: " + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " 0x" +
-                    Integer.toHexString(inputInt);
+            String i = ChatColor.WHITE + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " (0x" +
+                    Integer.toHexString(inputInt) + ")";
 
-            debug(i+ ". input " + idx + " is " + (newVal?"on":"off")+ ". ");
+            ioDebug("Input " + idx + " is " + (newVal?"on":"off")+ ": " + i + ".");
         }
 
         inputChange(idx, newVal);
@@ -231,16 +238,16 @@ public abstract class Circuit {
      */
     protected void sendOutput(int outIdx, boolean state) {
         outputBits.set(outIdx, state);
-        if (hasDebuggers()) {
+        if (hasIODebuggers()) {
             int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
 
             String o;
             if (outputs.length>0)
-                o = " outputs: " + ChatColor.YELLOW + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " 0x" +
-                    Integer.toHexString(outputInt);
+                o = ChatColor.YELLOW + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " (0x" +
+                    Integer.toHexString(outputInt) + ")";
             else o = "";
 
-            debug(o + ". output " + outIdx + " is " + (state?"on":"off"));
+            ioDebug("Output " + outIdx + " is " + (state?"on":"off") + ": " + o + ".");
         }
 
         changeLeverState(getOutputBlock(outIdx), state);
@@ -329,30 +336,52 @@ public abstract class Circuit {
      */
     protected void debug(String message) {        
         for (CommandSender s : debuggers)
-            s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
+            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
+    }
+
+    protected void ioDebug(String message) {
+        for (CommandSender s : iodebuggers)
+            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
     }
 
     /**
      * Adds the command sender as a debugger for the circuit.
      *
      * @param d The command sender to add.
-     * @throws IllegalArgumentException If the player is already in the debuggers list.
+     * @throws IllegalArgumentException If the sender is already in the debuggers list.
      */
     public void addDebugger(CommandSender d) throws IllegalArgumentException {
-        if (debuggers.contains(d)) throw new IllegalArgumentException("You are already debugging this circuit.");
-        debuggers.add(d);
+        if (!debuggers.contains(d)) debuggers.add(d);
+    }
+
+    /**
+     * Adds the command sender as an IO debugger for the circuit.
+     * 
+     * @param d The command sender to add.
+     * @throws IllegalArgumentException I the sender is already in the io debuggers list.
+     */
+    public void addIODebugger(CommandSender d) {
+        if (!iodebuggers.contains(d)) iodebuggers.add(d);
     }
 
     /**
      * Removes the command sender from the debuggers list.
      *
      * @param d The command sender.
-     * @return
-     * @throws IllegalArgumentException
+     * @return true if the command sender was found on the debugger list.
      */
-    public void removeDebugger(CommandSender d) throws IllegalArgumentException {
-        if (!debuggers.contains(d)) throw new IllegalArgumentException("You are not listed as a debugger of this circuit.");
-        debuggers.remove(d);
+    public boolean removeDebugger(CommandSender d) {
+        return debuggers.remove(d);
+    }
+
+    /**
+     * Removes the command sender from the IO debuggers list.
+     * 
+     * @param d The command sender.
+     * @return true if the command sender was found on the IO debugger list.
+     */
+    public boolean removeIODebugger(CommandSender d) {
+        return iodebuggers.remove(d);
     }
 
     /**
@@ -362,6 +391,12 @@ public abstract class Circuit {
      * @return True if the circuit has any debuggers.
      */
     public boolean hasDebuggers() { return !debuggers.isEmpty(); }
+
+    /**
+     * 
+     * @return true if the circuit has any IO debuggers.
+     */
+    public boolean hasIODebuggers() { return !iodebuggers.isEmpty(); }
 
     /**
      *
@@ -389,6 +424,14 @@ public abstract class Circuit {
      */
     public List<CommandSender> getDebuggers() {
         return debuggers;
+    }
+
+    /**
+     * 
+     * @return The circuit's IO debuggers list.
+     */
+    public List<CommandSender> getIODebuggers() {
+        return iodebuggers;
     }
 
     /**

@@ -38,6 +38,7 @@ commands:
       Use the command with no arguments to list all preferences values.
       To change a preference value use /rcprefs <pref key> <new value>.
   rcdebug:
+    aliases: [rcdb]
     description: Register yourself as a debugger of a chip.
     usage: |
       /rcdebug [chip-id|off|alloff]

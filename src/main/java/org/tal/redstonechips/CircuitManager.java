@@ -31,7 +31,6 @@ import org.tal.redstonechips.util.Locations;
  */
 public class CircuitManager {
 
-
     /**
      * Used for passing argument when scanning recursively for chips.
      */
@@ -97,8 +96,12 @@ public class CircuitManager {
     private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
     private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
+    private List<CommandSender> pausedDebuggers;
+
     public CircuitManager(RedstoneChips plugin) {
         rc = plugin;
+
+        pausedDebuggers = new ArrayList<CommandSender>();
     }
 
     /**
@@ -596,6 +599,19 @@ public class CircuitManager {
     public Object[] lookupOutputBlock(Block outputBlock) {
         return this.outputLookupMap.get(outputBlock.getLocation());
     }
+
+    public boolean isDebuggerPaused(CommandSender s) {
+        return pausedDebuggers.contains(s);
+    }
+
+    public void pauseDebugger(CommandSender s, boolean pause) {
+        if (pause) {
+            if (!pausedDebuggers.contains(s)) pausedDebuggers.add(s);
+        } else {
+            pausedDebuggers.remove(s);
+        }
+    }
+
 
     private void scanBranch(ScanParameters params) {
         // look in every horizontal direction for inputs, outputs or interface blocks.

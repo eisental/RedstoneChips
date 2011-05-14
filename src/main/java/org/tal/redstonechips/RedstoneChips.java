@@ -80,10 +80,11 @@ public class RedstoneChips extends JavaPlugin {
     public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
     public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
 
-    private RCsel rcsel = new RCsel();
+    public RCsel rcsel = new RCsel();
+    public RClist rclist = new RClist();
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
-        new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
+        new RCfixioblocks(), new RChelp(), new RCinfo(), rclist, new RCpin(), new RCprefs(), new RCreset(), rcsel,
         new RCtype(), new RCload(), new RCsave(), new RCp()
     };
 

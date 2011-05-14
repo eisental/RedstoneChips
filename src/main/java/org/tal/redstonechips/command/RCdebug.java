@@ -1,9 +1,12 @@
 
 package org.tal.redstonechips.command;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.util.ParsingUtils;
 
 /**
  *
@@ -13,91 +16,115 @@ public class RCdebug extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        int id = -1;
-        boolean add = true;
-        boolean alloff = false;
+        if (args.length==0) {
+            // toggle debug on target chip.
+            Circuit c = CommandUtils.findTargetCircuit(rc, sender);
+            if (c==null) return true;
+            else toggleCircuitDebug(sender, c);
 
-        if (args.length==1) {
-            // on, off or id (then on)
-            if (args[0].equalsIgnoreCase("on"))
-                add = true;
-            else if (args[0].equalsIgnoreCase("off"))
-                add = false;
-            else if (args[0].equals("alloff"))
-                alloff = true;
-            else {
-                try {
-                    id = Integer.decode(args[0]);
-                    add = true;
-                } catch (NumberFormatException ne) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad argument: " + args[0] + ". Expecting on, off or a chip id.");
-                }
+        } else if (args.length==1) {
+            if ("clear".startsWith(args[0].toLowerCase())) {
+                // clear debug list.
+                clearDebugList(sender);
+
+            } else if ("list".startsWith(args[0].toLowerCase())) {
+                // list all debugged chips.
+                listDebuggedCircuits(sender);
+
+            } else if (args[0].equals(".")) {
+                // pause debugging
+                pauseDebugging(sender);
+
+            } else if (ParsingUtils.isNumber(args[0])) {
+                // toggle debug using chip id.
+                int id = Integer.parseInt(args[0]);
+                Circuit c = rc.getCircuitManager().getCircuits().get(id);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id);
+                    return true;
+                } else
+                    toggleCircuitDebug(sender, c);
+
+            } else if (args[0].equalsIgnoreCase("io")) {
+                // toggle io messages on target chip.
+                Circuit c = CommandUtils.findTargetCircuit(rc, sender);
+                if (c==null) return true;
+                else toggleCircuitIODebug(sender, c);
+            } else {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad rcdebug argument: " + args[0]);
+                return true;
             }
         } else if (args.length==2) {
-            try {
-                id = Integer.decode(args[0]);
-            } catch (NumberFormatException ne) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a chip id number.");
-                return true;
-            }
-
-            if (args[1].equalsIgnoreCase("on"))
-                add = true;
-            else if (args[1].equalsIgnoreCase("off"))
-                add = false;
-            else {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad argument: " + args[1] + ". Expecting on or off.");
-                return true;
-            }
-        }
-
-        if (alloff) {
-            for (Circuit c : rc.getCircuitManager().getCircuits().values())
-                if (c.getDebuggers().contains(sender)) c.removeDebugger(sender);
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "You will not receive debug messages from any chip.");
-        } else {
-            Circuit c;
-            if (id!=-1) {
-                if (!rc.getCircuitManager().getCircuits().containsKey(id)) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad chip id " + id + ". Could only find " + rc.getCircuitManager().getCircuits().size() + " active chips.");
+            if (ParsingUtils.isNumber(args[0]) && args[1].equalsIgnoreCase("io")) {
+                // toggle io messages using chip id.
+                int id = Integer.parseInt(args[0]);
+                Circuit c = rc.getCircuitManager().getCircuits().get(id);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id);
                     return true;
-                }
-                c = rc.getCircuitManager().getCircuits().get(id);
+                } else
+                    toggleCircuitIODebug(sender, c);
+
             } else {
-                c = CommandUtils.findTargetCircuit(rc, sender);
-                if (c==null) return true;
-            }
-
-            if (add) {
-                try {
-                    if (id!=-1 && !sender.isOp()) {
-                        sender.sendMessage(rc.getPrefs().getErrorColor() + "You must have admin priviliges to debug a chip by id.");
-                        return true;
-                    } else
-                        c.addDebugger(sender);
-                } catch (IllegalArgumentException ie) {
-                    try {
-                        c.removeDebugger(sender);
-                    } catch (IllegalArgumentException me) {
-                        sender.sendMessage(rc.getPrefs().getInfoColor() + me.getMessage());
-                        return true;
-                    }
-                    sender.sendMessage(rc.getPrefs().getInfoColor() + "You will not receive any more debug messages from the " + c.getClass().getSimpleName() + " circuit.");
-
-                    return true;
-                }
-                sender.sendMessage(rc.getPrefs().getDebugColor() + "You are now a debugger of the " + c.getClass().getSimpleName() + " circuit.");
-            } else {
-                try {
-                    c.removeDebugger(sender);
-                } catch (IllegalArgumentException ie) {
-                    sender.sendMessage(rc.getPrefs().getInfoColor() + ie.getMessage());
-                    return true;
-                }
-                sender.sendMessage(rc.getPrefs().getInfoColor() + "You will not receive any more debug messages from the " + c.getClass().getSimpleName() + " circuit.");
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad rcdebug command: /rcdebug " + args[0] + " " + args[1]);
+                return true;
             }
         }
 
         return true;
+    }
+
+    private void clearDebugList(CommandSender sender) {
+        for (Circuit c : rc.getCircuitManager().getCircuits().values()) {
+            c.removeDebugger(sender);
+            c.removeIODebugger(sender);
+        }
+
+        sender.sendMessage(rc.getPrefs().getInfoColor() + "You will not receive debug messages from any chip.");
+    }
+
+    private void listDebuggedCircuits(CommandSender sender) {
+        List<Circuit> circuits = new ArrayList<Circuit>();
+        for (Circuit c : rc.getCircuitManager().getCircuits().values()) {
+            if (c.getDebuggers().contains(sender) || c.getIODebuggers().contains(sender))
+                circuits.add(c);
+        }
+
+        if (circuits.isEmpty()) {
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "You are currently not debugging any circuits.");
+        } else
+            rc.rclist.printCircuitList(sender, circuits, circuits.size() + " debugged IC(s).");
+    }
+
+    private void pauseDebugging(CommandSender sender) {
+        if (rc.getCircuitManager().isDebuggerPaused(sender)) {
+            rc.getCircuitManager().pauseDebugger(sender, false);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Unpaused debugging.");
+        } else {
+            rc.getCircuitManager().pauseDebugger(sender, true);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Paused debugging. Type '/rcdebug .' again to resume.");
+        }
+    }
+
+    private void toggleCircuitIODebug(CommandSender sender, Circuit c) {
+        if (c.getIODebuggers().contains(sender)) {
+            c.removeIODebugger(sender);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped IO debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+        } else {
+            c.addIODebugger(sender);
+            c.addDebugger(sender);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "IO debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+        }
+    }
+
+    private void toggleCircuitDebug(CommandSender sender, Circuit c) {
+        if (c.getDebuggers().contains(sender)) {
+            c.removeDebugger(sender);
+            c.removeIODebugger(sender);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+        } else {
+            c.addDebugger(sender);
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+        }
     }
 }
