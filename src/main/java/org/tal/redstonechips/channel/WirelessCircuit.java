@@ -1,6 +1,8 @@
 
 package org.tal.redstonechips.channel;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
@@ -23,7 +25,7 @@ public abstract class WirelessCircuit extends Circuit {
      *
      * @return the number of channel bits used by this circuit.
      */
-    public abstract int getLength();
+    public abstract int getChannelLength();
 
     /**
      *
@@ -46,7 +48,7 @@ public abstract class WirelessCircuit extends Circuit {
      * @param channelString
      * @throws IllegalArgumentException
      */
-    protected void initWireless(String channelString) throws IllegalArgumentException {
+    protected void initWireless(CommandSender sender, String channelString) throws IllegalArgumentException {
         String name;
         int colonIdx = channelString.indexOf(":");
         if (colonIdx!=-1) {
@@ -61,10 +63,29 @@ public abstract class WirelessCircuit extends Circuit {
             startBit = 0;
         }
 
-        if (this instanceof ReceivingCircuit)
+        if (this instanceof ReceivingCircuit) {
             channel = redstoneChips.registerReceiver((ReceivingCircuit)this, name);
-        else if (this instanceof TransmittingCircuit)
+            if (sender!=null) {
+                String bits;
+                if (this.getChannelLength()>1)
+                    bits = "bits " + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
+                else bits = "bit " + this.getStartBit();
+
+                info(sender, this.getCircuitClass() + " will listen on channel " +
+                        ChatColor.YELLOW + getChannel().name + redstoneChips.getPrefs().getInfoColor() + " " + bits + ".");
+            }
+        } else if (this instanceof TransmittingCircuit) {
             channel = redstoneChips.registerTransmitter((TransmittingCircuit)this, name);
+            if (sender!=null) {
+                String bits;
+                if (this.getChannelLength()>1)
+                    bits = "bits " + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
+                else bits = "bit " + this.getStartBit();
+                
+                info(sender, this.getCircuitClass() + " will broadcast over channel " + 
+                        ChatColor.YELLOW + getChannel().name + redstoneChips.getPrefs().getInfoColor() + " " + bits + ".");
+            }
+        }
     }
 
 }

@@ -51,8 +51,8 @@ public class RCchannels extends RCCommand {
             String sTransmitters = "";
             for (TransmittingCircuit t : channel.getTransmitters()) {
                 String range = "[";
-                if (t.getLength()>1)
-                    range += "bits " + t.getStartBit() + "-" + (t.getLength()+t.getStartBit()-1) + "]";
+                if (t.getChannelLength()>1)
+                    range += "bits " + t.getStartBit() + "-" + (t.getChannelLength()+t.getStartBit()-1) + "]";
                 else range += "bit " + t.getStartBit() + "]";
 
                 sTransmitters += t.getCircuitClass() + " (" + t.id + ") " + range + ", ";
@@ -61,8 +61,8 @@ public class RCchannels extends RCCommand {
             String sReceivers = "";
             for (ReceivingCircuit r : channel.getReceivers()) {
                 String range = "[";
-                if (r.getLength()>1)
-                    range += "bits " + r.getStartBit() + "-" + (r.getLength()+r.getStartBit()-1) + "]";
+                if (r.getChannelLength()>1)
+                    range += "bits " + r.getStartBit() + "-" + (r.getChannelLength()+r.getStartBit()-1) + "]";
                 else range += "bit " + r.getStartBit() + "]";
                 sReceivers += r.getCircuitClass() + " (" + r.id + ") " + range + ", ";
             }

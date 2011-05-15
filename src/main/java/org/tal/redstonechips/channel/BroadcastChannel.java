@@ -41,8 +41,8 @@ public class BroadcastChannel {
         if (receivers.contains(r)) return;
 
         receivers.add(r);
-        if (r.getStartBit()+r.getLength()>length)
-            length = r.getStartBit()+r.getLength();        
+        if (r.getStartBit()+r.getChannelLength()>length)
+            length = r.getStartBit()+r.getChannelLength();
     }
 
     /**
@@ -65,8 +65,8 @@ public class BroadcastChannel {
         if (transmitters.contains(t)) return;
         
         transmitters.add(t);
-        if (t.getStartBit()+t.getLength()>length)
-            length = t.getStartBit()+t.getLength();
+        if (t.getStartBit()+t.getChannelLength()>length)
+            length = t.getStartBit()+t.getChannelLength();
 
     }
 
@@ -100,10 +100,10 @@ public class BroadcastChannel {
     private void calcChannelLength() {
         length = 0;
         for (TransmittingCircuit t : transmitters)
-            if (t.getStartBit()+t.getLength()>length) length = t.getStartBit()+t.getLength();
+            if (t.getStartBit()+t.getChannelLength()>length) length = t.getStartBit()+t.getChannelLength();
 
         for (ReceivingCircuit r : receivers)
-            if (r.getStartBit()+r.getLength()>length) length = r.getStartBit()+r.getLength();
+            if (r.getStartBit()+r.getChannelLength()>length) length = r.getStartBit()+r.getChannelLength();
 
     }
 
@@ -140,11 +140,11 @@ public class BroadcastChannel {
     }
 
     private void transmitToReceiver(ReceivingCircuit r, int startBit, int length) {
-        if (r.getLength()!=0) {
+        if (r.getChannelLength()!=0) {
             // only send to receiver if the change is in its bit range.
-            if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getLength()) ||
+            if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getChannelLength()) ||
                     (startBit<r.getStartBit() && startBit+length>r.getStartBit()))
-                        r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getLength()));
+                        r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getChannelLength()));
         }
     }
 }
