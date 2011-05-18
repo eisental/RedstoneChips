@@ -143,6 +143,8 @@ public class InputPin {
      * Deactivates the circuit and sends a debug message of a detected feedback loop.
      */
     private void abortFeedbackLoop() {
+        if (circuit.isDisabled()) return;
+        
         if (circuit.hasDebuggers()) {
             circuit.debug("Possible infinite feedback loop detected in " + circuit.getCircuitClass() + " circuit, at"
                     + "pin " + index + ". It will no longer process any input changes. ");

@@ -259,7 +259,8 @@ public class CircuitManager {
 
             if (id<0)
                 c.id = generateId();
-            else c.id = id;
+            else
+                c.id = id;
             circuits.put(c.id, c);
 
             if (sender != null) {
@@ -384,6 +385,7 @@ public class CircuitManager {
     public boolean resetCircuit(Circuit c, CommandSender reseter) {
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         List<CommandSender> debuggers = c.getDebuggers();
+        List<CommandSender> iodebuggers = c.getIODebuggers();
         int id = c.id;
 
         rc.getCircuitManager().destroyCircuit(c, reseter, false);
@@ -395,7 +397,7 @@ public class CircuitManager {
         if (newCircuit!=null) {
             newCircuit.id = id;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
-
+            for (CommandSender d : iodebuggers) newCircuit.addIODebugger(d);
             if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefs().getInfoColor() + " circuit is reactivated.");
 
             return true;

@@ -17,5 +17,5 @@ enableDestroyCommand: false
 ## When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
 rightClickToActivate: false
 
-## Maximum number of redstone input signals per tick
-maxInputChangesPerTick: 2000
+## Maximum number of redstone input changes per tick
+maxInputChangesPerTick: 20000

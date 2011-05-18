@@ -75,7 +75,7 @@ public class RedstoneChips extends JavaPlugin {
     private CircuitPersistence circuitPersistence;
     private CircuitLoader circuitLoader;
 
-    private static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
+    public static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
     public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
     public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
@@ -85,7 +85,7 @@ public class RedstoneChips extends JavaPlugin {
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), rclist, new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp()
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override

@@ -288,8 +288,12 @@ public abstract class Circuit {
      * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
      */
     protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
+        BitSet7 original = outputBits.get(startOutIdx, startOutIdx+length);
+
         for (int i=0; i<length; i++) {
-            sendOutput(startOutIdx+i, bits.get(i));
+            boolean b = bits.get(i);
+            if (original.get(i)!=b)
+                sendOutput(startOutIdx+i, b);
         }
 
         //sendOutput(startOutIdx+length-1, bits.get(length-1));
@@ -503,6 +507,7 @@ public abstract class Circuit {
      */
     public void disableInputs() {
         inputsDisabled = true;
+        updateCircuitSign(true);
     }
 
     /**
@@ -585,7 +590,9 @@ public abstract class Circuit {
         if (sign==null) return;
         String line;
         if (activated) {
-            String signColor = redstoneChips.getPrefs().getSignColor();
+            String signColor;
+            if (isDisabled()) signColor = "8";
+            else signColor = redstoneChips.getPrefs().getSignColor();
             line = (char)167 + signColor + this.getCircuitClass();
         } else {
             line = this.getCircuitClass();
@@ -653,5 +660,10 @@ public abstract class Circuit {
         }
 
         return true;
+    }
+
+    public void resetOutputs() {
+        for (Location output : outputs)
+            this.changeLeverState(output.getBlock(), false);
     }
 }

@@ -1,14 +1,15 @@
 package org.tal.redstonechips;
 
+import java.io.BufferedWriter;
 import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +113,7 @@ public class CircuitPersistence {
 
         File file = new File(rc.getDataFolder(), circuitsFileName);
         DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Yaml yaml = new Yaml(options);
         List<Map<String,Object>> circuitMaps = new ArrayList<Map<String,Object>>();
 
@@ -122,7 +123,8 @@ public class CircuitPersistence {
         }
         
         try {
-            yaml.dump(circuitMaps, new FileWriter(file));
+            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(
+    new FileOutputStream(file), "UTF-8")));
         } catch (IOException ex) {
             rc.log(Level.SEVERE, ex.getMessage());
         }

@@ -5,6 +5,11 @@ author: eisental
 description: Core RedstoneChips plugin for building integrated redstone circuits.
 website: http://eisental.github.com/RedstoneChips
 commands:
+  redstonechips:
+    description: General plugin information.
+    usage: |
+      /redstonechips
+    aliases: [rc]
   rclist:
     description: Prints a list of active chips.
     usage: |
@@ -85,6 +90,7 @@ commands:
 
       Running `/rcreset all` will reset all active circuits. Use with caution!
   rcchannels:
+    aliases: [rcch]
     description: Prints a list of all wireless broadcast channels.
     usage: |
       /rcchannels [channel-name]

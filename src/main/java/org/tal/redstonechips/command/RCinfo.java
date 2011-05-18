@@ -88,8 +88,11 @@ public class RCinfo extends RCCommand {
         Map<String,String> internalState = c.getInternalState();
         if (!internalState.isEmpty()) {
             sender.sendMessage(infoColor + "internal state:");
+            String internal = "   ";
             for (String key : internalState.keySet())
-                sender.sendMessage(infoColor + "   " + key + ": " + extraColor + internalState.get(key));
+                internal += infoColor + key + ": " + extraColor + internalState.get(key) + infoColor + ", ";
+            
+            sender.sendMessage(internal.substring(0, internal.length()-2));
         }
     }
 }

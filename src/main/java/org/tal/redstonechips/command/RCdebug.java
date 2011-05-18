@@ -3,6 +3,7 @@ package org.tal.redstonechips.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.Circuit;
@@ -92,8 +93,13 @@ public class RCdebug extends RCCommand {
 
         if (circuits.isEmpty()) {
             sender.sendMessage(rc.getPrefs().getInfoColor() + "You are currently not debugging any circuits.");
-        } else
-            rc.rclist.printCircuitList(sender, circuits, circuits.size() + " debugged IC(s).");
+        } else {
+            String title;
+            if (rc.getCircuitManager().isDebuggerPaused(sender))
+                title = circuits.size() + " debugged IC(s) " + ChatColor.AQUA + "(Debugging Paused)" + rc.getPrefs().getInfoColor();
+            else title = circuits.size() + " debugged IC(s)";
+            rc.rclist.printCircuitList(sender, circuits, title);
+        }
     }
 
     private void pauseDebugging(CommandSender sender) {
