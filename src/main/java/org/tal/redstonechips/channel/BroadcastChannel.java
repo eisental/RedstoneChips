@@ -132,6 +132,21 @@ public class BroadcastChannel {
     }
 
     /**
+     * Transmits 1 bit over this channel to all receivers.
+     * The transmission can set any bit of the channel bit set. To set the 1st bit position should be 0.
+     * 
+     * @param bit The bit to transmit.
+     * @param position Position of the bit in the channel's bitset.
+     */
+    public void transmit(boolean bit, int position) {
+        bits.set(position, bit);
+
+        for (ReceivingCircuit r : receivers) {
+            transmitToReceiver(r, position, 1);
+        }
+    }
+
+    /**
      *
      * @return true if the channel has no registered circuits.
      */
