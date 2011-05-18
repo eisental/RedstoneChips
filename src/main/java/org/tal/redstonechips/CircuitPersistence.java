@@ -123,8 +123,7 @@ public class CircuitPersistence {
         }
         
         try {
-            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(
-    new FileOutputStream(file), "UTF-8")));
+            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
         } catch (IOException ex) {
             rc.log(Level.SEVERE, ex.getMessage());
         }
