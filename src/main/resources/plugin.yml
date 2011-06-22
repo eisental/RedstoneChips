@@ -8,18 +8,18 @@ commands:
   redstonechips:
     description: General plugin information.
     usage: |
-      /redstonechips
+      `/redstonechips`
     aliases: [rc]
   rclist:
     description: Prints a list of active chips.
     usage: |
-      /rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;...]
+      `/rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;...]`
 
       The command without any arguments will list all circuits in the current world or, when used from the server console, circuits
       in all worlds.
 
-      Use /rclist all as a player to see a list of all circuits on the server
-      Use /rclist <world-name> to list all circuits in a specific world.
+      Use `/rclist all` as a player to see a list of all circuits on the server
+      Use `/rclist <world-name>` to list all circuits in a specific world.
 
       To show only specific kind of circuits you can use a filter. There are several filter types.
       `location: <x>,<y>,<z>,[radius]` - Show only circuits in a radius around the location.
