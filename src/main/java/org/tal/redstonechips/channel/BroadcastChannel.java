@@ -43,6 +43,8 @@ public class BroadcastChannel {
         receivers.add(r);
         if (r.getStartBit()+r.getChannelLength()>length)
             length = r.getStartBit()+r.getChannelLength();
+
+        transmitToReceiver(r, 0, length);
     }
 
     /**
