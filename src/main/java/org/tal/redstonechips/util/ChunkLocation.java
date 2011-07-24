@@ -37,7 +37,7 @@ public class ChunkLocation {
         if (!(obj instanceof ChunkLocation)) return false;
 
         ChunkLocation that = (ChunkLocation)obj;
-        return (that.x==this.x && that.z==this.z && that.world.getId()==this.world.getId());
+        return (that.x==this.x && that.z==this.z && that.world.getUID().equals(this.world.getUID()));
     }
 
     public int getX() { return x; }
