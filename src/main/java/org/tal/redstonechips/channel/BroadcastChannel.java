@@ -37,14 +37,12 @@ public class BroadcastChannel {
      * Adds a receiver to receive broadcasts on this channel.
      * @param r The receiving circuit.
      */
-    public void addReceiver(ReceivingCircuit r) {
+    public void addReceiver(final ReceivingCircuit r) {
         if (receivers.contains(r)) return;
 
         receivers.add(r);
         if (r.getStartBit()+r.getChannelLength()>length)
             length = r.getStartBit()+r.getChannelLength();
-
-        transmitToReceiver(r, 0, length);
     }
 
     /**
@@ -163,5 +161,9 @@ public class BroadcastChannel {
                     (startBit<r.getStartBit() && startBit+length>r.getStartBit()))
                         r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getChannelLength()));
         }
+    }
+
+    public void sendAllForReceiver(ReceivingCircuit r) {
+        transmitToReceiver(r, 0, length);
     }
 }
