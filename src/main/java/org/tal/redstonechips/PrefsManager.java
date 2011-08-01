@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,7 +64,15 @@ public class PrefsManager {
 
         Yaml yaml = new Yaml();
 
-        defaults = (Map<String, Object>) yaml.load(getClass().getResourceAsStream(defaultsFileName));
+        URL res = getClass().getResource(defaultsFileName);
+        InputStream stream;
+        try {
+            stream = res.openStream();
+            defaults = (Map<String, Object>) yaml.load(stream);
+        } catch (IOException ex) {
+            rc.log(Level.SEVERE, ex.toString());
+        }
+        
         prefs = new HashMap<String, Object>();
     }
 
@@ -286,7 +296,7 @@ public class PrefsManager {
 
     /**
      * Allows circuit libraries to register their own preferences keys. This method should be called
-     * in the CircuitIndex onRedstoneChipsEnable() method to insure the key is added before RedstoneChips reads the preferences file.
+     * in the CircuitIndex onRedstoneChipsEnable() method to ensure the key is added before RedstoneChips reads the preferences file.
      * The preferences key is set in the format of class-name.key
      *
      * @param circuitClass The circuit class that uses this preference key.
