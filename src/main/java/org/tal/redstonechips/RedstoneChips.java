@@ -77,7 +77,7 @@ public class RedstoneChips extends JavaPlugin {
 
     public static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
 
-    public Map<Location, List<rcTypeReceiver>> rcTypeReceivers = new HashMap<Location, List<rcTypeReceiver>>();
+    public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
     public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
 
     public RCsel rcsel = new RCsel();
@@ -325,10 +325,7 @@ public class RedstoneChips extends JavaPlugin {
      * @param circuit The circuit that will receive the typed text.
      */
     public void registerRcTypeReceiver(Location typingBlock, rcTypeReceiver circuit) {
-		if (!rcTypeReceivers.containsKey(typingBlock))
-				rcTypeReceivers.put(typingBlock, new ArrayList<rcTypeReceiver>());
-
-            rcTypeReceivers.get(typingBlock).add(circuit);
+        rcTypeReceivers.put(typingBlock, circuit);
     }
 
     /**
@@ -336,23 +333,16 @@ public class RedstoneChips extends JavaPlugin {
      * @param circuit The rcTypeReceiver to remove.
      */
     public void removeRcTypeReceiver(rcTypeReceiver circuit) {
-		List<Location> receiversToRemove = new ArrayList<Location>();
-		for (Location l : rcTypeReceivers.keySet()) {
-            List<rcTypeReceiver> receivers = rcTypeReceivers.get(l);
-            List<rcTypeReceiver> toRemove = new ArrayList<rcTypeReceiver>();
-            for (rcTypeReceiver receiver : receivers) {
-                if (receiver==circuit)
-                    toRemove.add(receiver);
-            }
+        List<Location> toremove = new ArrayList<Location>();
 
-            receivers.removeAll(toRemove);
-            if (receivers.isEmpty())
-                receiversToRemove.add(l);
+        for (Location l : rcTypeReceivers.keySet()) {
+            if (rcTypeReceivers.get(l)==circuit)
+                toremove.add(l);
         }
 
-		for (Location l : receiversToRemove)
+        for (Location l : toremove)
             rcTypeReceivers.remove(l);
-	}
+    }
 
     /**
      * Adds the receiving circuit to listen on a channel and returns the BroadcastChannel object that the receiver
