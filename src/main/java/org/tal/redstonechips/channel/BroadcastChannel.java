@@ -23,6 +23,12 @@ public class BroadcastChannel {
      */
     public BitSet7 bits = new BitSet7();
 
+	/**
+     * Security Information.
+     */
+	public List<String> owners = new ArrayList<String>();
+	public List<String> users = new ArrayList<String>();
+
     private int length = 0;
 
     /**
@@ -162,4 +168,8 @@ public class BroadcastChannel {
                         r.receive(bits.get(r.getStartBit(), r.getStartBit()+r.getChannelLength()));
         }
     }
+	
+	public boolean isProtected() {
+		return !owners.isEmpty() || !users.isEmpty();
+	}
 }

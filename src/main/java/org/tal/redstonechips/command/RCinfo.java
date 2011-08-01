@@ -6,6 +6,7 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.util.BitSetUtils;
 import org.tal.redstonechips.util.ChunkLocation;
@@ -18,6 +19,10 @@ public class RCinfo extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	    if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+
         HashMap<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
 
         Circuit c;

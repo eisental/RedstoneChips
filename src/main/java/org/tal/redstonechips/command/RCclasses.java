@@ -9,6 +9,7 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
@@ -19,6 +20,10 @@ public class RCclasses extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+	
         Map<String,Class<? extends Circuit>> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
         
         if (circuitClasses.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");

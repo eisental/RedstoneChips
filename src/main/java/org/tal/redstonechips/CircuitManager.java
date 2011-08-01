@@ -24,6 +24,8 @@ import org.bukkit.material.Redstone;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.util.Locations;
+import org.tal.redstonechips.channel.WirelessCircuit;
+import org.tal.redstonechips.channel.BroadcastChannel;
 
 /**
  *
@@ -152,6 +154,19 @@ public class CircuitManager {
 
         // then check if the sign text points to a known circuit type
         if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -2;
+		
+		Player player = null;
+		if (sender!=null) {
+			if (sender instanceof Player) player = (Player)sender;
+			if (player!=null) {
+				if (rc.getPrefs().getUsePermissions()) {
+						if (!checkCreatePermission(player, signClass)) {
+						sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to create circuits of type " + signClass + ".");
+						return -2;
+					}
+				}
+			}
+		}
 
         List<Block> inputs = new ArrayList<Block>();
         List<Block> outputs = new ArrayList<Block>();
@@ -289,13 +304,17 @@ public class CircuitManager {
      * @param b The block that was broken.
      * @param s The breaker. Can be null.
      */
-    public void checkCircuitDestroyed(Block b, CommandSender s) {
+    public boolean checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.containsValue(destroyed)) {
-            if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
-            destroyCircuit(destroyed, s, false);
+			if (destroyCircuit(destroyed, s, false)) {
+				if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
+			} else {
+				return false;
+			}
         }
+		return true;
     }
 
     private final static Class redstoneClass = Redstone.class;
@@ -336,8 +355,28 @@ public class CircuitManager {
                 if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
                 return false;
             }
-
         }
+		
+		if (destroyer != null) {
+			Player player = null;
+			if (destroyer instanceof Player) player = (Player)destroyer;
+			if (player!=null) {
+				if (rc.getPrefs().getUsePermissions()) {
+					if (!checkDestroyPermission(player, destroyed.getClass().getSimpleName())) {
+						destroyer.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to destroy circuits of type " + destroyed.getClass().getSimpleName() + ".");
+						return false;
+					}
+				}
+			}
+		}
+		
+		if (destroyed instanceof WirelessCircuit) {
+			if (!(checkChanUserPermissions(destroyer, ((WirelessCircuit)destroyed).getChannel().name))) {
+				if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + ((WirelessCircuit)destroyed).getChannel().name + ".");
+				return false;
+			}
+		}
+		
         destroyed.circuitShutdown();
         destroyed.circuitDestroyed();
         circuits.remove(destroyed.id);
@@ -388,7 +427,7 @@ public class CircuitManager {
         List<CommandSender> iodebuggers = c.getIODebuggers();
         int id = c.id;
 
-        rc.getCircuitManager().destroyCircuit(c, reseter, false);
+        if (!rc.getCircuitManager().destroyCircuit(c, reseter, false)) return false;
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, reseter,
                 rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
@@ -866,4 +905,56 @@ public class CircuitManager {
 
         return i;
     }
+	
+	/**
+	* Checks if a player has permission to destroy a chip.
+	* 
+	* @return true if player has permission.
+	*/
+	private boolean checkDestroyPermission(Player player, String classname) {
+		if (player.hasPermission("redstonechips.circuit.destroy.deny") || player.hasPermission("redstonechips.circuit.destroy." + classname + ".deny")) return false;
+		if (player.hasPermission("redstonechips.circuit.destroy.*") || player.hasPermission("redstonechips.circuit.destroy." + classname)) return true;
+		return false;
+	}
+	
+	/**
+	* Checks if a player has permission to create a chip.
+	* 
+	* @return true if player has permission.
+	*/
+	private boolean checkCreatePermission(Player player, String classname) {
+		if (player.hasPermission("redstonechips.circuit.create.deny") || player.hasPermission("redstonechips.circuit.create." + classname + ".deny")) return false;
+		if (player.hasPermission("redstonechips.circuit.create.*") || player.hasPermission("redstonechips.circuit.create." + classname)) return true;
+		return false;
+	}
+	
+	private boolean checkChanUserPermissions(Player player, BroadcastChannel channel) {			
+		String playerName = player.getName();
+		if (player.hasPermission("redstonechips.channel.admin") || channel.users.contains(playerName.toLowerCase()) || channel.owners.contains(playerName.toLowerCase())) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean checkChanUserPermissions(CommandSender sender, String name) {
+		if (!(sender instanceof Player)) {
+			return true;
+		}
+		
+		if (!(rc.broadcastChannels.containsKey(name))) {
+			return true;
+		}
+		
+		if (!(rc.broadcastChannels.get(name).isProtected())) {
+			return true;
+		}
+		
+		String playerName = ((Player)sender).getName();
+		if (((Player)sender).hasPermission("redstonechips.channel.admin") || rc.broadcastChannels.get(name).users.contains(playerName.toLowerCase()) || rc.broadcastChannels.get(name).owners.contains(playerName.toLowerCase())) {
+			return true;
+		}
+		
+		return false;
+	}
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -14,7 +15,11 @@ public class RCprefs extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length==0) { // list preferences
+        if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+		
+		if (args.length==0) { // list preferences
             rc.getPrefs().printYaml(sender, rc.getPrefs().getPrefs());
             sender.sendMessage(rc.getPrefs().getInfoColor() + "Type /rcprefs <name> <value> to make changes.");
         } else if (args.length==1) { // show one key value pair
@@ -27,8 +32,8 @@ public class RCprefs extends RCCommand {
                 rc.getPrefs().printYaml(sender, map);
             }
         } else if (args.length>=2) { // set value
-            if (!sender.isOp()) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Only admins are authorized to change preferences values.");
+            if (!checkpermissions(sender, "rcprefs.set")) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to change preferences values.");
                 return true;
             }
 
@@ -51,4 +56,16 @@ public class RCprefs extends RCCommand {
         
         return true;
     }
+	
+	private boolean checkpermissions(CommandSender sender, String command) {
+		if (!rc.getPrefs().getUsePermissions()) {
+			return sender.isOp();
+		} else {
+			if (sender instanceof Player) {
+				return (((Player)sender).hasPermission("redstonechips.command." + command) && !((Player)sender).hasPermission("redstonechips.command." + command + ".deny"));
+			} else {
+				return true;
+			}
+		}
+	}
 }

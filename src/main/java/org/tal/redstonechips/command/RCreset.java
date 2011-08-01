@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
@@ -20,9 +21,9 @@ public class RCreset extends RCCommand {
 
         if (args.length>0) {
             if (args[0].equalsIgnoreCase("all")) {
-                if (sender.isOp())
+                if (checkpermissions(sender, "rcreset.all"))
                     resetAllCircuits(sender);
-                else sender.sendMessage(rc.getPrefs().getErrorColor() + "Only ops (admins) are allowed to use this command.");
+                else sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to reset all circuits.");
                 return true;
             }
 
@@ -38,6 +39,9 @@ public class RCreset extends RCCommand {
                 return true;
             }
         } else { // use targeted circuit
+			if (sender instanceof Player) {
+				if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+			}
             c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
         }
@@ -72,5 +76,17 @@ public class RCreset extends RCCommand {
         }
 
     }
+	
+	private boolean checkpermissions(CommandSender sender, String command) {
+		if (!rc.getPrefs().getUsePermissions()) {
+			return sender.isOp();
+		} else {
+			if (sender instanceof Player) {
+				return (((Player)sender).hasPermission("redstonechips.command." + command) && !((Player)sender).hasPermission("redstonechips.command." + command + ".deny"));
+			} else {
+				return true;
+			}
+		}
+	}
 
 }

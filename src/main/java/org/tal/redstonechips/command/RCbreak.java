@@ -4,6 +4,7 @@ package org.tal.redstonechips.command;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
@@ -14,6 +15,10 @@ public class RCbreak extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+	
         int id = -1;
         if (args.length>0) {
             try {
@@ -41,8 +46,8 @@ public class RCbreak extends RCCommand {
             }
         }
 
-        rc.getCircuitManager().destroyCircuit(c, sender, false);
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefs().getInfoColor() + " circuit is now deactivated.");
+        if (rc.getCircuitManager().destroyCircuit(c, sender, false))
+			sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefs().getInfoColor() + " circuit is now deactivated.");
 
         return true;
     }

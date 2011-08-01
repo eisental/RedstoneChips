@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.Circuit;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.util.ParsingUtils;
 
 /**
@@ -17,6 +18,10 @@ public class RCdebug extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+		
         if (args.length==0) {
             // toggle debug on target chip.
             Circuit c = CommandUtils.findTargetCircuit(rc, sender);

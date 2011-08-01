@@ -19,6 +19,8 @@ public class RCactivate extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = CommandUtils.checkIsPlayer(rc, sender);
         if (player==null) return true;
+		
+		if (!CommandUtils.checkPermission(rc, player, command.getName())) return true;
 
         Block target = CommandUtils.targetBlock(player);
         if (target.getType()==Material.WALL_SIGN) {
@@ -30,7 +32,7 @@ public class RCactivate extends RCCommand {
                 interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
             } else {
                 if (args.length!=3) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rccuboid activate [inputBlockType] [outputBlockType] [interfaceBlockType]");
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcactivate [inputBlockType] [outputBlockType] [interfaceBlockType]");
                     return true;
                 }
                 try {

@@ -1,9 +1,12 @@
 
 package org.tal.redstonechips.command;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.channel.BroadcastChannel;
 import org.tal.redstonechips.channel.ReceivingCircuit;
 import org.tal.redstonechips.channel.TransmittingCircuit;
@@ -17,21 +20,38 @@ public class RCchannels extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, command.getName())) return true;
+		}
+		
         if (rc.broadcastChannels.isEmpty()) {
             sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active broadcast channels.");
         } else {
             if (args.length>0 && rc.broadcastChannels.containsKey(args[0])) {
+				if (sender instanceof Player) {
+					if (!(checkChanUserPermissions(sender, args[0]))) {
+						return true;
+					}
+				}
                 printChannelInfo(sender, args[0]);
             } else {
-                String[] lines = new String[rc.broadcastChannels.size()];
-                int idx = 0;
+                List<String> lines = new ArrayList<String>();
                 for (BroadcastChannel channel : rc.broadcastChannels.values()) {
-                    lines[idx] = ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers.";
-                    idx++;
+					if (sender instanceof Player) {
+						if (!(checkChanUserPermissions(sender, channel.name))) {
+							continue;
+						}
+					}
+                    lines.add(ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers." + ChatColor.GREEN + (channel.isProtected()?" P":""));
                 }
 
+				if (lines.size() == 0) {
+					sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active broadcast channels.");
+					return true;
+				}
+				String[] outputLines = lines.toArray(new String[lines.size()]);
                 sender.sendMessage("");
-                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
+                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), outputLines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
                 sender.sendMessage("Use " + ChatColor.YELLOW + "/rcchannels <channel name>" + ChatColor.WHITE + " for more info about it.");
             }
         }
@@ -66,6 +86,18 @@ public class RCchannels extends RCCommand {
                 else range += "bit " + r.getStartBit() + "]";
                 sReceivers += r.getCircuitClass() + " (" + r.id + ") " + range + ", ";
             }
+			
+			String owners = "";
+			String users = "";
+			if (channel.isProtected()) {
+				for (String owner : channel.owners) {
+					owners += owner + ", ";
+				}
+				
+				for (String user : channel.users) {
+					users += user + ", ";
+				}
+			}
 
             sender.sendMessage("");
             sender.sendMessage(extraColor + channel.name + ":");
@@ -77,8 +109,31 @@ public class RCchannels extends RCCommand {
                 sender.sendMessage(infoColor + "transmitters: " + extraColor + sTransmitters.substring(0, sTransmitters.length()-2));
             if (!sReceivers.isEmpty())
                 sender.sendMessage(infoColor + "receivers: " + extraColor + sReceivers.substring(0, sReceivers.length()-2));
-
+			if (!owners.isEmpty())
+                sender.sendMessage(infoColor + "admins: " + extraColor + owners.substring(0, owners.length()-2));
+			if (!users.isEmpty())
+                sender.sendMessage(infoColor + "users: " + extraColor + users.substring(0, users.length()-2));
         }
     }
-
+	
+	private boolean checkChanUserPermissions(CommandSender sender, String name) {
+		if (!(sender instanceof Player)) {
+			return true;
+		}
+		
+		if (!(rc.broadcastChannels.containsKey(name))) {
+			return true;
+		}
+		
+		if (!(rc.broadcastChannels.get(name).isProtected())) {
+			return true;
+		}
+		
+		String playerName = ((Player)sender).getName();
+		if (((Player)sender).hasPermission("redstonechips.channel.admin") || rc.broadcastChannels.get(name).users.contains(playerName.toLowerCase()) || rc.broadcastChannels.get(name).owners.contains(playerName.toLowerCase())) {
+			return true;
+		}
+		
+		return false;
+	}
 }

@@ -17,6 +17,10 @@ public class RChelp extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	    if (sender instanceof Player) {
+			if (!CommandUtils.checkPermission(rc, (Player)sender, cmd.getName())) return true;
+		}
+
         Map commands = (Map)rc.getDescription().getCommands();
         ChatColor infoColor = rc.getPrefs().getInfoColor();
         ChatColor errorColor = rc.getPrefs().getErrorColor();

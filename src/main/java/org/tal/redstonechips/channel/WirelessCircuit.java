@@ -3,6 +3,7 @@ package org.tal.redstonechips.channel;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
@@ -63,6 +64,10 @@ public abstract class WirelessCircuit extends Circuit {
             startBit = 0;
         }
 
+		if (!checkChanUserPermissions(sender, name)) {
+			throw new IllegalArgumentException("You do not have permissions to use channel " + name + ".");
+		}
+
         if (this instanceof ReceivingCircuit) {
             channel = redstoneChips.registerReceiver((ReceivingCircuit)this, name);
             if (sender!=null) {
@@ -87,5 +92,25 @@ public abstract class WirelessCircuit extends Circuit {
             }
         }
     }
-
+	
+	private boolean checkChanUserPermissions(CommandSender sender, String name) {
+		if (!(sender instanceof Player)) {
+			return true;
+		}
+		
+		if (!(redstoneChips.broadcastChannels.containsKey(name))) {
+			return true;
+		}
+		
+		if (!(redstoneChips.broadcastChannels.get(name).isProtected())) {
+			return true;
+		}
+		
+		String playerName = ((Player)sender).getName();
+		if (((Player)sender).hasPermission("redstonechips.channel.admin") || redstoneChips.broadcastChannels.get(name).users.contains(playerName.toLowerCase()) || redstoneChips.broadcastChannels.get(name).owners.contains(playerName.toLowerCase())) {
+			return true;
+		}
+		
+		return false;
+	}
 }
