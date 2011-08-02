@@ -18,9 +18,11 @@ public class RCtype extends RCCommand {
         Player player = CommandUtils.checkIsPlayer(rc, sender);
         if (player==null) return true;
         
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+        
         Block block = CommandUtils.targetBlock(player);
         rcTypeReceiver t = rc.rcTypeReceivers.get(block.getLocation());
-
+    
         if (t==null) {
             player.sendMessage(rc.getPrefs().getErrorColor() + "You must point towards a typing block (a terminal circuit's interface block for example) to type.");
         } else {

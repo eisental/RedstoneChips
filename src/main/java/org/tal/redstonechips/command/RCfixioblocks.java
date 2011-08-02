@@ -16,8 +16,8 @@ public class RCfixioblocks extends RCCommand {
         Circuit c;
 
         if (args.length>0) { // use circuit id.
-            if (!sender.isOp()) {
-                sender.sendMessage("Only ops (admins) are allowed to use this command with a circuit id.");
+            if (!CommandUtils.checkPermission(rc, sender, command.getName() + ".id", true, false)) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to use this command with a circuit id.");
                 return true;
             }
 
@@ -33,6 +33,7 @@ public class RCfixioblocks extends RCCommand {
                 return true;
             }
         } else { // use targeted circuit
+            if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
             c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
         }

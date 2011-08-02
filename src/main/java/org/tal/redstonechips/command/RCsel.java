@@ -37,6 +37,8 @@ public class RCsel extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player p = CommandUtils.checkIsPlayer(rc, sender);
         if (p==null) return true;
+        
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
 
         if (args.length==0) {
             recordSelection(p);
@@ -62,6 +64,7 @@ public class RCsel extends RCCommand {
             if (cuboid==null) return true;
             
             List<Circuit> circuits;
+            int circuitCount = 0;
             switch (selCommand) {
                 case ACTIVATE:
                     massActivate(sender, args, cuboid, infoColor);
@@ -70,22 +73,22 @@ public class RCsel extends RCCommand {
                 case RESET:
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
-                        rc.getCircuitManager().resetCircuit(c, sender);
-                    sender.sendMessage(infoColor + "Reset " + circuits.size() + " circuit(s).");
+                        if (rc.getCircuitManager().resetCircuit(c, sender)) circuitCount++;
+                    sender.sendMessage(infoColor + "Reset " + circuitCount + " circuit(s).");
                     break;
 
                 case BREAK:
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
-                        rc.getCircuitManager().destroyCircuit(c, sender, false);
-                    sender.sendMessage(infoColor + "Deactivated " + circuits.size() + " circuit(s).");
+                        if (rc.getCircuitManager().destroyCircuit(c, sender, false)) circuitCount++;
+                    sender.sendMessage(infoColor + "Deactivated " + circuitCount + " circuit(s).");
                     break;
 
                 case DESTROY:
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
-                        rc.getCircuitManager().destroyCircuit(c, sender, true);
-                    sender.sendMessage(infoColor + "Destroyed " + circuits.size() + " circuit(s).");
+                        if (rc.getCircuitManager().destroyCircuit(c, sender, true)) circuitCount++;
+                    sender.sendMessage(infoColor + "Destroyed " + circuitCount + " circuit(s).");
                     break;
 
                 case FIXIOBLOCKS:

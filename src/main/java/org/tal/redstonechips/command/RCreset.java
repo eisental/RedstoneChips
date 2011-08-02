@@ -20,9 +20,9 @@ public class RCreset extends RCCommand {
 
         if (args.length>0) {
             if (args[0].equalsIgnoreCase("all")) {
-                if (sender.isOp())
+                if (CommandUtils.checkPermission(rc, sender, command.getName() + ".all", true, false))
                     resetAllCircuits(sender);
-                else sender.sendMessage(rc.getPrefs().getErrorColor() + "Only ops (admins) are allowed to use this command.");
+                else sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to reset all circuits.");
                 return true;
             }
 
@@ -38,6 +38,7 @@ public class RCreset extends RCCommand {
                 return true;
             }
         } else { // use targeted circuit
+            if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
             c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
         }
@@ -72,5 +73,4 @@ public class RCreset extends RCCommand {
         }
 
     }
-
 }

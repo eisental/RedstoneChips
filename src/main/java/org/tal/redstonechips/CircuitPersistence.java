@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
+import org.tal.redstonechips.channel.BroadcastChannel;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -64,14 +65,18 @@ public class CircuitPersistence {
         try {
             rc.log(Level.INFO, "Reading circuits file...");
             List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(new FileInputStream(file));
+            List<Map<String, Object>> broadcastChannels = new ArrayList<Map<String, Object>>();
 
             rc.log(Level.INFO, "Activating circuits...");
             if (circuitsList!=null) {
                 for (Map<String,Object> circuitMap : circuitsList) {
                     try {
-
-                        compileCircuitFromMap(circuitMap);
-
+                        if (!((String)circuitMap.get("class")).equals("BC")) {
+                            compileCircuitFromMap(circuitMap);
+                        } else {
+                            broadcastChannels.add(circuitMap);
+                        }
+                        
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
                         backupCircuitsFile();
@@ -88,6 +93,12 @@ public class CircuitPersistence {
                         rc.log(Level.SEVERE, t.toString() + ". Ignoring circuit.");
                         backupCircuitsFile();
                         t.printStackTrace();
+                    }
+                }
+                
+                if (!broadcastChannels.isEmpty()) {
+                    for (Map<String,Object> channelMap : broadcastChannels) {
+                        configureChannelFromMap(channelMap);
                     }
                 }
             }
@@ -122,6 +133,12 @@ public class CircuitPersistence {
             c.save();
         }
         
+        for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+            if (channel.isProtected()) {
+                circuitMaps.add(this.channelToMap(channel));
+            }
+        }
+        
         try {
             yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
         } catch (IOException ex) {
@@ -143,6 +160,15 @@ public class CircuitPersistence {
         map.put("state", c.getInternalState());
         map.put("id", c.id);
 
+        return map;
+    }
+
+    private Map<String, Object> channelToMap(BroadcastChannel c) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("class", "BC");
+        map.put("name", c.name);
+        map.put("owners", c.owners);
+        map.put("users", c.users);
         return map;
     }
 
@@ -177,6 +203,13 @@ public class CircuitPersistence {
             return c;
         }
         else return null;
+    }
+
+    private void configureChannelFromMap(Map<String,Object> map) {
+        BroadcastChannel channel;
+        channel = rc.getChannelByName((String)map.get("name"));
+        channel.owners = (List<String>)map.get("owners");
+        channel.users = (List<String>)map.get("users");
     }
 
     private List<Integer> makeBlockList(Location l) {

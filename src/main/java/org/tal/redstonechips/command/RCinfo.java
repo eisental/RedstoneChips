@@ -18,6 +18,8 @@ public class RCinfo extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+
         HashMap<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
 
         Circuit c;

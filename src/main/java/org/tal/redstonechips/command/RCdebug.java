@@ -17,6 +17,8 @@ public class RCdebug extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+        
         if (args.length==0) {
             // toggle debug on target chip.
             Circuit c = CommandUtils.findTargetCircuit(rc, sender);
