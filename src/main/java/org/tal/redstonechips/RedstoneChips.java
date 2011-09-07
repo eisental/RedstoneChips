@@ -353,9 +353,15 @@ public class RedstoneChips extends JavaPlugin {
      * @param channelName Name of the receiver's channel.
      * @return The channel that the receiver was added to.
      */
-    public BroadcastChannel registerReceiver(ReceivingCircuit r, String channelName) {
-        BroadcastChannel channel = getChannelByName(channelName);
+    public BroadcastChannel registerReceiver(final ReceivingCircuit r, String channelName) {
+        final BroadcastChannel channel = getChannelByName(channelName);
         channel.addReceiver(r);
+
+        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            public void run() {
+                channel.sendAllForReceiver(r);
+            }
+        });
 
         return channel;
     }

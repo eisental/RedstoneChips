@@ -45,7 +45,7 @@ public class BroadcastChannel {
      * Adds a receiver to receive broadcasts on this channel.
      * @param r The receiving circuit.
      */
-    public void addReceiver(ReceivingCircuit r) {
+    public void addReceiver(final ReceivingCircuit r) {
         if (receivers.contains(r)) return;
 
         receivers.add(r);
@@ -186,5 +186,9 @@ public class BroadcastChannel {
         }
         
         return false;
+    }
+
+    public void sendAllForReceiver(ReceivingCircuit r) {
+        transmitToReceiver(r, 0, length);
     }
 }
