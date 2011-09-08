@@ -273,20 +273,19 @@ public abstract class Circuit {
             for(int i=0;i<adjacentFaces.length;i++) {
                 BlockState state = blk.getRelative(adjacentFaces[i]).getState();
                 if(
-                  state.getType().equals(Material.REDSTONE_WIRE) ||
-                  state.getType().equals(Material.REDSTONE_TORCH_ON) ||
-                  state.getType().equals(Material.REDSTONE_TORCH_OFF) ||
-                  state.getType().equals(Material.RAILS) ||
-                  state.getType().equals(Material.POWERED_RAIL) ||
-                  state.getType().equals(Material.PISTON_BASE) ||
-                  state.getType().equals(Material.PISTON_STICKY_BASE) ||
-		  state.getType().equals(Material.WOODEN_DOOR) ||
-		  state.getType().equals(Material.IRON_DOOR_BLOCK) ||
-		  state.getType().equals(Material.DIODE)
+					state.getType().equals(Material.REDSTONE_WIRE) ||
+					state.getType().equals(Material.REDSTONE_TORCH_ON) ||
+					state.getType().equals(Material.REDSTONE_TORCH_OFF) ||
+					state.getType().equals(Material.RAILS) ||
+					state.getType().equals(Material.POWERED_RAIL) ||
+					state.getType().equals(Material.PISTON_BASE) ||
+					state.getType().equals(Material.PISTON_STICKY_BASE) ||
+					state.getType().equals(Material.WOODEN_DOOR) ||
+					state.getType().equals(Material.IRON_DOOR_BLOCK) ||
+					state.getType().equals(Material.DIODE)
                   )
                 state.update();
             }
-//            System.out.println(lvr+" : "+blk.getType());
         } catch (ConcurrentModificationException me) {
             redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput.");
             me.printStackTrace();
@@ -314,15 +313,10 @@ public abstract class Circuit {
      * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
      */
     protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
-//        BitSet7 original = outputBits.get(startOutIdx, startOutIdx+length);
-
         for (int i=0; i<length; i++) {
             boolean b = bits.get(i);
-//            if (original.get(i)!=b)
             sendOutput(startOutIdx+i, b);
         }
-
-        //sendOutput(startOutIdx+length-1, bits.get(length-1));
     }
 
     /**
