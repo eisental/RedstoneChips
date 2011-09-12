@@ -161,7 +161,7 @@ public class CircuitManager {
         structure.add(signBlock);
 
         BlockFace direction = ((org.bukkit.material.Sign)signBlock.getState().getData()).getAttachedFace();
-        Block firstChipBlock = signBlock.getFace(direction);
+        Block firstChipBlock = signBlock.getRelative(direction);
 
         if (!isTypeAllowed(firstChipBlock.getType())) {
             if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You can't build a redstone chip using this material (" + firstChipBlock.getType().name() + "). It's either doesn't work as a chip block or it already has another function as an i/o block.");
@@ -644,7 +644,7 @@ public class CircuitManager {
         checkForChipBlockOnSideFace(params);
 
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
-        Block up = origin.getFace(BlockFace.UP);
+        Block up = origin.getRelative(BlockFace.UP);
 
         if (!params.structure.contains(up) && up.getType()==params.chipMaterial) {
             params.structure.add(up);
@@ -654,7 +654,7 @@ public class CircuitManager {
         }
 
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
-        Block down = origin.getFace(BlockFace.DOWN);
+        Block down = origin.getRelative(BlockFace.DOWN);
 
         if (!params.structure.contains(down) && down.getType()==params.chipMaterial) {
             params.structure.add(down);
@@ -692,7 +692,7 @@ public class CircuitManager {
     }
 
     private void checkForIO(ScanParameters params) {
-        Block b = params.origin.getFace(params.direction);
+        Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
             if (b.getType()==params.inputBlockType.getItemType()
                     && (b.getData()==params.inputBlockType.getData() || params.inputBlockType.getData()==-1)) {
@@ -713,7 +713,7 @@ public class CircuitManager {
     }
 
     private void checkForChipBlockOnSideFace(ScanParameters params) {
-        Block b = params.origin.getFace(params.direction);
+        Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
             if (b.getType()==params.chipMaterial) {
                 params.structure.add(b);
@@ -728,11 +728,11 @@ public class CircuitManager {
     }
 
     private Block findLeverAround(Block b) {
-        Block up = b.getFace(BlockFace.UP);
-        Block north = b.getFace(BlockFace.NORTH);
-        Block east = b.getFace(BlockFace.EAST);
-        Block south = b.getFace(BlockFace.SOUTH);
-        Block west = b.getFace(BlockFace.WEST);
+        Block up = b.getRelative(BlockFace.UP);
+        Block north = b.getRelative(BlockFace.NORTH);
+        Block east = b.getRelative(BlockFace.EAST);
+        Block south = b.getRelative(BlockFace.SOUTH);
+        Block west = b.getRelative(BlockFace.WEST);
 
         int leverCount = 0;
         Block ret = null;
@@ -755,7 +755,7 @@ public class CircuitManager {
         BlockFace face = l.getAttachedFace();
 
         if (face==null) return true; // something is wrong with the map. assume it's attached...
-        else return lever.getFace(face).equals(origin);
+        else return lever.getRelative(face).equals(origin);
     }
 
     private String[] getArgsFromSign(Sign sign) {
