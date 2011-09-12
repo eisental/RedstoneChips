@@ -20,6 +20,8 @@ import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
 import org.tal.redstonechips.util.ChunkLocation;
 
+import org.bukkit.block.BlockFace;
+
 /**
  * Represents a RedstoneChips circuit.
  *
@@ -253,14 +255,38 @@ public abstract class Circuit {
         changeLeverState(getOutputBlock(outIdx), state);
     }
 
+    private static final BlockFace[] adjacentFaces = new BlockFace[] { BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
     private void changeLeverState(Block lever, boolean level) {
         if (!world.isChunkLoaded(lever.getChunk())) return;
         
         byte data = lever.getData();
+        boolean oldLevel = ((data&0x08) > 0);
+        if(oldLevel==level) return;
+
         byte newData = (byte)(level? data | 0x8 : data & 0x7);
 
         try {
             lever.setData(newData);
+            Lever lvr = (Lever)(lever.getState().getData());
+            Block blk = lever.getRelative(lvr.getAttachedFace());
+            blk.getState().update();
+            for(int i=0;i<adjacentFaces.length;i++) {
+                BlockState state = blk.getRelative(adjacentFaces[i]).getState();
+                if(
+                  state.getType().equals(Material.REDSTONE_WIRE) ||
+                  state.getType().equals(Material.REDSTONE_TORCH_ON) ||
+                  state.getType().equals(Material.REDSTONE_TORCH_OFF) ||
+                  state.getType().equals(Material.RAILS) ||
+                  state.getType().equals(Material.POWERED_RAIL) ||
+                  state.getType().equals(Material.PISTON_BASE) ||
+                  state.getType().equals(Material.PISTON_STICKY_BASE) ||
+		  state.getType().equals(Material.WOODEN_DOOR) ||
+		  state.getType().equals(Material.IRON_DOOR_BLOCK) ||
+		  state.getType().equals(Material.DIODE)
+                  )
+                state.update();
+            }
+//            System.out.println(lvr+" : "+blk.getType());
         } catch (ConcurrentModificationException me) {
             redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput.");
             me.printStackTrace();
@@ -288,12 +314,12 @@ public abstract class Circuit {
      * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
      */
     protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
-        BitSet7 original = outputBits.get(startOutIdx, startOutIdx+length);
+//        BitSet7 original = outputBits.get(startOutIdx, startOutIdx+length);
 
         for (int i=0; i<length; i++) {
             boolean b = bits.get(i);
-            if (original.get(i)!=b)
-                sendOutput(startOutIdx+i, b);
+//            if (original.get(i)!=b)
+            sendOutput(startOutIdx+i, b);
         }
 
         //sendOutput(startOutIdx+length-1, bits.get(length-1));
@@ -551,7 +577,7 @@ public abstract class Circuit {
             // output chunks
             Block leverBlock = o.getBlock();
             Lever l = new Lever(leverBlock.getType(), leverBlock.getData());
-            Block output = leverBlock.getFace(l.getAttachedFace());
+            Block output = leverBlock.getRelative(l.getAttachedFace());
 
             if (output.getTypeId()!=outputType || output.getData()!=outputData) {
                 output.setTypeIdAndData(outputType, outputData, false);
