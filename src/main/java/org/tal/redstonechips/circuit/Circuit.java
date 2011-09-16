@@ -265,30 +265,26 @@ public abstract class Circuit {
 
         byte newData = (byte)(level? data | 0x8 : data & 0x7);
 
-        try {
-            lever.setData(newData);
-            Lever lvr = (Lever)(lever.getState().getData());
-            Block blk = lever.getRelative(lvr.getAttachedFace());
-            blk.getState().update();
-            for(int i=0;i<adjacentFaces.length;i++) {
-                BlockState state = blk.getRelative(adjacentFaces[i]).getState();
-                if(
-					state.getType().equals(Material.REDSTONE_WIRE) ||
-					state.getType().equals(Material.REDSTONE_TORCH_ON) ||
-					state.getType().equals(Material.REDSTONE_TORCH_OFF) ||
-					state.getType().equals(Material.RAILS) ||
-					state.getType().equals(Material.POWERED_RAIL) ||
-					state.getType().equals(Material.PISTON_BASE) ||
-					state.getType().equals(Material.PISTON_STICKY_BASE) ||
-					state.getType().equals(Material.WOODEN_DOOR) ||
-					state.getType().equals(Material.IRON_DOOR_BLOCK) ||
-					state.getType().equals(Material.DIODE)
-                  )
-                state.update();
-            }
-        } catch (ConcurrentModificationException me) {
-            redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput.");
-            me.printStackTrace();
+        lever.setData(newData);
+        Lever lvr = (Lever)(lever.getState().getData());
+        Block blk = lever.getRelative(lvr.getAttachedFace());
+        blk.getState().update();
+        
+        for (int i=0; i<adjacentFaces.length; i++) {
+            BlockState state = blk.getRelative(adjacentFaces[i]).getState();
+            if (
+              state.getType().equals(Material.REDSTONE_WIRE) ||
+              state.getType().equals(Material.REDSTONE_TORCH_ON) ||
+              state.getType().equals(Material.REDSTONE_TORCH_OFF) ||
+              state.getType().equals(Material.RAILS) ||
+              state.getType().equals(Material.POWERED_RAIL) ||
+              state.getType().equals(Material.PISTON_BASE) ||
+              state.getType().equals(Material.PISTON_STICKY_BASE) ||
+              state.getType().equals(Material.WOODEN_DOOR) ||
+              state.getType().equals(Material.IRON_DOOR_BLOCK) ||
+              state.getType().equals(Material.DIODE)
+              )
+            state.update();
         }
     }
 

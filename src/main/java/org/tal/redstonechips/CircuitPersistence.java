@@ -34,7 +34,7 @@ public class CircuitPersistence {
 
     public final static String circuitsFileExtension = ".circuits";
     public final static String circuitsFileName = "redstonechips"+circuitsFileExtension;
-	public final static String channelsFileExtension = ".channels";
+    public final static String channelsFileExtension = ".channels";
     public final static String channelsFileName = "redstonechips"+channelsFileExtension;
 
     private List<String> madeBackup = new ArrayList<String>();
@@ -67,10 +67,10 @@ public class CircuitPersistence {
             loadCircuitsFromFile(dataFile,true);
         }
 
-		File channelsFile = new File(rc.getDataFolder(), channelsFileName);
-		if (channelsFile.exists()) {
-			loadChannelsFromFile(channelsFile);
-		}
+        File channelsFile = new File(rc.getDataFolder(), channelsFileName);
+        if (channelsFile.exists()) {
+            loadChannelsFromFile(channelsFile);
+        }
 
         rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
     }
@@ -125,7 +125,7 @@ public class CircuitPersistence {
         }
     }
 
-	public void loadChannelsFromFile(File file) {
+    public void loadChannelsFromFile(File file) {
         try {
             Yaml yaml = new Yaml();
 
@@ -183,16 +183,16 @@ public class CircuitPersistence {
                 rc.log(Level.SEVERE, ex.getMessage());
             }
         }
-		
-		circuitMaps = new ArrayList<Map<String,Object>>();
-		for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+        
+        circuitMaps = new ArrayList<Map<String,Object>>();
+        for (BroadcastChannel channel : rc.broadcastChannels.values()) {
             if (channel.isProtected()) {
                 circuitMaps.add(this.channelToMap(channel));
             }
         }
-		
-		if (!circuitMaps.isEmpty()) {
-			try {
+        
+        if (!circuitMaps.isEmpty()) {
+            try {
                 File channelsFile = new File(rc.getDataFolder(), channelsFileName);
                 FileOutputStream fosChannels = new FileOutputStream(channelsFile);
                 yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fosChannels, "UTF-8")));
@@ -201,7 +201,7 @@ public class CircuitPersistence {
             } catch (IOException ex) {
                 rc.log(Level.SEVERE, ex.getMessage());
             }
-		}
+        }
     }
 
     private Map<String, Object> circuitToMap(Circuit c) {
@@ -362,7 +362,7 @@ public class CircuitPersistence {
     private File getCircuitsFile() {
         return getCircuitsFile(circuitsFileName);
     }
-	
+    
     private File getCircuitsFile(String name) {
         return new File(rc.getDataFolder(), name);
     }
@@ -379,7 +379,7 @@ public class CircuitPersistence {
         }
         in.close();
         out.close();
-	}
+    }
 
     private File getBackupFileName(File parentFile,String filename) {
         String ext = ".BACKUP";
