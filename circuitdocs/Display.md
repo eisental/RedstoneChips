@@ -10,7 +10,7 @@ This chip requires two Interface Blocks placed at opposite corners of the displa
 
 The display chip requires at least one argument, specifying the size of the display in the format `<Width>x<Height>`, for example "10x20".
 
-Additional optional arguments are a color index as detailed in the [pixel](http://eisental.github.com/RedstoneChips/circuitdocs/Pixel.html) chip, and a channel identifier if the display will be wireless.
+Additional optional arguments are a color index as detailed in the [pixel](Pixel) chip, and a channel identifier if the display will be wireless.
 
 The number of inputs required will vary based on the size of the display and the number of colors specified, if any. The first input is the clock, and when turned on will cause the selected pixel to update. The next set of inputs is the X coordinate, and there must be enough input pins to express the X coordinate, for example 2 pins for a width of 4, 3 pins for a width of 8, 8 pins for a width of 256, etc. The next set of inputs is for the Y coordinate, and follow the same rules as the X cordinate pins. The final set of inputs are for the color. If a color index is used there must be enough inputs to represent the index, otherwise 4 pins are required.
 
