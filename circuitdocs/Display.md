@@ -8,7 +8,7 @@ This chip may be wireless, or use Input Blocks. To make a wireless version, do n
 
 This chip requires two Interface Blocks placed at opposite corners of the display, and a layer of wool making up the display. The display must be flat and can not be built at an angle. If the physical display is larger than the size specified on the sign, the size of the pixels will be adjusted accordingly. For example, if the sign states that the display is 10x10, and the physical display is 40x40, each pixel will be 4x4 wool blocks.
 
-The display chip requires at least one argument, specifying the size of the display in the format <Width>x<Height>, for example "10x20".
+The display chip requires at least one argument, specifying the size of the display in the format `<Width>x<Height>`, for example "10x20".
 
 Additional optional arguments are a color index as detailed in the [pixel](http://eisental.github.com/RedstoneChips/circuitdocs/Pixel.html) chip, and a channel identifier if the display will be wireless.
 
