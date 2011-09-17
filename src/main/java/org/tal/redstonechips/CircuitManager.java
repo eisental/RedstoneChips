@@ -490,7 +490,7 @@ public class CircuitManager {
      * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity().
      * Any unloaded circuit chunks are first loaded and then unloaded after the check is over.
      */
-    public void checkCircuitsIntegrity() {
+    public void checkCircuitsIntegrity(World world) {
         if (circuits==null) return;
 
         List<Integer> invalidIds = new ArrayList<Integer>();
@@ -498,16 +498,18 @@ public class CircuitManager {
         List<ChunkLocation> unloadedChunks = new ArrayList<ChunkLocation>();
 
         for (Circuit c : circuits.values()) {
-            for (ChunkLocation chunk : c.circuitChunks) {
-                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
-                    unloadedChunks.add(chunk);
-            }
+            if(c.world.equals(world)) {
+                for (ChunkLocation chunk : c.circuitChunks) {
+                    if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                        unloadedChunks.add(chunk);
+                }
 
-            // we also might need to load/unload some chunks that don't have i/o blocks in them
-            for (Location s : c.structure) {
-                ChunkLocation chunk = ChunkLocation.fromLocation(s);
-                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
-                    unloadedChunks.add(chunk);
+                // we also might need to load/unload some chunks that don't have i/o blocks in them
+                for (Location s : c.structure) {
+                    ChunkLocation chunk = ChunkLocation.fromLocation(s);
+                    if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                        unloadedChunks.add(chunk);
+                }
             }
         }
 
@@ -515,8 +517,10 @@ public class CircuitManager {
             unloaded.loadChunk();
 
         for (Circuit c : circuits.values()) {
-            if (!c.checkIntegrity()) {
-                invalidIds.add(c.id);
+            if(c.world.equals(world)) {
+                if (!c.checkIntegrity()) {
+                    invalidIds.add(c.id);
+                }
             }
         }
 
@@ -595,6 +599,21 @@ public class CircuitManager {
      */
     public HashMap<Integer, Circuit> getCircuits() {
         return circuits;
+    }
+
+    /**
+     *
+     * @return a map of all active circuits in world world. The map keys are circuit ids.
+     */
+    public HashMap<Integer, Circuit> getCircuits(World world) {
+        HashMap<Integer, Circuit> worldCircuits = new HashMap<Integer, Circuit>();
+        for(Integer id : circuits.keySet()) {
+          Circuit c = circuits.get(id);
+          if(c.world.equals(world)) {
+            worldCircuits.put(id,c);
+          }
+        }
+        return worldCircuits;
     }
 
     /**
