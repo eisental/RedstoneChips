@@ -29,7 +29,7 @@ public class PrefsManager {
     /**
      * enum of all the default preferences keys.
      */
-    public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
+    public enum Prefs { inputBlockType, outputBlockType, directOutputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
         signColor, rightClickToActivate, enableDestroyCommand, maxInputChangesPerTick;
     };
 
@@ -38,6 +38,7 @@ public class PrefsManager {
 
     private MaterialData inputBlockType;
     private MaterialData outputBlockType;
+    private MaterialData directOutputBlockType;
     private MaterialData interfaceBlockType;
 
     private ChatColor infoColor;
@@ -187,6 +188,14 @@ public class PrefsManager {
 
     /**
      *
+     * @return The current output block type preference value.
+     */
+    public MaterialData getDirectOutputBlockType() {
+        return directOutputBlockType;
+    }
+
+    /**
+     *
      * @return The current interface block type preference value.
      */
     public MaterialData getInterfaceBlockType() {
@@ -321,6 +330,7 @@ public class PrefsManager {
 
         inputBlockType = findMaterial(toapply.get(Prefs.inputBlockType.name()).toString());
         outputBlockType = findMaterial(toapply.get(Prefs.outputBlockType.name()).toString());
+        directOutputBlockType = findMaterial(toapply.get(Prefs.directOutputBlockType.name()).toString());
         interfaceBlockType = findMaterial(toapply.get(Prefs.interfaceBlockType.name()).toString());
 
         infoColor = ChatColor.valueOf((String)toapply.get(Prefs.infoColor.name()));

@@ -206,7 +206,7 @@ public class RedstoneChips extends JavaPlugin {
                 if ((event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate()) ||
                         (event.getAction()==Action.RIGHT_CLICK_BLOCK && prefsManager.getRightClickToActivate()))
                     circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(),
-                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
+                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getDirectOutputBlockType(), prefsManager.getInterfaceBlockType());
 
                 if (event.getAction()==Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType()==Material.AIR)) {
                     rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());

@@ -22,28 +22,30 @@ public class RCactivate extends RCCommand {
 
         Block target = CommandUtils.targetBlock(player);
         if (target.getType()==Material.WALL_SIGN) {
-            MaterialData inputBlockType, outputBlockType, interfaceBlockType;
+            MaterialData inputBlockType, outputBlockType, directOutputBlockType, interfaceBlockType;
 
             if (args.length==0) {
                 inputBlockType = rc.getPrefs().getInputBlockType();
                 outputBlockType = rc.getPrefs().getOutputBlockType();
+                directOutputBlockType = rc.getPrefs().getDirectOutputBlockType();
                 interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
             } else {
-                if (args.length!=3) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rccuboid activate [inputBlockType] [outputBlockType] [interfaceBlockType]");
+                if (args.length!=4) {
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcactivate [inputBlockType] [outputBlockType] [directOutputBlockType] [interfaceBlockType]");
                     return true;
                 }
                 try {
                     inputBlockType = PrefsManager.findMaterial(args[0]);
                     outputBlockType = PrefsManager.findMaterial(args[1]);
-                    interfaceBlockType = PrefsManager.findMaterial(args[2]);
+                    directOutputBlockType = PrefsManager.findMaterial(args[2]);
+                    interfaceBlockType = PrefsManager.findMaterial(args[3]);
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(ie.getMessage());
                     return true;
                 }
             }
 
-            if (rc.getCircuitManager().checkForCircuit(target, sender, inputBlockType, outputBlockType, interfaceBlockType)==-2) {
+            if (rc.getCircuitManager().checkForCircuit(target, sender, inputBlockType, outputBlockType, directOutputBlockType, interfaceBlockType)==-2) {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + "Could not activate integrated circuit.");
             }
         } else {

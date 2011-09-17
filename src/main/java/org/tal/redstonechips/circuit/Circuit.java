@@ -47,6 +47,11 @@ public abstract class Circuit {
     public Location[] outputs;
 
     /**
+     * Output blocks. List of lever block locations.
+     */
+    public Location[] directOutputs;
+
+    /**
      * Contains the location of any block that is part of this circuit. When any block in this array is broken the circuit is destroyed.
      * This includes the sign block, chip blocks, input blocks, output blocks and output lever blocks.
      */
@@ -250,10 +255,30 @@ public abstract class Circuit {
             ioDebug("Output " + outIdx + " is " + (state?"on":"off") + ": " + o + ".");
         }
 
-        changeLeverState(getOutputBlock(outIdx), state);
+        changeLeverState(outIdx, state);
     }
 
-    private void changeLeverState(Block lever, boolean level) {
+    private boolean isDirectOutput(int outIdx) {
+      if(outIdx>=outputs.length || directOutputs==null) return false;
+      Location outLoc = outputs[outIdx];
+      return isDirectOutput(outLoc);
+    }
+    private boolean isDirectOutput(Location outLoc) {
+      for(Location dOut : directOutputs) {
+        if(dOut.equals(outLoc)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void changeLeverState(int outIdx, boolean level) {
+        if(isDirectOutput(outIdx)) {
+          doDirectOutput(outIdx, level);
+          return;
+        }
+
+        Block lever = getOutputBlock(outIdx);
         if (!world.isChunkLoaded(lever.getChunk())) return;
         
         byte data = lever.getData();
@@ -261,9 +286,30 @@ public abstract class Circuit {
 
         try {
             lever.setData(newData);
+        } catch(java.lang.ClassCastException e) {
+          redstoneChips.log(Level.SEVERE, this.getClass()+"("+id+"): "+outIdx+" Lever is not lever anymore? ");
+          disableInputs();
         } catch (ConcurrentModificationException me) {
             redstoneChips.log(Level.WARNING, "We had another concurrent modification at sendoutput.");
             me.printStackTrace();
+        }
+    }
+
+    private void doDirectOutput(int id, boolean state) {
+        Location l = outputs[id];
+        Block blk = l.getBlock();
+        for(int i=0;i<adjacentFaces.length;i++) {
+          Block b = blk.getRelative(adjacentFaces[i]);
+          if(b!=null) {
+            Circuit circ = redstoneChips.getCircuitManager().getCircuitByStructureBlock(b);
+            if(circ!=null) {
+              for(InputPin pin : circ.inputs) {
+                if(pin.getInputBlock().equals(b.getLocation())) {
+                  pin.receiveValue(state);
+                }
+              }
+            }
+          }
         }
     }
 
@@ -473,7 +519,7 @@ public abstract class Circuit {
             i.refreshPowerBlocks();
 
         for (int i=0; i<outputs.length; i++)
-            changeLeverState(getOutputBlock(i), outputBits.get(i));
+            changeLeverState(i, outputBits.get(i));
     }
 
     /**
@@ -529,6 +575,9 @@ public abstract class Circuit {
         int outputType = redstoneChips.getPrefs().getOutputBlockType().getItemTypeId();
         byte outputData = redstoneChips.getPrefs().getOutputBlockType().getData();
 
+        int directOutputType = redstoneChips.getPrefs().getDirectOutputBlockType().getItemTypeId();
+        byte directOutputData = redstoneChips.getPrefs().getDirectOutputBlockType().getData();
+
         int interfaceType = redstoneChips.getPrefs().getInterfaceBlockType().getItemTypeId();
         byte interfaceData = redstoneChips.getPrefs().getInterfaceBlockType().getData();
 
@@ -549,13 +598,22 @@ public abstract class Circuit {
 
         for (Location o : outputs) {
             // output chunks
-            Block leverBlock = o.getBlock();
-            Lever l = new Lever(leverBlock.getType(), leverBlock.getData());
-            Block output = leverBlock.getFace(l.getAttachedFace());
+            if(isDirectOutput(o)) {
+                Block DIOBlock = o.getBlock();
 
-            if (output.getTypeId()!=outputType || output.getData()!=outputData) {
-                output.setTypeIdAndData(outputType, outputData, false);
-                blockCount++;
+                if (DIOBlock.getTypeId()!=directOutputType || DIOBlock.getData()!=directOutputData) {
+                    DIOBlock.setTypeIdAndData(directOutputType, directOutputData, false);
+                    blockCount++;
+                }
+            } else {
+                Block leverBlock = o.getBlock();
+                Lever l = new Lever(leverBlock.getType(), leverBlock.getData());
+                Block output = leverBlock.getRelative(l.getAttachedFace());
+
+                if (output.getTypeId()!=outputType || output.getData()!=outputData) {
+                    output.setTypeIdAndData(outputType, outputData, false);
+                    blockCount++;
+                }
             }
         }
 
@@ -637,7 +695,7 @@ public abstract class Circuit {
 
         for (Location o : outputs) {
             // expect lever
-            if (world.getBlockTypeIdAt(o)!=Material.LEVER.getId()) {
+            if (world.getBlockTypeIdAt(o)!=Material.LEVER.getId() && world.getBlockTypeIdAt(o)!=redstoneChips.getPrefs().getDirectOutputBlockType().getItemTypeId()) {
                 redstoneChips.log(Level.WARNING, "Circuit " + id + ": Output lever is missing at " + o.getBlockX() + "," + o.getBlockY() + ", " + o.getBlockZ() + ".");
                 return false;
             } else
@@ -663,7 +721,8 @@ public abstract class Circuit {
     }
 
     public void resetOutputs() {
-        for (Location output : outputs)
-            this.changeLeverState(output.getBlock(), false);
+        if(outputs.length==0) return;
+        for (int i = 0; i<outputs.length; i++)
+            this.changeLeverState(i, false);
     }
 }

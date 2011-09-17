@@ -132,6 +132,26 @@ public class InputPin {
     }
 
     /**
+     * Receive input value from some source.
+     *
+     * @param newVal The new input value.
+     */
+    public void receiveValue(final boolean newVal) {
+        circuit.redstoneChips.getServer().getScheduler().scheduleSyncDelayedTask(circuit.redstoneChips, new Runnable() {
+          public void run() {
+            long curTick = circuit.world.getFullTime();
+            if (curTick==lastRedstoneChangeTick) {
+                changesInTickCount++;
+                if (changesInTickCount>circuit.redstoneChips.getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
+            } else changesInTickCount = 1;
+            lastRedstoneChangeTick = curTick;
+
+            circuit.redstoneChange(getIndex(), newVal | getPinValue());
+          }
+        });
+    }
+
+    /**
      *
      * @return The power blocks surrounding this input pin.
      */

@@ -237,21 +237,23 @@ public class RCsel extends RCCommand {
     }
 
     private void massActivate(CommandSender sender, String[] args, Location[] cuboid, ChatColor infoColor) {
-        MaterialData inputBlockType, outputBlockType, interfaceBlockType;
+        MaterialData inputBlockType, outputBlockType, directOutputBlockType, interfaceBlockType;
 
         if (args.length==1) {
             inputBlockType = rc.getPrefs().getInputBlockType();
             outputBlockType = rc.getPrefs().getOutputBlockType();
+            directOutputBlockType = rc.getPrefs().getDirectOutputBlockType();
             interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
         } else {
-            if (args.length!=4) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <interfaceBlockType>]");
+            if (args.length!=5) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <directOutputBlockType> <interfaceBlockType>]");
                 return;
             }
             try {
                 inputBlockType = PrefsManager.findMaterial(args[1]);
                 outputBlockType = PrefsManager.findMaterial(args[2]);
-                interfaceBlockType = PrefsManager.findMaterial(args[3]);
+                directOutputBlockType = PrefsManager.findMaterial(args[3]);
+                interfaceBlockType = PrefsManager.findMaterial(args[4]);
             } catch (IllegalArgumentException ie) {
                 sender.sendMessage(ie.getMessage());
                 return;
@@ -276,7 +278,7 @@ public class RCsel extends RCCommand {
                 for (int z=lowz; z<=highz; z++) {
                     Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
                     if (b.getTypeId()==wallSignId) {
-                        if (rc.getCircuitManager().checkForCircuit(b, sender, inputBlockType, outputBlockType, interfaceBlockType)>=0)
+                        if (rc.getCircuitManager().checkForCircuit(b, sender, inputBlockType, outputBlockType, directOutputBlockType, interfaceBlockType)>=0)
                             count++;
                     }
                 }

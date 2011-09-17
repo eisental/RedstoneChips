@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import org.bukkit.World;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,6 +52,11 @@ public class CircuitManager {
         MaterialData outputBlockType;
 
         /**
+         * The direct-output block material.
+         */
+        MaterialData directOutputBlockType;
+
+        /**
          * The interface block material.
          */
         MaterialData interfaceBlockType;
@@ -74,6 +80,11 @@ public class CircuitManager {
          * List of discovered output blocks.
          */
         List<Block> outputs;
+
+        /**
+         * List of discovered direct output blocks.
+         */
+        List<Block> directOutputs;
 
         /**
          * List of discovered interface blocks.
@@ -133,7 +144,7 @@ public class CircuitManager {
      * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
      */
     public int checkForCircuit(Block signBlock, CommandSender sender,
-            MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
+            MaterialData inputBlockType, MaterialData outputBlockType, MaterialData directOutputBlockType, MaterialData interfaceBlockType) {
 
         if (signBlock.getType()!=Material.WALL_SIGN) return -1;
 
@@ -155,6 +166,7 @@ public class CircuitManager {
 
         List<Block> inputs = new ArrayList<Block>();
         List<Block> outputs = new ArrayList<Block>();
+        List<Block> directOutputs = new ArrayList<Block>();
         List<Block> structure = new ArrayList<Block>();
         List<Block> interfaceBlocks = new ArrayList<Block>();
 
@@ -176,10 +188,12 @@ public class CircuitManager {
             params.chipMaterial = chipMaterial;
             params.inputBlockType = inputBlockType;
             params.outputBlockType = outputBlockType;
+            params.directOutputBlockType = directOutputBlockType;
             params.interfaceBlockType = interfaceBlockType;
             params.origin = firstChipBlock;
             params.inputs = inputs;
             params.outputs = outputs;
+            params.directOutputs = directOutputs;
             params.interfaces = interfaceBlocks;
             params.structure = structure;
             params.direction = direction;
@@ -230,6 +244,11 @@ public class CircuitManager {
         c.outputs = new Location[outputs.size()];
         for (int i=0; i<outputs.size(); i++) {
             c.outputs[i] = outputs.get(i).getLocation();
+        }
+
+        c.directOutputs = new Location[directOutputs.size()];
+        for (int i=0; i<directOutputs.size(); i++) {
+            c.directOutputs[i] = directOutputs.get(i).getLocation();
         }
 
         c.interfaceBlocks = new Location[interfaceBlocks.size()];
@@ -391,7 +410,7 @@ public class CircuitManager {
         rc.getCircuitManager().destroyCircuit(c, reseter, false);
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, reseter,
-                rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
+                rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getDirectOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
         Circuit newCircuit = rc.getCircuitManager().getCircuitByActivationBlock(activationBlock);
 
         if (newCircuit!=null) {
@@ -704,6 +723,11 @@ public class CircuitManager {
                 Block o = findLeverAround(b);
                 params.structure.add(o);
                 params.outputs.add(o);
+            } else if (b.getType()==params.directOutputBlockType.getItemType()
+                    && (b.getData()==params.directOutputBlockType.getData() || params.directOutputBlockType.getData()==-1)) {
+                params.structure.add(b);
+                params.directOutputs.add(b);
+                params.outputs.add(b);
             } else if (b.getType()==params.interfaceBlockType.getItemType()
                     && (b.getData()==params.interfaceBlockType.getData() || params.interfaceBlockType.getData()==-1)) {
                 params.structure.add(b);

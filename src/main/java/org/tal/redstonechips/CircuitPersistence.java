@@ -137,6 +137,7 @@ public class CircuitPersistence {
         map.put("chunk", makeChunksList(c.circuitChunks));
         map.put("inputs", makeInputPinsList(c.inputs));
         map.put("outputs", makeBlockListsList(c.outputs));
+        map.put("directOutputs", makeBlockListsList(c.directOutputs));
         map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
         map.put("structure", makeBlockListsList(c.structure));
         map.put("signArgs", c.args);
@@ -154,6 +155,7 @@ public class CircuitPersistence {
         c.world = world;
         c.activationBlock = getLocation(world, (List<Integer>)map.get("activationBlock"));
         c.outputs = getLocationArray(world, (List<List<Integer>>)map.get("outputs"));
+        c.directOutputs = getLocationArray(world, (List<List<Integer>>)map.get("directOutputs"));
         c.interfaceBlocks = getLocationArray(world, (List<List<Integer>>)map.get("interfaces"));
         c.structure = getLocationArray(world, (List<List<Integer>>)map.get("structure"));
         c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);

@@ -1,6 +1,7 @@
 ## block types
 inputBlockType: IRON_BLOCK
 outputBlockType: GOLD_BLOCK
+directOutputBlockType: DIAMOND_BLOCK
 interfaceBlockType: LAPIS_BLOCK
 
 ## chat colors
