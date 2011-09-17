@@ -111,7 +111,7 @@ public class RCprotect extends RCCommand {
                         }
                         
                         if (sender instanceof Player) {
-                            if (!curChannel.owners.contains(((Player)sender).getName().toLowerCase()) curChannel.owners.add(((Player)sender).getName().toLowerCase());
+                            if (!curChannel.owners.contains(((Player)sender).getName().toLowerCase())) curChannel.owners.add(((Player)sender).getName().toLowerCase());
                         }
                         
                         if (sender != null) sender.sendMessage(rc.getPrefs().getInfoColor() + "Channel " + args[0] + " has been protected.");

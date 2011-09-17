@@ -25,9 +25,9 @@ import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.util.Locations;
 import org.tal.redstonechips.channel.WirelessCircuit;
-
 import org.bukkit.material.Wool;
 import org.bukkit.DyeColor;
+import org.bukkit.World;
 
 /**
  *
