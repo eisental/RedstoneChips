@@ -29,6 +29,8 @@ public class RClist extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+
         List<Filter> filters = new ArrayList<Filter>();
 
         boolean bthis = false;

@@ -21,6 +21,8 @@ public class RCpin extends RCCommand {
         Player player = CommandUtils.checkIsPlayer(rc, sender);
         if (player==null) return true;
         
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+        
         Block target = CommandUtils.targetBlock(player);
         printPinInfo(target, player);
 

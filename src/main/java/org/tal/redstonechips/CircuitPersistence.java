@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
+import org.tal.redstonechips.channel.BroadcastChannel;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -33,6 +34,8 @@ public class CircuitPersistence {
 
     public final static String circuitsFileExtension = ".circuits";
     public final static String circuitsFileName = "redstonechips"+circuitsFileExtension;
+    public final static String channelsFileExtension = ".channels";
+    public final static String channelsFileName = "redstonechips"+channelsFileExtension;
 
     private List<String> madeBackup = new ArrayList<String>();
 
@@ -54,21 +57,19 @@ public class CircuitPersistence {
 
     public void loadCircuits() {
         File file = getCircuitsFile();
-        if (file.exists()) { // create empty file if doesn't already exist
+        if (file.exists()) {
             loadCircuitsFromFile(file,false);
-
-//            try {
-//                copy(file,new File(file.getParentFile(),circuitsFileName+".old"));
-//                file.delete();
-//            } catch(IOException e) {
-//                e.printStackTrace();
-//            }
             file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
         }
 
         File[] dataFiles = rc.getDataFolder().listFiles(new FilenameFilter() {public boolean accept(File dir, String name) {return name.endsWith(circuitsFileExtension) && !name.equals(circuitsFileName);} });
         for(File dataFile : dataFiles) {
             loadCircuitsFromFile(dataFile,true);
+        }
+
+        File channelsFile = new File(rc.getDataFolder(), channelsFileName);
+        if (channelsFile.exists()) {
+            loadChannelsFromFile(channelsFile);
         }
 
         rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
@@ -124,6 +125,26 @@ public class CircuitPersistence {
         }
     }
 
+    public void loadChannelsFromFile(File file) {
+        try {
+            Yaml yaml = new Yaml();
+
+            rc.log(Level.INFO, "Reading channels file...");
+            FileInputStream fis = new FileInputStream(file);
+            List<Map<String, Object>> channelsList = (List<Map<String, Object>>) yaml.load(fis);
+            fis.close();
+
+            rc.log(Level.INFO, "Activating channels...");
+            if (channelsList!=null) {
+                for (Map<String,Object> channelMap : channelsList) {
+                    configureChannelFromMap(channelMap);
+                }
+            }
+        } catch (IOException ex) {
+            rc.log(Level.SEVERE, "Channels file threw error "+ex.toString()+".");
+        }
+    }
+
     public void saveCircuits() {
         if (dontSaveCircuits) return;
         
@@ -135,7 +156,7 @@ public class CircuitPersistence {
         rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
 
         DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Yaml yaml = new Yaml(options);
         HashMap<World,List<Map<String,Object>>> savedata = new HashMap<World,List<Map<String,Object>>>();
         List<Map<String,Object>> circuitMaps = null;
@@ -162,6 +183,25 @@ public class CircuitPersistence {
                 rc.log(Level.SEVERE, ex.getMessage());
             }
         }
+        
+        circuitMaps = new ArrayList<Map<String,Object>>();
+        for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+            if (channel.isProtected()) {
+                circuitMaps.add(this.channelToMap(channel));
+            }
+        }
+        
+        if (!circuitMaps.isEmpty()) {
+            try {
+                File channelsFile = new File(rc.getDataFolder(), channelsFileName);
+                FileOutputStream fosChannels = new FileOutputStream(channelsFile);
+                yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fosChannels, "UTF-8")));
+                fosChannels.flush();
+                fosChannels.close();
+            } catch (IOException ex) {
+                rc.log(Level.SEVERE, ex.getMessage());
+            }
+        }
     }
 
     private Map<String, Object> circuitToMap(Circuit c) {
@@ -178,6 +218,14 @@ public class CircuitPersistence {
         map.put("state", c.getInternalState());
         map.put("id", c.id);
 
+        return map;
+    }
+
+    private Map<String, Object> channelToMap(BroadcastChannel c) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("name", c.name);
+        map.put("owners", c.owners);
+        map.put("users", c.users);
         return map;
     }
 
@@ -212,6 +260,13 @@ public class CircuitPersistence {
             return c;
         }
         else return null;
+    }
+
+    private void configureChannelFromMap(Map<String,Object> map) {
+        BroadcastChannel channel;
+        channel = rc.getChannelByName((String)map.get("name"));
+        channel.owners = (List<String>)map.get("owners");
+        channel.users = (List<String>)map.get("users");
     }
 
     private List<Integer> makeBlockList(Location l) {
@@ -307,6 +362,7 @@ public class CircuitPersistence {
     private File getCircuitsFile() {
         return getCircuitsFile(circuitsFileName);
     }
+    
     private File getCircuitsFile(String name) {
         return new File(rc.getDataFolder(), name);
     }

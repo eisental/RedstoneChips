@@ -14,6 +14,8 @@ public class RCbreak extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+    
         int id = -1;
         if (args.length>0) {
             try {
@@ -28,8 +30,8 @@ public class RCbreak extends RCCommand {
             c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
         } else { // use circuit id.
-            if (!sender.isOp()) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "You must be an admin to remotely deactivate a circuit.");
+            if (!CommandUtils.checkPermission(rc, sender, command.getName() + ".id", true, false)) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to remotely deactivate a circuit.");
                 return true;
             }
 
@@ -41,8 +43,8 @@ public class RCbreak extends RCCommand {
             }
         }
 
-        rc.getCircuitManager().destroyCircuit(c, sender, false);
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefs().getInfoColor() + " circuit is now deactivated.");
+        if (rc.getCircuitManager().destroyCircuit(c, sender, false))
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefs().getInfoColor() + " circuit is now deactivated.");
 
         return true;
     }

@@ -158,3 +158,202 @@ commands:
     usage: |
       `/rcp [page #|prev|next|last]`
       Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
+  rcprotect:
+    description: Creates, removes, and configures protected wireless channels. 
+    usage: |
+      `/rcprotect [channel|listchannels] [protect|unprotect|add|remove] [users:names] [admins:names]`
+
+      Use the command with `listchannels` to list all protected channels.
+      Use the command with only a channel name to list users and admins of that channel.
+      Use the command with a channel name and `protect` to protect a channel, you will automatically be added as an admin of the channel. You may also pass a list of users and/or admins.
+      Use the command with a channel name and `unprotect` to remove protection for a channel.
+      Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
+      Users and admins should be passed in the form of `users:User1,User2,User3` and `admins:Admin1,Admin2,Admin3`.
+permissions:
+  redstonechips.admin:
+    description: Grants access to all of RedstoneChips including admin commands.
+    children:
+      redstonechips.command.admin: true
+      redstonechips.circuit.*: true
+      redstonechips.channel.admin: true
+  redstonechips.*:
+    description: Grants access to all of RedstoneChips excluding admin commands.
+    children:
+      redstonechips.command.*: true
+      redstonechips.circuit.*: true
+  redstonechips.deny:
+    description: Denys access to all of RedstoneChips.
+    children:
+      redstonechips.command.deny: true
+      redstonechips.circuit.deny: true
+  redstonechips.command.*:
+    description: Grants access to all of RedstoneChips commands excluding admin commands.
+    children:
+      redstonechips.command.redstonechips: true
+      redstonechips.command.rclist: true
+      redstonechips.command.rcclasses: true
+      redstonechips.command.rcprefs: true
+      redstonechips.command.rcdebug: true
+      redstonechips.command.rcpin: true
+      redstonechips.command.rcactivate: true
+      redstonechips.command.rcbreak: true
+      redstonechips.command.rctype: true
+      redstonechips.command.rcreset: true
+      redstonechips.command.rcchannels: true
+      redstonechips.command.rcinfo: true
+      redstonechips.command.rcfixioblocks: true
+      redstonechips.command.rcsel: true
+      redstonechips.command.rcarg: true
+      redstonechips.command.rchelp: true
+      redstonechips.command.rcprotect: true
+  redstonechips.command.admin:
+    description: Grants access to all of RedstoneChips commands including admin commands.
+    children:
+      redstonechips.command.*: true
+      redstonechips.command.rcload: true
+      redstonechips.command.rcsave: true
+      redstonechips.command.rcdestroy: true
+      redstonechips.command.rcprefs.set: true
+      redstonechips.command.rcreset.all: true
+      redstonechips.command.break.id: true
+      redstonechips.command.fixioblocks.id: true
+  redstonechips.command.deny:
+    description: Deny all commands.
+    children:
+      redstonechips.command.redstonechips.deny: true
+      redstonechips.command.rclist.deny: true
+      redstonechips.command.rcclasses.deny: true
+      redstonechips.command.rcprefs.deny: true
+      redstonechips.command.rcprefs.set.deny: true
+      redstonechips.command.rcdebug.deny: true
+      redstonechips.command.rcpin.deny: true
+      redstonechips.command.rcactivate.deny: true
+      redstonechips.command.rcbreak.deny: true
+      redstonechips.command.rctype.deny: true
+      redstonechips.command.rcreset.deny: true
+      redstonechips.command.rcreset.all.deny: true
+      redstonechips.command.rcchannels.deny: true
+      redstonechips.command.rcinfo.deny: true
+      redstonechips.command.rcfixioblocks.deny: true
+      redstonechips.command.rcsel.deny: true
+      redstonechips.command.rcarg.deny: true
+      redstonechips.command.rchelp.deny: true
+      redstonechips.command.rcload.deny: true
+      redstonechips.command.rcsave.deny: true
+      redstonechips.command.rcdestroy.deny: true
+      redstonechips.command.rcprotect.deny: true
+      redstonechips.command.break.id.deny: true
+      redstonechips.command.fixioblocks.id.deny: true
+      redstonechips.command.rcreset.all.deny: true
+  redstonechips.circuit.*:
+    description: Grants access to create and destroy all RedstoneChips circuits.
+    children:
+      redstonechips.circuit.destroy.*: true
+      redstonechips.circuit.create.*: true
+  redstonechips.circuit.deny:
+    description: Deny all circuits.
+    children:
+      redstonechips.circuit.destroy.deny: true
+      redstonechips.circuit.create.deny: true
+  redstonechips.command.redstonechips:
+    description: Grants the redstonechips command.
+  redstonechips.command.redstonechips.deny:
+    description: Denies the redstonechips command.
+  redstonechips.command.rclist:
+    description: Grants the rclist command.
+  redstonechips.command.rclist.deny:
+    description: Denies the rclist command.
+  redstonechips.command.rcclasses:
+    description: Grants the rcclasses command.
+  redstonechips.command.rcclasses.deny:
+    description: Denies the rcclasses command.
+  redstonechips.command.rcprefs:
+    description: Grants the rcprefs command.
+  redstonechips.command.rcprefs.set:
+    description: Grants using the rcprefs command to set preferences.
+  redstonechips.command.rcprefs.deny:
+    description: Denies the rcprefs command.
+  redstonechips.command.rcprefs.set.deny:
+    description: Denies using the rcprefs command to set preferences.
+  redstonechips.command.rcdebug:
+    description: Grants the rcdebug command.
+  redstonechips.command.rcdebug.deny:
+    description: Denies the rcdebug command.
+  redstonechips.command.rcpin:
+    description: Grants the rcpin command.
+  redstonechips.command.rcpin.deny:
+    description: Denies the rcpin command.
+  redstonechips.command.rcactivate:
+    description: Grants the rcactivate command.
+  redstonechips.command.rcactivate.deny:
+    description: Denies the rcactivate command.
+  redstonechips.command.rcdestroy:
+    description: Grants the rcdestroy command.
+  redstonechips.command.rcdestroy.deny:
+    description: Denies the rcdestroy command.
+  redstonechips.command.rcbreak:
+    description: Grants the rcbreak command.
+  redstonechips.command.rcbreak.id:
+    description: Grants the rcbreak command with a circuit id.
+  redstonechips.command.rcbreak.deny:
+    description: Denies the rcbreak command.
+  redstonechips.command.rcbreak.id.deny:
+    description: Denies the rcbreak command with a circuit id.
+  redstonechips.command.rctype:
+    description: Grants the rctype command.
+  redstonechips.command.rctype.deny:
+    description: Denies the rctype command.
+  redstonechips.command.rcreset:
+    description: Grants the rcreset command.
+  redstonechips.command.rcreset.all:
+    description: Grants the rcreset all command.
+  redstonechips.command.rcreset.deny:
+    description: Denies the rcreset command.
+  redstonechips.command.rcreset.all.deny:
+    description: Denies the rcreset all command
+  redstonechips.command.rcchannels:
+    description: Grants the rcchannels command.
+  redstonechips.command.rcchannels.deny:
+    description: Denies the rcchannels command.
+  redstonechips.command.rcinfo:
+    description: Grants the rcinfo command.
+  redstonechips.command.rcinfo.deny:
+    description: Denies the rcinfo command.
+  redstonechips.command.rcfixioblocks:
+    description: Grants the rcfixioblocks command.
+  redstonechips.command.rcfixioblocks.id:
+    description: Grants the rcfixioblocks command with a circuit id.
+  redstonechips.command.rcfixioblocks.deny:
+    description: Denies the rcfixioblocks command.
+  redstonechips.command.rcfixioblocks.id.deny:
+    description: Denies the rcfixioblocks command with a circuit id.
+  redstonechips.command.rcsel:
+    description: Grants the rcsel command.
+  redstonechips.command.rcsel.deny:
+    description: Denies the rcsel command.
+  redstonechips.command.rcarg:
+    description: Grants the rcarg command.
+  redstonechips.command.rcarg.deny:
+    description: Denies the rcarg command.
+  redstonechips.command.rcsave:
+    description: Grants the rcsave command.
+  redstonechips.command.rcsave.deny:
+    description: Denies the rcsave command.
+  redstonechips.command.rcload:
+    description: Grants the rcload command.
+  redstonechips.command.rcload.deny:
+    description: Denies the rcload command.
+  redstonechips.command.rchelp:
+    description: Grants the rchelp command.
+  redstonechips.command.rchelp.deny:
+    description: Denies the rchelp command.
+  redstonechips.circuit.destroy.*:
+    description: Grants permission to destroy all circuits.
+  redstonechips.circuit.create.*:
+    description: Grants permission to create all circuits.
+  redstonechips.circuit.destroy.deny:
+    description: Denies permission to destroy all circuits. 
+  redstonechips.circuit.create.deny:
+    description: Denies  permission to create all circuits.
+  redstonechips.channel.admin:
+    description: Grants admin rights to all channels.

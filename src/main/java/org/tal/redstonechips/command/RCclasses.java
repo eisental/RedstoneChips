@@ -19,6 +19,8 @@ public class RCclasses extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+    
         Map<String,Class<? extends Circuit>> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
         
         if (circuitClasses.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");

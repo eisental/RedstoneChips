@@ -14,6 +14,8 @@ public class RCprefs extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
+        
         if (args.length==0) { // list preferences
             rc.getPrefs().printYaml(sender, rc.getPrefs().getPrefs());
             sender.sendMessage(rc.getPrefs().getInfoColor() + "Type /rcprefs <name> <value> to make changes.");
@@ -27,8 +29,8 @@ public class RCprefs extends RCCommand {
                 rc.getPrefs().printYaml(sender, map);
             }
         } else if (args.length>=2) { // set value
-            if (!sender.isOp()) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Only admins are authorized to change preferences values.");
+            if (!CommandUtils.checkPermission(rc, sender, command.getName() + ".set", true, false)) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to change preferences values.");
                 return true;
             }
 
