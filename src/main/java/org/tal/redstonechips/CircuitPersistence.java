@@ -3,6 +3,7 @@ package org.tal.redstonechips;
 import java.io.BufferedWriter;
 import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,18 +31,20 @@ import org.yaml.snakeyaml.Yaml;
 public class CircuitPersistence {
     private RedstoneChips rc;
 
-    public final static String circuitsFileName = "redstonechips.circuits";
-    private boolean madeBackup = false;
+    public final static String circuitsFileExtension = ".circuits";
+    public final static String circuitsFileName = "redstonechips"+circuitsFileExtension;
+
+    private List<String> madeBackup = new ArrayList<String>();
 
     /**
      * Used to prevent saving state more than once per game tick.
      */
-    private boolean dontSaveCircuits = false;
+    private List<World> dontSaveCircuits = new ArrayList<World>();
 
     private Runnable dontSaveCircuitsReset = new Runnable() {
         @Override
         public void run() {
-            dontSaveCircuits = false;
+            dontSaveCircuits.clear();
         }
     };
 
@@ -51,19 +54,44 @@ public class CircuitPersistence {
 
     public void loadCircuits() {
         File file = getCircuitsFile();
-        if (!file.exists()) { // create empty file if doesn't already exist
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                rc.log(Level.SEVERE, ex.getMessage());
-            }
+        if (file.exists()) { // create empty file if doesn't already exist
+            loadCircuitsFromFile(file,false);
+
+//            try {
+//                copy(file,new File(file.getParentFile(),circuitsFileName+".old"));
+//                file.delete();
+//            } catch(IOException e) {
+//                e.printStackTrace();
+//            }
+            file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
         }
 
-        Yaml yaml = new Yaml();
+        File[] dataFiles = rc.getDataFolder().listFiles(new FilenameFilter() {public boolean accept(File dir, String name) {return name.endsWith(circuitsFileExtension) && !name.equals(circuitsFileName);} });
+        for(File dataFile : dataFiles) {
+            loadCircuitsFromFile(dataFile,true);
+        }
 
+        rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
+    }
+
+    public void loadCircuitsFromFile(File file, boolean checkForWorld) {
+        if(checkForWorld) {
+            String fileName=file.getName();
+            String worldName=fileName.substring(0,fileName.length()-circuitsFileExtension.length());
+
+            if(rc.getServer().getWorld(worldName)==null) {
+                rc.log(Level.WARNING,"World "+worldName+" seems to be nonexistant while circuits for it do exist.");
+                return;
+            }
+        }
         try {
-            rc.log(Level.INFO, "Reading circuits file...");
-            List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(new FileInputStream(file));
+
+            Yaml yaml = new Yaml();
+
+            rc.log(Level.INFO, "Reading circuits file "+file.getName()+" ...");
+            FileInputStream fis = new FileInputStream(file);
+            List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);
+            fis.close();
 
             rc.log(Level.INFO, "Activating circuits...");
             if (circuitsList!=null) {
@@ -74,56 +102,59 @@ public class CircuitPersistence {
 
                     } catch (IllegalArgumentException ie) {
                         rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
-                        backupCircuitsFile();
+                        backupCircuitsFile(file.getName());
                         ie.printStackTrace();
                     } catch (InstantiationException ex) {
                         rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile();
+                        backupCircuitsFile(file.getName());
                         ex.printStackTrace();
                     } catch (IllegalAccessException ex) {
                         rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile();
+                        backupCircuitsFile(file.getName());
                         ex.printStackTrace();
                     } catch (Throwable t) {
                         rc.log(Level.SEVERE, t.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile();
+                        backupCircuitsFile(file.getName());
                         t.printStackTrace();
                     }
                 }
             }
-
-            rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
-
-        } catch (FileNotFoundException ex) {
-            rc.log(Level.SEVERE, "Circuits file '" + file + "' was not found.");
+        } catch (IOException ex) {
+            rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
         }
-
-        madeBackup = false;
     }
 
     public void saveCircuits() {
-        if (dontSaveCircuits) return;
-        
-        rc.getCircuitManager().checkCircuitsIntegrity();
+      for(World wrld : rc.getServer().getWorlds())
+        saveCircuits(wrld);
+    }
 
-        Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
-        rc.log(Level.INFO, "Saving " + circuits.size() + " circuits state to file...");
-        dontSaveCircuits = true;
+    public void saveCircuits(World world) {
+        if (dontSaveCircuits.contains(world)) return;
+        
+        rc.getCircuitManager().checkCircuitsIntegrity(world);
+
+        Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits(world);
+        rc.log(Level.INFO, "Saving " + world.getName() +"("+circuits.size() + ") circuits state to file...");
+        dontSaveCircuits.add(world);
         rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
 
-        File file = new File(rc.getDataFolder(), circuitsFileName);
         DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
         Yaml yaml = new Yaml(options);
         List<Map<String,Object>> circuitMaps = new ArrayList<Map<String,Object>>();
 
         for (Circuit c : circuits.values()) {
-            circuitMaps.add(this.circuitToMap(c));
             c.save();
+            circuitMaps.add(this.circuitToMap(c));
         }
         
         try {
-            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
+            File file = getCircuitsFile(world.getName()+circuitsFileExtension);
+            FileOutputStream fos = new FileOutputStream(file);
+            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
+            fos.flush();
+            fos.close();
         } catch (IOException ex) {
             rc.log(Level.SEVERE, ex.getMessage());
         }
@@ -209,7 +240,8 @@ public class CircuitPersistence {
 
     private Object makeBlockListsList(Location[] vs) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (Location l : vs)
+        if(vs!=null)
+          for (Location l : vs)
             list.add(makeBlockList(l));
         return list;
     }
@@ -237,7 +269,8 @@ public class CircuitPersistence {
 
     private Location[] getLocationArray(World w, List<List<Integer>> list) {
         List<Location> locations = new ArrayList<Location>();
-        for (List<Integer> coords : list)
+        if(list!=null)
+          for (List<Integer> coords : list)
             locations.add(getLocation(w, coords));
 
         return locations.toArray(new Location[locations.size()]);
@@ -253,12 +286,12 @@ public class CircuitPersistence {
         return inputs.toArray(new InputPin[inputs.size()]);
     }
 
-    private void backupCircuitsFile() {
-        if (madeBackup) return;
+    private void backupCircuitsFile(String filename) {
+        if (madeBackup.contains(filename)) return;
 
         try {
-            File original = getCircuitsFile();
-            File backup = getBackupFileName(original.getParentFile());
+            File original = getCircuitsFile(filename);
+            File backup = getBackupFileName(original.getParentFile(),filename);
 
             rc.log(Level.INFO, "An error occurred while loading circuits state. To make sure you won't lose any circuit data, a backup copy of "
                 + circuitsFileName + " is being created. The backup can be found at " + backup.getPath());
@@ -266,11 +299,14 @@ public class CircuitPersistence {
         } catch (IOException ex) {
             rc.log(Level.SEVERE, "Error while trying to write backup file: " + ex);
         }
-        madeBackup = true;
+        madeBackup.add(filename);
     }
 
     private File getCircuitsFile() {
-        return new File(rc.getDataFolder(), circuitsFileName);
+        return getCircuitsFile(circuitsFileName);
+    }
+    private File getCircuitsFile(String name) {
+        return new File(rc.getDataFolder(), name);
     }
 
     private void copy(File src, File dst) throws IOException {
@@ -285,15 +321,15 @@ public class CircuitPersistence {
         }
         in.close();
         out.close();
-}
+    }
 
-    private File getBackupFileName(File parentFile) {
+    private File getBackupFileName(File parentFile,String filename) {
         String ext = ".BACKUP";
         File backup;
         int idx = 0;
 
         do {
-            backup = new File(parentFile, circuitsFileName + ext + idx);
+            backup = new File(parentFile, filename + ext + idx);
             idx++;
         } while (backup.exists());
         return backup;

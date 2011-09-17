@@ -229,9 +229,7 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onWorldSave(WorldSaveEvent event) {
-                if (event.getWorld()==getServer().getWorlds().get(0)) {
-                    circuitPersistence.saveCircuits();
-                }
+                circuitPersistence.saveCircuits(event.getWorld());
             }
         };
 
