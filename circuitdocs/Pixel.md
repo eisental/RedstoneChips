@@ -16,7 +16,7 @@ When the last sign argument is a broadcast channel name (i.e. not a color name).
 In this operation mode it's possible to use a transmitter to set the pixel's color wirelessly. The transmitted bits should not include a clock value, starting at bit 0 with the pixel color or index. You can build the chip without any inputs in this mode. 
 The channel name can specify a start bit using the syntax `<channel name>:<start bit>`. When used, the pixel will receive data from this bit in the channel.
 
-The default wool painting range is 3 blocks away from the interface blocks. To use a different range add a d{<distance>} or dist{<distance>} argument to the chip sign. For example adding a dist{1} argument will make the pixel only paint blocks that are directly attached to its interface block.
+The default wool painting range is 3 blocks away from the interface blocks. To use a different range add a `d{<distance>}` or `dist{<distance>}` argument to the chip sign. For example adding a dist{1} argument will make the pixel only paint blocks that are directly attached to its interface block.
 
 It's possible to build the chip without a clock pin when only 1 data pin is used.  
 
