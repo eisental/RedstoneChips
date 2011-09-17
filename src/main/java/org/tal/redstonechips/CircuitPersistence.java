@@ -39,12 +39,12 @@ public class CircuitPersistence {
     /**
      * Used to prevent saving state more than once per game tick.
      */
-    private boolean dontSaveCircuits = false;
+    private List<World> dontSaveCircuits = new ArrayList<World>();
 
     private Runnable dontSaveCircuitsReset = new Runnable() {
         @Override
         public void run() {
-            dontSaveCircuits = false;
+            dontSaveCircuits.clear();
         }
     };
 
@@ -125,42 +125,38 @@ public class CircuitPersistence {
     }
 
     public void saveCircuits() {
-        if (dontSaveCircuits) return;
-        
-        rc.getCircuitManager().checkCircuitsIntegrity();
+      for(World wrld : rc.getServer().getWorlds())
+        saveCircuits(wrld);
+    }
 
-        Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
-        rc.log(Level.INFO, "Saving " + circuits.size() + " circuits state to file...");
-        dontSaveCircuits = true;
+    public void saveCircuits(World world) {
+        if (dontSaveCircuits.contains(world)) return;
+        
+        rc.getCircuitManager().checkCircuitsIntegrity(world);
+
+        Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits(world);
+        rc.log(Level.INFO, "Saving " + world.getName() +"("+circuits.size() + ") circuits state to file...");
+        dontSaveCircuits.add(world);
         rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
         Yaml yaml = new Yaml(options);
-        HashMap<World,List<Map<String,Object>>> savedata = new HashMap<World,List<Map<String,Object>>>();
-        List<Map<String,Object>> circuitMaps = null;
+        List<Map<String,Object>> circuitMaps = new ArrayList<Map<String,Object>>();
 
         for (Circuit c : circuits.values()) {
-            World world = c.world;
-            if(!savedata.containsKey(world)) {
-                savedata.put(world, new ArrayList<Map<String,Object>>());
-            }
-            circuitMaps = savedata.get(world);
             c.save();
             circuitMaps.add(this.circuitToMap(c));
         }
         
-        for(World wrld : savedata.keySet()) {
-            try {
-                File file = getCircuitsFile(wrld.getName()+circuitsFileExtension);
-                circuitMaps = savedata.get(wrld);
-                FileOutputStream fos = new FileOutputStream(file);
-                yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
-                fos.flush();
-                fos.close();
-            } catch (IOException ex) {
-                rc.log(Level.SEVERE, ex.getMessage());
-            }
+        try {
+            File file = getCircuitsFile(world.getName()+circuitsFileExtension);
+            FileOutputStream fos = new FileOutputStream(file);
+            yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
+            fos.flush();
+            fos.close();
+        } catch (IOException ex) {
+            rc.log(Level.SEVERE, ex.getMessage());
         }
     }
 
@@ -244,7 +240,8 @@ public class CircuitPersistence {
 
     private Object makeBlockListsList(Location[] vs) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (Location l : vs)
+        if(vs!=null)
+          for (Location l : vs)
             list.add(makeBlockList(l));
         return list;
     }
@@ -272,7 +269,8 @@ public class CircuitPersistence {
 
     private Location[] getLocationArray(World w, List<List<Integer>> list) {
         List<Location> locations = new ArrayList<Location>();
-        for (List<Integer> coords : list)
+        if(list!=null)
+          for (List<Integer> coords : list)
             locations.add(getLocation(w, coords));
 
         return locations.toArray(new Location[locations.size()]);
