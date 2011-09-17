@@ -25,6 +25,9 @@ import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.util.Locations;
 
+import org.bukkit.material.Wool;
+import org.bukkit.DyeColor;
+
 /**
  *
  * @author Tal Eisenberg
@@ -39,6 +42,7 @@ public class CircuitManager {
          * The chip block material of the scanned chip.
          */
         Material chipMaterial;
+        DyeColor woolColor;
 
         /**
          * The input block material.
@@ -174,6 +178,10 @@ public class CircuitManager {
         try {
             ScanParameters params = new ScanParameters();
             params.chipMaterial = chipMaterial;
+            if(chipMaterial.equals(Material.WOOL))
+                params.woolColor=((Wool)(firstChipBlock.getState().getData())).getColor();
+            else
+                params.woolColor=null;
             params.inputBlockType = inputBlockType;
             params.outputBlockType = outputBlockType;
             params.interfaceBlockType = interfaceBlockType;
@@ -646,7 +654,7 @@ public class CircuitManager {
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
         Block up = origin.getRelative(BlockFace.UP);
 
-        if (!params.structure.contains(up) && up.getType()==params.chipMaterial) {
+        if (!params.structure.contains(up) && ((!up.getType().equals(Material.WOOL) && up.getType()==params.chipMaterial) || (up.getType().equals(Material.WOOL) && ((Wool)(up.getState().getData())).getColor().equals(params.woolColor)))) {
             params.structure.add(up);
             params.direction = direction;
             params.origin = up;
@@ -656,7 +664,7 @@ public class CircuitManager {
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
         Block down = origin.getRelative(BlockFace.DOWN);
 
-        if (!params.structure.contains(down) && down.getType()==params.chipMaterial) {
+        if (!params.structure.contains(down) && ((!down.getType().equals(Material.WOOL) && down.getType()==params.chipMaterial) || (down.getType().equals(Material.WOOL) && ((Wool)(down.getState().getData())).getColor().equals(params.woolColor)))) {
             params.structure.add(down);
             params.direction = direction;
             params.origin = down;
@@ -715,7 +723,7 @@ public class CircuitManager {
     private void checkForChipBlockOnSideFace(ScanParameters params) {
         Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
-            if (b.getType()==params.chipMaterial) {
+            if ((!b.getType().equals(Material.WOOL) && b.getType()==params.chipMaterial) || (b.getType().equals(Material.WOOL) && ((Wool)(b.getState().getData())).getColor().equals(params.woolColor))) {
                 params.structure.add(b);
                 Block origin = params.origin;
                 params.origin = b;
