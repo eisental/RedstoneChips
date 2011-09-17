@@ -5,7 +5,7 @@ title: transmitter
 
 Broadcasts its data inputs wirelessly over a specific broadcast channel. The data can be received by any [receiver](Receiver) chip tuned to the same channel.
 
-Set your message in the input data pins, then set the send pin (input 0) on to send the message.
+Set your message in the input data pins, then set the send pin (input 0) on to send the message. If the send pin is left in an on state, the transitter will send data whenever any of the input data pins change.
 A transmitter with one input pin doesn't have a send pin and will send a message whenever the pin changes state.
 
 The channel name can specify a start bit using the syntax `<channel name>:<start bit>`. When used, the transmitter will set the broadcast channel data from the start bit on leaving the current value of channel bits that are out of range.
