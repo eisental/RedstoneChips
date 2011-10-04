@@ -2,22 +2,25 @@
 layout: main
 title: display
 ---
+Creates a wool display with individually addressable pixels.
 
-what it does?
+This chip may be wireless, or use Input Blocks. To make a wireless version, do not attach any Input Blocks and specify a channel Identifier as the lat parameter on the sign.
 
+This chip requires two Interface Blocks placed at opposite corners of the display, and a layer of wool making up the display. The display must be flat and can not be built at an angle. If the physical display is larger than the size specified on the sign, the size of the pixels will be adjusted accordingly. For example, if the sign states that the display is 10x10, and the physical display is 40x40, each pixel will be 4x4 wool blocks.
 
-how to build?
+The display chip requires at least one argument, specifying the size of the display in the format `<Width>x<Height>`, for example "10x20".
 
-size arg - doesn't have to match actual size. 
-indexed/non indexed color
-wireless mode
+Additional optional arguments are a color index as detailed in the [pixel](Pixel) chip, and a channel identifier if the display will be wireless.
 
+The number of inputs required will vary based on the size of the display and the number of colors specified, if any. The first input is the clock, and when turned on will cause the selected pixel to update. The next set of inputs is the X coordinate, and there must be enough input pins to express the X coordinate, for example 2 pins for a width of 4, 3 pins for a width of 8, 8 pins for a width of 256, etc. The next set of inputs is for the Y coordinate, and follow the same rules as the X cordinate pins. The final set of inputs are for the color. If a color index is used there must be enough inputs to represent the index, otherwise 4 pins are required.
+
+The channel name can specify a start bit using the syntax `<channel name>:<start bit>`.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/display.java)
 
 * * *
 
-#### Colors and IDs (Color names are case insensitive)
+#### Color names and ids (Color names are case insensitive)
 - 0: White
 - 1: Orange
 - 2: Magenta
@@ -35,18 +38,19 @@ wireless mode
 - 14: Red
 - 15: Black
 
-
 #### I/O setup 
-* Inputs: 1 clock pin (input 0), a number of x-coordinate inputs, a number of y-coordinate inputs, and up to 4 color input pins.
-* No outputs.
-* 2 interface blocks. one in each opposite corners of the screen.
-* When using a broadcast channel for receiving data the chip can have no inputs at all.
+* input 0 is clock pin.
+* X inputs for the X coordinate.
+* Y inputs for the Y coordinate.
+* C inputs for color.
+* Requires two Interface Blocks at opposite corners of the display area.
 
 #### Sign text
 1. `   display   `
-2. `  <width>x<height>   `
-2. `  [color] ... [color] ` (optional)
-4. ` [broadcast-channel] (optional. must be the last argument)
+2. `  <width>x<height>  `
+2. `   colors   ` (optional)
+3. ` <broadcast channel>[:<start bit>] ` (optional)
+
 
 
 __Version history:__ Added to BasicCircuits 0.92
