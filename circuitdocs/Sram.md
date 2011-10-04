@@ -41,12 +41,16 @@ The word value can be typed in various formats:
 - binary - by using the b prefix. For ex. `/rctype b0001 b0010 b0100 b1000`.
 - ascii - by typing any individual character. For ex. `/rctype a d j`. Note that you can't currently enter ascii values of digits (0-9) using this method.
 
-Use /rctype ascii <ascii string> to enter a string of ascii characters. For ex. `/rctype ascii Some text and some more text`. Will write 28 8bit words into memory with the ascii codes of each input character.
+Use `/rctype ascii <ascii string>` to enter a string of ascii characters. For ex. `/rctype ascii Some text and some more text`. Will write 28 8bit words into memory with the ascii codes of each input character.
+
+To see a printout of the current memory data use `/rctype dump`. For viewing a specific range of addresses, type `/rctype dump <first address>..[last address]`
 
 The sram's memory data is stored in a separate file inside `<plugins folder>/RedstoneChips/` folder, when the plugin saves its data. The values are reloaded when the circuit is initalized. Once the circuit is destroyed or reset the memory file is deleted unless a memory id argument is used.
-A memory id sign argument can specify a permanent id for this memory chip. When used the plugin will never delete its memory data file and try to use an existing memory data file if one is found. Therefore `/rcreset` for ex., will not clear the memory data in this mode.
+A memory id sign argument can specify a permanent id for this memory chip. When used the plugin will never delete its memory data file and try to use an existing memory data file if one is found. Therefore `/rcreset` for ex., will not clear the memory data in this mode. A valid id must start with a letter and may contain letters digits or underscores (_).
 
-The filename format for the data file is `sram-<memory id>.data` while memory-id is either a free id generated on first circuit init or the memory id specified in the 
+Any number of sram chips that use the same memory id will share their data contents in memory as well as on file. Any change made by one of the srams will immediately affect all other chips.
+ 
+The filename format for the data file is `sram-<memory id>.data` while memory-id is either an unused id, generated on first chip init or the memory id specified in the 
 sign argument. 
 
 on [Wikipeda](http://en.wikipedia.org/wiki/Static_random-access_memory)

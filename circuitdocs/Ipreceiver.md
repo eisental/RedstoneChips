@@ -8,6 +8,8 @@ When a pulse is sent to the clock input pin, the receiver will fill its outputs 
 If the data size is greater than the number of outputs, additional triggers to the clock pin will fill the outputs with new data.
 Once the circuit finished updating its outputs a quick (and invisible) pulse is sent out the 1st output pin.
 
+The 2nd and sign argument and above set a list of authorized incoming addresses. These can be any valid internet host address. To receive from any address use `any`. 
+
 on [Wikipedia](http://en.wikipedia.org/wiki/Interplanetary_Internet) ;-)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/ipreceiver.java)

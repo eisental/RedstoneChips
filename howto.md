@@ -29,6 +29,9 @@ A [decoder](/RedstoneChips/circuitdocs/Decoder.html) circuit with a more complex
 Plugin commands
 ----------------
 
+###`/redstonechips` or `/rc` - General plugin information.
+
+
 ###`/rclist` - Prints a list of active chips.
 
 usage: `/rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;…]`
@@ -69,15 +72,18 @@ You can make changes to more than 1 argument by typing additional command argume
 will set the 1st argument to val and remove the 2nd argument.
 
 
-###`/rcdebug` - Register yourself as a debugger of a chip.
+###`/rcdebug` or `/rcdb` - Register yourself as a debugger of a chip.
 
-usage: `/rcdebug [chip-id|off|alloff]`
+usage: `/rcdebug [io] [id|.|clear|list]`
 
-Use by either pointing at the circuit you wish to debug or by using `/rcdebug <chip id>` if you have admin priviliges.
-      
-To stop receiving debug messages from the chip use the same command again or use `/rcdebug off` or `/rcdebug <chip id> off`.
-To stop receiving debug messages from all circuits use `/rcdebug alloff`.
-
+- Pointing at a chip and running the command will toggle debugging the chip.
+- To debug or stop debugging a remote chip use `/rcdebug <chip id>` if you have admin priviliges.
+- Pause debugging for all chips by running `/rcdebug`.
+- List all debugged chips by running `/rcdebug list`.
+- Clear your debug list by running `/rcdebug clear`.
+- To receive a debug message whenever a chip pin change state use `/rcdebug io [chip id]`.
+  
+You can also type only part of the command for ex. `/rcdb l` is equivalent to `/rcdebug list`.
 
 ###`/rcpin` - Prints information about a chip pin.
 
@@ -143,7 +149,7 @@ When either types of selection are defined you can execute any of the following 
 `/rcsel clear` - Clears the current selection.
 
 
-###`/rcchannels` - Prints a list of all wireless broadcast channels.
+###`/rcchannels` or `/rcch` - Prints a list of all wireless broadcast channels.
 
 usage: `/rcchannels [channel-name]`
       
@@ -240,3 +246,4 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 - `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
 - `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
+- `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the chip is disabled. Set to 20000 changes per tick by default.
