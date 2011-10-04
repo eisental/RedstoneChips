@@ -24,4 +24,4 @@ Note, the unique id of a player is only valid while the player is logged into th
 #### Sign text
 1. `   playerid   `
 
-__Version history:__ Added to SensorLibrary 0.26
+__Version history:__ Added to SensorLibrary 0.3
