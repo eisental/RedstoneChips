@@ -173,7 +173,7 @@ public class CircuitManager {
         BlockFace direction = ((org.bukkit.material.Sign)signBlock.getState().getData()).getAttachedFace();
         Block firstChipBlock = signBlock.getRelative(direction);
 
-        if (!isTypeAllowed(firstChipBlock.getType())) {
+        if (!isTypeAllowed(firstChipBlock.getType(), firstChipBlock.getData())) {
             if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You can't build a redstone chip using this material (" + firstChipBlock.getType().name() + "). It's either doesn't work as a chip block or it already has another function as an i/o block.");
             return -1;
         }
@@ -362,7 +362,8 @@ public class CircuitManager {
         }
         
         if (destroyed instanceof WirelessCircuit) {
-            if (!(((WirelessCircuit)destroyed).getChannel().checkChanPermissions(destroyer, false))) {
+            WirelessCircuit w = (WirelessCircuit)destroyed;
+            if (w.getChannel()!=null && !(w.getChannel().checkChanPermissions(destroyer, false))) {
                 if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + ((WirelessCircuit)destroyed).getChannel().name + ".");
                 return false;
             }
@@ -895,12 +896,21 @@ public class CircuitManager {
            chunkLookupMap.remove(loc);
     }
 
-    private boolean isTypeAllowed(Material material) {
-        return material!=rc.getPrefs().getInputBlockType().getItemType() &&
-                material!=rc.getPrefs().getOutputBlockType().getItemType() &&
-                material!=rc.getPrefs().getInterfaceBlockType().getItemType() &&
+    private boolean isTypeAllowed(Material material, byte data) {
+        return !matchMaterial(material, rc.getPrefs().getInputBlockType(), data) &&
+                !matchMaterial(material, rc.getPrefs().getOutputBlockType(), data) &&
+                !matchMaterial(material, rc.getPrefs().getInterfaceBlockType(), data) &&
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
+
+    private boolean matchMaterial(Material m, MaterialData md, byte data) {
+        if (m!=md.getItemType()) return false;
+        else if (m==Material.WOOL) {
+            return data==md.getData();
+        } else return true;
+        
+    }
+
 
     /**
      * Generates a circuit id.

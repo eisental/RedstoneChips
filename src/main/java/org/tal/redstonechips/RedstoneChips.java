@@ -356,6 +356,7 @@ public class RedstoneChips extends JavaPlugin {
         channel.addReceiver(r);
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
             public void run() {
                 channel.sendAllForReceiver(r);
             }
