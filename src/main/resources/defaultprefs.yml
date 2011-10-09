@@ -19,3 +19,6 @@ rightClickToActivate: false
 
 ## Maximum number of redstone input changes per tick
 maxInputChangesPerTick: 20000
+
+## Use permissions?
+usePermissions: false

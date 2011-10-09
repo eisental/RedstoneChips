@@ -54,6 +54,7 @@ import org.tal.redstonechips.command.RCreset;
 import org.tal.redstonechips.command.RCsave;
 import org.tal.redstonechips.command.RCsel;
 import org.tal.redstonechips.command.RCtype;
+import org.tal.redstonechips.command.RCprotect;
 import org.tal.redstonechips.util.ChunkLocation;
 
 
@@ -85,7 +86,7 @@ public class RedstoneChips extends JavaPlugin {
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), rclist, new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new org.tal.redstonechips.command.RedstoneChips()
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override
@@ -121,7 +122,7 @@ public class RedstoneChips extends JavaPlugin {
         }
 
         prefsManager.loadPrefs();
-
+        
         registerEvents();
         registerCommands();
 
@@ -161,7 +162,7 @@ public class RedstoneChips extends JavaPlugin {
             @Override
             public void onBlockBreak(BlockBreakEvent event) {
                 if (!event.isCancelled()) {
-                    circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer());
+                    if (!circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer())) event.setCancelled(true);
                     circuitManager.checkCircuitInputChanged(event.getBlock(), event.getPlayer(), true);
                 }
             }
@@ -229,9 +230,7 @@ public class RedstoneChips extends JavaPlugin {
 
             @Override
             public void onWorldSave(WorldSaveEvent event) {
-                if (event.getWorld()==getServer().getWorlds().get(0)) {
-                    circuitPersistence.saveCircuits();
-                }
+                circuitPersistence.saveCircuits(event.getWorld());
             }
         };
 
@@ -380,7 +379,7 @@ public class RedstoneChips extends JavaPlugin {
         return channel;
     }
 
-    private BroadcastChannel getChannelByName(String name) {
+    public BroadcastChannel getChannelByName(String name) {
         BroadcastChannel channel;
         if (broadcastChannels.containsKey(name))
             channel = broadcastChannels.get(name);
@@ -397,7 +396,7 @@ public class RedstoneChips extends JavaPlugin {
         if (channel==null) return false;
         
         boolean res = channel.removeTransmitter(t);
-        if (channel.isDeserted())
+        if (channel.isDeserted() && !channel.isProtected())
             broadcastChannels.remove(channel.name);
 
         return res;
@@ -408,7 +407,7 @@ public class RedstoneChips extends JavaPlugin {
         if (channel==null) return false;
         
         boolean res = channel.removeReceiver(r);
-        if (channel.isDeserted())
+        if (channel.isDeserted() && !channel.isProtected())
             broadcastChannels.remove(channel.name);
 
         return res;

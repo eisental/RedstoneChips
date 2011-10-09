@@ -17,6 +17,8 @@ public class RChelp extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!CommandUtils.checkPermission(rc, sender, cmd.getName(), false, true)) return true;
+
         Map commands = (Map)rc.getDescription().getCommands();
         ChatColor infoColor = rc.getPrefs().getInfoColor();
         ChatColor errorColor = rc.getPrefs().getErrorColor();

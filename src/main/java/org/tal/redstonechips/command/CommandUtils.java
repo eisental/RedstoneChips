@@ -58,6 +58,16 @@ public class CommandUtils {
         return player.getTargetBlock(transparentMaterials, 100);
     }
 
+    public static boolean checkPermission(RedstoneChips rc, CommandSender sender, String commandName, boolean opRequired, boolean report) {
+        if (!rc.getPrefs().getUsePermissions()) return (opRequired?sender.isOp():true);
+        if (!(sender instanceof Player)) return true;
+        if(((Player)sender).hasPermission("redstonechips.command." + commandName) && !((Player)sender).hasPermission("redstonechips.command." + commandName + ".deny")) {
+            return true;
+        } else {
+            if (report) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to use command " + commandName + ".");
+            return false;
+        }
+    }
 
     public static Map<CommandSender, PageInfo> playerPages = new HashMap<CommandSender, PageInfo>();
 

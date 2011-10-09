@@ -24,6 +24,11 @@ import org.bukkit.material.Redstone;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.util.Locations;
+import org.tal.redstonechips.channel.WirelessCircuit;
+import org.tal.redstonechips.channel.BroadcastChannel;
+import org.bukkit.material.Wool;
+import org.bukkit.DyeColor;
+import org.bukkit.World;
 
 /**
  *
@@ -39,6 +44,7 @@ public class CircuitManager {
          * The chip block material of the scanned chip.
          */
         Material chipMaterial;
+        DyeColor woolColor;
 
         /**
          * The input block material.
@@ -152,6 +158,11 @@ public class CircuitManager {
 
         // then check if the sign text points to a known circuit type
         if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -2;
+        
+        if (!checkChipPermission(sender, signClass, true)) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to create circuits of type " + signClass + ".");
+            return -2;
+        }
 
         List<Block> inputs = new ArrayList<Block>();
         List<Block> outputs = new ArrayList<Block>();
@@ -174,6 +185,10 @@ public class CircuitManager {
         try {
             ScanParameters params = new ScanParameters();
             params.chipMaterial = chipMaterial;
+            if(chipMaterial.equals(Material.WOOL))
+                params.woolColor=((Wool)(firstChipBlock.getState().getData())).getColor();
+            else
+                params.woolColor=null;
             params.inputBlockType = inputBlockType;
             params.outputBlockType = outputBlockType;
             params.interfaceBlockType = interfaceBlockType;
@@ -289,13 +304,17 @@ public class CircuitManager {
      * @param b The block that was broken.
      * @param s The breaker. Can be null.
      */
-    public void checkCircuitDestroyed(Block b, CommandSender s) {
+    public boolean checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
 
         if (destroyed!=null && circuits.containsValue(destroyed)) {
-            if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
-            destroyCircuit(destroyed, s, false);
+            if (destroyCircuit(destroyed, s, false)) {
+                if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
+            } else {
+                return false;
+            }
         }
+        return true;
     }
 
     private final static Class redstoneClass = Redstone.class;
@@ -336,8 +355,24 @@ public class CircuitManager {
                 if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
                 return false;
             }
-
         }
+
+        if (!checkChipPermission(destroyer, destroyed.getClass().getSimpleName(), false)) {
+            if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to destroy circuits of type " + destroyed.getClass().getSimpleName() + ".");
+            return false;
+        }
+        
+        if (destroyed instanceof WirelessCircuit) {
+            BroadcastChannel destroychannel;
+            destroychannel = ((WirelessCircuit)destroyed).getChannel();
+            if (destroychannel != null) {
+                if (!(((WirelessCircuit)destroyed).getChannel().checkChanPermissions(destroyer, false))) {
+                    if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + ((WirelessCircuit)destroyed).getChannel().name + ".");
+                    return false;
+                }
+            }
+        }
+        
         destroyed.circuitShutdown();
         destroyed.circuitDestroyed();
         circuits.remove(destroyed.id);
@@ -388,7 +423,7 @@ public class CircuitManager {
         List<CommandSender> iodebuggers = c.getIODebuggers();
         int id = c.id;
 
-        rc.getCircuitManager().destroyCircuit(c, reseter, false);
+        if (!rc.getCircuitManager().destroyCircuit(c, reseter, false)) return false;
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, reseter,
                 rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
@@ -460,7 +495,7 @@ public class CircuitManager {
      * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity().
      * Any unloaded circuit chunks are first loaded and then unloaded after the check is over.
      */
-    public void checkCircuitsIntegrity() {
+    public void checkCircuitsIntegrity(World world) {
         if (circuits==null) return;
 
         List<Integer> invalidIds = new ArrayList<Integer>();
@@ -468,16 +503,18 @@ public class CircuitManager {
         List<ChunkLocation> unloadedChunks = new ArrayList<ChunkLocation>();
 
         for (Circuit c : circuits.values()) {
-            for (ChunkLocation chunk : c.circuitChunks) {
-                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
-                    unloadedChunks.add(chunk);
-            }
+            if(c.world.equals(world)) {
+                for (ChunkLocation chunk : c.circuitChunks) {
+                    if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                        unloadedChunks.add(chunk);
+                }
 
-            // we also might need to load/unload some chunks that don't have i/o blocks in them
-            for (Location s : c.structure) {
-                ChunkLocation chunk = ChunkLocation.fromLocation(s);
-                if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
-                    unloadedChunks.add(chunk);
+                // we also might need to load/unload some chunks that don't have i/o blocks in them
+                for (Location s : c.structure) {
+                    ChunkLocation chunk = ChunkLocation.fromLocation(s);
+                    if (!chunk.isChunkLoaded() && !unloadedChunks.contains(chunk))
+                        unloadedChunks.add(chunk);
+                }
             }
         }
 
@@ -485,8 +522,10 @@ public class CircuitManager {
             unloaded.loadChunk();
 
         for (Circuit c : circuits.values()) {
-            if (!c.checkIntegrity()) {
-                invalidIds.add(c.id);
+            if(c.world.equals(world)) {
+                if (!c.checkIntegrity()) {
+                    invalidIds.add(c.id);
+                }
             }
         }
 
@@ -569,6 +608,21 @@ public class CircuitManager {
 
     /**
      *
+     * @return a map of all active circuits in world world. The map keys are circuit ids.
+     */
+    public HashMap<Integer, Circuit> getCircuits(World world) {
+        HashMap<Integer, Circuit> worldCircuits = new HashMap<Integer, Circuit>();
+        for(Integer id : circuits.keySet()) {
+          Circuit c = circuits.get(id);
+          if(c.world.equals(world)) {
+            worldCircuits.put(id,c);
+          }
+        }
+        return worldCircuits;
+    }
+
+    /**
+     *
      * @param structureBlock Any block that belongs to a chip.
      * @return The circuit that the block is part of its structure.
      */
@@ -646,7 +700,7 @@ public class CircuitManager {
         // look up. If found chip block above, will try to continue in the old direction 1 block up.
         Block up = origin.getRelative(BlockFace.UP);
 
-        if (!params.structure.contains(up) && up.getType()==params.chipMaterial) {
+        if (!params.structure.contains(up) && ((!up.getType().equals(Material.WOOL) && up.getType()==params.chipMaterial) || (up.getType().equals(Material.WOOL) && ((Wool)(up.getState().getData())).getColor().equals(params.woolColor)))) {
             params.structure.add(up);
             params.direction = direction;
             params.origin = up;
@@ -656,7 +710,7 @@ public class CircuitManager {
         // look down. If found chip block below, will try to continue in the old direction 1 block down.
         Block down = origin.getRelative(BlockFace.DOWN);
 
-        if (!params.structure.contains(down) && down.getType()==params.chipMaterial) {
+        if (!params.structure.contains(down) && ((!down.getType().equals(Material.WOOL) && down.getType()==params.chipMaterial) || (down.getType().equals(Material.WOOL) && ((Wool)(down.getState().getData())).getColor().equals(params.woolColor)))) {
             params.structure.add(down);
             params.direction = direction;
             params.origin = down;
@@ -715,7 +769,7 @@ public class CircuitManager {
     private void checkForChipBlockOnSideFace(ScanParameters params) {
         Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
-            if (b.getType()==params.chipMaterial) {
+            if ((!b.getType().equals(Material.WOOL) && b.getType()==params.chipMaterial) || (b.getType().equals(Material.WOOL) && ((Wool)(b.getState().getData())).getColor().equals(params.woolColor))) {
                 params.structure.add(b);
                 Block origin = params.origin;
                 params.origin = b;
@@ -865,5 +919,20 @@ public class CircuitManager {
             while(circuits.containsKey(i)) i++;
 
         return i;
+    }
+    
+    /**
+    * Checks if a player has permission to create or destroy a chip.
+    * 
+    * @return true if player has permission.
+    */
+    private boolean checkChipPermission(CommandSender sender, String classname, boolean create) {
+        if (!rc.getPrefs().getUsePermissions()) return true;
+        if (!(sender instanceof Player)) return true;
+        Player player = (Player)sender;
+    
+        if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny")) return false;
+        if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname)) return true;
+        return false;
     }
 }

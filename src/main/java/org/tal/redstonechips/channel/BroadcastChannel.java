@@ -2,6 +2,8 @@ package org.tal.redstonechips.channel;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
@@ -22,6 +24,12 @@ public class BroadcastChannel {
      * Contains the last broadcasted message.
      */
     public BitSet7 bits = new BitSet7();
+
+    /**
+     * Security Information.
+     */
+    public List<String> owners = new ArrayList<String>();
+    public List<String> users = new ArrayList<String>();
 
     private int length = 0;
 
@@ -165,5 +173,22 @@ public class BroadcastChannel {
 
     public void sendAllForReceiver(ReceivingCircuit r) {
         transmitToReceiver(r, 0, length);
+    }
+    
+    public boolean isProtected() {
+        return !owners.isEmpty() || !users.isEmpty();
+    }
+    
+    public boolean checkChanPermissions(CommandSender sender, boolean admin) {
+        if (!(sender instanceof Player)) return true;
+        
+        if (owners.isEmpty() && users.isEmpty()) return true;
+        
+        String playerName = ((Player)sender).getName();
+        if (((Player)sender).hasPermission("redstonechips.channel.admin") || owners.contains(playerName.toLowerCase()) || (admin?false:users.contains(playerName.toLowerCase()))) {
+            return true;
+        }
+        
+        return false;
     }
 }
