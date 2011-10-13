@@ -873,6 +873,7 @@ public class CircuitManager {
     private boolean isTypeAllowed(Material material) {
         return material!=rc.getPrefs().getInputBlockType().getItemType() &&
                 material!=rc.getPrefs().getOutputBlockType().getItemType() &&
+                material!=rc.getPrefs().getDirectOutputBlockType().getItemType() &&
                 material!=rc.getPrefs().getInterfaceBlockType().getItemType() &&
                 material.isBlock() && material!=Material.GRAVEL && material!=Material.SAND;
     }
