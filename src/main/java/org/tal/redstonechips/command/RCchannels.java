@@ -33,13 +33,11 @@ public class RCchannels extends RCCommand {
             } else {
                 List<String> lines = new ArrayList<String>();
                 for (BroadcastChannel channel : rc.broadcastChannels.values()) {
-                    if (!(channel.checkChanPermissions(sender, false))) {
-                        continue;
-                    }
-                    lines.add(ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers." + ChatColor.GREEN + (channel.isProtected()?" P":""));
+                    if (channel.checkChanPermissions(sender, false))
+                        lines.add(ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers." + ChatColor.GREEN + (channel.isProtected()?" P":""));
                 }
 
-                if (lines.size() == 0) {
+                if (lines.isEmpty()) {
                     sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active broadcast channels.");
                     return true;
                 }

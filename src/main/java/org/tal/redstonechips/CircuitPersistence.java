@@ -5,7 +5,6 @@ import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,21 +57,31 @@ public class CircuitPersistence {
     public void loadCircuits() {
         File file = getCircuitsFile();
         if (file.exists()) {
+            rc.log(Level.INFO, "Reading old circuits file "+file.getName()+" ...");
             loadCircuitsFromFile(file,false);
             file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
         }
 
-        File[] dataFiles = rc.getDataFolder().listFiles(new FilenameFilter() {public boolean accept(File dir, String name) {return name.endsWith(circuitsFileExtension) && !name.equals(circuitsFileName);} });
-        for(File dataFile : dataFiles) {
-            loadCircuitsFromFile(dataFile,true);
-        }
+        File[] dataFiles = rc.getDataFolder().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(circuitsFileExtension) && !name.equals(circuitsFileName);
+            } 
+        });
+        
+        String files = "";
+        for (File dataFile : dataFiles) files += dataFile.getName() + ", ";
+        files = files.substring(0, files.length()-2);
+        rc.log(Level.INFO, "Loading chips from " + files + "...");
+        
+        for(File dataFile : dataFiles) loadCircuitsFromFile(dataFile,true);        
 
         File channelsFile = new File(rc.getDataFolder(), channelsFileName);
         if (channelsFile.exists()) {
             loadChannelsFromFile(channelsFile);
         }
 
-        rc.log(Level.INFO, "Done. Loaded " + rc.getCircuitManager().getCircuits().size() + " chips.");
+        rc.log(Level.INFO, rc.getCircuitManager().getCircuits().size() + " chip(s) activated.");
     }
 
     public void loadCircuitsFromFile(File file, boolean checkForWorld) {
@@ -88,13 +97,11 @@ public class CircuitPersistence {
         try {
 
             Yaml yaml = new Yaml();
-
-            rc.log(Level.INFO, "Reading circuits file "+file.getName()+" ...");
+            
             FileInputStream fis = new FileInputStream(file);
             List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);
             fis.close();
 
-            rc.log(Level.INFO, "Activating circuits...");
             if (circuitsList!=null) {
                 for (Map<String,Object> circuitMap : circuitsList) {
                     try {
