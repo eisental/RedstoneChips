@@ -25,8 +25,7 @@ public class RCprotect extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
         if (args.length == 0) {
-            Map commands = (Map)rc.getDescription().getCommands();
-            Map commandMap = (Map)commands.get("rcprotect");
+            Map commandMap = (Map)((Map)rc.getDescription().getCommands()).get("rcprotect");
             List<String> lines = new ArrayList<String>();
 
             lines.add(ChatColor.YELLOW+commandMap.get("description").toString());
