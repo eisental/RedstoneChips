@@ -4,6 +4,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -105,7 +109,7 @@ public class RedstoneChips extends JavaPlugin {
 
         // load circuit classes
         for (CircuitIndex lib : circuitLibraries) {
-            String libMsg = desc.getName() + ": Loading " + lib.getName() + " " + lib.getVersion() + " > ";
+            String libMsg = "[" + desc.getName() + "] Loading " + lib.getName() + " " + lib.getVersion() + " > ";
             Class[] classes = lib.getCircuitClasses();
             if (classes != null && classes.length>0) {
                 for (Class c : classes)
@@ -132,11 +136,13 @@ public class RedstoneChips extends JavaPlugin {
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 @Override
                 public void run() {
-                    circuitPersistence.loadCircuits();
+                    circuitPersistence.loadOldFile();
+                    circuitPersistence.loadChannels();
+                    log(Level.INFO, "Running " + circuitManager.getCircuits().size() + " active chip(s).");
                 }})==-1) {
 
-            log(Level.WARNING, "Couldn't schedule circuit loading. Multiworld support might not work.");
-            circuitPersistence.loadCircuits();
+            circuitPersistence.loadOldFile();
+            circuitPersistence.loadChannels();
         }
 
     }
@@ -201,16 +207,23 @@ public class RedstoneChips extends JavaPlugin {
             }
 
             @Override
-            public void onPlayerInteract(PlayerInteractEvent event) {
+            public void onPlayerInteract(PlayerInteractEvent event) {                
                 if (event.isCancelled()) return;
-
-                if ((event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate()) ||
-                        (event.getAction()==Action.RIGHT_CLICK_BLOCK && prefsManager.getRightClickToActivate()))
-                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(),
+                
+                if (event.getAction()==Action.LEFT_CLICK_BLOCK && 
+                        !prefsManager.getRightClickToActivate() && 
+                        event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
+                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
+                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());                    
+                    
+                } else if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
+                    if (prefsManager.getRightClickToActivate() || 
+                            event.getPlayer().getGameMode()==GameMode.CREATIVE)
+                        circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
                             prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
-
-                if (event.getAction()==Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType()==Material.AIR)) {
-                    rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
+                    
+                    if (!event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType()==Material.AIR)
+                        rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());                
                 }
             }
         };
@@ -228,10 +241,33 @@ public class RedstoneChips extends JavaPlugin {
                     circuitManager.updateOnChunkUnload(ChunkLocation.fromChunk(event.getChunk()));
             }
 
+            World unloadedWorld = null;
+            
+            @Override
+            public void onWorldUnload(WorldUnloadEvent event) {
+                unloadedWorld = event.getWorld();
+            }
+            
             @Override
             public void onWorldSave(WorldSaveEvent event) {
+                log(Level.INFO, "Saving " + event.getWorld().getName() + " chip data...");                
                 circuitPersistence.saveCircuits(event.getWorld());
+                
+                // if world is unloaded remove circuits.
+                if (unloadedWorld==event.getWorld()) {
+                    int size = circuitManager.getCircuits().size();
+                    circuitManager.unloadWorld(unloadedWorld);
+                    log(Level.INFO, "Unloaded " + (size-circuitManager.getCircuits().size()) + " chip(s).");                    
+                    unloadedWorld = null;
+                }
+                            
             }
+
+            @Override
+            public void onWorldLoad(WorldLoadEvent event) {
+                circuitPersistence.loadCircuits(event.getWorld());
+            }
+            
         };
 
         PluginManager pm = getServer().getPluginManager();
@@ -245,6 +281,8 @@ public class RedstoneChips extends JavaPlugin {
         pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
         pm.registerEvent(Type.CHUNK_UNLOAD, rcWorldListener, Priority.Monitor, this);
         pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
+        pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
     }
 
     private void registerCommands() {
@@ -280,7 +318,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     public void log(Level level, String message) {
-        String logMsg = this.getDescription().getName() + ": " + message;
+        String logMsg = "[" + this.getDescription().getName() + "] " + message;
         logg.log(level, logMsg);
     }
 

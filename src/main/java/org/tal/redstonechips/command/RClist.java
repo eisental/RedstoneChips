@@ -102,7 +102,7 @@ public class RClist extends RCCommand {
         }
 
         if (title==null)
-            title = lines.size() + " active IC(s)";
+            title = lines.size() + " active chip(s)";
 
         sender.sendMessage("");
 

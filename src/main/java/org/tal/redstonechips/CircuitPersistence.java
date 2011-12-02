@@ -3,7 +3,6 @@ package org.tal.redstonechips;
 import java.io.BufferedWriter;
 import org.tal.redstonechips.circuit.Circuit;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,46 +53,24 @@ public class CircuitPersistence {
         rc = plugin;
     }
 
-    public void loadCircuits() {
+    public void loadOldFile() {
         File file = getCircuitsFile();
         if (file.exists()) {
-            rc.log(Level.INFO, "Reading old circuits file "+file.getName()+" ...");
-            loadCircuitsFromFile(file,false);
+            rc.log(Level.INFO, "Reading old circuits file "+file.getName()+"...");
+            loadCircuitsFromFile(file);
             file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
         }
-
-        File[] dataFiles = rc.getDataFolder().listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(circuitsFileExtension) && !name.equals(circuitsFileName);
-            } 
-        });
-        
-        String files = "";
-        for (File dataFile : dataFiles) files += dataFile.getName() + ", ";
-        files = files.substring(0, files.length()-2);
-        rc.log(Level.INFO, "Loading chips from " + files + "...");
-        
-        for(File dataFile : dataFiles) loadCircuitsFromFile(dataFile,true);        
-
-        File channelsFile = new File(rc.getDataFolder(), channelsFileName);
-        if (channelsFile.exists()) {
-            loadChannelsFromFile(channelsFile);
-        }
-
-        rc.log(Level.INFO, rc.getCircuitManager().getCircuits().size() + " chip(s) activated.");
     }
 
-    public void loadCircuitsFromFile(File file, boolean checkForWorld) {
-        if(checkForWorld) {
-            String fileName=file.getName();
-            String worldName=fileName.substring(0,fileName.length()-circuitsFileExtension.length());
-
-            if(rc.getServer().getWorld(worldName)==null) {
-                rc.log(Level.WARNING,"World "+worldName+" seems to be nonexistant while circuits for it do exist.");
-                return;
-            }
-        }
+    public void loadCircuits(World world) {
+        File file = new File(rc.getDataFolder(), world.getName()+circuitsFileExtension);
+        if (file.exists()) {
+            rc.log(Level.INFO, "Loading chips for world '" + world.getName() + "'...");
+            loadCircuitsFromFile(file);
+        }        
+    }
+        
+    protected void loadCircuitsFromFile(File file) {        
         try {
 
             Yaml yaml = new Yaml();
@@ -132,16 +109,21 @@ public class CircuitPersistence {
         }
     }
 
+    public void loadChannels() {
+        File channelsFile = new File(rc.getDataFolder(), channelsFileName);
+        if (channelsFile.exists()) {
+            loadChannelsFromFile(channelsFile);
+        }        
+    }
+    
     public void loadChannelsFromFile(File file) {
         try {
             Yaml yaml = new Yaml();
 
-            rc.log(Level.INFO, "Reading channels file...");
             FileInputStream fis = new FileInputStream(file);
             List<Map<String, Object>> channelsList = (List<Map<String, Object>>) yaml.load(fis);
             fis.close();
 
-            rc.log(Level.INFO, "Activating channels...");
             if (channelsList!=null) {
                 for (Map<String,Object> channelMap : channelsList) {
                     configureChannelFromMap(channelMap);
@@ -153,6 +135,7 @@ public class CircuitPersistence {
     }
 
     public void saveCircuits() {
+      rc.log(Level.INFO, "Saving chip data of all worlds...");
       for(World wrld : rc.getServer().getWorlds())
         saveCircuits(wrld);
     }
@@ -163,7 +146,6 @@ public class CircuitPersistence {
         rc.getCircuitManager().checkCircuitsIntegrity(world);
 
         Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits(world);
-        rc.log(Level.INFO, "Saving " + world.getName() +"("+circuits.size() + ") circuits state to file...");
         dontSaveCircuits.add(world);
         rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
 
@@ -355,7 +337,7 @@ public class CircuitPersistence {
             File original = getCircuitsFile(filename);
             File backup = getBackupFileName(original.getParentFile(),filename);
 
-            rc.log(Level.INFO, "An error occurred while loading circuits state. To make sure you won't lose any circuit data, a backup copy of "
+            rc.log(Level.INFO, "An error occurred while loading redstone chips. To make sure you won't lose any data, a backup copy of "
                 + circuitsFileName + " is being created. The backup can be found at " + backup.getPath());
             copy(original, backup);
         } catch (IOException ex) {

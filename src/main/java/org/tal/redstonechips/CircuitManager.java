@@ -525,10 +525,8 @@ public class CircuitManager {
             }
         }
 
-        String msg;
-        if (invalidIds.isEmpty())
-            msg = "All circuits are intact.";
-        else {
+        String msg = "";
+        if (!invalidIds.isEmpty()) {
             String ids = "";
 
             for (int i : invalidIds) {
@@ -547,7 +545,7 @@ public class CircuitManager {
             chunk.unloadChunk();
         }
 
-        rc.log(Level.INFO, "Done checking circuits. " + msg);
+        if (!invalidIds.isEmpty()) rc.log(Level.INFO, "Done checking circuits. " + msg);
     }
 
     /**
@@ -664,6 +662,11 @@ public class CircuitManager {
         }
     }
 
+    public void unloadWorld(World unloadedWorld) {
+        HashMap<Integer, Circuit> unloadedCircuits = this.getCircuits(unloadedWorld);
+        for (Circuit c : unloadedCircuits.values())
+            circuits.remove(c.id);
+    }
 
     private void scanBranch(ScanParameters params) {
         // look in every horizontal direction for inputs, outputs or interface blocks.
@@ -934,10 +937,16 @@ public class CircuitManager {
     private boolean checkChipPermission(CommandSender sender, String classname, boolean create) {
         if (!rc.getPrefs().getUsePermissions()) return true;
         if (!(sender instanceof Player)) return true;
+        
         Player player = (Player)sender;
-    
-        if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny")) return false;
-        if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname)) return true;
-        return false;
+        if (player.isOp()) return true;
+        
+        if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || 
+                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny")) 
+            return false;
+        else if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || 
+                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname)) 
+            return true;
+        else return false;
     }
 }
