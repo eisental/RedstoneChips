@@ -15,12 +15,35 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* Download latest [RedstoneChips jar file](https://github.com/downloads/eisental/RedstoneChips/RedstoneChips-beta.jar).
-* Download latest [BasicCircuits jar file](https://github.com/downloads/eisental/BasicCircuits/BasicCircuits-beta.jar).
+* Download latest RedstoneChips.jar file.
+* Download latest BasicCircuits.jar file.
 * Copy both jar files to the plugins folder of your craftbukkit installation. 
 
 Changelog
 ----------
+#### RedstoneChips 0.92 (4/12/11)
+- Compatible with craftbukkit build 1532+- and Minecraft 1.0.
+- Different wool colors act as different materials when used as a chip block (by @AterIgnis). 
+- Finally, permissions support! By @Mordenkainen
+- Better support for multiworld: Each world has it's own circuits file. chips are activated and deactivated when their world is loading/unloading allowing for hotswapping worlds without any ghost chips. This should also solve any startup problems you might have. by @AterIgnis and @eisental
+- Special characters are allowed for sign args. Circuits file is saved in UTF-8 encoding.
+- Changed the yaml dump format.
+- new `/redstonechips` (or `/rc`) command for general plugin info.
+- disabled chips have gray class names on their sign.
+- A debugged disabled chip will broadcast a MUCH lower number of messages.
+- When using `/rcdebug list` the title notifies whether debug is paused or not.
+- `/rcinfo` internal state keys will appear on 1 line.
+- Rewrote /rcdebug. Added /rcdb alias. 
+- /rcp command will not re-execute the last paging command each time it's typed.
+- Lever state is not updated unless its chunk is loaded. 
+- Checking if player interact event and entity explode event is cancelled.
+- New pref key - maxInputChangesPerTick. When a pin receives this many input changes the feedback loop detector will fire and disable the chip's inputs. Set to 20000 by default.
+- Receiving circuit clock output will pulse even when the message received is identical to the last one.
+- `/rclist` filter parsing errors are now properly handled.
+- levers must be actually attached to an output block in order to function. Bugged 0-data levers will still work.
+- when the players gamemode is creative, only right-click can activate a chip.
+- A fix to solve the "broken counter" bug. Thanks @Mordenkainen !
+
 #### RedstoneChips 0.9 (23/04/11)
 - Circuit input state will now update when a redstone source block is placed or removed from around the input block.
 - Redstone torches can also be used as an input source.
