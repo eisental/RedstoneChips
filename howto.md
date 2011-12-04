@@ -10,6 +10,7 @@ title: How-To Guide
 - [Preference keys](#prefs)
 - [Permissions](#permissions)
 
+<a name="#build"/>
 Building a Chip
 ---------------
 - Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
