@@ -286,7 +286,7 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 ##### Other 
 - `enableDestroyCommand` - Enable or disable /rcdestroy command. Possible values are `true` or `false` (`false` by default).
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
-- `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
+- `rightClickToActivate` - When set to true chips will be activated by right-clicking their sign. Otherwise circuits are activated by left-click in survival mode and right-click in creative mode.
 - `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
 chip is disabled. Set to 20000 changes per tick by default.
 - `usePermissions` - When set to true the plugin will use the permission system if a permissions plugin is installed. `false` by default.
