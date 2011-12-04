@@ -256,8 +256,8 @@ public abstract class Circuit {
 
     private static final BlockFace[] adjacentFaces = new BlockFace[] { BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
     private void changeLeverState(Block lever, boolean level) {
-        if (!world.isChunkLoaded(lever.getChunk())) return;
-        
+        if (!world.isChunkLoaded(lever.getChunk())) return;        
+
         byte data = lever.getData();
         boolean oldLevel = ((data&0x08) > 0);
         if(oldLevel==level) return;

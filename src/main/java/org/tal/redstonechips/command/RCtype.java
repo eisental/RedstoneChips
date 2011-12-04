@@ -24,7 +24,7 @@ public class RCtype extends RCCommand {
         rcTypeReceiver t = rc.rcTypeReceivers.get(block.getLocation());
     
         if (t==null) {
-            player.sendMessage(rc.getPrefs().getErrorColor() + "You must point towards a typing block (a terminal circuit's interface block for example) to type.");
+            player.sendMessage(rc.getPrefs().getErrorColor() + "You must point towards a typing block (check the docs of your chip) to type.");
         } else {
             player.sendMessage(rc.getPrefs().getInfoColor() + "Input sent.");
             t.type(args, player);
