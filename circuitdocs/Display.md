@@ -20,6 +20,8 @@ The channel name can specify a start bit using the syntax `<channel name>:<start
 
 * * *
 
+![a 2x2 display](/RedstoneChips/images/display1.png "a 2x2 display")
+
 #### Color names and ids (Color names are case insensitive)
 - 0: White
 - 1: Orange
@@ -51,6 +53,6 @@ The channel name can specify a start bit using the syntax `<channel name>:<start
 2. `   colors   ` (optional)
 3. ` <broadcast channel>[:<start bit>] ` (optional)
 
-
+![a 40x24 wireless display running random colors.](/RedstoneChips/images/display7.png "a 40x24 wireless display running random colors.")
 
 __Version history:__ Added to BasicCircuits 0.92

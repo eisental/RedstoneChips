@@ -6,7 +6,7 @@ title: comparator
 A digital comparator circuit that compares two input numbers of any size and outputs the result.
 
 There are 2 modes of operation:
-- Identity comparator, when the circuit is built with 1 output. The chip sets its output on when both numbers are equal.
+- Identity comparator, when the chip is built with 1 output. The chip sets its output on when both numbers are equal.
 - Magnitude comparator, When it's built with 3 outputs. It will set its 1st output on when the 1st input is less than the 2nd input, its 2nd output on when the 1st input is equal to the 2nd input, and its 3rd output on when the 1st input is greater than the 2nd input.
 
 The 2nd input number can be a constant number set in the sign arguments. In that case the 1st number is the value of all the input pins and the 2nd number is the argument constant. When the constant argument is not used, the 1st half of input bits are treated as the 1st number and the 2nd half of input bits are treated as the 2nd number.

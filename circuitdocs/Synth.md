@@ -19,6 +19,7 @@ change of the data pin will trigger the note blocks.
 
 * * *
 
+![synth](/RedstoneChips/images/synth.png "synth")
     
 #### I/O setup 
 * Inputs: Either 1 data pin without a clock pin, or 1 clock pin (input 0) and any number of data pins.

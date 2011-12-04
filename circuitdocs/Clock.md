@@ -15,7 +15,7 @@ The clock's pulse width is set to 0.5 by default which means that the clock outp
 The clock chip uses the system time to prevent it's output timing to drift keeping a steady pulse over long periods of time. 
 The minimum duration of the clock's on or off states is 50ms (or 1 game tick).
 
-To send the clock output over a wireless channel, add a broadcast channel name (possibly including a start bit) as the last sign argument. For ex. `ch:5` will cause the clock to broadcast on channel `ch`, 5th bit each time it pulses.
+To send the clock output over a wireless channel, add a broadcast channel name (possibly including a start bit) as the last sign argument. The argument must start with a hash sign (#). For ex. `#ch:5` will cause the clock to broadcast on channel `ch` on its 5th bit each time it pulses.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/clock.java)
 

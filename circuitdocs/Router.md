@@ -4,7 +4,7 @@ title: router
 ---
 
 Routes any input signal into one or more outputs according to the routing table.
-The routing table should be written on the sign using the following syntax: ` <input pin>:<output pin> ` any number of table entries 
+The routing table should be written on the sign using the following format: ` <input pin>:<output pin> `. Any number of table entries 
 can be used. The 1st input of the router is an input clock, when its state is set to high the router will update its outputs.
 Routing table entries should use input 0 as the first input after the clock pin.
 

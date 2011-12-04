@@ -15,15 +15,13 @@ When the chip has a single input pin and multiple outputs, triggering the input 
 For maximum performance a pulse of 0ms duration should be used. This will make the circuit output to go from off to on and then immediately back, creating an invisible pulse.
 Though it's not possible to see the state change, the pulse is there and can be used to control any chip's clock input.
 
-If the chip only has one input and multiple outputs, when the input changes from off to on, the first output will turn on, wait the duration, then turn off, then the next output will will do the same, until all outputs have toggled.
-
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/pulse.java)
     
 * * *
 
 
 #### I/O setup 
-* Can have any number of input, output pairs, or a single input any any number of outputs.
+* Can have any number of input/output pairs, or a single input any any number of outputs.
 
 #### Sign text
 1. `   pulse   `

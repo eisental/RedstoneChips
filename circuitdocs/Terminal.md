@@ -5,7 +5,7 @@ title: terminal
 
 An input terminal for sending ascii characters or numbers over redstone wires. 
 To use it, point towards one of its interface blocks and enter the chat command `/rctype <data>`
-Once the command is executed, the terminal will send the command data through its output according to the `type` sign argument.
+Once the command is executed, the terminal will send the command data through its outputs.
 
 The first sign argument sets the way the data is encoded.
 
@@ -20,6 +20,7 @@ This circuit can be directly connected to a [print](Print.html) circuit.
 
 * * *
 
+![terminal](/RedstoneChips/images/terminal.png "terminal")
 
 #### I/O setup 
 * ascii mode requires 1 clock output and 8 data output pins. An additional end-of-transmission 2nd output pin is used when the chip has 10 outputs.

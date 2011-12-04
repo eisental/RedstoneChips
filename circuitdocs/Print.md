@@ -30,6 +30,7 @@ If the circuit is using add or scroll mode the new text will be added to the pre
 
 * * *
 
+![print chip](/RedstoneChips/images/print.png "print")
 
 #### I/O setup 
 * No output pins.

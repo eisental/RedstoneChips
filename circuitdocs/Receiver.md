@@ -4,9 +4,9 @@ title: receiver
 ---
 
 Outputs any data sent wirelessly by a [transmitter](Transmitter) chip or other transmitting circuits over the chosen broadcast channel. 
-When the receiver has more than one output it's 1st output is used as an output clock pin. Whenever the receiver receives any data the clock pin pulses shortly. The pulse is too short to actually see it.
+When the receiver has more than one output its 1st output is used as an output clock pin. Whenever the receiver receives any data the clock pin pulses shortly. The pulse is too short to actually see it.
 
-The channel argument can specify a start bit using the syntax `<channel name>:<start bit>`. When used, the receiver will receive data in the channel from this bit filling its outputs. Bits that are either too high to fit in the receivers outputs or are lower than the start bit are ignored.
+The channel argument can specify a start bit using the format `<channel name>:<start bit>`. When used, the receiver will receive data in the channel from this bit on. Bits that are either too high to fit in the receivers outputs or are lower than the start bit are ignored.
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/receiver.java)
 
@@ -20,6 +20,6 @@ The channel argument can specify a start bit using the syntax `<channel name>:<s
 1. `   receiver   `
 2. `  <broadcast channel>[:<start bit>] ` (The channel name is not optional)
 
-![transmitter/receiver pair on channel A](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair on channel A")
+![transmitter/receiver pair](/RedstoneChips/images/transmitterreceiver.png "transmitter/receiver pair")
 
 __Version history:__ Added to BasicCircuits 0.1

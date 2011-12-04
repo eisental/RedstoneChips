@@ -3,7 +3,14 @@ layout: main
 title: How-To Guide
 ---
 
-Building a Chip
+- [Building a chip](#build)
+- [Plugin commands](#commands)
+- [Destroying a chip](#destroy)
+- [Chip detectionscanning rules](#scanning)
+- [Preference keys](#prefs)
+- [Permissions](#permissions)
+
+Building a Chip<a id="build"/>
 ---------------
 - Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
 - Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
@@ -26,7 +33,7 @@ A [decoder](/RedstoneChips/circuitdocs/Decoder.html) circuit with a more complex
 
 ![decoder circuit](/RedstoneChips/images/decoder2.png)
 
-Plugin commands
+Plugin commands<a id="commands"/>
 ----------------
 
 ###`/redstonechips` or `/rc` - General plugin information.
@@ -162,7 +169,17 @@ usage: `/rcinfo [circuit-id]`
 
 Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
 
+###`/rcprotect` - Creates, removes, and configures protected wireless channels. 
 
+usage: `/rcprotect [channel|listchannels] [protect|unprotect|add|remove] [users:names] [admins:names]`
+
+Use the command with `listchannels` to list all protected channels.
+Use the command with only a channel name to list users and admins of that channel.
+Use the command with a channel name and `protect` to protect a channel, you will automatically be added as an admin of the channel. You may also pass a list of users and/or admins.
+Use the command with a channel name and `unprotect` to remove protection for a channel.
+Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
+Users and admins should be passed in the form of `users:User1,User2,User3` and `admins:Admin1,Admin2,Admin3`.
+      
 ###`/rchelp` - Prints a list or description of all RC commands.
 
 usage: `/rchelp [command name]
@@ -201,7 +218,7 @@ usage: `/rcload`
 
 This command will reload circuit states from file, resetting any changes made since last save.
 
-Destroying a Chip
+Destroying a Chip<a id="destroy"/>
 -----------------
 You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /redchips-deactivate command
 while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
@@ -209,7 +226,7 @@ __Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable bl
 __Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
 When the plugin saves it's circuits states it will deactivate any circuit that any of it's blocks were broken.
 
-Chip detection scanning rules (for the advanced RC user...)
+Chip detection scanning rules (for the advanced RC user...)<a id="scanning"/>
 ------------------------------
 To be able to guess the pin numbering of more complex structures you need to understand how the plugin detects and scans the structure once you activate it by clicking on the sign. It scans the circuit block by block starting at the sign block itself. The pins are numbered as the circuit structure is scanned, therefore when the structure is a straight line the count starts at the sign and onwards. When more than one dimension is used the plugin will scan according to the following rules:
 1. The sign block is added to the structure and then the plugin moves to the chip block the sign is attached to. 
@@ -226,7 +243,7 @@ One very important thing to note is that the recursive scanning process work by 
 
 The exact algorithm can be found at the [CircuitManager](http://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/CircuitManager.java) class. Specifically `CircuitManager.checkForCircuit()`
 
-Preference keys
+Preference keys<a id="prefs"/>
 ---------------
 To change any of the preferences while playing, you can use the `/rcprefs` command. All values are stored in `<craftbukkit folder>/plugins/RedstoneChips/preferences.yml`.
 
@@ -247,3 +264,7 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
 - `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
 - `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the chip is disabled. Set to 20000 changes per tick by default.
+
+Permissions<a id="permissions"/>
+-----------
+To be continued...

@@ -14,7 +14,7 @@ In addition to building the segdriver it's still of course necessary to actually
 
 The segdriver will print hex a,b,c,d,e and f letters for input values 10-15.
 
-To easily divide a binary number into multiple decimal digits see the [bintobcd](Bintobcd) circuit.
+To easily divide a binary number into multiple decimal digits see a [bintobcd](Bintobcd) chip.
 
 on [Wikipeda](http://en.wikipedia.org/wiki/7_segment_display)
 

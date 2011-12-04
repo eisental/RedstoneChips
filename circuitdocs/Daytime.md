@@ -3,7 +3,7 @@ layout: main
 title: daytime
 ---
 
-A circuit for getting the current either real or game time. 
+A chip for sending the current real, or game time. 
 Use 'earthtime' as 1st sign argument to sync with real world time or use 'gametime' to sync with game ticks. 
 The 2nd sign argument determines the time field that will be sent to the chip's outputs.
 

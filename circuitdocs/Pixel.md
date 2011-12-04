@@ -57,6 +57,6 @@ Note that wool blocks that are not attached directly or indirectly (through othe
 3. ` [dist{<distance>}] ` (optional)
 4. ` [broadcast-channel] (optional. must be the last argument)
 
-![pixel circuit w/o sign arguments](/RedstoneChips/images/pixel3.png "pixel circuit w/o sign arguments")
+![pixel chip](/RedstoneChips/images/pixel4.png "pixel chip")
 
 __Version history:__ Added to BasicCircuits 0.6

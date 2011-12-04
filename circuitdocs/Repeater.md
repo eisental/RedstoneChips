@@ -5,7 +5,7 @@ title: repeater
 
 A repeater chip. Will set the state of each of its outputs according to its input.
 
-[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/delay.java)
+[source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/repeater.java)
     
 * * *
 
