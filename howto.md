@@ -33,7 +33,7 @@ A [decoder](/RedstoneChips/circuitdocs/Decoder.html) circuit with a more complex
 
 ![decoder circuit](/RedstoneChips/images/decoder2.png)
 
-Plugin commands<a id="commands"/>
+Plugin commands<a id="commands"></a>
 ----------------
 
 ###`/redstonechips` or `/rc` - General plugin information.
