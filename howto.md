@@ -6,11 +6,11 @@ title: How-To Guide
 - [Building a chip](#build)
 - [Plugin commands](#commands)
 - [Destroying a chip](#destroy)
-- [Chip detectionscanning rules](#scanning)
+- [Chip detection scanning rules](#scanning)
 - [Preference keys](#prefs)
 - [Permissions](#permissions)
 
-Building a Chip<a id="build"/>
+Building a Chip
 ---------------
 - Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
 - Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
@@ -19,7 +19,7 @@ Building a Chip<a id="build"/>
 - Some circuits, such as the [synth](/RedstoneChips/circuitdocs/Synth.html) circuit require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a chip block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
 - Last but not least, go back to your circuit sign and __left-click__ it to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated: > a input(s), b output(s), and c interface block(s)'. 
 
-The order of your input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. See "Chip detection scanning rules" below, for information on predicting the order of pins in more complex structures.
+The order of your input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. See [Chip detection scanning rules](#scanning) below, for information on predicting the order of pins in more complex structures.
 
 If you're having problems or just want to see more information, you can use the debugging commands `/rcdebug`, `/rcinfo` and `/rcpin`. See the description below.
 
