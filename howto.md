@@ -5,9 +5,9 @@ title: How-To Guide
 
 - [Building a chip](#building_a_chip)
 - [Plugin commands](#plugin_commands)
-- [Destroying a chip](#destroy)
-- [Chip detection scanning rules](#scanning)
-- [Preference keys](#prefs)
+- [Destroying a chip](#destroying_a_chip)
+- [Chip detection scanning rules](#chip_detection_scanning_rules_for_the_advanced_rc_user)
+- [Preference keys](#preference_keys)
 - [Permissions](#permissions)
 
 Building a Chip
@@ -38,6 +38,7 @@ Plugin commands
 
 ###`/redstonechips` or `/rc` - General plugin information.
 
+* * *
 
 ###`/rclist` - Prints a list of active chips.
 
@@ -60,10 +61,13 @@ Examples:
   `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
   `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
 
+* * *
+
 ###`/rcclasses` - Prints a list of installed circuit classes.
 
 usage: `/rcclasses`
 
+* * *
 
 ###`/rcarg` - Replace, add or clear circuit sign arguments.
 
@@ -78,6 +82,7 @@ To remove an argument use `/rcarg clear <arg-number>`
 You can make changes to more than 1 argument by typing additional command arguments, for ex. `/rcarg 1 val clear 2`
 will set the 1st argument to val and remove the 2nd argument.
 
+* * *
 
 ###`/rcdebug` or `/rcdb` - Register yourself as a debugger of a chip.
 
@@ -91,6 +96,8 @@ usage: `/rcdebug [io] [id|.|clear|list]`
 - To receive a debug message whenever a chip pin change state use `/rcdebug io [chip id]`.
   
 You can also type only part of the command for ex. `/rcdb l` is equivalent to `/rcdebug list`.
+
+* * *
 
 ###`/rcpin` - Prints information about a chip pin.
 
@@ -107,6 +114,7 @@ usage: `/rcactivate [<inputBlockType> >outputBlockType> <interfaceBlockType>]
 Point the circuit sign and execute the command.
 To activate a circuit built with different input, output or interface block types then set in the preferences use `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`
 
+* * *
       
 ###`/rcdestroy` - Destroys a circuit and removes its blocks.
 
@@ -115,6 +123,7 @@ usage: `/rcdestroy`
 Point at a block of the circuit you wish to destroy and enter the command.
 This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
 
+* * *
 
 ###`/rcbreak` - Deactivates a circuit without removing its blocks.
 
@@ -122,6 +131,7 @@ usage: `/rcbreak [circuit-id]`
 
 Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
 
+* * *
 
 ###`/rcreset` - Rescans and reactivates a circuit.
 
@@ -132,6 +142,7 @@ Reset a circuit to scan for new i/o blocks or sign arguments and apply any chang
 
 Running `/rcreset all` will reset all active circuits. Use with caution!
 
+* * *
 
 ###`/rcfixioblocks` - Replace i/o blocks using incorrect materials.
 
@@ -140,6 +151,7 @@ usage: `/rcfixioblocks [circuit-id]`
 Use by pointing at the circuit you want to fix or, if you have op priviliges, use a circuit id as an argument.
 Any i/o blocks using a different block type than set in the plugin's preferences are replaced to the correct material.
 
+* * *
 
 ###`/rcsel` - Mass editing circuits within a selection cuboid.
 
@@ -155,6 +167,7 @@ When either types of selection are defined you can execute any of the following 
 `/rcsel list` - Lists all circuits in the selection
 `/rcsel clear` - Clears the current selection.
 
+* * *
 
 ###`/rcchannels` or `/rcch` - Prints a list of all wireless broadcast channels.
 
@@ -162,12 +175,15 @@ usage: `/rcchannels [channel-name]`
       
 Use a channel name as an argument to print info about that channel.
 
+* * *
 
 ###`/rcinfo` - Prints a lot of useful information about a chip.
 
 usage: `/rcinfo [circuit-id]`
 
 Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
+
+* * *
 
 ###`/rcprotect` - Creates, removes, and configures protected wireless channels. 
 
@@ -179,6 +195,8 @@ Use the command with a channel name and `protect` to protect a channel, you will
 Use the command with a channel name and `unprotect` to remove protection for a channel.
 Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
 Users and admins should be passed in the form of `users:User1,User2,User3` and `admins:Admin1,Admin2,Admin3`.
+
+* * *
       
 ###`/rchelp` - Prints a list or description of all RC commands.
 
@@ -187,6 +205,7 @@ usage: `/rchelp [command name]
 Use `/rchelp` to list all the plugin commands.
 Use `/rchelp <command name>` to get help about a specific command.
 
+* * *
 
 ###`/rcp` - Moves to a different page when run after using a command with paging.
 
@@ -194,6 +213,7 @@ usage: `/rcp [page #|prev|next|last]`
       
 Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
 
+* * *
 
 ###`/rcprefs` - Allows to see and change the plugin's preferences.
 
@@ -202,6 +222,7 @@ usage: `/rcprefs [pref key] [new value]`
 Use the command with no arguments to list all preferences values.
 To change a preference value use `/rcprefs <pref key> <new value>`.
 
+* * *
 
 ###`/rcsave` - Saves all circuit data to file.
 
@@ -210,6 +231,7 @@ usage: `/rcsave`
 Makes sure all circuits are intact and saves their current state to the plugin's circuits file.
 Should not be used unless there's a problem with the automatic data save.
 
+* * *
 
 ###`/rcload` - Reloads circuit data from file.
 
@@ -218,7 +240,9 @@ usage: `/rcload`
 
 This command will reload circuit states from file, resetting any changes made since last save.
 
-Destroying a Chip<a id="destroy"/>
+* * *
+
+Destroying a Chip
 -----------------
 You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /redchips-deactivate command
 while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
@@ -226,7 +250,7 @@ __Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable bl
 __Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
 When the plugin saves it's circuits states it will deactivate any circuit that any of it's blocks were broken.
 
-Chip detection scanning rules (for the advanced RC user...)<a id="scanning"/>
+Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
 To be able to guess the pin numbering of more complex structures you need to understand how the plugin detects and scans the structure once you activate it by clicking on the sign. It scans the circuit block by block starting at the sign block itself. The pins are numbered as the circuit structure is scanned, therefore when the structure is a straight line the count starts at the sign and onwards. When more than one dimension is used the plugin will scan according to the following rules:
 1. The sign block is added to the structure and then the plugin moves to the chip block the sign is attached to. 
@@ -243,7 +267,7 @@ One very important thing to note is that the recursive scanning process work by 
 
 The exact algorithm can be found at the [CircuitManager](http://github.com/eisental/RedstoneChips/blob/master/src/main/java/org/tal/redstonechips/CircuitManager.java) class. Specifically `CircuitManager.checkForCircuit()`
 
-Preference keys<a id="prefs"/>
+Preference keys
 ---------------
 To change any of the preferences while playing, you can use the `/rcprefs` command. All values are stored in `<craftbukkit folder>/plugins/RedstoneChips/preferences.yml`.
 
@@ -263,8 +287,10 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 - `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
 - `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
-- `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the chip is disabled. Set to 20000 changes per tick by default.
+- `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
+chip is disabled. Set to 20000 changes per tick by default.
+- `usePermissions` - When set to true the plugin will use the permission system if a permissions plugin is installed. `false` by default.
 
-Permissions<a id="permissions"/>
+Permissions
 -----------
 To be continued...
