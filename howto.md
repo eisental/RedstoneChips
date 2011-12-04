@@ -244,11 +244,11 @@ This command will reload circuit states from file, resetting any changes made si
 
 Destroying a Chip
 -----------------
-You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /redchips-deactivate command
-while pointing at a circuit block. Use `/redchips-destroy` to destroy the chip and remove all of its blocks. 
+You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /rcbreak command
+while pointing at a circuit block. Use `/rcdestroy` to destroy the chip and remove all of its blocks. 
 __Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the IC to stop functioning.
 __Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
-When the plugin saves it's circuits states it will deactivate any circuit that any of it's blocks were broken.
+When the plugin saves it's chip data it will deactivate any circuit that any of it's blocks were broken.
 
 Chip detection scanning rules (for the advanced RC user...)
 ------------------------------
@@ -284,7 +284,7 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 - `debugColor` - Color of debug messages (`AQUA` by default)
 
 ##### Other 
-- `enableDestroyCommand` - Enable or disable /redchips-destroy command. Possible values are `true` or `false` (`false` by default).
+- `enableDestroyCommand` - Enable or disable /rcdestroy command. Possible values are `true` or `false` (`false` by default).
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
 - `rightClickToActivate` - When set to true circuits will be activated by right-clicking their sign. Otherwise circuits are activated by left-click.
 - `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
