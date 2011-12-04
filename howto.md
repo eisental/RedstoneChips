@@ -3,14 +3,13 @@ layout: main
 title: How-To Guide
 ---
 
-- [Building a chip](#build)
-- [Plugin commands](#commands)
+- [Building a chip](#building_a_chip)
+- [Plugin commands](#plugin_commands)
 - [Destroying a chip](#destroy)
 - [Chip detection scanning rules](#scanning)
 - [Preference keys](#prefs)
 - [Permissions](#permissions)
 
-<a name="#build"/>
 Building a Chip
 ---------------
 - Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
