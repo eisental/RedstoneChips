@@ -10,7 +10,11 @@ import java.util.logging.Level;
  * @author Tal Eisenberg
  */
 public class CircuitLoader {
+    /**
+     * Contains all circuit classes from every loaded chip library.
+     */
     private Map<String,Class<? extends Circuit>> circuitClasses = new HashMap<String,Class<? extends Circuit>>();
+    
     private RedstoneChips rc;
 
     /**

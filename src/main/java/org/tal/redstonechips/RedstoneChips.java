@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.Action;
@@ -59,6 +60,7 @@ import org.tal.redstonechips.command.RCsave;
 import org.tal.redstonechips.command.RCsel;
 import org.tal.redstonechips.command.RCtype;
 import org.tal.redstonechips.command.RCprotect;
+import org.tal.redstonechips.command.RCtool;
 import org.tal.redstonechips.util.ChunkLocation;
 
 
@@ -84,13 +86,15 @@ public class RedstoneChips extends JavaPlugin {
 
     public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
     public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
-
+    private Map<String, Material> playerChipProbe = new HashMap<String, Material>();
+    
     public RCsel rcsel = new RCsel();
     public RClist rclist = new RClist();
+    public RCtool rctool = new RCtool();
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), rclist, new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new org.tal.redstonechips.command.RedstoneChips()
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), rctool, new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override
@@ -222,8 +226,14 @@ public class RedstoneChips extends JavaPlugin {
                         circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
                             prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
                     
-                    if (!event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType()==Material.AIR)
-                        rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());                
+                    if (!event.getPlayer().getItemInHand().getType().isBlock()) {
+                        rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
+                        
+                        if (playerChipProbe.containsKey(event.getPlayer().getName())
+                                && event.getPlayer().getItemInHand().getType()==playerChipProbe.get(event.getPlayer().getName())) {
+                            rctool.probeChipBlock(event.getPlayer(), event.getClickedBlock());
+                        }
+                    }                    
                 }
             }
         };
@@ -256,7 +266,7 @@ public class RedstoneChips extends JavaPlugin {
                 // if world is unloaded remove circuits.
                 if (unloadedWorld==event.getWorld()) {
                     int size = circuitManager.getCircuits().size();
-                    circuitManager.unloadWorld(unloadedWorld);
+                    circuitManager.unloadWorldChips(unloadedWorld);
                     log(Level.INFO, "Unloaded " + (size-circuitManager.getCircuits().size()) + " chip(s).");                    
                     unloadedWorld = null;
                 }
@@ -450,5 +460,16 @@ public class RedstoneChips extends JavaPlugin {
             broadcastChannels.remove(channel.name);
 
         return res;
+    }
+
+    /**
+     * Sets the chip probe item for this player
+     * 
+     * @param player 
+     * @param item 
+     */
+    public void setChipProbe(Player player, Material item) {
+        if (item.isBlock()) throw new IllegalArgumentException("Blocks can't be used as a chip probe.");
+        playerChipProbe.put(player.getName(), item);
     }
 }

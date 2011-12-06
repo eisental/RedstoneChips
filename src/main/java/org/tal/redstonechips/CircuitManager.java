@@ -110,7 +110,7 @@ public class CircuitManager {
     }
 
     /**
-     * Checks if this redstone change event reports an input change in any circuit's input pins.
+     * Checks if this redstone event reports an input change in any circuit's input pins.
      * When the new redstone state is different than the current the input pin is updated and the circuit is notified.
      *
      * @param e A redstone change event.
@@ -660,9 +660,9 @@ public class CircuitManager {
         } else {
             pausedDebuggers.remove(s);
         }
-    }
-
-    public void unloadWorld(World unloadedWorld) {
+    }    
+    
+    public void unloadWorldChips(World unloadedWorld) {
         HashMap<Integer, Circuit> unloadedCircuits = this.getCircuits(unloadedWorld);
         for (Circuit c : unloadedCircuits.values())
             circuits.remove(c.id);

@@ -266,7 +266,14 @@ public abstract class Circuit {
 
         lever.setData(newData);
         Lever lvr = (Lever)(lever.getState().getData());
-        Block blk = lever.getRelative(lvr.getAttachedFace());
+        BlockFace aface = lvr.getAttachedFace();
+        if (aface==null) {
+            if (hasDebuggers())
+                debug(this.getCircuitClass() + " chip (" + id + ") has a lever that needs replacing.");
+            return;
+        }
+        
+        Block blk = lever.getRelative(aface);
         blk.getState().update();
         
         for (int i=0; i<adjacentFaces.length; i++) {

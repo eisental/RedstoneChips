@@ -45,7 +45,7 @@ commands:
       To change a preference value use `/rcprefs <pref key> <new value>`.
   rcdebug:
     aliases: [rcdb]
-    description: Register yourself as a debugger of a chip and receive messages from it.
+    description: Register yourself as a chip debugger.
     usage: |
       `/rcdebug [io] [id|.|clear|list]`
 
@@ -59,8 +59,8 @@ commands:
   rcpin:
     description: Prints information about a chip pin.
     usage: |
-      Point towards an output lever or input redstone source to use.
-      Prints the pin number (starting with 0), pin type (input/output), and current state (on/off) of the pin.
+      Point towards an output lever or input redstone source.
+      Prints the pin number (starting from 0), pin type (input/output), and current state (on/off) of the pin.
   rcactivate:
     description: Activates a circuit.
     usage: |
@@ -170,6 +170,12 @@ commands:
       Use the command with a channel name and `unprotect` to remove protection for a channel.
       Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
       Users and admins should be passed in the form of `users:User1,User2,User3` and `admins:Admin1,Admin2,Admin3`.
+  rctool:
+    description: Turns the item in your hand into a chip probe.
+    usage: |
+      Using the chip probe on a chip i/o block prints information about the pin state.
+      Using it on the chip sign prints info about the chip.
+      Using it on any other turns debug on and off. 
 permissions:
   redstonechips.admin:
     description: Grants access to all of RedstoneChips including admin commands.
@@ -208,6 +214,7 @@ permissions:
       redstonechips.command.rcarg: true
       redstonechips.command.rchelp: true
       redstonechips.command.rcprotect: true
+      redstonechips.command.rctool: true
   redstonechips.command.admin:
     description: Grants access to all of RedstoneChips commands including admin commands.
     children:
@@ -350,6 +357,11 @@ permissions:
   redstonechips.command.rcfixioblocks.id.deny:
     default: false
     description: Denies the rcfixioblocks command with a circuit id.
+  redstonechips.command.rctool:
+    description: Grants the rctool command.
+  redstonechips.command.rctool.deny:
+    default: false
+    description: Denies the rctool command.
   redstonechips.command.rcsel:
     description: Grants the rcsel command.
   redstonechips.command.rcsel.deny:

@@ -41,12 +41,12 @@ public class RCinfo extends RCCommand {
             }
         }
 
-        printCircuitInfo(sender, c);
+        printCircuitInfo(sender, c, rc);
 
         return true;
     }
 
-    public void printCircuitInfo(CommandSender sender, Circuit c) {
+    public static void printCircuitInfo(CommandSender sender, Circuit c, org.tal.redstonechips.RedstoneChips rc) {
         ChatColor infoColor = rc.getPrefs().getInfoColor();
         ChatColor errorColor = rc.getPrefs().getErrorColor();
         ChatColor extraColor = ChatColor.YELLOW;

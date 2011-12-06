@@ -24,30 +24,41 @@ public class RCpin extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
         Block target = CommandUtils.targetBlock(player);
-        printPinInfo(target, player);
+        try {
+            printPinInfo(target, player, rc);
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + e.getMessage());
+        }
 
         return true;
     }
 
-    private void printPinInfo(Block pinBlock, CommandSender sender) {
+    public static void printPinInfo(Block pinBlock, CommandSender sender, org.tal.redstonechips.RedstoneChips rc) {
         List<InputPin> inputList = rc.getCircuitManager().lookupInputBlock(pinBlock);
-        if (inputList==null) {
-            Object[] oo = rc.getCircuitManager().lookupOutputBlock(pinBlock);
-            if (oo==null) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at an output lever or input redstone source.");
-            } else { // output pin
-                Circuit c = (Circuit)oo[0];
-                int i = (Integer)oo[1];
-                sender.sendMessage(rc.getPrefs().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.YELLOW + "output pin "
-                        + i + " - " + (c.getOutputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));
-            }
-        } else { // input pin
-            for (InputPin io : inputList) {
-                Circuit c = io.getCircuit();
-                int i = io.getIndex();
-                sender.sendMessage(rc.getPrefs().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.WHITE + "input pin "
-                        + i + " - " + (c.getInputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));
-            }
+        
+        if (inputList!=null) printInputInfo(sender, inputList, rc);
+        else {
+            Object[] o = rc.getCircuitManager().lookupOutputBlock(pinBlock);
+            
+            if (o!=null) printOutputInfo(sender, o, rc);
+            else throw new IllegalArgumentException("You need to point at an output lever or an input redstone source.");
         }
+        
+    }
+
+    private static void printInputInfo(CommandSender sender, List<InputPin> inputList, org.tal.redstonechips.RedstoneChips rc) {
+        for (InputPin io : inputList) {
+            Circuit c = io.getCircuit();
+            int i = io.getIndex();
+            sender.sendMessage(rc.getPrefs().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.WHITE + "input pin "
+                    + i + " - " + (c.getInputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));
+        }            
+    }
+
+    private static void printOutputInfo(CommandSender sender, Object[] o, org.tal.redstonechips.RedstoneChips rc) {
+        Circuit c = (Circuit)o[0];
+        int i = (Integer)o[1];
+        sender.sendMessage(rc.getPrefs().getInfoColor() + c.getClass().getSimpleName() + ": " + ChatColor.YELLOW + "output pin "
+                + i + " - " + (c.getOutputBits().get(i)?ChatColor.RED+"on":ChatColor.WHITE+"off"));                        
     }
 }
