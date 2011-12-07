@@ -9,7 +9,7 @@ A simple 7-segment wool display. Made of 7 [pixel](../circuitdocs/Pixel.html) ch
 Send a 4-bit number over the receiver channel in order to display it on the digit. You should probably change the receiver channel to something more original than "digit".
 To display numbers with more than 1 digit use a [bintobcd](../circuitdocs/Bintobcd.html) chip.
 
-<center>###[Download .schematic](7segdigit.schematic)</center>
+###[download .schematic](7segdigit.schematic)
 
 * * *
 
