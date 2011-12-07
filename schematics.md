@@ -9,10 +9,8 @@ Copy memory data files into /plugins/RedstoneChips folder under your craftbukkit
 
 To mass activate all the chips in the schematic select a region (using WorldEdit or /rcsel) that contains the chips, and run /rcsel activate.
 
-![7-seg digit](images/thumb7seg.png) 
-####[7-segment display digit](schematics/7segs.md)
+####[7-segment display digit](schematics/7segs.html)
+[![7-seg digit](images/thumb7seg.png)](schematics/7segs.html)
 
-* * *
-
-![16-seg digit](images/thumb16seg.png) 
-####[16-segment display digit](schematics/16segs.md)
+####[16-segment display digit](schematics/16segs.html)
+[![16-seg digit](images/thumb16seg.png)](schematics/16segs.html)
