@@ -224,7 +224,7 @@ permissions:
       redstonechips.command.rcdestroy: true
       redstonechips.command.rcprefs.set: true
       redstonechips.command.rcreset.all: true
-      redstonechips.command.break.id: true
+      redstonechips.command.rcbreak.id: true
       redstonechips.command.fixioblocks.id: true
   redstonechips.command.deny:
     default: false
