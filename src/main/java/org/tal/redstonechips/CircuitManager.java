@@ -28,6 +28,7 @@ import org.tal.redstonechips.channel.WirelessCircuit;
 import org.bukkit.material.Wool;
 import org.bukkit.DyeColor;
 import org.bukkit.World;
+import org.tal.redstonechips.util.ParsingUtils;
 
 /**
  *
@@ -418,7 +419,8 @@ public class CircuitManager {
         List<CommandSender> debuggers = c.getDebuggers();
         List<CommandSender> iodebuggers = c.getIODebuggers();
         int id = c.id;
-
+        String name = c.name;
+        
         if (!rc.getCircuitManager().destroyCircuit(c, reseter, false)) return false;
         Block a = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         rc.getCircuitManager().checkForCircuit(a, reseter,
@@ -427,9 +429,11 @@ public class CircuitManager {
 
         if (newCircuit!=null) {
             newCircuit.id = id;
+            newCircuit.name = name;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
             for (CommandSender d : iodebuggers) newCircuit.addIODebugger(d);
-            if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + " (" + + newCircuit.id + ")" + rc.getPrefs().getInfoColor() + " circuit is reactivated.");
+            if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + 
+                    " (#" + newCircuit.id + (c.name!=null?" " + c.name:"")+ ")" + rc.getPrefs().getInfoColor() + " circuit is reactivated.");
 
             return true;
         } else {
@@ -633,6 +637,20 @@ public class CircuitManager {
         return this.activationLookupMap.get(activationBlock.getLocation());
     }
 
+    public Circuit getCircuitById(String id) {  
+        if (id==null) return null;
+
+        if (ParsingUtils.isInt(id)) { // as id number
+            return circuits.get(Integer.decode(id));
+        } else { // as name
+            for (Circuit c : circuits.values()) {
+                if (c.name!=null && c.name.equals(id)) return c;
+            }
+        }
+        
+        return null;
+    }
+    
     /**
      * Sets the map of active circuits to a new one.
      *

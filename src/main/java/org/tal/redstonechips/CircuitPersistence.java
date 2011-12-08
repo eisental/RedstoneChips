@@ -56,7 +56,8 @@ public class CircuitPersistence {
 
     /**
      * Attempts to load the old circuits file (redstonechips.circuits). 
-     * This should only be used in case per world circuit files were not found.
+     * This is only used in case the old file name is found in the plugin folder.
+     * File is renamed to redstonechips.circuits.old.
      * 
      * @return true if the old file exists. false otherwise.
      */
@@ -216,7 +217,7 @@ public class CircuitPersistence {
         map.put("signArgs", c.args);
         map.put("state", c.getInternalState());
         map.put("id", c.id);
-
+        map.put("name", c.name);
         return map;
     }
 
@@ -249,16 +250,17 @@ public class CircuitPersistence {
         List<String> argsList = (List<String>)map.get("signArgs");
         String[] signArgs = argsList.toArray(new String[argsList.size()]);
 
+        if (map.containsKey("name")) c.name = (String)map.get("name");
+        
         int id = -1;
         if (map.containsKey("id")) id = (Integer)map.get("id");
-
-        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>0) {
+        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>=0) {
             if (map.containsKey("state"))
                 c.setInternalState((Map<String, String>)map.get("state"));
             
             return c;
-        }
-        else return null;
+            
+        } else return null;
     }
 
     private void configureChannelFromMap(Map<String,Object> map) {

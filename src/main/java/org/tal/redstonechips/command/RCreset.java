@@ -24,18 +24,17 @@ public class RCreset extends RCCommand {
                     resetAllCircuits(sender);
                 else sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to reset all circuits.");
                 return true;
-            }
-
-            try {
-                int id = Integer.decode(args[0]);
-                c = rc.getCircuitManager().getCircuits().get(id);
-                if (c==null) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id + ".");
+            } else {
+                if (CommandUtils.checkPermission(rc, sender, command.getName() + ".id", true, false)) {
+                    c = rc.getCircuitManager().getCircuitById(args[0]);
+                    if (c==null) {
+                        sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown circuit id: " + args[0] + ".");
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to remotely reset a circuit.");
                     return true;
                 }
-            } catch (NumberFormatException ne) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a number.");
-                return true;
             }
         } else { // use targeted circuit
             if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;

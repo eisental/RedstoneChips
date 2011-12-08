@@ -38,32 +38,26 @@ public class RCdebug extends RCCommand {
                 // pause debugging
                 pauseDebugging(sender);
 
-            } else if (ParsingUtils.isNumber(args[0])) {
-                // toggle debug using chip id.
-                int id = Integer.parseInt(args[0]);
-                Circuit c = rc.getCircuitManager().getCircuits().get(id);
-                if (c==null) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id);
-                    return true;
-                } else
-                    toggleCircuitDebug(sender, c);
-
             } else if (args[0].equalsIgnoreCase("io")) {
                 // toggle io messages on target chip.
                 Circuit c = CommandUtils.findTargetCircuit(rc, sender);
                 if (c==null) return true;
                 else toggleCircuitIODebug(sender, c);
             } else {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad rcdebug argument: " + args[0]);
-                return true;
+                // toggle debug using chip id.
+                Circuit c = rc.getCircuitManager().getCircuitById(args[0]);
+                if (c==null) {
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown circuit id or bad argument: " + args[0]);
+                    return true;
+                } else
+                    toggleCircuitDebug(sender, c);
             }
         } else if (args.length==2) {
-            if (ParsingUtils.isNumber(args[0]) && args[1].equalsIgnoreCase("io")) {
+            if (args[1].equalsIgnoreCase("io")) {
                 // toggle io messages using chip id.
-                int id = Integer.parseInt(args[0]);
-                Circuit c = rc.getCircuitManager().getCircuits().get(id);
+                Circuit c = rc.getCircuitManager().getCircuitById(args[0]);
                 if (c==null) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id);
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown circuit id or bad argument: " + args[0]);
                     return true;
                 } else
                     toggleCircuitIODebug(sender, c);

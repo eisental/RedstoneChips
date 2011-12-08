@@ -176,6 +176,13 @@ commands:
       Using the chip probe on a chip i/o block prints information about the pin state.
       Using it on the chip sign prints info about the chip.
       Using it on any other turns debug on and off. 
+  rcname:
+    description: Name/unname a circuit for easier debugging.
+    usage: |
+      `/rcname [id] <new-name>` - change the chip name.
+      `/rcname [id] remove` - unname the chip.
+      
+      Point at a chip and run the command, or use the chip id or it's existing name.
 permissions:
   redstonechips.admin:
     description: Grants access to all of RedstoneChips including admin commands.
@@ -215,6 +222,7 @@ permissions:
       redstonechips.command.rchelp: true
       redstonechips.command.rcprotect: true
       redstonechips.command.rctool: true
+      redstonechips.command.rcname: true
   redstonechips.command.admin:
     description: Grants access to all of RedstoneChips commands including admin commands.
     children:
@@ -224,7 +232,9 @@ permissions:
       redstonechips.command.rcdestroy: true
       redstonechips.command.rcprefs.set: true
       redstonechips.command.rcreset.all: true
+      redstonechips.command.rcreset.id: true
       redstonechips.command.rcbreak.id: true
+      redstonechips.command.rcname.id: true
       redstonechips.command.fixioblocks.id: true
   redstonechips.command.deny:
     default: false
@@ -242,6 +252,7 @@ permissions:
       redstonechips.command.rctype.deny: true
       redstonechips.command.rcreset.deny: true
       redstonechips.command.rcreset.all.deny: true
+      redstonechips.command.rcreset.id.deny: true
       redstonechips.command.rcchannels.deny: true
       redstonechips.command.rcinfo.deny: true
       redstonechips.command.rcfixioblocks.deny: true
@@ -252,9 +263,12 @@ permissions:
       redstonechips.command.rcsave.deny: true
       redstonechips.command.rcdestroy.deny: true
       redstonechips.command.rcprotect.deny: true
-      redstonechips.command.break.id.deny: true
+      redstonechips.command.rcbreak.id.deny: true
       redstonechips.command.fixioblocks.id.deny: true
       redstonechips.command.rcreset.all.deny: true
+      redstonechips.command.rctool.deny: true
+      redstonechips.command.rcname.deny: true
+      redstonechips.command.rcname.id.deny: true
   redstonechips.circuit.*:
     description: Grants access to create and destroy all RedstoneChips circuits.
     children:
@@ -329,11 +343,16 @@ permissions:
     description: Denies the rctype command.    
   redstonechips.command.rcreset:
     description: Grants the rcreset command.
+  redstonechips.command.rcreset.id:
+    description: Grants the rcreset command with a circuit id.
   redstonechips.command.rcreset.all:
     description: Grants the rcreset all command.
   redstonechips.command.rcreset.deny:
     default: false
     description: Denies the rcreset command.
+  redstonechips.command.rcreset.id.deny:
+    default: false
+    description: Denies the rcreset command with a circuit id.
   redstonechips.command.rcreset.all.deny:
     default: false
     description: Denies the rcreset all command
@@ -362,6 +381,16 @@ permissions:
   redstonechips.command.rctool.deny:
     default: false
     description: Denies the rctool command.
+  redstonechips.command.rcname:
+    description: Grants the rcname command.
+  redstonechips.command.rcname.deny:
+    default: false
+    description: Denies the rcname command.    
+  redstonechips.command.rcname.id:
+    description: Grants the rcname command with a circuit id.
+  redstonechips.command.rcname.id.deny:
+    default: false
+    description: Denies the rcname command with a circuit id.
   redstonechips.command.rcsel:
     description: Grants the rcsel command.
   redstonechips.command.rcsel.deny:

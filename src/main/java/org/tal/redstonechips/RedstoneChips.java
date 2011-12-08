@@ -38,6 +38,7 @@ import org.tal.redstonechips.command.RChelp;
 import org.tal.redstonechips.command.RCinfo;
 import org.tal.redstonechips.command.RClist;
 import org.tal.redstonechips.command.RCload;
+import org.tal.redstonechips.command.RCname;
 import org.tal.redstonechips.command.RCp;
 import org.tal.redstonechips.command.RCpin;
 import org.tal.redstonechips.command.RCprefs;
@@ -79,7 +80,8 @@ public class RedstoneChips extends JavaPlugin {
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), new org.tal.redstonechips.command.RedstoneChips()
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), 
+        new RCname(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override

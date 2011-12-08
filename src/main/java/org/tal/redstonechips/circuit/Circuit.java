@@ -98,6 +98,11 @@ public abstract class Circuit {
      */
     public int id = -1;
 
+    /**
+     * An optional circuit instance name.
+     */
+    public String name = null;
+    
     private boolean chunksLoaded;
 
     /**
@@ -367,12 +372,14 @@ public abstract class Circuit {
      */
     protected void debug(String message) {        
         for (CommandSender s : debuggers)
-            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
+            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
+                    (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
     }
 
     protected void ioDebug(String message) {
         for (CommandSender s : iodebuggers)
-            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + this.getClass().getSimpleName() + " (" + id + "): " + message);
+            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
+                    (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
     }
 
     /**

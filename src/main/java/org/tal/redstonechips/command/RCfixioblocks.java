@@ -20,16 +20,9 @@ public class RCfixioblocks extends RCCommand {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to use this command with a circuit id.");
                 return true;
             }
-
-            try {
-                int id = Integer.decode(args[0]);
-                c = rc.getCircuitManager().getCircuits().get(id);
-                if (c==null) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Invalid circuit id: " + id + ".");
-                    return true;
-                }
-            } catch (NumberFormatException ne) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad argument: " + args[0] + ". Expecting a number.");
+            c = rc.getCircuitManager().getCircuitById(args[0]);
+            if (c==null) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown circuit id: " + args[0] + ".");
                 return true;
             }
         } else { // use targeted circuit

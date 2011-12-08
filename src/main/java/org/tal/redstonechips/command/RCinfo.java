@@ -20,25 +20,18 @@ public class RCinfo extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
 
-        HashMap<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits();
-
         Circuit c;
         if (args.length==0) { // use target circuit
             c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
         } else {
-            try {
-                int id = Integer.decode(args[0]);
-                if (!circuits.containsKey(id)) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "There's no activated circuit with id " + id);
-                    return true;
-                }
-
-                c = rc.getCircuitManager().getCircuits().get(id);
-            } catch (NumberFormatException ie) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad circuit id argument: " + args[0]);
+            
+            c = rc.getCircuitManager().getCircuitById(args[0]);
+            if (c==null) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "There's no activated chip with id " + args[0]);
                 return true;
             }
+
         }
 
         printCircuitInfo(sender, c, rc);
@@ -52,7 +45,7 @@ public class RCinfo extends RCCommand {
         ChatColor extraColor = ChatColor.YELLOW;
 
         String disabled;
-        if (c.isDisabled()) disabled = errorColor + " (inputs disabled)";
+        if (c.isDisabled()) disabled = errorColor + " (disabled)";
         else disabled = "";
 
         String loc = c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ();
@@ -61,10 +54,14 @@ public class RCinfo extends RCCommand {
             chunkCoords += (l.isChunkLoaded()?extraColor:ChatColor.WHITE) + "[" + l.getX() + ", " + l.getZ() + " " + (l.isChunkLoaded()?"L":"u") + "]" + infoColor + ", ";
 
         if (!chunkCoords.isEmpty()) chunkCoords = chunkCoords.substring(0, chunkCoords.length()-2);
-
+        
+        String name;
+        if (c.name==null) name = "unnamed";
+        else name = c.name;
+        
         sender.sendMessage("");
-        sender.sendMessage(extraColor + Integer.toString(c.id) + ": " + infoColor + c.getCircuitClass() + " circuit" + disabled);
-        sender.sendMessage(extraColor + "----------------------");
+        sender.sendMessage(extraColor + "#" + Integer.toString(c.id) + ChatColor.AQUA + " (" + name + "): " + infoColor + c.getCircuitClass() + " chip" + disabled);
+        sender.sendMessage(extraColor + "----------------------------------------");
 
         sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
         sender.sendMessage(infoColor +

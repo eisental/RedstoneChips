@@ -125,7 +125,7 @@ public class RClist extends RCCommand {
 
         String sworld = c.world.getName() + " ";
 
-        return c.id + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + ChatColor.WHITE + " @ "
+        return c.id + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + (c.name!=null?ChatColor.AQUA + " (" + c.name + ")":"") + ChatColor.WHITE + " @ "
                 + c.activationBlock.getX() + "," + c.activationBlock.getY() + "," + c.activationBlock.getZ()
                 + " " + sworld + argsColor + cargs;
     }
