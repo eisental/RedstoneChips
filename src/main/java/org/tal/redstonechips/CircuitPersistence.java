@@ -41,7 +41,8 @@ public class CircuitPersistence {
      * Used to prevent saving state more than once per game tick.
      */
     private List<World> dontSaveCircuits = new ArrayList<World>();
-
+    private List<World> loadedWorlds = new ArrayList<World>();
+    
     private Runnable dontSaveCircuitsReset = new Runnable() {
         @Override
         public void run() {
@@ -53,59 +54,71 @@ public class CircuitPersistence {
         rc = plugin;
     }
 
-    public void loadOldFile() {
+    /**
+     * Attempts to load the old circuits file (redstonechips.circuits). 
+     * This should only be used in case per world circuit files were not found.
+     * 
+     * @return true if the old file exists. false otherwise.
+     */
+    public boolean loadOldFile() {
         File file = getCircuitsFile();
         if (file.exists()) {
             rc.log(Level.INFO, "Reading old circuits file "+file.getName()+"...");
-            loadCircuitsFromFile(file);
+            try {
+                loadCircuitsFromFile(file);
+            } catch (IOException ex) {
+                rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
+            }                
+            
             file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
-        }
+            return true;
+        } else return false;
     }
 
     public void loadCircuits(World world) {
         File file = new File(rc.getDataFolder(), world.getName()+circuitsFileExtension);
         if (file.exists()) {
             rc.log(Level.INFO, "Loading chips for world '" + world.getName() + "'...");
-            loadCircuitsFromFile(file);
+            try {
+                loadCircuitsFromFile(file);
+                loadedWorlds.add(world);
+            } catch (IOException ex) {
+                rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
+            }                
         }        
     }
         
-    protected void loadCircuitsFromFile(File file) {        
-        try {
+    protected void loadCircuitsFromFile(File file) throws IOException {        
+        Yaml yaml = new Yaml();
 
-            Yaml yaml = new Yaml();
-            
-            FileInputStream fis = new FileInputStream(file);
-            List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);
-            fis.close();
+        FileInputStream fis = new FileInputStream(file);
+        List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);
+        fis.close();
 
-            if (circuitsList!=null) {
-                for (Map<String,Object> circuitMap : circuitsList) {
-                    try {
+        if (circuitsList!=null) {
+            for (Map<String,Object> circuitMap : circuitsList) {
+                try {
 
-                        compileCircuitFromMap(circuitMap);
+                    compileCircuitFromMap(circuitMap);
 
-                    } catch (IllegalArgumentException ie) {
-                        rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
-                        backupCircuitsFile(file.getName());
-                        ie.printStackTrace();
-                    } catch (InstantiationException ex) {
-                        rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile(file.getName());
-                        ex.printStackTrace();
-                    } catch (IllegalAccessException ex) {
-                        rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile(file.getName());
-                        ex.printStackTrace();
-                    } catch (Throwable t) {
-                        rc.log(Level.SEVERE, t.toString() + ". Ignoring circuit.");
-                        backupCircuitsFile(file.getName());
-                        t.printStackTrace();
-                    }
+                } catch (IllegalArgumentException ie) {
+                    rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
+                    backupCircuitsFile(file.getName());
+                    ie.printStackTrace();
+                } catch (InstantiationException ex) {
+                    rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
+                    backupCircuitsFile(file.getName());
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    rc.log(Level.WARNING, ex.toString() + ". Ignoring circuit.");
+                    backupCircuitsFile(file.getName());
+                    ex.printStackTrace();
+                } catch (Throwable t) {
+                    rc.log(Level.SEVERE, t.toString() + ". Ignoring circuit.");
+                    backupCircuitsFile(file.getName());
+                    t.printStackTrace();
                 }
             }
-        } catch (IOException ex) {
-            rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
         }
     }
 
@@ -379,5 +392,17 @@ public class CircuitPersistence {
             idx++;
         } while (backup.exists());
         return backup;
+    }
+
+    boolean isWorldChipLoaded(World w) {
+        return loadedWorlds.contains(w);
+    }
+
+    void clearLoadedWorldsList() {
+        loadedWorlds.clear();
+    }
+
+    void removeLoadedWorld(World unloadedWorld) {
+        loadedWorlds.remove(unloadedWorld);
     }
 }

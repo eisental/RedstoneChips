@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
@@ -95,25 +96,32 @@ public class RedstoneChips extends JavaPlugin {
 
         // schedule loading channel and old circuits file (if exists) until after server startup is complete.
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                @Override
-                public void run() {
-                    circuitPersistence.loadOldFile();
-                    circuitPersistence.loadChannels();
-                    log(Level.INFO, (isEnabled()?"Enabled.":"Disabled.") + " Running " + circuitManager.getCircuits().size() + " active chip(s).");
-                }})==-1) {
+                public void run() { postStartup();} })==-1) {
 
             // couldn't schedule task. Try running it before server startup is finished (could fail).
-            circuitPersistence.loadOldFile();
-            circuitPersistence.loadChannels();
+            postStartup();
         }
 
     }
 
+    private void postStartup() {
+        if (!circuitPersistence.loadOldFile()) {
+            for (World w : getServer().getWorlds()) {
+                if (!circuitPersistence.isWorldChipLoaded(w)) 
+                    circuitPersistence.loadCircuits(w);
+            }
+        }
+        
+        circuitPersistence.loadChannels();
+        log(Level.INFO, (isEnabled()?"Enabled.":"Disabled.") + " Running " + circuitManager.getCircuits().size() + " active chip(s).");        
+    }
+    
     @Override
     public void onDisable() {
         circuitPersistence.saveCircuits();
         circuitManager.shutdownAllCircuits();
-
+        circuitPersistence.clearLoadedWorldsList();
+        
         String msg = getDescription().getName() + " " + getDescription().getVersion() + " disabled.";
         log.info(msg);
     }

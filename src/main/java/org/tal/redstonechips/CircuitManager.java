@@ -668,6 +668,8 @@ public class CircuitManager {
             c.circuitShutdown();
             circuits.remove(c.id);
         }
+        
+        rc.getCircuitPersistence().removeLoadedWorld(unloadedWorld);
     }
 
     private void scanBranch(ScanParameters params) {
