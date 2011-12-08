@@ -118,7 +118,7 @@ public class RCsel extends RCCommand {
         if (playerCuboids.containsKey(p))
             p.sendMessage(rc.getPrefs().getInfoColor() + "Clearing previous selection coordinates.");
 
-        p.sendMessage(rc.getPrefs().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid. Right-clicking while holding a block in hand is ignored.");
+        p.sendMessage(rc.getPrefs().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid. Right-clicking while holding a block in hand is ignored. To clear the selection enter /rcsel clear.");
         definingCuboids.add(p);
         playerCuboids.put(p, new Location[2]);
     }

@@ -101,9 +101,11 @@ public class PrefsManager {
 
             yaml.dump(prefs, new FileWriter(propFile));
         } catch (IOException ex) {
-            rc.log(Level.WARNING, ex.toString());
+            rc.log(Level.SEVERE, ex.toString() + ". Disabling plugin. Fix preferences.yml and try again.");
+            rc.getPluginLoader().disablePlugin(rc);
         } catch (IllegalArgumentException ie) {
-            rc.log(Level.WARNING, "While loading preferences: " + ie.toString());
+            rc.log(Level.SEVERE, "While loading preferences: " + ie.toString() + ". Disabling plugin. Fix preferences.yml and try again.");
+            rc.getPluginLoader().disablePlugin(rc);
         }
     }
 
@@ -322,7 +324,7 @@ public class PrefsManager {
             prefs.put(key, defaultValue);
     }
 
-    private void applyPrefs(Map<String, Object> loadedPrefs) throws IllegalArgumentException {
+    private void applyPrefs(Map<String, Object> loadedPrefs) {
         Map toapply = new HashMap<String, Object>();
         toapply.putAll(prefs);
         toapply.putAll(loadedPrefs);

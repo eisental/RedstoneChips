@@ -142,7 +142,7 @@ public class RedstoneChips extends JavaPlugin {
                 public void run() {
                     circuitPersistence.loadOldFile();
                     circuitPersistence.loadChannels();
-                    log(Level.INFO, "Running " + circuitManager.getCircuits().size() + " active chip(s).");
+                    log(Level.INFO, (isEnabled()?"Enabled.":"Disabled.") + " Running " + circuitManager.getCircuits().size() + " active chip(s).");
                 }})==-1) {
 
             circuitPersistence.loadOldFile();
@@ -280,19 +280,21 @@ public class RedstoneChips extends JavaPlugin {
             
         };
 
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
-        pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
-        pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
-        pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
-        pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
-        pm.registerEvent(Type.CHUNK_UNLOAD, rcWorldListener, Priority.Monitor, this);
-        pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
-        pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
-        pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
+        if (this.isEnabled()) {
+            PluginManager pm = getServer().getPluginManager();
+            pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
+            pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
+            pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
+            pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
+            pm.registerEvent(Type.CHUNK_UNLOAD, rcWorldListener, Priority.Monitor, this);
+            pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
+            pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
+            pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
+        }
     }
 
     private void registerCommands() {
