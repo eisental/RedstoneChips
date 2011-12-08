@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.tal.redstonechips.circuit.Circuit;
 
@@ -49,12 +50,11 @@ public class RCtool extends RCCommand {
             Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(block);
             if (c!=null) {
                 if (c.activationBlock.equals(block.getLocation()))
-                    RCinfo.printCircuitInfo(player, c, rc);
-                else player.performCommand("rcdebug");
+                    player.performCommand("rcdebug");
+                else RCinfo.printCircuitInfo(player, c, rc);
             }
-                
+
         }
-            
     }
     
 }

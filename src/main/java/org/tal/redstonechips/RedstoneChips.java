@@ -213,27 +213,25 @@ public class RedstoneChips extends JavaPlugin {
             @Override
             public void onPlayerInteract(PlayerInteractEvent event) {                
                 if (event.isCancelled()) return;
-                
-                if (event.getAction()==Action.LEFT_CLICK_BLOCK && 
-                        !prefsManager.getRightClickToActivate() && 
+
+                if (event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate() && 
                         event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
                     circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
                             prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());                    
                     
                 } else if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
-                    if (prefsManager.getRightClickToActivate() || 
-                            event.getPlayer().getGameMode()==GameMode.CREATIVE)
+                    if (playerChipProbe.containsKey(event.getPlayer().getName())
+                            && event.getPlayer().getItemInHand().getType() == playerChipProbe.get(event.getPlayer().getName())) {
+                        rctool.probeChipBlock(event.getPlayer(), event.getClickedBlock());
+                        event.setCancelled(true);
+                        
+                    } else if (prefsManager.getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE)
                         circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
                             prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
-                    
+
                     if (!event.getPlayer().getItemInHand().getType().isBlock()) {
                         rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
-                        
-                        if (playerChipProbe.containsKey(event.getPlayer().getName())
-                                && event.getPlayer().getItemInHand().getType()==playerChipProbe.get(event.getPlayer().getName())) {
-                            rctool.probeChipBlock(event.getPlayer(), event.getClickedBlock());
-                        }
-                    }                    
+                    }
                 }
             }
         };
