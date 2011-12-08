@@ -667,6 +667,9 @@ public abstract class Circuit {
             if (world.getBlockTypeIdAt(o)!=Material.LEVER.getId()) {
                 redstoneChips.log(Level.WARNING, "Circuit " + id + ": Output lever is missing at " + o.getBlockX() + "," + o.getBlockY() + ", " + o.getBlockZ() + ".");
                 return false;
+            } else if (world.getBlockAt(o).getData()==0) {
+                redstoneChips.log(Level.WARNING, "Circuit " + id + ": Found bad output lever at " + o.getBlockX() + "," + o.getBlockY() + ", " + o.getBlockZ() + ".");
+                return false;                
             } else
                 checked.add(o);
         }
@@ -676,7 +679,7 @@ public abstract class Circuit {
             return false;
         } else
             checked.add(activationBlock);
-
+        
         for (Location s : structure) {
             if (!checked.contains(s)) {
                 if (world.getBlockTypeIdAt(s)==Material.AIR.getId()) {
