@@ -142,6 +142,7 @@ public class CircuitPersistence {
 
     public void saveCircuits(World world) {
         if (dontSaveCircuits.contains(world)) return;
+        if (rc.getCircuitManager().getCircuits(world).isEmpty()) return;
         
         rc.getCircuitManager().checkCircuitsIntegrity(world);
 
