@@ -588,7 +588,7 @@ public class CircuitManager {
     /**
      * Calls Circuit.circuitShutdown on every activated circuit.
      */
-    public void shutdownCircuits() {
+    public void shutdownAllCircuits() {
         for (Circuit c : circuits.values()) c.circuitShutdown();
     }
 
@@ -664,8 +664,10 @@ public class CircuitManager {
     
     public void unloadWorldChips(World unloadedWorld) {
         HashMap<Integer, Circuit> unloadedCircuits = this.getCircuits(unloadedWorld);
-        for (Circuit c : unloadedCircuits.values())
+        for (Circuit c : unloadedCircuits.values()) {
+            c.circuitShutdown();
             circuits.remove(c.id);
+        }
     }
 
     private void scanBranch(ScanParameters params) {

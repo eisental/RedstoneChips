@@ -6,13 +6,10 @@ package org.tal.redstonechips.command;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.tal.redstonechips.circuit.Circuit;
 
 /**
  *
@@ -38,23 +35,7 @@ public class RCtool extends RCCommand {
         }
         
         sender.sendMessage(rc.getPrefs().getInfoColor() + "Chip probe set to " + ChatColor.RED + type.name().toLowerCase() + ". " 
-                + rc.getPrefs().getInfoColor() + "Right-click a chip block to get info about it.");
+                + rc.getPrefs().getInfoColor() + "Right-click a chip block to get info.");
         return true;
-    }
-
-    public void probeChipBlock(Player player, Block block) {
-        try {
-            RCpin.printPinInfo(block, player, rc);
-        } catch (IllegalArgumentException ie) {
-            // not probing a pin
-            Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(block);
-            if (c!=null) {
-                if (c.activationBlock.equals(block.getLocation()))
-                    player.performCommand("rcdebug");
-                else RCinfo.printCircuitInfo(player, c, rc);
-            }
-
-        }
-    }
-    
+    }    
 }

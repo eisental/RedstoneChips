@@ -100,7 +100,7 @@ public class RCdebug extends RCCommand {
             if (rc.getCircuitManager().isDebuggerPaused(sender))
                 title = circuits.size() + " debugged IC(s) " + ChatColor.AQUA + "(Debugging Paused)" + rc.getPrefs().getInfoColor();
             else title = circuits.size() + " debugged IC(s)";
-            rc.rclist.printCircuitList(sender, circuits, title);
+            RClist.printCircuitList(sender, circuits, title, rc);
         }
     }
 

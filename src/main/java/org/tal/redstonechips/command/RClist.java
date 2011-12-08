@@ -89,13 +89,13 @@ public class RClist extends RCCommand {
 
         if (circuits.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active circuits that match the criteria.");
         else {
-            printCircuitList(sender, sorted.values(), null);
+            printCircuitList(sender, sorted.values(), null, rc);
         }
 
         return true;
     }
 
-    public void printCircuitList(CommandSender sender, Iterable<Circuit> circuits, String title) {
+    public static void printCircuitList(CommandSender sender, Iterable<Circuit> circuits, String title, org.tal.redstonechips.RedstoneChips rc) {
         List<String> lines = new ArrayList<String>();
         for (Circuit c : circuits) {
             lines.add(makeCircuitDescriptionLine(c, rc.getPrefs().getInfoColor()));

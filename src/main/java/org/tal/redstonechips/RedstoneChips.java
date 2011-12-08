@@ -1,11 +1,5 @@
 package org.tal.redstonechips;
 
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,31 +7,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldListener;
-import org.bukkit.event.world.WorldSaveEvent;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.channel.BroadcastChannel;
 import org.tal.redstonechips.channel.ReceivingCircuit;
 import org.tal.redstonechips.channel.TransmittingCircuit;
+import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
 import org.tal.redstonechips.command.RCCommand;
 import org.tal.redstonechips.command.RCactivate;
@@ -61,7 +46,6 @@ import org.tal.redstonechips.command.RCsel;
 import org.tal.redstonechips.command.RCtype;
 import org.tal.redstonechips.command.RCprotect;
 import org.tal.redstonechips.command.RCtool;
-import org.tal.redstonechips.util.ChunkLocation;
 
 
 /**
@@ -70,7 +54,8 @@ import org.tal.redstonechips.util.ChunkLocation;
  * @author Tal Eisenberg
  */
 public class RedstoneChips extends JavaPlugin {
-    private static final Logger logg = Logger.getLogger("Minecraft");
+    
+    private static final Logger log = Logger.getLogger("Minecraft");
     
     private BlockListener rcBlockListener;
     private EntityListener rcEntityListener;
@@ -89,54 +74,26 @@ public class RedstoneChips extends JavaPlugin {
     private Map<String, Material> playerChipProbe = new HashMap<String, Material>();
     
     public RCsel rcsel = new RCsel();
-    public RClist rclist = new RClist();
-    public RCtool rctool = new RCtool();
+    
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
-        new RCfixioblocks(), new RChelp(), new RCinfo(), rclist, new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), rctool, new org.tal.redstonechips.command.RedstoneChips()
+        new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override
     public void onEnable() {
-        prefsManager = new PrefsManager(this);
-        circuitManager = new CircuitManager(this);
-        circuitPersistence = new CircuitPersistence(this);
-        circuitLoader = new CircuitLoader(this);
-
-        PluginDescriptionFile desc = this.getDescription();
-
-        // initalize registered circuit libraries giving them a reference to the plugin.
-        for (CircuitIndex lib : circuitLibraries) {
-            lib.onRedstoneChipsEnable(this);
-        }
-
-        // load circuit classes
-        for (CircuitIndex lib : circuitLibraries) {
-            String libMsg = "[" + desc.getName() + "] Loading " + lib.getName() + " " + lib.getVersion() + " > ";
-            Class[] classes = lib.getCircuitClasses();
-            if (classes != null && classes.length>0) {
-                for (Class c : classes)
-                    libMsg += c.getSimpleName() + ", ";
-
-                libMsg = libMsg.substring(0, libMsg.length()-2) + ".";
-                logg.info(libMsg);
-                
-                this.addCircuitClasses(classes);
-            } else {
-                libMsg += "No circuit classes were loaded.";
-                logg.info(libMsg);
-            }
-        }
-
-        prefsManager.loadPrefs();
-        
+        initManagers();
+        callLibraryRedstoneChipsEnable();
+        loadClasses();
+        prefsManager.loadPrefs();        
         registerEvents();
         registerCommands();
 
-        String msg = desc.getName() + " " + desc.getVersion() + " enabled.";
-        logg.info(msg);
+        String msg = getDescription().getName() + " " + getDescription().getVersion() + " enabled.";
+        log.info(msg);
 
+        // schedule loading channel and old circuits file (if exists) until after server startup is complete.
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 @Override
                 public void run() {
@@ -145,6 +102,7 @@ public class RedstoneChips extends JavaPlugin {
                     log(Level.INFO, (isEnabled()?"Enabled.":"Disabled.") + " Running " + circuitManager.getCircuits().size() + " active chip(s).");
                 }})==-1) {
 
+            // couldn't schedule task. Try running it before server startup is finished (could fail).
             circuitPersistence.loadOldFile();
             circuitPersistence.loadChannels();
         }
@@ -154,129 +112,31 @@ public class RedstoneChips extends JavaPlugin {
     @Override
     public void onDisable() {
         circuitPersistence.saveCircuits();
+        circuitManager.shutdownAllCircuits();
 
-        circuitManager.shutdownCircuits();
-
-        PluginDescriptionFile desc = this.getDescription();
-        String msg = desc.getName() + " " + desc.getVersion() + " disabled.";
-        logg.info(msg);
+        String msg = getDescription().getName() + " " + getDescription().getVersion() + " disabled.";
+        log.info(msg);
     }
 
+    private void initManagers() {
+        prefsManager = new PrefsManager(this);
+        circuitManager = new CircuitManager(this);
+        circuitPersistence = new CircuitPersistence(this);
+        circuitLoader = new CircuitLoader(this);        
+    }                
+
+    private void registerCommands() {
+        for (RCCommand cmd : commands) {
+            cmd.setRCInstance(this);
+            getCommand(cmd.getClass().getSimpleName().toLowerCase()).setExecutor(cmd);
+        }
+    }
+    
     private void registerEvents() {
-        if (rcBlockListener==null) rcBlockListener = new BlockListener() {
-            @Override
-            public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-                circuitManager.redstoneChange(event);
-            }
-
-            @Override
-            public void onBlockBreak(BlockBreakEvent event) {
-                if (!event.isCancelled()) {
-                    if (!circuitManager.checkCircuitDestroyed(event.getBlock(), event.getPlayer())) event.setCancelled(true);
-                    circuitManager.checkCircuitInputChanged(event.getBlock(), event.getPlayer(), true);
-                }
-            }
-
-            @Override
-            public void onBlockPlace(BlockPlaceEvent event) {
-                if (!event.isCancelled()) {
-                    circuitManager.checkCircuitInputChanged(event.getBlock(), event.getPlayer(), false);
-                }
-            }
-
-            @Override
-            public void onBlockBurn(BlockBurnEvent event) {
-                if (!event.isCancelled()) {
-                    circuitManager.checkCircuitDestroyed(event.getBlock(), null);
-                }
-            }
-        };
-
-        if (rcEntityListener==null) rcEntityListener = new EntityListener() {
-
-            @Override
-            public void onEntityExplode(EntityExplodeEvent event) {
-                if (event.isCancelled()) return;
-
-                for (Block b : event.blockList())
-                    circuitManager.checkCircuitDestroyed(b, null);
-            }
-        };
-
-        if (rcPlayerListener==null) rcPlayerListener = new PlayerListener() {
-
-            @Override
-            public void onPlayerQuit(PlayerQuitEvent event) {
-                circuitManager.checkDebuggerQuit(event.getPlayer());
-            }
-
-            @Override
-            public void onPlayerInteract(PlayerInteractEvent event) {                
-                if (event.isCancelled()) return;
-
-                if (event.getAction()==Action.LEFT_CLICK_BLOCK && !prefsManager.getRightClickToActivate() && 
-                        event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
-                    circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
-                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());                    
-                    
-                } else if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
-                    if (playerChipProbe.containsKey(event.getPlayer().getName())
-                            && event.getPlayer().getItemInHand().getType() == playerChipProbe.get(event.getPlayer().getName())) {
-                        rctool.probeChipBlock(event.getPlayer(), event.getClickedBlock());
-                        event.setCancelled(true);
-                        
-                    } else if (prefsManager.getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE)
-                        circuitManager.checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
-                            prefsManager.getInputBlockType(), prefsManager.getOutputBlockType(), prefsManager.getInterfaceBlockType());
-
-                    if (!event.getPlayer().getItemInHand().getType().isBlock()) {
-                        rcsel.cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
-                    }
-                }
-            }
-        };
-
-        if (rcWorldListener==null) rcWorldListener = new WorldListener() {
-
-            @Override
-            public void onChunkLoad(ChunkLoadEvent event) {
-                circuitManager.updateOnChunkLoad(ChunkLocation.fromChunk(event.getChunk()));
-            }
-
-            @Override
-            public void onChunkUnload(ChunkUnloadEvent event) {
-                if (!event.isCancelled())
-                    circuitManager.updateOnChunkUnload(ChunkLocation.fromChunk(event.getChunk()));
-            }
-
-            World unloadedWorld = null;
-            
-            @Override
-            public void onWorldUnload(WorldUnloadEvent event) {
-                unloadedWorld = event.getWorld();
-            }
-            
-            @Override
-            public void onWorldSave(WorldSaveEvent event) {
-                log(Level.INFO, "Saving " + event.getWorld().getName() + " chip data...");                
-                circuitPersistence.saveCircuits(event.getWorld());
-                
-                // if world is unloaded remove circuits.
-                if (unloadedWorld==event.getWorld()) {
-                    int size = circuitManager.getCircuits().size();
-                    circuitManager.unloadWorldChips(unloadedWorld);
-                    log(Level.INFO, "Unloaded " + (size-circuitManager.getCircuits().size()) + " chip(s).");                    
-                    unloadedWorld = null;
-                }
-                            
-            }
-
-            @Override
-            public void onWorldLoad(WorldLoadEvent event) {
-                circuitPersistence.loadCircuits(event.getWorld());
-            }
-            
-        };
+        if (rcBlockListener==null) rcBlockListener = new RCBlockListener(this);
+        if (rcEntityListener==null) rcEntityListener = new RCEntityListener(this);
+        if (rcPlayerListener==null) rcPlayerListener = new RCPlayerListener(this);
+        if (rcWorldListener==null) rcWorldListener = new RCWorldListener(this);
 
         if (this.isEnabled()) {
             PluginManager pm = getServer().getPluginManager();
@@ -292,13 +152,6 @@ public class RedstoneChips extends JavaPlugin {
             pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
             pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
             pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
-        }
-    }
-
-    private void registerCommands() {
-        for (RCCommand cmd : commands) {
-            cmd.setRCInstance(this);
-            getCommand(cmd.getClass().getSimpleName().toLowerCase()).setExecutor(cmd);
         }
     }
 
@@ -327,9 +180,15 @@ public class RedstoneChips extends JavaPlugin {
         circuitLibraries.add(lib);
     }
 
+    /** 
+     * Sends a RedstoneChips log message to the console.
+     * 
+     * @param level
+     * @param message 
+     */
     public void log(Level level, String message) {
         String logMsg = "[" + this.getDescription().getName() + "] " + message;
-        logg.log(level, logMsg);
+        log.log(level, logMsg);
     }
 
     /**
@@ -428,18 +287,12 @@ public class RedstoneChips extends JavaPlugin {
         return channel;
     }
 
-    public BroadcastChannel getChannelByName(String name) {
-        BroadcastChannel channel;
-        if (broadcastChannels.containsKey(name))
-            channel = broadcastChannels.get(name);
-        else {
-            channel = new BroadcastChannel(name);
-            broadcastChannels.put(name, channel);
-        }
-
-        return channel;
-    }
-
+    /**
+     * Removes this transmitter from the list and removes its channel if it's deserted.
+     * 
+     * @param t a transmitting circuit.
+     * @return true if the transmitter was actually removed.
+     */
     public boolean removeTransmitter(TransmittingCircuit t) {
         BroadcastChannel channel = t.getChannel();
         if (channel==null) return false;
@@ -451,6 +304,12 @@ public class RedstoneChips extends JavaPlugin {
         return res;
     }
 
+    /**
+     * Removes this receiver from the list and removes its channel if it's deserted.
+     * 
+     * @param r a receiving circuit.
+     * @return true if the receiver was actually removed.
+     */    
     public boolean removeReceiver(ReceivingCircuit r) {
         BroadcastChannel channel = r.getChannel();
         if (channel==null) return false;
@@ -463,6 +322,24 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
+     * If the named channel doesn't exist, a new channel is created.
+     * 
+     * @param Channel name
+     * @return a BroadcastChannel instance representing the named channel. 
+     */
+    public BroadcastChannel getChannelByName(String name) {
+        BroadcastChannel channel;
+        if (broadcastChannels.containsKey(name))
+            channel = broadcastChannels.get(name);
+        else {
+            channel = new BroadcastChannel(name);
+            broadcastChannels.put(name, channel);
+        }
+
+        return channel;
+    }
+    
+    /**
      * Sets the chip probe item for this player
      * 
      * @param player 
@@ -471,5 +348,72 @@ public class RedstoneChips extends JavaPlugin {
     public void setChipProbe(Player player, Material item) {
         if (item.isBlock()) throw new IllegalArgumentException("Blocks can't be used as a chip probe.");
         playerChipProbe.put(player.getName(), item);
+    }
+
+    /**
+     * @return a list containing player names and their respective chip probe material, if one is defined.
+     */
+    public Map<String, Material> getPlayerChipProbe() {
+        return playerChipProbe;
+    }
+    
+    /**
+     * Prints a chip block info. 
+     * When block points to a chip pin, the player receives an /rcpin message of this pin.
+     * When block points to an activation block, debug mode is toggled for this player.
+     * When block points to any other structure block the chip info is sent.
+     * 
+     * @param player The player to send the info message to.
+     * @param block Queried block.
+     */
+    public void probeChipBlock(Player player, Block block) {
+        try {
+            RCpin.printPinInfo(block, player, this);
+        } catch (IllegalArgumentException ie) {
+            // not probing a pin
+            Circuit c = circuitManager.getCircuitByStructureBlock(block);
+            
+            if (c!=null) {
+                if (c.activationBlock.equals(block.getLocation()))
+                    player.performCommand("rcdebug");
+                else RCinfo.printCircuitInfo(player, c, this);
+            }
+
+        }
+    }
+
+    /**
+     * @return Running instance of the /rcsel command.
+     */
+    public RCsel getRCsel() {
+        return rcsel;
+    }
+        
+    private void loadClasses() {
+        String prefix = "[" + getDescription().getName() + "] Loading ";
+        
+        for (CircuitIndex lib : circuitLibraries) {
+            String libMsg = prefix + lib.getName() + " " + lib.getVersion() + " > ";
+            Class[] classes = lib.getCircuitClasses();
+            
+            if (classes != null && classes.length>0) {
+                for (Class c : classes)
+                    libMsg += c.getSimpleName() + ", ";
+
+                libMsg = libMsg.substring(0, libMsg.length()-2) + ".";
+                log.info(libMsg);
+                
+                this.addCircuitClasses(classes);
+            } else {
+                libMsg += "No circuit classes were loaded.";
+                log.info(libMsg);
+            }
+        }        
+    }
+
+    private void callLibraryRedstoneChipsEnable() {
+        for (CircuitIndex lib : circuitLibraries) {
+            lib.onRedstoneChipsEnable(this);
+        }        
     }
 }
