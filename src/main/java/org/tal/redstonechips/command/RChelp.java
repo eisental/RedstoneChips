@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 /**
  *
@@ -25,17 +26,23 @@ public class RChelp extends RCCommand {
 
         if (args.length==0) {
             printCommandList(sender, commands, null, infoColor, errorColor);
+        } else if (args[0].equalsIgnoreCase("all")) {
+            String help = "";
+            for (Object command : commands.keySet()) {
+                help += infoColor + "/" + command.toString() + ": ";
+                help += getCommandHelp((String)command, rc) + "\n";
+            }
+            sender.sendMessage(help);
         } else {
-            Map commandMap = (Map)commands.get(args[0]);
-            if (commandMap==null) {
+            if (!commands.containsKey(args[0])) {
                 printCommandList(sender, commands, args, infoColor, errorColor);
-            } else printCommandHelp(sender, args, commandMap, infoColor, errorColor);
+            } else CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", getCommandHelp(args[0], rc), infoColor, errorColor);
         }
 
         return true;
     }
 
-    private void printCommandList(CommandSender sender, Map commands, String[] args, ChatColor infoColor, ChatColor errorColor) {
+    public static void printCommandList(CommandSender sender, Map commands, String[] args, ChatColor infoColor, ChatColor errorColor) {
         String[] lines = new String[commands.size()];
 
         int i = 0;
@@ -49,19 +56,29 @@ public class RChelp extends RCCommand {
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 
-    private void printCommandHelp(CommandSender sender, String[] args, Map commandMap, ChatColor infoColor, ChatColor errorColor) {
-        List<String> lines = new ArrayList<String>();
-
-        lines.add(ChatColor.YELLOW+commandMap.get("description").toString());
+    public static String getCommandHelp(String  command, org.tal.redstonechips.RedstoneChips rc) {
+        Map commands = (Map)rc.getDescription().getCommands();        
+        Map commandMap = (Map)commands.get(command);
+        String help = "";
+        help += ChatColor.YELLOW+commandMap.get("description").toString();
         if (commandMap.containsKey("usage") && commandMap.get("usage")!=null) {
-            String[] usage = commandMap.get("usage").toString().split("\\n");
-            sender.sendMessage("");
-
-            for (String line : usage)
-                lines.add(line.toString());
+            help += "\n" + ChatColor.WHITE + commandMap.get("usage").toString();
+        }
+        
+        List<Permission> perms = new ArrayList<Permission>();
+        for (Permission p : rc.getDescription().getPermissions()) {
+            if (p.getName().startsWith("redstonechips.command." + command.toString())) {
+                perms.add(p);
+            }
+        }
+        
+        if (!perms.isEmpty()) {
+            help += "\n" + ChatColor.RED + "permissions:\n";
+            for (Permission p : perms) 
+                help += ChatColor.YELLOW + p.getName() + "\n   " + ChatColor.WHITE + p.getDescription() + "\n";
         }
 
-        CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", lines.toArray(new String[lines.size()]), infoColor, errorColor);
+        return help;
     }
 
 }

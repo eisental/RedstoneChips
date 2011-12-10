@@ -91,7 +91,7 @@ public abstract class Circuit {
     /**
      * When set to true any input changes will be ignored.
      */
-    protected boolean inputsDisabled;
+    protected boolean disabled;
 
     /**
      * The circuits id. Set by CircuitManager.
@@ -124,7 +124,7 @@ public abstract class Circuit {
 
         inputBits = new BitSet7(inputs.length);
         outputBits = new BitSet7(outputs.length);
-        inputsDisabled = false;
+        disabled = false;
         this.args = args;
 
         chunksLoaded = false;
@@ -163,10 +163,7 @@ public abstract class Circuit {
      * @param newVal true if the current is greater than 0.
      */
     public void redstoneChange(int idx, boolean newVal) {
-        if (inputsDisabled) {
-            debug(redstoneChips.getPrefs().getErrorColor() + "Inputs are disabled.");
-            return;
-        }
+        if (disabled) return;
 
         if (inputBits.get(idx)==newVal) return;
 
@@ -528,8 +525,10 @@ public abstract class Circuit {
     }
 
     /**
-     * Returns true. A stateless circuit is a circuit that will always have the same output values for a set of input values.
-     * A logical gate is an example of a stateless circuit while a counter is not stateless
+     * Returns true. A stateless circuit is a circuit that will always output the same values 
+     * for a set of input values.
+     * A logical gate is an example of a stateless circuit while a counter is not stateless.
+     * 
      * @return True if the circuit is stateless.
      */
     protected boolean isStateless() {
@@ -537,18 +536,38 @@ public abstract class Circuit {
     }
 
     /**
+     * Disables or enables the chip according to the parameter.
+     * 
+     * @param d true to disable or false to enable.
+     */
+    public void setDisabled(Boolean d) {
+        if (d) disable();
+        else enable();
+    }
+    
+    /**
      * Forces the circuit to stop processing input changes.
      */
-    public void disableInputs() {
-        inputsDisabled = true;
+    public void disable() {
+        disabled = true;
         updateCircuitSign(true);
+        if (hasDebuggers()) debug(redstoneChips.getPrefs().getErrorColor() + "Chip is disabled.");
     }
 
+    /**
+     * Enables the chip, allowing it to process input changes.
+     */
+    public void enable() {
+        disabled = false;
+        updateCircuitSign(true);
+        if (hasDebuggers()) debug(redstoneChips.getPrefs().getErrorColor() + "Chip is enabled.");
+    }
+    
     /**
      *
      * @return true if the circuit's inputs are disabled.
      */
-    public boolean isDisabled() { return inputsDisabled; }
+    public boolean isDisabled() { return disabled; }
 
     /**
      * Replaces the chip input, output and interface block materials to the currently set materials in the preferences.

@@ -27,7 +27,7 @@ import org.tal.redstonechips.circuit.Circuit;
 public class RCsel extends RCCommand {
 
     private enum SelCommand {
-        ACTIVATE, RESET, BREAK, LIST, DESTROY, FIXIOBLOCKS, CLEAR
+        ACTIVATE, RESET, BREAK, LIST, DESTROY, FIXIOBLOCKS, CLEAR, ENABLE, DISABLE
     }
 
     private List<Player> definingCuboids = new ArrayList<Player>();
@@ -74,21 +74,21 @@ public class RCsel extends RCCommand {
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
                         if (rc.getCircuitManager().resetCircuit(c, sender)) circuitCount++;
-                    sender.sendMessage(infoColor + "Reset " + circuitCount + " circuit(s).");
+                    sender.sendMessage(infoColor + "Reset " + circuitCount + " chip(s).");
                     break;
 
                 case BREAK:
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
                         if (rc.getCircuitManager().destroyCircuit(c, sender, false)) circuitCount++;
-                    sender.sendMessage(infoColor + "Deactivated " + circuitCount + " circuit(s).");
+                    sender.sendMessage(infoColor + "Deactivated " + circuitCount + " chip(s).");
                     break;
 
                 case DESTROY:
                     circuits = findActiveCircuitsInCuboid(sender, cuboid);
                     for (Circuit c : circuits)
                         if (rc.getCircuitManager().destroyCircuit(c, sender, true)) circuitCount++;
-                    sender.sendMessage(infoColor + "Destroyed " + circuitCount + " circuit(s).");
+                    sender.sendMessage(infoColor + "Destroyed " + circuitCount + " chip(s).");
                     break;
 
                 case FIXIOBLOCKS:
@@ -96,8 +96,30 @@ public class RCsel extends RCCommand {
                     int blockCount = 0;
                     for (Circuit c : circuits)
                         blockCount += c.fixIOBlocks();
-                    sender.sendMessage(infoColor + "Fixed i/o blocks of " + circuits.size() + " circuit(s). " + blockCount +" blocks were replaced.");
+                    sender.sendMessage(infoColor + "Fixed i/o blocks of " + circuits.size() + " chip(s). " + blockCount +" blocks were replaced.");
                     break;
+                    
+                case ENABLE:
+                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
+                    for (Circuit c : circuits) {
+                        if (c.isDisabled()) {
+                            c.enable();
+                            circuitCount++;
+                        }
+                    }
+                    sender.sendMessage(infoColor + "Enabled " + circuitCount + " chip(s).");
+                    break;
+                    
+                case DISABLE:
+                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
+                    for (Circuit c : circuits) {
+                        if (!c.isDisabled()) {
+                            c.disable();
+                            circuitCount++;
+                        }
+                    }
+                    sender.sendMessage(infoColor + "Disabled " + circuitCount + " chip(s).");
+                    break;                    
 
                 case LIST:
                     printList(sender, cuboid, args);
@@ -142,7 +164,7 @@ public class RCsel extends RCCommand {
                 coords[1] = point;
                 p.sendMessage(rc.getPrefs().getInfoColor() + "Cuboid defined: " + coords[0].getBlockX() + "," + coords[0].getBlockY() + "," + coords[0].getBlockZ()
                         + " to " + coords[1].getBlockX() + "," + coords[1].getBlockY() + "," + coords[1].getBlockZ());
-                p.sendMessage(rc.getPrefs().getInfoColor() + "You can now use any of the /rcsel commands. Type /rcsel clear to clear your selection.");
+                p.sendMessage(rc.getPrefs().getInfoColor() + "You can now use any of the /rcsel commands. Type '/rcsel clear' to clear your selection.");
                 definingCuboids.remove(p);
             }
         }
@@ -157,9 +179,9 @@ public class RCsel extends RCCommand {
                 if (cuboid==null)
                     p.sendMessage(infoColor + "No /rcsel selection or WorldEdit selection defined. Use /rcsel with no arguments and right-click two opposite corners to define.");
                 else
-                    p.sendMessage(infoColor + "No /rcsel selection defined. Using WorldEdit selection instead.");
+                    p.sendMessage(infoColor + "Using WorldEdit selection.");
             } else {
-                p.sendMessage(infoColor + "No /rcsel selection defined and WorldEdit is not installed. Use /rcsel with no arguments and right-click two opposite corners to define.");
+                p.sendMessage(infoColor + "No /rcsel selection defined. Use /rcsel with no arguments and right-click two opposite corners to define.");
                 return null;
             }
         } else p.sendMessage(infoColor + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");
@@ -293,14 +315,15 @@ public class RCsel extends RCCommand {
         List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
         if (circuits.isEmpty()) return;
 
-        String selection = cuboid[0].getBlockX() + ", " + cuboid[0].getBlockY() + ", " + cuboid[0].getBlockZ() + " - "
+        String selection = "" + ChatColor.YELLOW + cuboid[0].getBlockX() + ", " + cuboid[0].getBlockY() + ", " + cuboid[0].getBlockZ() + " to "
                 + cuboid[1].getBlockX() + "," + cuboid[1].getBlockY() + "," + cuboid[1].getBlockZ();
 
-        String lines[] = new String[circuits.size()];
-        for (int i=0; i<lines.length; i++) {
-            lines[i] = RClist.makeCircuitDescriptionLine(circuits.get(i), rc.getPrefs().getInfoColor());
+        String lines = "";
+        for (int i=0; i<circuits.size(); i++) {
+            lines += RClist.makeCircuitDescriptionLine(circuits.get(i), rc.getPrefs().getInfoColor()) + "\n";
         }
 
-        CommandUtils.pageMaker(sender, "Active circuits in selection", "rcsel", lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+        CommandUtils.pageMaker(sender, "Active circuits in selection", "rcsel", lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines-1);
+        sender.sendMessage("selection: " + selection);
     }
 }

@@ -20,35 +20,10 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.tal.redstonechips.channel.BroadcastChannel;
-import org.tal.redstonechips.channel.ReceivingCircuit;
-import org.tal.redstonechips.channel.TransmittingCircuit;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
-import org.tal.redstonechips.command.RCCommand;
-import org.tal.redstonechips.command.RCactivate;
-import org.tal.redstonechips.command.RCarg;
-import org.tal.redstonechips.command.RCbreak;
-import org.tal.redstonechips.command.RCchannels;
-import org.tal.redstonechips.command.RCclasses;
-import org.tal.redstonechips.command.RCdebug;
-import org.tal.redstonechips.command.RCdestroy;
-import org.tal.redstonechips.command.RCfixioblocks;
-import org.tal.redstonechips.command.RChelp;
-import org.tal.redstonechips.command.RCinfo;
-import org.tal.redstonechips.command.RClist;
-import org.tal.redstonechips.command.RCload;
-import org.tal.redstonechips.command.RCname;
-import org.tal.redstonechips.command.RCp;
-import org.tal.redstonechips.command.RCpin;
-import org.tal.redstonechips.command.RCprefs;
-import org.tal.redstonechips.command.RCreset;
-import org.tal.redstonechips.command.RCsave;
-import org.tal.redstonechips.command.RCsel;
-import org.tal.redstonechips.command.RCtype;
-import org.tal.redstonechips.command.RCprotect;
-import org.tal.redstonechips.command.RCtool;
-
+import org.tal.redstonechips.channel.*;
+import org.tal.redstonechips.command.*;
 
 /**
  * RedstoneChips Bukkit JavaPlugin implementation. The main entry point of the plugin.
@@ -81,7 +56,7 @@ public class RedstoneChips extends JavaPlugin {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
         new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), 
-        new RCname(), new org.tal.redstonechips.command.RedstoneChips()
+        new RCname(), new RCenable(), new RCdisable(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override

@@ -151,7 +151,7 @@ public class InputPin {
             circuit.debug("Use /rcreset to reactivate the circuit after solving the problem or destroy it normally.");
         }
 
-        circuit.disableInputs();
+        circuit.disable();
     }
 
     /**

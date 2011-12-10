@@ -96,17 +96,20 @@ public class RClist extends RCCommand {
     }
 
     public static void printCircuitList(CommandSender sender, Iterable<Circuit> circuits, String title, org.tal.redstonechips.RedstoneChips rc) {
-        List<String> lines = new ArrayList<String>();
+        String lines = "";        
+        int chipCount = 0;
+        
         for (Circuit c : circuits) {
-            lines.add(makeCircuitDescriptionLine(c, rc.getPrefs().getInfoColor()));
+            lines += (makeCircuitDescriptionLine(c, rc.getPrefs().getInfoColor())) + "\n";
+            chipCount++;
         }
 
         if (title==null)
-            title = lines.size() + " active chip(s)";
+            title = chipCount + " active chip(s)";
 
         sender.sendMessage("");
 
-        CommandUtils.pageMaker(sender, title, "rclist", lines.toArray(new String[lines.size()]),
+        CommandUtils.pageMaker(sender, title, "rclist", lines,
                 rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 

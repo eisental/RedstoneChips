@@ -71,6 +71,19 @@ public class CommandUtils {
 
     public static Map<CommandSender, PageInfo> playerPages = new HashMap<CommandSender, PageInfo>();
 
+    public static void pageMaker(CommandSender s, String title, String commandName, String text, ChatColor infoColor, ChatColor errorColor) {
+        CommandUtils.pageMaker(s, title, commandName, text, infoColor, errorColor, MaxLines);
+    }
+
+    public static void pageMaker(CommandSender s, String title, String commandName, String text, ChatColor infoColor, ChatColor errorColor, int maxLines) {
+        String lines[];
+        if (s instanceof Player)
+            lines = wrapText(text);
+        else lines = text.split("\n");
+        
+        CommandUtils.pageMaker(s, title, commandName, lines, infoColor, errorColor, maxLines);
+    }
+    
     public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
         CommandUtils.pageMaker(s, title, commandName, lines, infoColor, errorColor, MaxLines);
     }
@@ -99,6 +112,83 @@ public class CommandUtils {
             s.sendMessage(infoColor + "----------------------");
             if (pageCount>1) s.sendMessage("Use " + ChatColor.YELLOW + (s instanceof Player?"/":"") + "rcp [page#|next|prev|last]" + ChatColor.WHITE + " to see other pages.");
         }
+    }
+
+    private static final int CHAT_WINDOW_WIDTH = 320;
+    private static final int CHAT_STRING_LENGTH = 119;
+    private static final char COLOR_CHAR = '\u00A7';
+    
+    // fixed char width until a better solution comes by.
+    private static final int CHAR_WIDTH = 6;
+    private static final int SPACE_WIDTH = 4;
+    private static final String TWO_PIXEL_CHARS = "!,.|:'i;";
+    private static final String THREE_PIXEL_CHARS = "l'";
+    private static final String FOUR_PIXEL_CHARS = "It[]";
+    private static final String FIVE_PIXEL_CHARS = "f<>(){}";
+    
+    private static String[] wrapText(String text) {
+        final StringBuilder out = new StringBuilder();
+
+        int lineWidth = 0;
+        int lineLength = 0;
+        char colorChar = 'f';
+        
+        // Go over the message char by char.
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+
+            if (ch=='\n') {
+                lineLength = 0;
+                lineWidth = 0;
+            }
+            
+            // Get the color
+            if (ch == COLOR_CHAR && i < text.length() - 1) {
+                // We might need a linebreak ... so ugly ;(
+                if (lineLength + 2 > CHAT_STRING_LENGTH) {
+                    out.append('\n');
+                    lineLength = 0;
+                    if (colorChar != 'f' && colorChar != 'F') {
+                        out.append(COLOR_CHAR).append(colorChar);
+                        lineLength += 2;
+                    }
+                }
+                colorChar = text.charAt(++i);
+                out.append(COLOR_CHAR).append(colorChar);
+                lineLength += 2;
+                continue;
+            }
+            
+            // See if we need a linebreak
+            if (lineLength + 1 > CHAT_STRING_LENGTH || lineWidth + CHAR_WIDTH >= CHAT_WINDOW_WIDTH) {
+                out.append('\n');
+                lineLength = 0;
+                lineWidth = getCharWidth(ch);
+
+                // Re-apply the last color if it isn't the default
+                if (colorChar != 'f' && colorChar != 'F') {
+                    out.append(COLOR_CHAR).append(colorChar);
+                    lineLength += 2;
+                }                
+            } else {
+                lineWidth += getCharWidth(ch);
+            }
+            out.append(ch);
+            lineLength++;
+        }
+
+        // Return it split
+        return out.toString().split("\n");
+    }
+    
+    private static int getCharWidth(char ch) {
+        if (ch==' ') return SPACE_WIDTH;
+        else if (TWO_PIXEL_CHARS.indexOf(ch)!=-1) return 2;
+        else if (THREE_PIXEL_CHARS.indexOf(ch)!=-1) return 3;
+        else if (FOUR_PIXEL_CHARS.indexOf(ch)!=-1) return 4;
+        else if (FIVE_PIXEL_CHARS.indexOf(ch)!=-1) return 5;
+        else return CHAR_WIDTH;
+        
     }
 
 }

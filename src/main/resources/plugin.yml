@@ -16,24 +16,25 @@ commands:
     usage: |
       `/rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;...]`
 
-      The command without any arguments will list all circuits in the current world or, when used from the server console, circuits
-      in all worlds.
+      - Use `/rclist` to list all chips in the current world or, when used from the server console, all chips on the server.
+      - Use `/rclist all` as a player to see a list of all chips on the server
+      - Use `/rclist <world-name>` to list all circuits in a specific world.
 
-      Use `/rclist all` as a player to see a list of all circuits on the server
-      Use `/rclist <world-name>` to list all circuits in a specific world.
-
-      To show only specific kind of circuits you can use a filter. There are several filter types.
-      `location: <x>,<y>,<z>,[radius]` - Show only circuits in a radius around the location.
-      `location: this, [radius]` - Uses your current location.
-      `chunk: <x>,<z>` - Show only circuits in the specified chunk. `chunk: this` will use your current chunk
-      `class: <class-name>` - Show only circuits of the specified class. You can use partial class names.
+      To show only certain kinds of chips you can use a filter. There are several filter types:
+      
+      - `location: <x>,<y>,<z>,[radius]` - Show only circuits in a radius around the location.
+      - `location: this, [radius]` - Uses your current location.
+      - `chunk: <x>,<z>` - Show only circuits in the specified chunk. `chunk: this` will use your current chunk
+      - `class: <class-name>` - Show only circuits of the specified class. You can use partial class names.
+      
       You can combine different filters by separating them with a semicolon (;). You can also use partial filter type names.
 
       Examples:
-        `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
-        `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
+      
+      - `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
+      - `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
   rcclasses:
-    description: Prints a list of installed circuit classes.
+    description: Prints a list of installed chip classes.
     usage: |
       `/rcclasses`
   rcprefs:
@@ -50,49 +51,65 @@ commands:
       `/rcdebug [io] [id|.|clear|list]`
 
       - Pointing at a chip and running the command will toggle debugging the chip.
-      - To debug or stop debugging a remote chip use `/rcdebug <chip id>` if you have admin priviliges.
+      - To debug or stop debugging a chip remotely use `/rcdebug <chip id>`.
       - Pause debugging for all chips by running `/rcdebug`.
       - List all debugged chips by running `/rcdebug list`.
       - Clear your debug list by running `/rcdebug clear`.
-      - To receive a debug message whenever a chip pin change state use `/rcdebug io [chip id]`.
-      You can use `/rcdb` as a shortcut and type only part of the command for ex. `/rcdb l` is equivalent to `/rcdebug list`.
+      - To receive a debug message whenever a chip pin changes its state use `/rcdebug io [chip id]`.
+      
+      You can use `/rcdb` as a shortcut or type only part of the command. 
+      For ex. `/rcdb l` is equivalent to `/rcdebug list`.
   rcpin:
     description: Prints information about a chip pin.
     usage: |
       Point towards an output lever or input redstone source.
-      Prints the pin number (starting from 0), pin type (input/output), and current state (on/off) of the pin.
+      Prints the pin number (starting at 0), pin type (input/output), and current state (on/off) of the pin.
   rcactivate:
-    description: Activates a circuit.
+    description: Activates a chip.
     usage: |
-      Point the circuit sign and execute the command.
-      To activate a circuit built with different input, output or interface block types then set in the preferences use /rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType> .
+      Point towards the chip sign and execute the command.
+      To activate a circuit built with different input, output or interface block types then set in the preferences use: `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`.
   rcdestroy:
-    description: Destroys a circuit and removes its blocks.
+    description: Destroys a chip and removes its blocks.
     usage: |
-      Point at a block of the circuit you wish to destroy and enter the command.
-      This command is disabled by default. To enable it use ;/rcprefs enableDestroyCommand true;.
+      Point towards a block of the chip you wish to destroy and enter the command.
+      This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
   rcbreak:
-    description: Deactivates a circuit without removing its blocks.
+    description: Deactivates a chip without removing its blocks.
     usage: |
-      `/rcbreak [circuit-id]`
+      `/rcbreak [id]`
 
-      Point at a block of the circuit or enter the chip's id number as an argument if you have admin priviliges.
+      Point towards a block of the chip or enter the its id as an argument.
   rctype:
     description: General command for sending input to a chip.
     usage: |
       `/rctype [...]`
 
-      Use by pointing at a block and executing the command. Each circuit class uses it differently.
+      Use by pointing at a block and enter the command. Each chip reacts to it differently.
       Check the relevant chip documentation for more information about usage.
   rcreset:
-    description: Rescans and reactivates a circuit.
+    description: Rescans and reactivates a chip.
     usage: |
-      `/rcreset [circuit-id|all]`
+      `/rcreset [id|all]`
 
-      Use by pointing towards the circuit or by using the chip's id number as an argument if you have op priviliges.
+      Use by pointing towards the chip or by using the its id as an argument.
       Reset a circuit to scan for new i/o blocks or sign arguments and apply any changes.
 
-      Running `/rcreset all` will reset all active circuits. Use with caution!
+      Running `/rcreset all` will reset all active chips. Use with caution!
+  rcenable:
+    description: Enables a disabled chip.
+    usage: |
+      `rcenable [id]`
+      
+      Use by pointing towards the chip or by using the its id as an argument.
+  rcdisable:
+    description: Disables a chip. 
+    usage: |
+      `/rcdisable [circuit-id]`
+      
+      A disabled chip is still active but does not respond to any input. 
+      Use by pointing towards the chip or by using its id as an argument.
+      To reenable the chip use /rcenable. Disabled chip sign color changes to gray.
   rcchannels:
     aliases: [rcch]
     description: Prints a list of all wireless broadcast channels.
@@ -105,57 +122,64 @@ commands:
     usage: |
       `/rcinfo [circuit-id]`
 
-      Use by pointing at a block of the chip you want to get info about or use the chip's id number as an argument.
+      Use by pointing at a block of the chip you want to get info about or use it's id as an argument.
   rcfixioblocks:
-    description: Replace i/o blocks using incorrect materials.
+    description: Replaces i/o blocks that use incorrect materials.
     usage: |
       `/rcfixioblocks [circuit-id]`
 
-      Use by pointing at the circuit you want to fix or, if you have op priviliges, use a circuit id as an argument.
-      Any i/o blocks using a different block type than set in the plugin's preferences are replaced to the correct material.
+      Use by pointing at the chip you want to fix, or use its id as an argument.
+      Any i/o blocks using a different block type than those set in the plugin's preferences are replaced to the correct material.
   rcsel:
-    description: Mass editing circuits within a selection cuboid.
+    description: Mass edit chips within a selection cuboid.
     usage: |
-      To define a selection type /rcsel and right-click on two opposite corners of your cuboid.
+      To define a selection type `/rcsel` and right-click on two opposite corners of your cuboid.
       When no selection is defined /rcsel will try to use WorldEdit's current selection.       
 
       When either types of selection are defined you can execute any of the following commands.
 
-      `/rcsel activate [<input type> <output type> <interface block type>]`, `/rcsel fixioblocks`,
-      `/rcsel break`, `/rcsel destroy`, `/rcsel reset` - These work the same as their single circuit counterparts.
+      - `/rcsel list` - Lists all chips in the selection
+      - `/rcsel clear` - Clears the current selection.
 
-      `/rcsel list` - Lists all circuits in the selection
-
-      `/rcsel clear` - Clears the current selection.
+      The following work the same as their single chip verions, only on all chips within the cuboid:
+        
+      - `/rcsel activate [<input type> <output type> <interface block type>]`, 
+      - `/rcsel fixioblocks`
+      - `/rcsel break`
+      - `/rcsel destroy`
+      - `/rcsel reset`
+      - `/rcsel enable`
+      - `/rcsel disable` 
+      
   rcarg:
-    description: Replace, add or clear circuit sign arguments.
+    description: Replace, add or clear chip sign arguments.
     usage: |
       `/rcarg <arg-number|add|clear> <arg-value>...<arg-number|add|clear> <arg-value>`
 
-      Use by pointing at the circuit you want to edit and execute the command.
+      Use by pointing at the circuit you want to edit and enter the command.
       To change an existing argument value use `/rcarg <arg-number> <arg-value>`, where arg-number is the
-      sign argument number, starting to count with 1 and arg-value is the new value for this argument.
+      sign argument number (starting from 1), and arg-value is the new value for this argument.
 
-      To add an argument as the last argument use `/rcarg add <arg-value>`.
+      To add an argument as the last use `/rcarg add <arg-value>`.
       To remove an argument use `/rcarg clear <arg-number>`.
 
-      You can make changes to more than 1 argument by typing additional command arguments, for ex. `/rcarg 1 val clear 2`
+      You can make changes to more than 1 argument by typing additional command arguments. For ex. `/rcarg 1 val clear 2`
       will set the 1st argument to val and remove the 2nd argument.
   rcsave:
-    description: Saves all circuit data to file.
+    description: Saves all chip data to file.
     usage: |
-      Makes sure all circuits are intact and saves their current state to the plugin's circuits file.
-      Should not be used unless there's a problem with the automatic data save.
+      Makes sure all chips are intact and saves their current state.
+      You don't need to use it unless there's a problem with the automatic data save.
   rcload:
-    description: Reloads circuit data from file.
+    description: Reloads chip data from file.
     usage: |
-      This will reset any changes made to the circuits state since the last save occured.
+      This will reset any changes made to the chips state since the last save occured.
   rchelp:
     description: Prints a list or description of all RC commands.
     usage: |
       Use `/rchelp <command name>` to get help about a specific command.
   rcp:
-    description: Moves to a different page when run after using a command with paging.
+    description: Moves to a different page when entered after using a command with paging.
     usage: |
       `/rcp [page #|prev|next|last]`
       Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
@@ -164,25 +188,26 @@ commands:
     usage: |
       `/rcprotect [channel|listchannels] [protect|unprotect|add|remove] [users:names] [admins:names]`
 
-      Use the command with `listchannels` to list all protected channels.
-      Use the command with only a channel name to list users and admins of that channel.
-      Use the command with a channel name and `protect` to protect a channel, you will automatically be added as an admin of the channel. You may also pass a list of users and/or admins.
-      Use the command with a channel name and `unprotect` to remove protection for a channel.
-      Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
+      - Use the command with `listchannels` to list all protected channels.
+      - Use the command with only a channel name to list users and admins of that channel.
+      - Use the command with a channel name and `protect` to protect a channel, you will automatically be added as an admin of the channel. You may also pass a list of users and/or admins.
+      - Use the command with a channel name and `unprotect` to remove protection for a channel.
+      - Use the command with a channel name and `add` or `remove` to add or remove admins and users of a channel. These commands require that you pass a list of users and/or admins.
+      
       Users and admins should be passed in the form of `users:User1,User2,User3` and `admins:Admin1,Admin2,Admin3`.
   rctool:
     description: Turns the item in your hand into a chip probe.
     usage: |
-      Using the chip probe on a chip i/o block prints information about the pin state.
-      Using it on the chip sign prints info about the chip.
-      Using it on any other turns debug on and off. 
+      - Use the chip probe on a chip i/o block to print information about the pin state.
+      - Use it on the chip sign to print info about the chip.
+      - Using it on any other chip block turns chip debug on and off. 
   rcname:
-    description: Name/unname a circuit for easier debugging.
+    description: Name or unname a circuit for easier debugging.
     usage: |
       `/rcname [id] <new-name>` - change the chip name.
       `/rcname [id] remove` - unname the chip.
       
-      Point at a chip and run the command, or use the chip id or it's existing name.
+      Point towards a chip and enter the command, or use the its id (including its existing name).
 permissions:
   redstonechips.admin:
     description: Grants access to all of RedstoneChips including admin commands.
@@ -214,6 +239,8 @@ permissions:
       redstonechips.command.rcbreak: true
       redstonechips.command.rctype: true
       redstonechips.command.rcreset: true
+      redstonechips.command.rcenable: true
+      redstonechips.command.rcdisable: true
       redstonechips.command.rcchannels: true
       redstonechips.command.rcinfo: true
       redstonechips.command.rcfixioblocks: true
@@ -233,6 +260,8 @@ permissions:
       redstonechips.command.rcprefs.set: true
       redstonechips.command.rcreset.all: true
       redstonechips.command.rcreset.id: true
+      redstonechips.command.rcenable.id: true
+      redstonechips.command.rcdisable.id: true
       redstonechips.command.rcbreak.id: true
       redstonechips.command.rcname.id: true
       redstonechips.command.fixioblocks.id: true
@@ -253,6 +282,10 @@ permissions:
       redstonechips.command.rcreset.deny: true
       redstonechips.command.rcreset.all.deny: true
       redstonechips.command.rcreset.id.deny: true
+      redstonechips.command.rcenable.deny: true
+      redstonechips.command.rcenable.id.deny: true      
+      redstonechips.command.rcdisable.deny: true      
+      redstonechips.command.rcdisable.id.deny: true      
       redstonechips.command.rcchannels.deny: true
       redstonechips.command.rcinfo.deny: true
       redstonechips.command.rcfixioblocks.deny: true
@@ -356,6 +389,26 @@ permissions:
   redstonechips.command.rcreset.all.deny:
     default: false
     description: Denies the rcreset all command
+  redstonechips.command.rcenable:
+    description: Grants the rcenable command.
+  redstonechips.command.rcenable.id:    
+    description: Grants the rcenable command with a circuit id.    
+  redstonechips.command.rcenable.deny:
+    default: false
+    description: Denies the rcenable command.    
+  redstonechips.command.rcenable.id.deny:
+    default: false
+    description: Denies the rcenable command with a circuit id.    
+  redstonechips.command.rcdisable:
+    description: Grants the rcdisable command.
+  redstonechips.command.rcdisable.id:    
+    description: Grants the rcdisable command with a circuit id.    
+  redstonechips.command.rcdisable.deny:
+    default: false
+    description: Denies the rcdisable command.    
+  redstonechips.command.rcdisable.id.deny:
+    default: false
+    description: Denies the rcdisable command with a circuit id.    
   redstonechips.command.rcchannels:
     description: Grants the rcchannels command.
   redstonechips.command.rcchannels.deny:

@@ -1,9 +1,6 @@
 
 package org.tal.redstonechips.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,34 +22,25 @@ public class RCprotect extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
         if (args.length == 0) {
-            Map commandMap = (Map)((Map)rc.getDescription().getCommands()).get("rcprotect");
-            List<String> lines = new ArrayList<String>();
-
-            lines.add(ChatColor.YELLOW+commandMap.get("description").toString());
-            if (commandMap.containsKey("usage") && commandMap.get("usage")!=null) {
-                String[] usage = commandMap.get("usage").toString().split("\\n");
-                sender.sendMessage("");
-
-                for (String line : usage)
-                    lines.add(line.toString());
-            }
-
-            CommandUtils.pageMaker(sender, "/rcprotect", "rcprotect", lines.toArray(new String[lines.size()]), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            CommandUtils.pageMaker(sender, "rcprotect", "rcprotect", RChelp.getCommandHelp("rcprotect", rc), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            return true;
         }
         
         if (args.length == 1) {
-            if (args[0].toLowerCase().equals("listchannels")) {
+            if (args[0].equalsIgnoreCase("listchannels")) {
                 String protectedChannels = "";
                 for (BroadcastChannel curChannel : rc.broadcastChannels.values()) {
                     if (curChannel.isProtected()) {
                         protectedChannels += curChannel.name + ", ";
                     }
                 }
+                
                 if (!protectedChannels.isEmpty()) {
                     if (sender != null) sender.sendMessage(rc.getPrefs().getInfoColor() + "Protected Channels: " + protectedChannels.substring(0, protectedChannels.length()-2));
                 } else {
                     if (sender != null) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no protected channels.");
                 }
+                
             } else if (rc.broadcastChannels.containsKey(args[0])) {
                 BroadcastChannel curChannel = rc.broadcastChannels.get(args[0]);
                 if (curChannel.isProtected()) {
@@ -60,6 +48,7 @@ public class RCprotect extends RCCommand {
                         if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to list channel " + args[0] + ".");
                         return true;
                     }
+                    
                     String owners = "";
                     String users = "";
                     for (String owner : curChannel.owners) {

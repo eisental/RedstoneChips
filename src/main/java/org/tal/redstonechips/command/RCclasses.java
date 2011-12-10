@@ -34,24 +34,18 @@ public class RCclasses extends RCCommand {
     private void printClassesList(CommandSender sender, String[] args, Map<String, Class<? extends Circuit>> circuitClasses) {
         List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
         Collections.sort(names);
-
-        List<String> lines = new ArrayList<String>();
-
         String list = "";
+
         ChatColor color = ChatColor.WHITE;
+        
         for (String name : names) {
             list += color + name + ", ";
-            if (list.length()>50) {
-                lines.add(list.substring(0, list.length()-2));
-                list = "";
-            }
-            
             if (color==ChatColor.WHITE) color = ChatColor.YELLOW;
             else color = ChatColor.WHITE;
         }
 
         if (!list.isEmpty()) 
-            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", lines.toArray(new String[lines.size()]), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", list, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 
 }

@@ -218,6 +218,7 @@ public class CircuitPersistence {
         map.put("state", c.getInternalState());
         map.put("id", c.id);
         map.put("name", c.name);
+        map.put("disabled", c.isDisabled());
         return map;
     }
 
@@ -257,6 +258,8 @@ public class CircuitPersistence {
         if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>=0) {
             if (map.containsKey("state"))
                 c.setInternalState((Map<String, String>)map.get("state"));
+            
+            if (map.containsKey("disabled")) c.setDisabled((Boolean)map.get("disabled"));            
             
             return c;
             
