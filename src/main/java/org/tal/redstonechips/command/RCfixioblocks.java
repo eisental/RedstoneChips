@@ -33,7 +33,7 @@ public class RCfixioblocks extends RCCommand {
 
         int blockCount = c.fixIOBlocks();
 
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "Finished fixing i/o blocks of circuit " + c.id + ". " + blockCount + " blocks were replaced.");
+        sender.sendMessage(rc.getPrefs().getInfoColor() + "Finished fixing i/o blocks of " + c.getChipString() + ". " + blockCount + " blocks were replaced.");
         return true;
     }
 

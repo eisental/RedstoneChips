@@ -190,5 +190,4 @@ public class CommandUtils {
         else return CHAR_WIDTH;
         
     }
-
 }

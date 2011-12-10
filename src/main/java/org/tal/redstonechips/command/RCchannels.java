@@ -67,7 +67,7 @@ public class RCchannels extends RCCommand {
                     range += "bits " + t.getStartBit() + "-" + (t.getChannelLength()+t.getStartBit()-1) + "]";
                 else range += "bit " + t.getStartBit() + "]";
 
-                sTransmitters += t.getCircuitClass() + " (" + t.id + ") " + range + ", ";
+                sTransmitters += t.getChipString() + " " + range + ", ";
             }
 
             String sReceivers = "";
@@ -76,7 +76,7 @@ public class RCchannels extends RCCommand {
                 if (r.getChannelLength()>1)
                     range += "bits " + r.getStartBit() + "-" + (r.getChannelLength()+r.getStartBit()-1) + "]";
                 else range += "bit " + r.getStartBit() + "]";
-                sReceivers += r.getCircuitClass() + " (" + r.id + ") " + range + ", ";
+                sReceivers += r.getChipString() + " " + range + ", ";
             }
             
             String owners = "";

@@ -38,8 +38,7 @@ public class RCenable extends RCCommand {
 
         if (c.isDisabled()) {
             c.enable();
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Enabled " + c.getCircuitClass() + 
-                    " chip (" + c.id + (c.name==null?"":" " + c.name) + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Enabled " + c.getChipString() + ".");
         } else sender.sendMessage(rc.getPrefs().getDebugColor() + "The chip is already enabled.");
         
         return true;

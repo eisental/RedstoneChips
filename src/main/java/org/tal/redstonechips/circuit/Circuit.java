@@ -271,7 +271,7 @@ public abstract class Circuit {
         BlockFace aface = lvr.getAttachedFace();
         if (aface==null) {
             if (hasDebuggers())
-                debug(this.getCircuitClass() + " chip (" + id + ") has a lever that needs replacing.");
+                debug(getChipString() + " has a lever that needs replacing.");
             return;
         }
         
@@ -453,6 +453,14 @@ public abstract class Circuit {
         return this.getClass().getSimpleName();
     }
 
+    /**
+     * 
+     * @return The name of the circuit class and chip id and name.
+     */
+    public String getChipString() {
+        return getCircuitClass() + " (" + (name!=null?name + "/":"") + id + ")";
+    }
+    
     /**
      *
      * @return The circuit's debuggers list.

@@ -146,7 +146,7 @@ public class InputPin {
         if (circuit.isDisabled()) return;
         
         if (circuit.hasDebuggers()) {
-            circuit.debug("Possible infinite feedback loop detected in " + circuit.getCircuitClass() + " circuit, at"
+            circuit.debug("Possible infinite feedback loop detected in " + circuit.getChipString() + ", at"
                     + "pin " + index + ". It will no longer process any input changes. ");
             circuit.debug("Use /rcreset to reactivate the circuit after solving the problem or destroy it normally.");
         }

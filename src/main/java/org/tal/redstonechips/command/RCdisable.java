@@ -38,8 +38,7 @@ public class RCdisable extends RCCommand {
 
         if (!c.isDisabled()) {
             c.disable();
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Disabled " + c.getCircuitClass() + 
-                    " chip (" + c.id + (c.name==null?"":" " + c.name) + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Disabled " + c.getChipString() + ".");
         } else sender.sendMessage(rc.getPrefs().getDebugColor() + "The chip is already disabled.");
         
         return true;

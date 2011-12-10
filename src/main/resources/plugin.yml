@@ -178,6 +178,7 @@ commands:
     description: Prints a list or description of all RC commands.
     usage: |
       Use `/rchelp <command name>` to get help about a specific command.
+      Use `/rchelp all` to get a printout of all help content available.
   rcp:
     description: Moves to a different page when entered after using a command with paging.
     usage: |

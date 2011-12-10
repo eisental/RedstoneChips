@@ -59,11 +59,10 @@ public class RCname extends RCCommand {
         c.name = name;
         
         if (name!=null) {
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + 
-                rc.getPrefs().getInfoColor() + " is now named " + ChatColor.YELLOW + c.name + rc.getPrefs().getInfoColor() + ".");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Renamed chip: " + ChatColor.YELLOW + c.getChipString());
         } else {
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + 
-                rc.getPrefs().getInfoColor() + " is now unnamed.");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Removed name: " + ChatColor.YELLOW + c.getChipString());
+                
         }
 
         return true;

@@ -16,7 +16,7 @@ public class RCsave extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), true, true)) return true;
         rc.getCircuitPersistence().saveCircuits();
         if (sender instanceof Player)
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Done saving " + rc.getCircuitManager().getCircuits().size() + " circuits. Note: Errors and warning are only printed in the server console.");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Done saving " + rc.getCircuitManager().getCircuits().size() + " chips.");
         
         return true;
     }

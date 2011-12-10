@@ -35,7 +35,7 @@ public class RCbreak extends RCCommand {
         }
 
         if (rc.getCircuitManager().destroyCircuit(c, sender, false))
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + c.getCircuitClass() + " (" + c.id + ")" + rc.getPrefs().getInfoColor() + " circuit is now deactivated.");
+            sender.sendMessage(ChatColor.YELLOW + c.getChipString() + rc.getPrefs().getInfoColor() + " was deactivated.");
 
         return true;
     }

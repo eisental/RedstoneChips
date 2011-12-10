@@ -152,7 +152,7 @@ public class CircuitManager {
         // first check if its already registered
         Circuit check = this.getCircuitByActivationBlock(signBlock);
         if (check!=null) {
-            if (sender!=null) sender.sendMessage(rc.getPrefs().getInfoColor() + "Circuit is already activated (" + check.id + ").");
+            if (sender!=null) sender.sendMessage(rc.getPrefs().getInfoColor() + "Chip is already active - " + check.getChipString() + ".");
             return -2;
         }
 
@@ -281,7 +281,7 @@ public class CircuitManager {
             if (sender != null) {
                 ChatColor infoColor = rc.getPrefs().getInfoColor();
                 ChatColor debugColor = rc.getPrefs().getDebugColor();
-                sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getClass().getSimpleName() + " (" + c.id + ") " + infoColor + "circuit:");
+                sender.sendMessage(infoColor + "Activated " + ChatColor.YELLOW + c.getChipString() + infoColor + ":");
                 sender.sendMessage(debugColor + "> " + ChatColor.WHITE + c.inputs.length + debugColor + " input"
                         + (c.inputs.length!=1?"s":"") + ", " + ChatColor.YELLOW + c.outputs.length + debugColor + " output"
                         + (c.outputs.length!=1?"s":"") + " and " + ChatColor.AQUA + c.interfaceBlocks.length + debugColor
@@ -309,7 +309,7 @@ public class CircuitManager {
 
         if (destroyed!=null && circuits.containsValue(destroyed)) {
             if (destroyCircuit(destroyed, s, false)) {
-                if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getClass().getSimpleName() + "(" + destroyed.id + ") chip.");
+                if (s!=null) s.sendMessage(rc.getPrefs().getErrorColor() + "You destroyed the " + destroyed.getChipString() + " chip.");
             } else {
                 return false;
             }
@@ -432,8 +432,7 @@ public class CircuitManager {
             newCircuit.name = name;
             for (CommandSender d : debuggers) newCircuit.addDebugger(d);
             for (CommandSender d : iodebuggers) newCircuit.addIODebugger(d);
-            if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "The " + ChatColor.YELLOW + newCircuit.getCircuitClass() + 
-                    " (#" + newCircuit.id + (c.name!=null?" " + c.name:"")+ ")" + rc.getPrefs().getInfoColor() + " circuit is reactivated.");
+            if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newCircuit.getChipString() + rc.getPrefs().getInfoColor() + ".");
 
             return true;
         } else {

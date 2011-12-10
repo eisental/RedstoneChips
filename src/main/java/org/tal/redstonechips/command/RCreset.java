@@ -22,17 +22,17 @@ public class RCreset extends RCCommand {
             if (args[0].equalsIgnoreCase("all")) {
                 if (CommandUtils.checkPermission(rc, sender, command.getName() + ".all", true, false))
                     resetAllCircuits(sender);
-                else sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to reset all circuits.");
+                else sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to reset all chips.");
                 return true;
             } else {
                 if (CommandUtils.checkPermission(rc, sender, command.getName() + ".id", true, false)) {
                     c = rc.getCircuitManager().getCircuitById(args[0]);
                     if (c==null) {
-                        sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown circuit id: " + args[0] + ".");
+                        sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown chip id: " + args[0] + ".");
                         return true;
                     }
                 } else {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to remotely reset a circuit.");
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to remotely reset a chip.");
                     return true;
                 }
             }
@@ -61,13 +61,14 @@ public class RCreset extends RCCommand {
         if (sender!=null) {
             if (!failed.isEmpty()) {
                 String ids = "";
-                for (Circuit c : failed)
-                    ids += c.id + ", ";
+                for (Circuit c : failed) {
+                    ids += (c.name==null?c.id:c.name) + ", ";
+                }
 
                 ids = ids.substring(0, ids.length()-2);
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Some circuits could not reactivate: " + ids);
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Some chip could not reactivate: " + ids);
             } else {
-                sender.sendMessage(ChatColor.AQUA + "Successfully reset all active circuits.");
+                sender.sendMessage(ChatColor.AQUA + "Successfully reset all active chips.");
             }
         }
 

@@ -45,7 +45,7 @@ public class RCinfo extends RCCommand {
         ChatColor extraColor = ChatColor.YELLOW;
 
         String disabled;
-        if (c.isDisabled()) disabled = errorColor + " (disabled)";
+        if (c.isDisabled()) disabled = ChatColor.GRAY + " - disabled";
         else disabled = "";
 
         String loc = c.activationBlock.getBlockX() + ", " + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ();
@@ -60,7 +60,7 @@ public class RCinfo extends RCCommand {
         else name = c.name;
         
         sender.sendMessage("");
-        sender.sendMessage(extraColor + "#" + Integer.toString(c.id) + ChatColor.AQUA + " (" + name + "): " + infoColor + c.getCircuitClass() + " chip" + disabled);
+        sender.sendMessage(infoColor + c.getChipString() + disabled);
         sender.sendMessage(extraColor + "----------------------------------------");
 
         sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");

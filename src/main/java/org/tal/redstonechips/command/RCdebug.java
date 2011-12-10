@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.util.ParsingUtils;
 
 /**
  *
@@ -111,11 +110,11 @@ public class RCdebug extends RCCommand {
     private void toggleCircuitIODebug(CommandSender sender, Circuit c) {
         if (c.getIODebuggers().contains(sender)) {
             c.removeIODebugger(sender);
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped IO debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped IO debugging " + c.getChipString() + ".");
         } else {
             c.addIODebugger(sender);
             c.addDebugger(sender);
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "IO debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "IO debugging " + c.getChipString() + ".");
         }
     }
 
@@ -123,10 +122,10 @@ public class RCdebug extends RCCommand {
         if (c.getDebuggers().contains(sender)) {
             c.removeDebugger(sender);
             c.removeIODebugger(sender);
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Stopped debugging " + c.getChipString() + ".");
         } else {
             c.addDebugger(sender);
-            sender.sendMessage(rc.getPrefs().getInfoColor() + "Debugging the " + c.getCircuitClass() + " chip (" + c.id + ").");
+            sender.sendMessage(rc.getPrefs().getInfoColor() + "Debugging " + c.getChipString() + ".");
         }
     }
 }

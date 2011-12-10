@@ -34,7 +34,7 @@ public class RCtool extends RCCommand {
             return true;            
         }
         
-        sender.sendMessage(rc.getPrefs().getInfoColor() + "Chip probe set to " + ChatColor.RED + type.name().toLowerCase() + ". " 
+        sender.sendMessage(rc.getPrefs().getInfoColor() + "Chip probe set to " + ChatColor.YELLOW + type.name().toLowerCase() + ". " 
                 + rc.getPrefs().getInfoColor() + "Right-click a chip block to get info.");
         return true;
     }    

@@ -87,7 +87,7 @@ public class RClist extends RCCommand {
         TreeMap<Integer, Circuit> sorted = new TreeMap<Integer,Circuit>();
         for (Circuit c : circuits) sorted.put(c.id, c);
 
-        if (circuits.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active circuits that match the criteria.");
+        if (circuits.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active chips that match the criteria.");
         else {
             printCircuitList(sender, sorted.values(), null, rc);
         }
@@ -127,8 +127,9 @@ public class RClist extends RCCommand {
         cargs = "[ " + cargs + " ]";
 
         String sworld = c.world.getName() + " ";
-
-        return c.id + ": " + ChatColor.YELLOW + c.getClass().getSimpleName() + (c.name!=null?ChatColor.AQUA + " (" + c.name + ")":"") + ChatColor.WHITE + " @ "
+        ChatColor nameColor = (c.isDisabled()?ChatColor.GRAY:ChatColor.YELLOW);
+        
+        return c.id + ": " + nameColor + c.getClass().getSimpleName() + (c.name!=null?ChatColor.AQUA + " (" + c.name + ")":"") + ChatColor.WHITE + " @ "
                 + c.activationBlock.getX() + "," + c.activationBlock.getY() + "," + c.activationBlock.getZ()
                 + " " + sworld + argsColor + cargs;
     }
@@ -310,7 +311,7 @@ public class RClist extends RCCommand {
                 StringBuilder sb = new StringBuilder();
                 for (String s : string) sb.append(s);
 
-                throw new IllegalArgumentException("Bad class filter: " + sb.toString() + ". Expecting 'class: <circuit class>'.");
+                throw new IllegalArgumentException("Bad class filter: " + sb.toString() + ". Expecting 'class: <chip class>'.");
             } else {
                 for (String sclass : rc.getCircuitLoader().getCircuitClasses().keySet()) {
                     if (sclass.startsWith(string[0])) {
@@ -320,7 +321,7 @@ public class RClist extends RCCommand {
                 }
 
                 if (cclass==null)
-                    throw new IllegalArgumentException("Unknown circuit class: " + string[0]);
+                    throw new IllegalArgumentException("Unknown chip class: " + string[0]);
             }
         }
 

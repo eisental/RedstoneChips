@@ -156,7 +156,14 @@ public class CircuitPersistence {
 
     public void saveCircuits(World world) {
         if (dontSaveCircuits.contains(world)) return;
-        if (rc.getCircuitManager().getCircuits(world).isEmpty()) return;
+        
+        File file = getCircuitsFile(world.getName()+circuitsFileExtension);
+        
+        if (rc.getCircuitManager().getCircuits(world).isEmpty()) {
+            if (file.delete()) 
+                rc.log(Level.INFO, "Deleted empty world file - " + file.getName());
+            return;
+        }
         
         rc.getCircuitManager().checkCircuitsIntegrity(world);
 
@@ -175,7 +182,6 @@ public class CircuitPersistence {
         }
         
         try {
-            File file = getCircuitsFile(world.getName()+circuitsFileExtension);
             FileOutputStream fos = new FileOutputStream(file);
             yaml.dump(circuitMaps, new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
             fos.flush();
