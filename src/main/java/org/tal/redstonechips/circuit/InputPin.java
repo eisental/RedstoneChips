@@ -13,11 +13,8 @@ import org.bukkit.block.Block;
  *
  * @author Tal Eisenberg
  */
-public class InputPin {
-    private Circuit circuit;
-    private Location inputBlock;
-    private int index;
-    private Map<Location, Boolean> powerBlocks;
+public class InputPin extends IOBlock {
+    private Map<Location, Boolean> sourceBlocks;
 
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
@@ -29,37 +26,17 @@ public class InputPin {
      * @param index The input pin's order index in the circuit.
      */
     public InputPin(Circuit circuit, Location inputBlock, int index) {
-        this.inputBlock = inputBlock;
-        this.circuit = circuit;
-        this.index = index;
+        super(circuit, inputBlock, index);
 
         // assuming circuit already has its structure block set up.
-        powerBlocks = new HashMap<Location, Boolean>();
+        sourceBlocks = new HashMap<Location, Boolean>();
 
-        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()+1, inputBlock.getBlockZ()));
-        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX()+1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
-        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX()-1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
-        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()+1));
-        addPowerBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()-1));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()+1, inputBlock.getBlockZ()));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()+1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()-1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()+1));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()-1));
     }
-
-    /**
-     *
-     * @return The circuit of this input pin.
-     */
-    public Circuit getCircuit() { return circuit; }
-
-    /**
-     *
-     * @return The location of the input pin block (the iron block by default).
-     */
-    public Location getInputBlock() { return inputBlock; }
-
-    /**
-     *
-     * @return The index of the input pin in its circuit.
-     */
-    public int getIndex() { return index; }
 
     /**
      * Calculates the overall state of the pin according to the state of its surrounding blocks - the power blocks.
@@ -68,15 +45,15 @@ public class InputPin {
      */
     public boolean getPinValue() {
         boolean ret = false;
-        for (Boolean val : powerBlocks.values())
+        for (Boolean val : sourceBlocks.values())
             ret = ret | val;
 
         return ret;
     }
 
-    private void addPowerBlock(Location loc) {
+    private void addSourceBlock(Location loc) {
 
-        if (!partOfStructure(loc)) {
+        if (!isPartOfStructure(loc)) {
             boolean state = false;
 
             int type = circuit.world.getBlockTypeIdAt(loc);
@@ -90,17 +67,8 @@ public class InputPin {
                 state = false;
             }
 
-            powerBlocks.put(loc, state);
+            sourceBlocks.put(loc, state);
         }
-    }
-
-    private boolean partOfStructure(Location b) {
-        for (Location l : circuit.structure) {
-            if (b.equals(l))
-                return true;
-        }
-
-        return false;
     }
 
     /**
@@ -113,7 +81,7 @@ public class InputPin {
     public void updateValue(Block block, boolean newVal) throws IllegalArgumentException {
         Location l = block.getLocation();
 
-        if (!powerBlocks.containsKey(l))
+        if (!sourceBlocks.containsKey(l))
             throw new IllegalArgumentException("Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
         else {
             long curTick = circuit.world.getFullTime();
@@ -122,7 +90,7 @@ public class InputPin {
                 if (changesInTickCount>circuit.redstoneChips.getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
             } else changesInTickCount = 1;
 
-            powerBlocks.put(l, newVal);
+            sourceBlocks.put(l, newVal);
 
             lastRedstoneChangeTick = curTick;
 
@@ -135,8 +103,8 @@ public class InputPin {
      *
      * @return The power blocks surrounding this input pin.
      */
-    public Iterable<Location> getPowerBlocks() {
-        return powerBlocks.keySet();
+    public Iterable<Location> getSourceBlocks() {
+        return sourceBlocks.keySet();
     }
 
     /**
@@ -155,11 +123,11 @@ public class InputPin {
     }
 
     /**
-     * refreshes the state of all power blocks according to their block state.
+     * refreshes the state of all source blocks according to their block state.
      */
-    public void refreshPowerBlocks() {
-        for (Location l : this.powerBlocks.keySet())
-            powerBlocks.put(l, InputPin.findBlockPowerState(l));
+    public void refreshSourceBlocks() {
+        for (Location l : this.sourceBlocks.keySet())
+            sourceBlocks.put(l, InputPin.findSourceBlockState(l));
     }
 
     /**
@@ -167,7 +135,7 @@ public class InputPin {
      * @param loc The location of the block to check.
      * @return true if the block is powered and false otherwise.
      */
-    public static boolean findBlockPowerState(Location loc) {
+    public static boolean findSourceBlockState(Location loc) {
         boolean state = false;
         Block b = loc.getBlock();
 

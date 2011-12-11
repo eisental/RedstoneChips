@@ -16,9 +16,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.channel.BroadcastChannel;
+import org.tal.redstonechips.circuit.IOBlock;
+import org.tal.redstonechips.circuit.InputPin;
+import org.tal.redstonechips.circuit.InterfaceBlock;
+import org.tal.redstonechips.circuit.OutputPin;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -34,7 +37,26 @@ public class CircuitPersistence {
     public final static String circuitsFileName = "redstonechips"+circuitsFileExtension;
     public final static String channelsFileExtension = ".channels";
     public final static String channelsFileName = "redstonechips"+channelsFileExtension;
+    private final static String backupFileExtension = ".BACKUP";
+    
+    private final static String classKey = "class";
+    private final static String worldKey = "world";
+    private final static String activationBlockKey = "activationBlock";
+    private final static String chunkKey = "chunk";
+    private final static String inputsKey = "inputs";
+    private final static String outputsKey = "outputs";
+    private final static String interfacesKey = "interfaces";
+    private final static String structureKey = "structure";
+    private final static String argsKey = "signArgs";
+    private final static String stateKey = "state";
+    private final static String idKey = "id";
+    private final static String nameKey = "name";
+    private final static String disabledKey = "disabled";
 
+    private final static String channelNameKey = "name";
+    private final static String channelOwnersKey = "owners";
+    private final static String channelUsersKey = "users";    
+    
     private List<String> madeBackup = new ArrayList<String>();
 
     /**
@@ -212,60 +234,69 @@ public class CircuitPersistence {
 
     private Map<String, Object> circuitToMap(Circuit c) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("class", c.getCircuitClass());
-        map.put("world", c.world.getName());
-        map.put("activationBlock", makeBlockList(c.activationBlock));
-        map.put("chunk", makeChunksList(c.circuitChunks));
-        map.put("inputs", makeInputPinsList(c.inputs));
-        map.put("outputs", makeBlockListsList(c.outputs));
-        map.put("interfaces", makeBlockListsList(c.interfaceBlocks));
-        map.put("structure", makeBlockListsList(c.structure));
-        map.put("signArgs", c.args);
-        map.put("state", c.getInternalState());
-        map.put("id", c.id);
-        map.put("name", c.name);
-        map.put("disabled", c.isDisabled());
+        map.put(classKey, c.getCircuitClass());
+        map.put(worldKey, c.world.getName());
+        map.put(activationBlockKey, makeBlockList(c.activationBlock));
+        map.put(chunkKey, makeChunksList(c.circuitChunks));
+        map.put(inputsKey, makeIOBlockList(c.inputs));
+        map.put(outputsKey, makeIOBlockList(c.outputs));
+        map.put(interfacesKey, makeIOBlockList(c.interfaceBlocks));
+        map.put(structureKey, makeBlockListsList(c.structure));
+        map.put(argsKey, c.args);
+        map.put(stateKey, c.getInternalState());
+        map.put(idKey, c.id);
+        map.put(nameKey, c.name);
+        map.put(disabledKey, c.isDisabled());
         return map;
     }
 
     private Map<String, Object> channelToMap(BroadcastChannel c) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("name", c.name);
-        map.put("owners", c.owners);
-        map.put("users", c.users);
+        map.put(channelNameKey, c.name);
+        map.put(channelOwnersKey, c.owners);
+        map.put(channelUsersKey, c.users);
         return map;
     }
 
     private Circuit compileCircuitFromMap(Map<String,Object> map) throws InstantiationException, IllegalAccessException {
 
-        String className = (String)map.get("class");
-        World world = findWorld((String)map.get("world"));
+        String className = (String)map.get(classKey);
+        World world = findWorld((String)map.get(worldKey));
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
         c.world = world;
-        c.activationBlock = getLocation(world, (List<Integer>)map.get("activationBlock"));
-        c.outputs = getLocationArray(world, (List<List<Integer>>)map.get("outputs"));
-        c.interfaceBlocks = getLocationArray(world, (List<List<Integer>>)map.get("interfaces"));
-        c.structure = getLocationArray(world, (List<List<Integer>>)map.get("structure"));
-        c.inputs = getInputPinsArray((List<List<Integer>>)map.get("inputs"), c);
+        c.activationBlock = getLocation(world, (List<Integer>)map.get(activationBlockKey));
+        c.structure = getLocationArray(world, (List<List<Integer>>)map.get(structureKey));
         
-        if (map.containsKey("chunks")) {
-            c.circuitChunks = getChunkLocations(world, (List<List<Integer>>)map.get("chunks"));
+        IOBlock[] inIO = getIOBlockArray((List<List<Integer>>)map.get(inputsKey), c, IOBlock.Type.INPUT);        
+        IOBlock[] outIO = getIOBlockArray((List<List<Integer>>)map.get(outputsKey), c, IOBlock.Type.OUTPUT);
+        IOBlock[] interfaceIO = getIOBlockArray((List<List<Integer>>)map.get(interfacesKey), c, IOBlock.Type.INTERFACE);
+
+        c.inputs = new InputPin[inIO.length];
+        c.outputs = new OutputPin[outIO.length];
+        c.interfaceBlocks = new InterfaceBlock[interfaceIO.length];        
+        
+        for (int i=0; i<inIO.length; i++) c.inputs[i] = (InputPin)inIO[i];
+        for (int i=0; i<outIO.length; i++) c.outputs[i] = (OutputPin)outIO[i];
+        for (int i=0; i<interfaceIO.length; i++) c.interfaceBlocks[i] = (InterfaceBlock)interfaceIO[i];
+        
+        if (map.containsKey(chunkKey)) {
+            c.circuitChunks = getChunkLocations(world, (List<List<Integer>>)map.get(chunkKey));
         } else {
             c.circuitChunks = rc.getCircuitManager().findCircuitChunks(c);
         }
 
-        List<String> argsList = (List<String>)map.get("signArgs");
-        String[] signArgs = argsList.toArray(new String[argsList.size()]);
+        List<String> argsList = (List<String>)map.get(argsKey);
+        c.args = argsList.toArray(new String[argsList.size()]);
 
-        if (map.containsKey("name")) c.name = (String)map.get("name");
-        
+        if (map.containsKey(nameKey)) c.name = (String)map.get(nameKey);
+
         int id = -1;
-        if (map.containsKey("id")) id = (Integer)map.get("id");
-        if (rc.getCircuitManager().activateCircuit(c, null, signArgs, id)>=0) {
-            if (map.containsKey("state"))
-                c.setInternalState((Map<String, String>)map.get("state"));
+        if (map.containsKey(idKey)) id = (Integer)map.get(idKey);
+        if (rc.getCircuitManager().activateCircuit(c, null, id)>=0) {
+            if (map.containsKey(stateKey))
+                c.setInternalState((Map<String, String>)map.get(stateKey));
             
-            if (map.containsKey("disabled")) c.setDisabled((Boolean)map.get("disabled"));            
+            if (map.containsKey(disabledKey)) c.setDisabled((Boolean)map.get(disabledKey));            
             
             return c;
             
@@ -274,9 +305,9 @@ public class CircuitPersistence {
 
     private void configureChannelFromMap(Map<String,Object> map) {
         BroadcastChannel channel;
-        channel = rc.getChannelByName((String)map.get("name"));
-        channel.owners = (List<String>)map.get("owners");
-        channel.users = (List<String>)map.get("users");
+        channel = rc.getChannelByName((String)map.get(channelNameKey));
+        channel.owners = (List<String>)map.get(channelOwnersKey);
+        channel.users = (List<String>)map.get(channelUsersKey);
     }
 
     private List<Integer> makeBlockList(Location l) {
@@ -300,13 +331,13 @@ public class CircuitPersistence {
         return list;
     }
 
-    private Object makeInputPinsList(InputPin[] inputs) {
+    private Object makeIOBlockList(IOBlock[] blocks) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (InputPin p : inputs)
-            list.add(makeBlockList(p.getInputBlock()));
-        return list;
-    }
-
+        for (IOBlock b : blocks)
+            list.add(makeBlockList(b.getLocation()));
+        return list;        
+    }    
+    
     private Object makeBlockListsList(Location[] vs) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
         if(vs!=null)
@@ -345,16 +376,17 @@ public class CircuitPersistence {
         return locations.toArray(new Location[locations.size()]);
     }
 
-    private InputPin[] getInputPinsArray(List<List<Integer>> list, Circuit c) {
-        List<InputPin> inputs = new ArrayList<InputPin>();
+    private IOBlock[] getIOBlockArray(List<List<Integer>> list, Circuit c, IOBlock.Type type) {
+        List<IOBlock> io = new ArrayList<IOBlock>();
         for (int i=0; i<list.size(); i++) {
             List<Integer> coords = list.get(i);
-            inputs.add(new InputPin(c, new Location(c.world, coords.get(0), coords.get(1), coords.get(2)), i));
+            IOBlock ib = IOBlock.makeIOBlock(type, c, new Location(c.world, coords.get(0), coords.get(1), coords.get(2)), i);
+            io.add(ib);
         }
 
-        return inputs.toArray(new InputPin[inputs.size()]);
+        return io.toArray(new IOBlock[io.size()]);
     }
-
+    
     private void backupCircuitsFile(String filename) {
         if (madeBackup.contains(filename)) return;
 
@@ -394,12 +426,11 @@ public class CircuitPersistence {
     }
 
     private File getBackupFileName(File parentFile,String filename) {
-        String ext = ".BACKUP";
         File backup;
         int idx = 0;
 
         do {
-            backup = new File(parentFile, filename + ext + idx);
+            backup = new File(parentFile, filename + backupFileExtension + idx);
             idx++;
         } while (backup.exists());
         return backup;

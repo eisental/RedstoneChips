@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips;
 
 import org.bukkit.GameMode;
@@ -35,8 +31,8 @@ class RCPlayerListener extends PlayerListener {
             
             if (!rc.getPrefs().getRightClickToActivate() && event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
                 
-                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
-                    rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
+                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer()); 
+                    
                 
             }
 
@@ -45,8 +41,7 @@ class RCPlayerListener extends PlayerListener {
                 rc.probeChipBlock(event.getPlayer(), event.getClickedBlock());
                 event.setCancelled(true);
             } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE)
-                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer(), 
-                    rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(), rc.getPrefs().getInterfaceBlockType());
+                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
 
             if (!event.getPlayer().getItemInHand().getType().isBlock()) {
                 rc.getRCsel().cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());

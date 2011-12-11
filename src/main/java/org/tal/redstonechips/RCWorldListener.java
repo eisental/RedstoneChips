@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips;
 
 import java.util.logging.Level;
@@ -45,6 +41,8 @@ class RCWorldListener extends WorldListener {
 
     @Override
     public void onWorldSave(WorldSaveEvent event) {
+        if (!rc.isEnabled()) return;
+        
         rc.log(Level.INFO, "Saving " + event.getWorld().getName() + " chip data...");                
         rc.getCircuitPersistence().saveCircuits(event.getWorld());
 
