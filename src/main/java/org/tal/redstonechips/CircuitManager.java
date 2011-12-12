@@ -99,7 +99,7 @@ public class CircuitManager {
         String signClass = getClassFromSign(sign);
 
         // check if the sign text points to a known circuit type.
-        if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -2;
+        if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -1;
         
         // check if it belongs to an active chip.
         Circuit check = this.getCircuitByActivationBlock(signBlock);

@@ -38,36 +38,44 @@ public class RCpin extends RCCommand {
     }
 
     public static void printPinInfo(Block pinBlock, CommandSender sender, org.tal.redstonechips.RedstoneChips rc) {
+        boolean success = false;
+        
         List<InputPin> inputList = rc.getCircuitManager().lookupInputSource(pinBlock);
         
-        if (inputList!=null) printInputInfo(sender, inputList, rc);
+        if (inputList!=null) { printInputInfo(sender, inputList, rc); success = true; }
 
         InputPin input = rc.getCircuitManager().lookupInputBlock(pinBlock);
         if (input!=null) {
             List<InputPin> i = new ArrayList<InputPin>();
             i.add(input);
             printInputInfo(sender, i, rc);
+            success = true;
         }
         
         OutputPin o = rc.getCircuitManager().lookupOutputBlock(pinBlock);
 
-        if (o!=null) printOutputInfo(sender, o, rc);
+        if (o!=null) { printOutputInfo(sender, o, rc); success = true; }
                 
         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(pinBlock);
-        if (c==null || c.interfaceBlocks == null) return;
-        
-        InterfaceBlock i = null;
-        Location pinLoc = pinBlock.getLocation();
-        
-        for (InterfaceBlock bl : c.interfaceBlocks) {
-            if (bl.getLocation().equals(pinLoc)) {
-                i = bl;
-                break;
-            }
-        }
+        if (c!=null && c.interfaceBlocks != null) {
 
-        if (i!=null) 
-            printInterfaceInfo(sender, i, rc);
+            InterfaceBlock i = null;
+            Location pinLoc = pinBlock.getLocation();
+
+            for (InterfaceBlock bl : c.interfaceBlocks) {
+                if (bl.getLocation().equals(pinLoc)) {
+                    i = bl;
+                    break;
+                }
+            }
+
+            if (i!=null) {
+                printInterfaceInfo(sender, i, rc);
+                success = true;
+            } 
+        }
+        
+        if (!success) throw new IllegalArgumentException("You must point at a chip io block.");
     }
 
     private static void printInputInfo(CommandSender sender, List<InputPin> inputList, org.tal.redstonechips.RedstoneChips rc) {

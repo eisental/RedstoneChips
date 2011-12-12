@@ -42,7 +42,7 @@ public class CircuitPersistence {
     private final static String classKey = "class";
     private final static String worldKey = "world";
     private final static String activationBlockKey = "activationBlock";
-    private final static String chunkKey = "chunk";
+    private final static String chunkKey = "chunks";
     private final static String inputsKey = "inputs";
     private final static String outputsKey = "outputs";
     private final static String interfacesKey = "interfaces";

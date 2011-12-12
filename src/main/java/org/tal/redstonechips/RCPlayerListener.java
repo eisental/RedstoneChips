@@ -31,8 +31,9 @@ class RCPlayerListener extends PlayerListener {
             
             if (!rc.getPrefs().getRightClickToActivate() && event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
                 
-                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer()); 
-                    
+                if (rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())==-2 ||
+                        rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())>=0)
+                    event.setCancelled(true);
                 
             }
 
@@ -40,8 +41,11 @@ class RCPlayerListener extends PlayerListener {
             if (isUsingChipProbe(event.getPlayer())) {
                 rc.probeChipBlock(event.getPlayer(), event.getClickedBlock());
                 event.setCancelled(true);
-            } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE)
-                rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
+            } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE) {
+                if (rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())==-2 ||
+                        rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())>=0)
+                    event.setCancelled(true);                
+            }
 
             if (!event.getPlayer().getItemInHand().getType().isBlock()) {
                 rc.getRCsel().cuboidLocation(event.getPlayer(), event.getClickedBlock().getLocation());
