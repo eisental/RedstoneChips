@@ -32,6 +32,7 @@ public class InputPin extends IOBlock {
         sourceBlocks = new HashMap<Location, Boolean>();
 
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()+1, inputBlock.getBlockZ()));
+        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()-1, inputBlock.getBlockZ()));
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()+1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()-1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()+1));

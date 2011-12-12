@@ -23,6 +23,7 @@ public class OutputPin extends IOBlock {
         outputBlocks = new ArrayList<Location>();
         
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY()+1, outputBlock.getBlockZ()));
+        addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY()-1, outputBlock.getBlockZ()));
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX()+1, outputBlock.getBlockY(), outputBlock.getBlockZ()));
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX()-1, outputBlock.getBlockY(), outputBlock.getBlockZ()));
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY(), outputBlock.getBlockZ()+1));
