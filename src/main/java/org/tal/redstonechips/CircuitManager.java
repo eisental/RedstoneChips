@@ -25,6 +25,7 @@ import org.tal.redstonechips.channel.WirelessCircuit;
 import org.bukkit.World;
 import org.tal.redstonechips.ChipScanner.ChipScanException;
 import org.tal.redstonechips.ChipScanner.ScanParameters;
+import org.tal.redstonechips.circuit.InputPin.InputSource;
 import org.tal.redstonechips.circuit.InterfaceBlock;
 import org.tal.redstonechips.circuit.OutputPin;
 import org.tal.redstonechips.util.ParsingUtils;
@@ -68,10 +69,16 @@ public class CircuitManager {
         List<InputPin> inputList = sourceLookupMap.get(e.getBlock().getLocation());
         if (inputList==null) return;
         for (InputPin inputPin : inputList)
-            inputPin.updateValue(e.getBlock(), newVal);
+            inputPin.updateValue(e.getBlock(), newVal, InputSource.REDSTONE);
         
     }
 
+    /**
+     * Tries to detect a circuit starting at the specified activation sign block using the i/o block materials in the preferences.
+     *
+     * @param signBlock The activation sign block.
+     * @param sender The circuit activator.
+     */
     public int checkForCircuit(Block signBlock, CommandSender sender) {
         return checkForCircuit(signBlock, sender, rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(),
                 rc.getPrefs().getInterfaceBlockType());
@@ -246,8 +253,8 @@ public class CircuitManager {
             List<InputPin> inputs = sourceLookupMap.get(block.getLocation());
             if (inputs!=null) {
                 for (InputPin pin : inputs) {
-                    if (isBroken) pin.updateValue(block, false);
-                    else pin.updateValue(block, InputPin.findSourceBlockState(block.getLocation()));                    
+                    if (isBroken) pin.updateValue(block, false, InputSource.REDSTONE);
+                    else pin.updateValue(block, InputPin.findSourceBlockState(block.getLocation()), InputSource.REDSTONE);
                 }
             }
 

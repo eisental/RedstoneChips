@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Lever;
+import org.tal.redstonechips.circuit.InputPin.InputSource;
 
 /**
  *
@@ -54,7 +55,7 @@ public class OutputPin extends IOBlock {
                 InputPin i = circuit.getPlugin().getCircuitManager().lookupInputBlock(l.getBlock());
 
                 if (i!=null) {
-                    i.updateValue(loc.getBlock(), state);
+                    i.updateValue(loc.getBlock(), state, InputSource.DIRECT);
                 } 
             }
             
@@ -70,7 +71,7 @@ public class OutputPin extends IOBlock {
             if (outputBlock.getRelative(lever.getAttachedFace()).equals(ioBlock)) {
                 updateOutputBlock(outputBlock, state);
                 ioBlock.getState().update();
-            }
+            } else return false;
         } else if (outputBlock.getType()==Material.POWERED_RAIL) {
             updateOutputBlock(outputBlock, state);
             ioBlock.getState().update();

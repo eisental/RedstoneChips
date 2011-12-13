@@ -41,6 +41,7 @@ class RCPlayerListener extends PlayerListener {
             if (isUsingChipProbe(event.getPlayer())) {
                 rc.probeChipBlock(event.getPlayer(), event.getClickedBlock());
                 event.setCancelled(true);
+                
             } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE) {
                 if (rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())==-2 ||
                         rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())>=0)

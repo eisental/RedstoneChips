@@ -14,8 +14,10 @@ import org.bukkit.block.Block;
  * @author Tal Eisenberg
  */
 public class InputPin extends IOBlock {
+    public enum InputSource { REDSTONE, DIRECT };
+    
     private Map<Location, Boolean> sourceBlocks;
-
+    private Location bottomSourceBlock;
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
 
@@ -32,7 +34,8 @@ public class InputPin extends IOBlock {
         sourceBlocks = new HashMap<Location, Boolean>();
 
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()+1, inputBlock.getBlockZ()));
-        addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()-1, inputBlock.getBlockZ()));
+        bottomSourceBlock = new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY()-1, inputBlock.getBlockZ());
+        addSourceBlock(bottomSourceBlock);
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()+1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX()-1, inputBlock.getBlockY(), inputBlock.getBlockZ()));
         addSourceBlock(new Location(circuit.world, inputBlock.getBlockX(), inputBlock.getBlockY(), inputBlock.getBlockZ()+1));
@@ -79,12 +82,14 @@ public class InputPin extends IOBlock {
      * @param newVal The new redstone current of the block.
      * @throws IllegalArgumentException If the block in the provided location is not a power block of the input.
      */
-    public void updateValue(Block block, boolean newVal) throws IllegalArgumentException {
+    public void updateValue(Block block, boolean newVal, InputSource source) throws IllegalArgumentException {
         Location l = block.getLocation();
 
         if (!sourceBlocks.containsKey(l))
             throw new IllegalArgumentException("Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
         else {
+            if (source==InputSource.REDSTONE && l.equals(bottomSourceBlock)) return;
+            
             long curTick = circuit.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;

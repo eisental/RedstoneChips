@@ -66,7 +66,7 @@ public class ChunkLocation {
     }
 
     public void loadChunk() {
-        world.loadChunk(x, z, false);
+        world.loadChunk(x, z, true);
     }
 
     @Override

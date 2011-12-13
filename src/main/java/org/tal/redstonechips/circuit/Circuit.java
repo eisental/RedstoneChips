@@ -134,8 +134,9 @@ public abstract class Circuit {
             } else chunksToUnload.add(chunk);
         }
 
-        for (ChunkLocation chunk : chunksToUnload)
+        for (ChunkLocation chunk : chunksToUnload) {
             chunk.loadChunk();
+        }
 
         updateInputBits();
         
