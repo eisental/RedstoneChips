@@ -46,7 +46,7 @@ public class CommandUtils {
         if (player==null) return null;
 
         Block target = targetBlock(player);
-        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target.getLocation());
         if (c==null) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a block of a redstone chip.");
         }

@@ -48,14 +48,14 @@ commands:
     aliases: [rcdb]
     description: Register yourself as a chip debugger.
     usage: |
-      `/rcdebug [io] [id|.|clear|list]`
+      `/rcdebug [id] [io|.|clear|list]`
 
       - Pointing at a chip and running the command will toggle debugging the chip.
       - To debug or stop debugging a chip remotely use `/rcdebug <chip id>`.
       - Pause debugging for all chips by running `/rcdebug`.
       - List all debugged chips by running `/rcdebug list`.
       - Clear your debug list by running `/rcdebug clear`.
-      - To receive a debug message whenever a chip pin changes its state use `/rcdebug io [chip id]`.
+      - To receive a debug message whenever a chip pin changes its state use `/rcdebug [chip id] io`. 
       
       You can use `/rcdb` as a shortcut or type only part of the command. 
       For ex. `/rcdb l` is equivalent to `/rcdebug list`.

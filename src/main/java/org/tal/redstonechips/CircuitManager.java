@@ -109,7 +109,7 @@ public class CircuitManager {
         if (!rc.getCircuitLoader().getCircuitClasses().containsKey(signClass)) return -1;
         
         // check if it belongs to an active chip.
-        Circuit check = this.getCircuitByActivationBlock(signBlock);
+        Circuit check = this.getCircuitByActivationBlock(signBlock.getLocation());
         if (check!=null) {
             if (sender!=null) sender.sendMessage(rc.getPrefs().getInfoColor() + "Chip is already active - " + check.getChipString() + ".");
             return -2;
@@ -254,7 +254,7 @@ public class CircuitManager {
             if (inputs!=null) {
                 for (InputPin pin : inputs) {
                     if (isBroken) pin.updateValue(block, false, InputSource.REDSTONE);
-                    else pin.updateValue(block, InputPin.findSourceBlockState(block.getLocation()), InputSource.REDSTONE);
+                    else pin.updateValue(block, pin.findSourceBlockState(block.getLocation()), InputSource.REDSTONE);
                 }
             }
 
@@ -537,8 +537,8 @@ public class CircuitManager {
      * @param structureBlock Any block that belongs to a chip.
      * @return The circuit that the block is part of its structure.
      */
-    public Circuit getCircuitByStructureBlock(Block structureBlock) {
-        return this.structureLookupMap.get(structureBlock.getLocation());
+    public Circuit getCircuitByStructureBlock(Location structureBlock) {
+        return this.structureLookupMap.get(structureBlock);
     }
 
     /**
@@ -546,10 +546,22 @@ public class CircuitManager {
      * @param activationBlock An activation sign of a chip.
      * @return The circuit that uses this activation sign.
      */
-    public Circuit getCircuitByActivationBlock(Block activationBlock) {
-        return this.activationLookupMap.get(activationBlock.getLocation());
+    public Circuit getCircuitByActivationBlock(Location activationBlock) {
+        return this.activationLookupMap.get(activationBlock);
     }
 
+    public OutputPin getOutputPin(Location outputBlock) {
+        return this.outputLookupMap.get(outputBlock);
+    }
+    
+    public InputPin getInputPin(Location inputBlock) {
+        return this.inputLookupMap.get(inputBlock);
+    }
+    
+    public List<InputPin> getInputPinBySource(Location sourceBlock) {
+        return this.sourceLookupMap.get(sourceBlock);
+    }
+    
     public Circuit getCircuitById(String id) {  
         if (id==null) return null;
 
@@ -739,4 +751,5 @@ public class CircuitManager {
             return true;
         else return false;
     }
+
 }

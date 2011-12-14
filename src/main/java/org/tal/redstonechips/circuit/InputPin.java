@@ -133,7 +133,7 @@ public class InputPin extends IOBlock {
      */
     public void refreshSourceBlocks() {
         for (Location l : this.sourceBlocks.keySet())
-            sourceBlocks.put(l, InputPin.findSourceBlockState(l));
+            sourceBlocks.put(l, findSourceBlockState(l));
     }
 
     /**
@@ -141,7 +141,7 @@ public class InputPin extends IOBlock {
      * @param loc The location of the block to check.
      * @return true if the block is powered and false otherwise.
      */
-    public static boolean findSourceBlockState(Location loc) {
+    public boolean findSourceBlockState(Location loc) {
         boolean state = false;
         Block b = loc.getBlock();
 
@@ -154,6 +154,11 @@ public class InputPin extends IOBlock {
             state = false;
         } else if (b.getType() == Material.REDSTONE_TORCH_ON) {
             state = true;
+        } else {
+            // looking for direct connection to an output block.
+            OutputPin out = circuit.getPlugin().getCircuitManager().getOutputPin(loc);
+            if (out!=null && out.isDirect())  
+                state = out.getState();            
         }
 
         return state;

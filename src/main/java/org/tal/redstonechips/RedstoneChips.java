@@ -141,22 +141,6 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * Tells the plugin to add a list of circuit classes to the circuit loader.
-     * @param circuitClasses An array of Class objects that extend the Circuit class.
-     */
-    public void addCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.addCircuitClass(c);
-    }
-
-    /**
-     * Removes a list of circuit classes from the circuit loader.
-     * @param circuitClasses An array of Class objects to be removed.
-     */
-    public void removeCircuitClasses(Class... circuitClasses) {
-        for (Class c : circuitClasses) circuitLoader.removeCircuitClass(c);
-    }
-
-    /**
      * Tells the plugin to load circuit classes from this circuit library when enabled.
      *
      * @param lib Any object implementing the CircuitIndex interface.
@@ -356,7 +340,7 @@ public class RedstoneChips extends JavaPlugin {
             RCpin.printPinInfo(block, player, this);
         } catch (IllegalArgumentException ie) {
             // not probing a pin
-            Circuit c = circuitManager.getCircuitByStructureBlock(block);
+            Circuit c = circuitManager.getCircuitByStructureBlock(block.getLocation());
             
             if (c!=null) {
                 if (c.activationBlock.equals(block.getLocation()))
@@ -379,7 +363,7 @@ public class RedstoneChips extends JavaPlugin {
         
         for (CircuitIndex lib : circuitLibraries) {
             String libMsg = prefix + lib.getName() + " " + lib.getVersion() + " > ";
-            Class[] classes = lib.getCircuitClasses();
+            Class<? extends Circuit>[] classes = lib.getCircuitClasses();
             
             if (classes != null && classes.length>0) {
                 for (Class c : classes)
@@ -387,8 +371,8 @@ public class RedstoneChips extends JavaPlugin {
 
                 libMsg = libMsg.substring(0, libMsg.length()-2) + ".";
                 log.info(libMsg);
-                
-                this.addCircuitClasses(classes);
+
+                circuitLoader.addCircuitIndex(lib);
             } else {
                 libMsg += "No circuit classes were loaded.";
                 log.info(libMsg);

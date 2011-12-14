@@ -65,7 +65,8 @@ public class RCinfo extends RCCommand {
 
         sender.sendMessage(infoColor + "" + c.inputs.length + " input(s), " + c.outputs.length + " output(s) and " + c.interfaceBlocks.length + " interface blocks.");
         sender.sendMessage(infoColor +
-                "location: " + extraColor + loc + infoColor + " @ " + extraColor + c.world.getName() + infoColor + " chunks: " + chunkCoords);
+                "location: " + extraColor + loc + infoColor + " @ " + extraColor + c.world.getName());
+        sender.sendMessage(infoColor + " chunks: " + chunkCoords);
 
         int inputInt = BitSetUtils.bitSetToUnsignedInt(c.getInputBits(), 0, c.inputs.length);
         int outputInt = BitSetUtils.bitSetToUnsignedInt(c.getOutputBits(), 0, c.outputs.length);

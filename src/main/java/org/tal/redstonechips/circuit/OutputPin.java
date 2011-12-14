@@ -109,4 +109,17 @@ public class OutputPin extends IOBlock {
                 adj.update();
         }        
     }
+
+    public boolean isDirect() {
+        for (Location b : outputBlocks) {
+            Material m = b.getBlock().getType();
+            if (m==Material.LEVER || m==Material.POWERED_RAIL) return false;
+        }
+        
+        return true;
+    }
+
+    public boolean getState() {
+        return circuit.getOutputBits().get(index);
+    }
 }

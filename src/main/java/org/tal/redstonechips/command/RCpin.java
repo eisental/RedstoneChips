@@ -56,7 +56,7 @@ public class RCpin extends RCCommand {
 
         if (o!=null) { printOutputInfo(sender, o, rc); success = true; }
                 
-        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(pinBlock);
+        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(pinBlock.getLocation());
         if (c!=null && c.interfaceBlocks != null) {
 
             InterfaceBlock i = null;

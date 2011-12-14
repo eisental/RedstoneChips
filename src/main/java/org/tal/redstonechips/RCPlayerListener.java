@@ -30,11 +30,8 @@ class RCPlayerListener extends PlayerListener {
         if (event.getAction()==Action.LEFT_CLICK_BLOCK) {
             
             if (!rc.getPrefs().getRightClickToActivate() && event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
-                
-                if (rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())==-2 ||
-                        rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())>=0)
-                    event.setCancelled(true);
-                
+                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
+                if (result == -2 || result >= 0) event.setCancelled(true);
             }
 
         } else if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
@@ -43,9 +40,8 @@ class RCPlayerListener extends PlayerListener {
                 event.setCancelled(true);
                 
             } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE) {
-                if (rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())==-2 ||
-                        rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer())>=0)
-                    event.setCancelled(true);                
+                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
+                if (result == -2 || result >= 0) event.setCancelled(true);
             }
 
             if (!event.getPlayer().getItemInHand().getType().isBlock()) {

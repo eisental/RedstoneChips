@@ -13,7 +13,7 @@ public interface CircuitIndex {
      * Called by the RedstoneChips plugin. Every circuit class in the class array is added to the circuit class pool.
      * @return An array of Class objects. Each class must extend the Circuit class.
      */
-    public Class[] getCircuitClasses();
+    public Class<? extends Circuit>[] getCircuitClasses();
 
     /**
      * Called by the RedstoneChips plugin before starting to load circuit classes.
@@ -31,4 +31,5 @@ public interface CircuitIndex {
      * @return the index version
      */
     public String getVersion();
+    
 }

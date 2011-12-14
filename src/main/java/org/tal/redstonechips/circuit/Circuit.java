@@ -89,7 +89,7 @@ public abstract class Circuit {
     /**
      * When set to true any input changes will be ignored.
      */
-    protected boolean disabled;
+    public boolean disabled = false;
 
     /**
      * The circuits id. Set by CircuitManager.
@@ -121,8 +121,7 @@ public abstract class Circuit {
         iodebuggers = new ArrayList<CommandSender>();
 
         inputBits = new BitSet7(inputs.length);
-        outputBits = new BitSet7(outputs.length);
-        disabled = false;
+        if (outputBits==null) outputBits = new BitSet7(outputs.length);
 
         chunksLoaded = false;
 
@@ -142,7 +141,8 @@ public abstract class Circuit {
         
         boolean result = init(sender, args);
 
-        if (result!=false && isStateless()) {
+        if (disabled) disable();
+        else if (result!=false && isStateless()) {
             runInputLogic();
         }
 
@@ -679,5 +679,10 @@ public abstract class Circuit {
 
     public RedstoneChips getPlugin() {
         return redstoneChips;
+    }
+
+    public void setOutputBits(BitSet7 bits) {
+        if (outputBits==null) outputBits = bits;
+        else throw new RuntimeException("Trying to set outputBits, but it's already set.");
     }
 }

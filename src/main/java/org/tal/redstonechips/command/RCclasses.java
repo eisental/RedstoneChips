@@ -2,14 +2,14 @@
 package org.tal.redstonechips.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.circuit.CircuitIndex;
 
 /**
  *
@@ -21,31 +21,53 @@ public class RCclasses extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
     
-        Map<String,Class<? extends Circuit>> circuitClasses = rc.getCircuitLoader().getCircuitClasses();
+        List<CircuitIndex> libs = rc.getCircuitLoader().getCircuitLibraries();
         
-        if (circuitClasses.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");
+        if (libs.isEmpty()) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no circuit classes installed.");
         else {
-            printClassesList(sender, args, circuitClasses);
+            printClassesList(sender, libs);
         }
 
         return true;
     }
 
-    private void printClassesList(CommandSender sender, String[] args, Map<String, Class<? extends Circuit>> circuitClasses) {
-        List<String> names = Arrays.asList(circuitClasses.keySet().toArray(new String[circuitClasses.size()]));
-        Collections.sort(names);
-        String list = "";
-
-        ChatColor color = ChatColor.WHITE;
+    private void printClassesList(CommandSender sender, List<CircuitIndex> libs) {
+        String list = "";        
+        List<String> libNames = new ArrayList<String>();
+        for (CircuitIndex lib : libs) libNames.add(lib.getName());
+        Collections.sort(libNames);
         
-        for (String name : names) {
-            list += color + name + ", ";
-            if (color==ChatColor.WHITE) color = ChatColor.YELLOW;
-            else color = ChatColor.WHITE;
+        for (String libName : libNames) {
+            CircuitIndex lib = findLibrary(libs, libName);
+            if (lib==null) continue;
+            
+            list += "\n";
+            ChatColor color = rc.getPrefs().getInfoColor();
+            
+            List<String> names = new ArrayList<String>();
+            for (Class c : lib.getCircuitClasses()) names.add(c.getSimpleName());
+            Collections.sort(names);
+            
+            list += ChatColor.WHITE + lib.getName() + " " + lib.getVersion() + ":\n   ";
+            for (String name : names) {
+                list += color + name + ", ";
+                if (color==rc.getPrefs().getInfoColor()) color = ChatColor.YELLOW;
+                else color = rc.getPrefs().getInfoColor();
+            }
+            list = list.substring(0, list.length()-2) + "\n";
+            
         }
-
+        
+        
         if (!list.isEmpty()) 
             CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", list, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+    }
+    
+    private CircuitIndex findLibrary(List<CircuitIndex> libs, String libName) { 
+        for (CircuitIndex lib : libs) 
+            if (lib.getName().equals(libName)) return lib;
+        
+        return null;
     }
 
 }

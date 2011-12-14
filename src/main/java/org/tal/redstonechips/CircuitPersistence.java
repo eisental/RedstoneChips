@@ -22,6 +22,7 @@ import org.tal.redstonechips.circuit.IOBlock;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.circuit.InterfaceBlock;
 import org.tal.redstonechips.circuit.OutputPin;
+import org.tal.redstonechips.util.BitSetUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -52,8 +53,9 @@ public class CircuitPersistence {
     private final static String idKey = "id";
     private final static String nameKey = "name";
     private final static String disabledKey = "disabled";
-
+    private final static String outputBitsKey = "outputBits";
     private final static String channelNameKey = "name";
+    private final static String channelStateKey = "state";
     private final static String channelOwnersKey = "owners";
     private final static String channelUsersKey = "users";    
     
@@ -115,14 +117,18 @@ public class CircuitPersistence {
         Yaml yaml = new Yaml();
 
         FileInputStream fis = new FileInputStream(file);
-        List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);
+        List<Map<String, Object>> circuitsList = (List<Map<String, Object>>) yaml.load(fis);        
         fis.close();
+        
+        List<Circuit> circuits = new ArrayList<Circuit>();
 
         if (circuitsList!=null) {
+            Map<Circuit, Map<String, String>> internalStates = new HashMap<Circuit, Map<String, String>>();
+            
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
 
-                    compileCircuitFromMap(circuitMap);
+                    circuits.add(compileCircuitFromMap(circuitMap, internalStates));
 
                 } catch (IllegalArgumentException ie) {
                     rc.log(Level.WARNING, ie.getMessage() + ". Ignoring circuit.");
@@ -141,6 +147,13 @@ public class CircuitPersistence {
                     backupCircuitsFile(file.getName());
                     t.printStackTrace();
                 }
+            }
+            
+            for (Circuit c : circuits) {
+                if (rc.getCircuitManager().activateCircuit(c, null, c.id)>=0) {
+                    Map<String, String> state = internalStates.get(c);
+                    if (state!=null) c.setInternalState(state);
+                } 
             }
         }
     }
@@ -247,18 +260,20 @@ public class CircuitPersistence {
         map.put(idKey, c.id);
         map.put(nameKey, c.name);
         map.put(disabledKey, c.isDisabled());
+        map.put(outputBitsKey, BitSetUtils.bitSetToString(c.getOutputBits(), c.outputs.length));
         return map;
     }
 
     private Map<String, Object> channelToMap(BroadcastChannel c) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(channelNameKey, c.name);
+        map.put(channelStateKey, BitSetUtils.bitSetToString(c.bits, c.getLength()));
         map.put(channelOwnersKey, c.owners);
         map.put(channelUsersKey, c.users);
         return map;
     }
 
-    private Circuit compileCircuitFromMap(Map<String,Object> map) throws InstantiationException, IllegalAccessException {
+    private Circuit compileCircuitFromMap(Map<String,Object> map, Map<Circuit, Map<String,String>> internalStates) throws InstantiationException, IllegalAccessException {
 
         String className = (String)map.get(classKey);
         World world = findWorld((String)map.get(worldKey));
@@ -290,22 +305,20 @@ public class CircuitPersistence {
 
         if (map.containsKey(nameKey)) c.name = (String)map.get(nameKey);
 
-        int id = -1;
-        if (map.containsKey(idKey)) id = (Integer)map.get(idKey);
-        if (rc.getCircuitManager().activateCircuit(c, null, id)>=0) {
-            if (map.containsKey(stateKey))
-                c.setInternalState((Map<String, String>)map.get(stateKey));
-            
-            if (map.containsKey(disabledKey)) c.setDisabled((Boolean)map.get(disabledKey));            
-            
-            return c;
-            
-        } else return null;
+        if (map.containsKey(outputBitsKey)) c.setOutputBits(BitSetUtils.stringToBitSet((String)map.get(outputBitsKey)));
+        
+        if (map.containsKey(idKey)) c.id = (Integer)map.get(idKey);
+        if (map.containsKey(stateKey)) 
+            internalStates.put(c, (Map<String, String>)map.get(stateKey));
+        if (map.containsKey(disabledKey)) c.disabled = (Boolean)map.get(disabledKey);
+        
+        return c;
     }
 
     private void configureChannelFromMap(Map<String,Object> map) {
         BroadcastChannel channel;
         channel = rc.getChannelByName((String)map.get(channelNameKey));
+        if (map.containsKey(channelStateKey)) channel.bits = BitSetUtils.stringToBitSet((String)map.get(channelStateKey));        
         channel.owners = (List<String>)map.get(channelOwnersKey);
         channel.users = (List<String>)map.get(channelUsersKey);
     }

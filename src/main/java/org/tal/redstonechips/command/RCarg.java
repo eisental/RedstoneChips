@@ -22,7 +22,7 @@ public class RCarg extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
 
         Block target = CommandUtils.targetBlock(player);
-        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target);
+        Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target.getLocation());
         if (c==null) {
             player.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a block of the circuit you wish to reset.");
             return true;
