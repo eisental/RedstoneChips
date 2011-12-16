@@ -1,6 +1,7 @@
 
 package org.tal.redstonechips.channel;
 
+import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
@@ -15,4 +16,10 @@ public abstract class ReceivingCircuit extends WirelessCircuit {
      * @param bits Transmitted bits.
      */
     public abstract void receive(BitSet7 bits);
+    
+    @Override
+    public void circuitShutdown() {
+        if (getChannel()!=null) redstoneChips.getChannelManager().removeReceiver(this);
+    }
+    
 }

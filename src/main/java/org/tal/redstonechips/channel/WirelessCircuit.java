@@ -69,7 +69,7 @@ public abstract class WirelessCircuit extends Circuit {
         }
 
         if (this instanceof ReceivingCircuit) {
-            channel = redstoneChips.registerReceiver((ReceivingCircuit)this, name);
+            channel = redstoneChips.getChannelManager().registerReceiver((ReceivingCircuit)this, name);
             if (sender!=null) {
                 String bits;
                 if (this.getChannelLength()>1)
@@ -80,7 +80,7 @@ public abstract class WirelessCircuit extends Circuit {
                         ChatColor.YELLOW + getChannel().name + redstoneChips.getPrefs().getInfoColor() + " " + bits + ".");
             }
         } else if (this instanceof TransmittingCircuit) {
-            channel = redstoneChips.registerTransmitter((TransmittingCircuit)this, name);
+            channel = redstoneChips.getChannelManager().registerTransmitter((TransmittingCircuit)this, name);
             if (sender!=null) {
                 String bits;
                 if (this.getChannelLength()>1)
@@ -96,12 +96,13 @@ public abstract class WirelessCircuit extends Circuit {
     private boolean checkChanUserPermissions(CommandSender sender, String name) {
         if (!(sender instanceof Player)) return true;
         
-        if (!(redstoneChips.broadcastChannels.containsKey(name))) return true;
+        if (!(redstoneChips.getChannelManager().getBroadcastChannels().containsKey(name))) return true;
         
-        if (!(redstoneChips.broadcastChannels.get(name).isProtected())) return true;
+        if (!(redstoneChips.getChannelManager().getChannelByName(name, false).isProtected())) return true;
         
         String playerName = ((Player)sender).getName();
-        if (((Player)sender).hasPermission("redstonechips.channel.admin") || redstoneChips.broadcastChannels.get(name).users.contains(playerName.toLowerCase()) || redstoneChips.broadcastChannels.get(name).owners.contains(playerName.toLowerCase())) {
+        if (((Player)sender).hasPermission("redstonechips.channel.admin") || redstoneChips.getChannelManager().getChannelByName(name, false).users.contains(playerName.toLowerCase()) 
+                || redstoneChips.getChannelManager().getChannelByName(name, false).owners.contains(playerName.toLowerCase())) {
             return true;
         }
         

@@ -100,6 +100,10 @@ public class CircuitPersistence {
         } else return false;
     }
 
+    /**
+     * Loads all of the world chips from file.
+     * @param world 
+     */
     public void loadCircuits(World world) {
         File file = new File(rc.getDataFolder(), world.getName()+circuitsFileExtension);
         if (file.exists()) {
@@ -158,6 +162,9 @@ public class CircuitPersistence {
         }
     }
 
+    /**
+     * Loads channel data from file.
+     */
     public void loadChannels() {
         File channelsFile = new File(rc.getDataFolder(), channelsFileName);
         if (channelsFile.exists()) {
@@ -165,7 +172,7 @@ public class CircuitPersistence {
         }        
     }
     
-    public void loadChannelsFromFile(File file) {
+    private void loadChannelsFromFile(File file) {
         try {
             Yaml yaml = new Yaml();
 
@@ -183,12 +190,20 @@ public class CircuitPersistence {
         }
     }
 
+    /**
+     * Saves all the circuits on the server.
+     */
     public void saveCircuits() {
       rc.log(Level.INFO, "Saving chip data of all worlds...");
       for(World wrld : rc.getServer().getWorlds())
         saveCircuits(wrld);
     }
 
+    /**
+     * Saves all the circuits in the specified world.
+     * 
+     * @param world 
+     */
     public void saveCircuits(World world) {
         if (dontSaveCircuits.contains(world)) return;
         
@@ -226,7 +241,7 @@ public class CircuitPersistence {
         }
         
         circuitMaps = new ArrayList<Map<String,Object>>();
-        for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+        for (BroadcastChannel channel : rc.getChannelManager().getBroadcastChannels().values()) {
             if (channel.isProtected()) {
                 circuitMaps.add(this.channelToMap(channel));
             }
@@ -317,10 +332,11 @@ public class CircuitPersistence {
 
     private void configureChannelFromMap(Map<String,Object> map) {
         BroadcastChannel channel;
-        channel = rc.getChannelByName((String)map.get(channelNameKey));
+        channel = rc.getChannelManager().getChannelByName((String)map.get(channelNameKey), true);
         if (map.containsKey(channelStateKey)) channel.bits = BitSetUtils.stringToBitSet((String)map.get(channelStateKey));        
         channel.owners = (List<String>)map.get(channelOwnersKey);
         channel.users = (List<String>)map.get(channelUsersKey);
+        channel.transmit(channel.bits, 0, channel.getLength());
     }
 
     private List<Integer> makeBlockList(Location l) {
@@ -449,7 +465,7 @@ public class CircuitPersistence {
         return backup;
     }
 
-    boolean isWorldChipLoaded(World w) {
+    boolean isWorldLoaded(World w) {
         return loadedWorlds.contains(w);
     }
 

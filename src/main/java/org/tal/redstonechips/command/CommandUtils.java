@@ -33,6 +33,13 @@ public class CommandUtils {
     }
 
 
+    /**
+     * Checks whether this command sender is a player and sends the command sender an error otherwise.
+     * 
+     * @param rc
+     * @param sender The command sender to check.
+     * @return the sender object cast to the Player class.
+     */
     public static Player checkIsPlayer(RedstoneChips rc, CommandSender sender) {
         if (sender instanceof Player) return (Player)sender;
         else {
@@ -41,6 +48,14 @@ public class CommandUtils {
         }
     }
 
+    /**
+     * Checks whether the player is pointing towards a chip block.
+     * Sends an error message to the player in case no chip was found.
+     * 
+     * @param rc
+     * @param sender 
+     * @return The chip pointed by the player or null if one was not found.
+     */
     public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender) {
         Player player = checkIsPlayer(rc, sender);
         if (player==null) return null;
@@ -54,10 +69,26 @@ public class CommandUtils {
         return c;
     }
 
+    /**
+     * See transparentMaterials for a list of materials that are considered transparent.
+     * 
+     * @param player
+     * @return The block pointed by the player.
+     */
     public static Block targetBlock(Player player) {
         return player.getTargetBlock(transparentMaterials, 100);
     }
 
+    /**
+     * Checks whether the command sender has a permission to use a command.
+     * 
+     * @param rc
+     * @param sender
+     * @param commandName command name without the slash (/).
+     * @param opRequired used in case a permission plugin was not found. If set to true, permission is only granted if the sender is op.
+     * @param report Determines whether an error message is sent to the sender in case it doesn't have permission.
+     * @return true if the sender has permission to use the command.
+     */
     public static boolean checkPermission(RedstoneChips rc, CommandSender sender, String commandName, boolean opRequired, boolean report) {
         if (!rc.getPrefs().getUsePermissions()) return (opRequired?sender.isOp():true);
         if (!(sender instanceof Player)) return true;
@@ -125,7 +156,7 @@ public class CommandUtils {
     private static final String THREE_PIXEL_CHARS = "l'";
     private static final String FOUR_PIXEL_CHARS = "It[]";
     private static final String FIVE_PIXEL_CHARS = "f<>(){}";
-    
+
     private static String[] wrapText(String text) {
         final StringBuilder out = new StringBuilder();
 

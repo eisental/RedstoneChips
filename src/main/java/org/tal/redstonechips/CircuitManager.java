@@ -25,7 +25,7 @@ import org.tal.redstonechips.channel.WirelessCircuit;
 import org.bukkit.World;
 import org.tal.redstonechips.ChipScanner.ChipScanException;
 import org.tal.redstonechips.ChipScanner.ScanParameters;
-import org.tal.redstonechips.circuit.InputPin.InputSource;
+import org.tal.redstonechips.circuit.InputPin.SourceType;
 import org.tal.redstonechips.circuit.InterfaceBlock;
 import org.tal.redstonechips.circuit.OutputPin;
 import org.tal.redstonechips.util.ParsingUtils;
@@ -43,8 +43,9 @@ public class CircuitManager {
 
     private Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
     private Map<Location, List<InputPin>> sourceLookupMap = new HashMap<Location, List<InputPin>>();
-    private Map<Location, InputPin> inputLookupMap = new HashMap<Location, InputPin>();
-    private Map<Location, OutputPin> outputLookupMap = new HashMap<Location, OutputPin>();
+    private Map<Location, InputPin> inputPinLookupMap = new HashMap<Location, InputPin>();
+    private Map<Location, OutputPin> outputPinLookupMap = new HashMap<Location, OutputPin>();
+    private Map<Location, List<OutputPin>> outputLookupMap = new HashMap<Location, List<OutputPin>>();
     private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
     private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
@@ -69,7 +70,7 @@ public class CircuitManager {
         List<InputPin> inputList = sourceLookupMap.get(e.getBlock().getLocation());
         if (inputList==null) return;
         for (InputPin inputPin : inputList)
-            inputPin.updateValue(e.getBlock(), newVal, InputSource.REDSTONE);
+            inputPin.updateValue(e.getBlock(), newVal, SourceType.REDSTONE);
         
     }
 
@@ -185,7 +186,6 @@ public class CircuitManager {
      *
      * @param c The circuit to activate
      * @param sender The activator.
-     * @param signargs The circuit's sign arguments.
      * @param id The desired circuit id. When less than 0, a new id is generated.
      * @return The circuit's id or -2 if an error occurred.
      */
@@ -241,26 +241,59 @@ public class CircuitManager {
     private final static Class redstoneClass = Redstone.class;
 
     /**
-     * Called on block place and block break to see if any circuit's input pin's state is affected by the change.
+     * Called on block place and block break to see if any circuit input pin state is affected by the change.
      *
      * @param block The block that was placed or broken.
      * @param player The player who placed or broke the block.
      * @param isBroken True if the block was broken and false if it was placed.
+     * @return true if an input source block was placed or broken.
      */
-    void checkCircuitInputChanged(Block block, Player player, boolean isBroken) {
+    boolean checkCircuitInputBlockChanged(Block block, Player player, boolean isBroken) {
         Class<? extends MaterialData> dataClass = block.getType().getData();
         if (dataClass!=null && redstoneClass.isAssignableFrom(dataClass)) {
             List<InputPin> inputs = sourceLookupMap.get(block.getLocation());
             if (inputs!=null) {
                 for (InputPin pin : inputs) {
-                    if (isBroken) pin.updateValue(block, false, InputSource.REDSTONE);
-                    else pin.updateValue(block, pin.findSourceBlockState(block.getLocation()), InputSource.REDSTONE);
+                    if (isBroken) pin.updateValue(block, false, SourceType.REDSTONE);
+                    else pin.updateValue(block, pin.findSourceBlockState(block.getLocation()), SourceType.REDSTONE);
                 }
+                return true;
             }
 
         }
+        
+        return false;
     }
 
+    /**
+     * Called on block place to see if any circuit output pin needs to refresh.
+     * 
+     * @param block The block that was placed.
+     * @param player The player who placed the block.
+     * @return true if an output block was placed.
+     */
+    boolean checkCircuitOutputBlockPlaced(Block block, Player player) {
+        if (OutputPin.isOutputMaterial(block.getType())) {
+            final List<OutputPin> outputs = outputLookupMap.get(block.getLocation());
+            if (outputs!=null && !outputs.isEmpty()) {
+                rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, 
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                for (OutputPin pin : outputs) {
+                                    pin.refreshOutputs();
+                                }
+                            }
+                        }
+                    );
+                return true;
+            }
+
+        }
+        
+        return false;
+    }
+    
     /**
      * Deactivates the specified circuit, possibly changing all of its structure blocks into air.
      *
@@ -463,7 +496,7 @@ public class CircuitManager {
     }
 
     /**
-     * Finds the circuit's chunks according to its activation block, output blocks, input power blocks and interface blocks.
+     * Finds the circuit's chunks according to its activation block, output power blocks, input power blocks and interface blocks.
      *
      * @param c The circuit to check.
      * @return All chunks used by this circuit.
@@ -535,7 +568,7 @@ public class CircuitManager {
     /**
      *
      * @param structureBlock Any block that belongs to a chip.
-     * @return The circuit that the block is part of its structure.
+     * @return The circuit that the block belongs to or null if a circuit was not found.
      */
     public Circuit getCircuitByStructureBlock(Location structureBlock) {
         return this.structureLookupMap.get(structureBlock);
@@ -544,24 +577,53 @@ public class CircuitManager {
     /**
      *
      * @param activationBlock An activation sign of a chip.
-     * @return The circuit that uses this activation sign.
+     * @return The circuit that uses this activation sign or null if a circuit was not found.
      */
     public Circuit getCircuitByActivationBlock(Location activationBlock) {
         return this.activationLookupMap.get(activationBlock);
     }
 
+    /**
+     * 
+     * @param outputBlock An output block of a chip.
+     * @return The output pin represented by this block or null if none was found.
+     */
     public OutputPin getOutputPin(Location outputBlock) {
-        return this.outputLookupMap.get(outputBlock);
+        return this.outputPinLookupMap.get(outputBlock);
     }
-    
+
+    /**
+     * 
+     * @param inputBlock An input block of a chip.
+     * @return The input pin represented by this block or null if none was found.
+     */    
     public InputPin getInputPin(Location inputBlock) {
-        return this.inputLookupMap.get(inputBlock);
+        return this.inputPinLookupMap.get(inputBlock);
     }
     
+    /**
+     * 
+     * @param sourceBlock A signal source block surrounding an input block.
+     * @return A list of input pins that can receive a signal from this block or null if none was found.
+     */
     public List<InputPin> getInputPinBySource(Location sourceBlock) {
         return this.sourceLookupMap.get(sourceBlock);
     }
+
+    /**
+     * 
+     * @param outputBlock A block that receives signal from an output pin.
+     * @return A list of output pins that can change the state of the output block or null if none was found.
+     */
+    public List<OutputPin> getOutputPinByOutputBlock(Location outputBlock) {
+        return this.outputLookupMap.get(outputBlock);
+    }
     
+    /**
+     * 
+     * @param id A chip id number of name.
+     * @return The chip that has this id or null if none was found.
+     */
     public Circuit getCircuitById(String id) {  
         if (id==null) return null;
 
@@ -585,22 +647,20 @@ public class CircuitManager {
         this.circuits = circuits;
     }
 
-    public List<InputPin> lookupInputSource(Block inputBlock) {
-        return this.sourceLookupMap.get(inputBlock.getLocation());
-    }
-
-    public InputPin lookupInputBlock(Block inputBlock) {
-        return this.inputLookupMap.get(inputBlock.getLocation());
-    }
-    
-    public OutputPin lookupOutputBlock(Block outputBlock) {
-        return this.outputLookupMap.get(outputBlock.getLocation());
-    }
-
+    /**
+     * 
+     * @param s a CommandSender
+     * @return true if the command sender paused his debugger.
+     */
     public boolean isDebuggerPaused(CommandSender s) {
         return pausedDebuggers.contains(s);
     }
 
+    /**
+     * 
+     * @param s a CommandSender
+     * @param pause Sets whether the debugger of this command sender is paused.
+     */
     public void pauseDebugger(CommandSender s, boolean pause) {
         if (pause) {
             if (!pausedDebuggers.contains(s)) pausedDebuggers.add(s);
@@ -609,6 +669,11 @@ public class CircuitManager {
         }
     }    
     
+    /**
+     * Unloads all chip in the specified world.
+     * 
+     * @param unloadedWorld 
+     */
     public void unloadWorldChips(World unloadedWorld) {
         HashMap<Integer, Circuit> unloadedCircuits = this.getCircuits(unloadedWorld);
         for (Circuit c : unloadedCircuits.values()) {
@@ -619,6 +684,20 @@ public class CircuitManager {
         rc.getCircuitPersistence().removeLoadedWorld(unloadedWorld);
     }
 
+    /**
+     * Generates a circuit id.
+     * 
+     * @return a new unused circuit id.
+     */
+    public int generateId() {
+        int i = 0;
+
+        if (circuits!=null)
+            while(circuits.containsKey(i)) i++;
+
+        return i;
+    }
+    
     private String[] getArgsFromSign(Sign sign) {
         String sargs = (sign.getLine(1) + " " + sign.getLine(2) + " " + sign.getLine(3)).replaceAll("\\xA7\\d", "");
         StringTokenizer t = new StringTokenizer(sargs);
@@ -642,13 +721,6 @@ public class CircuitManager {
         for (int i=0; i<c.structure.length; i++)
             structureLookupMap.put(c.structure[i], c);
 
-        for (int i=0; i<c.outputs.length; i++) {
-            Location l = c.outputs[i].getLocation();
-            if (!outputLookupMap.containsKey(l))
-                outputLookupMap.put(l, c.outputs[i]);
-            
-        }
-
         activationLookupMap.put(c.activationBlock, c);
 
         for (int i=0; i<c.inputs.length; i++) {
@@ -659,9 +731,20 @@ public class CircuitManager {
                 sourceLookupMap.get(l).add(c.inputs[i]);
             }
             
-            inputLookupMap.put(c.inputs[i].getLocation(), c.inputs[i]);
+            inputPinLookupMap.put(c.inputs[i].getLocation(), c.inputs[i]);
         }
 
+        for (int i=0; i<c.outputs.length; i++) {
+            for (Location l : c.outputs[i].getOutputBlocks()) {
+                if (!outputLookupMap.containsKey(l))
+                    outputLookupMap.put(l, new ArrayList<OutputPin>());
+                
+                outputLookupMap.get(l).add(c.outputs[i]);
+            }
+            
+            outputPinLookupMap.put(c.outputs[i].getLocation(), c.outputs[i]);
+        }
+        
         for (ChunkLocation chunk : c.circuitChunks) {
             if (!chunkLookupMap.containsKey(chunk))
                 chunkLookupMap.put(chunk, new ArrayList<Circuit>());
@@ -674,11 +757,11 @@ public class CircuitManager {
             structureLookupMap.remove(l);
 
         for (OutputPin o : c.outputs) {
-            outputLookupMap.remove(o.getLocation());
+            outputPinLookupMap.remove(o.getLocation());
         }
 
         for (InputPin i : c.inputs) {
-            inputLookupMap.remove(i.getLocation());
+            inputPinLookupMap.remove(i.getLocation());
         }
         
         List<Location> inputBlocksToRemove = new ArrayList<Location>();
@@ -696,6 +779,22 @@ public class CircuitManager {
         }
         for (Location l : inputBlocksToRemove)
             sourceLookupMap.remove(l);
+        
+        List<Location> outputBlocksToRemove = new ArrayList<Location>();
+        for (Location l : outputLookupMap.keySet()) {
+            List<OutputPin> pins = outputLookupMap.get(l);
+            List<OutputPin> toRemove = new ArrayList<OutputPin>();
+            for (OutputPin pin : pins) {
+                if (pin.getCircuit()==c)
+                    toRemove.add(pin);
+            }
+            
+            pins.removeAll(toRemove);
+            if (pins.isEmpty())
+                outputBlocksToRemove.add(l);
+        }
+        for (Location l : outputBlocksToRemove)
+            outputLookupMap.remove(l);
         
         activationLookupMap.remove(c.activationBlock);
 
@@ -715,20 +814,6 @@ public class CircuitManager {
         
         for (ChunkLocation loc : emptyChunks)
            chunkLookupMap.remove(loc);
-    }
-
-    /**
-     * Generates a circuit id.
-     * 
-     * @return a new unused circuit id.
-     */
-    public int generateId() {
-        int i = 0;
-
-        if (circuits!=null)
-            while(circuits.containsKey(i)) i++;
-
-        return i;
     }
     
     /**

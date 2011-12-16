@@ -87,6 +87,13 @@ commands:
 
       Use by pointing at a block and enter the command. Each chip reacts to it differently.
       Check the relevant chip documentation for more information about usage.
+  rctransmit:
+    description: Transmit data over a wireless channel.
+    usage: |
+      `/rctransmit <channel> [start-bit:]data ... [start-bit:]data
+      
+      data can be either an integer number, ascii character, or the letter 'b' followed by a binary number.
+    aliases: [rct]
   rcreset:
     description: Rescans and reactivates a chip.
     usage: |
@@ -251,6 +258,7 @@ permissions:
       redstonechips.command.rcprotect: true
       redstonechips.command.rctool: true
       redstonechips.command.rcname: true
+      redstonechips.command.rctransmit: true      
   redstonechips.command.admin:
     description: Grants access to all of RedstoneChips commands including admin commands.
     children:
@@ -303,6 +311,7 @@ permissions:
       redstonechips.command.rctool.deny: true
       redstonechips.command.rcname.deny: true
       redstonechips.command.rcname.id.deny: true
+      redstonechips.command.rctransmit.deny: true
   redstonechips.circuit.*:
     description: Grants access to create and destroy all RedstoneChips circuits.
     children:
@@ -475,6 +484,11 @@ permissions:
   redstonechips.command.rchelp.deny:
     default: false
     description: Denies the rchelp command.
+  redstonechips.command.rctransmit:
+    description: Grants the rctransmit command.
+  redstonechips.command.rctransmit.deny:
+    default: false
+    description: Denies the rctransmit command.
   redstonechips.circuit.destroy.*:
     description: Grants permission to destroy all circuits.
   redstonechips.circuit.create.*:

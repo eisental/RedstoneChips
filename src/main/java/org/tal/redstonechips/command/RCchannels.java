@@ -22,17 +22,17 @@ public class RCchannels extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
-        if (rc.broadcastChannels.isEmpty()) {
+        if (rc.getChannelManager().getBroadcastChannels().isEmpty()) {
             sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no active broadcast channels.");
         } else {
-            if (args.length>0 && rc.broadcastChannels.containsKey(args[0])) {
+            if (args.length>0 && rc.getChannelManager().getBroadcastChannels().containsKey(args[0])) {
                 if (!(checkChanPermissions(sender, args[0]))) {
                     return true;
                 }
                 printChannelInfo(sender, args[0]);
             } else {
                 List<String> lines = new ArrayList<String>();
-                for (BroadcastChannel channel : rc.broadcastChannels.values()) {
+                for (BroadcastChannel channel : rc.getChannelManager().getBroadcastChannels().values()) {
                     if (channel.checkChanPermissions(sender, false))
                         lines.add(ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers." + ChatColor.GREEN + (channel.isProtected()?" Protected":""));
                 }
@@ -56,7 +56,7 @@ public class RCchannels extends RCCommand {
         ChatColor errorColor = rc.getPrefs().getErrorColor();
         ChatColor extraColor = ChatColor.YELLOW;
 
-        BroadcastChannel channel = rc.broadcastChannels.get(channelName);
+        BroadcastChannel channel = rc.getChannelManager().getChannelByName(channelName, false);
         if (channel==null) {
             sender.sendMessage(errorColor + "Channel " + channelName + " doesn't exist.");
         } else {
@@ -111,12 +111,14 @@ public class RCchannels extends RCCommand {
     private boolean checkChanPermissions(CommandSender sender, String name) {
         if (!(sender instanceof Player)) return true;
         
-        if (!(rc.broadcastChannels.containsKey(name))) return true;
+        if (!(rc.getChannelManager().getBroadcastChannels().containsKey(name))) return true;
         
-        if (!(rc.broadcastChannels.get(name).isProtected())) return true;
+        if (!(rc.getChannelManager().getBroadcastChannels().get(name).isProtected())) return true;
         
         String playerName = ((Player)sender).getName();
-        if (((Player)sender).hasPermission("redstonechips.channel.admin") || rc.broadcastChannels.get(name).users.contains(playerName.toLowerCase()) || rc.broadcastChannels.get(name).owners.contains(playerName.toLowerCase())) {
+        if (((Player)sender).hasPermission("redstonechips.channel.admin") || 
+                rc.getChannelManager().getChannelByName(name, false).users.contains(playerName.toLowerCase()) || 
+                rc.getChannelManager().getChannelByName(name, false).owners.contains(playerName.toLowerCase())) {
             return true;
         }
         

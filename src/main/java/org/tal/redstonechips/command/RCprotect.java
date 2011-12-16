@@ -29,7 +29,7 @@ public class RCprotect extends RCCommand {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("listchannels")) {
                 String protectedChannels = "";
-                for (BroadcastChannel curChannel : rc.broadcastChannels.values()) {
+                for (BroadcastChannel curChannel : rc.getChannelManager().getBroadcastChannels().values()) {
                     if (curChannel.isProtected()) {
                         protectedChannels += curChannel.name + ", ";
                     }
@@ -41,8 +41,8 @@ public class RCprotect extends RCCommand {
                     if (sender != null) sender.sendMessage(rc.getPrefs().getInfoColor() + "There are no protected channels.");
                 }
                 
-            } else if (rc.broadcastChannels.containsKey(args[0])) {
-                BroadcastChannel curChannel = rc.broadcastChannels.get(args[0]);
+            } else if (rc.getChannelManager().getBroadcastChannels().containsKey(args[0])) {
+                BroadcastChannel curChannel = rc.getChannelManager().getChannelByName(args[0], false);
                 if (curChannel.isProtected()) {
                     if (!curChannel.checkChanPermissions(sender, false)) {
                         if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to list channel " + args[0] + ".");
@@ -84,7 +84,7 @@ public class RCprotect extends RCCommand {
         
             switch (protCommand) {
                 case PROTECT:
-                    curChannel = rc.getChannelByName(args[0]);
+                    curChannel = rc.getChannelManager().getChannelByName(args[0], true);
                     if (!curChannel.isProtected()) {
                         if (!(sender instanceof Player) && args.length < 3) {
                             if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "Usernames must be specified if run from console.");
@@ -108,8 +108,8 @@ public class RCprotect extends RCCommand {
                     }
                     break;
                 case UNPROTECT:
-                    if (rc.broadcastChannels.containsKey(args[0])) {
-                        curChannel = rc.broadcastChannels.get(args[0]);
+                    if (rc.getChannelManager().getBroadcastChannels().containsKey(args[0])) {
+                        curChannel = rc.getChannelManager().getChannelByName(args[0], false);
                         if (!curChannel.checkChanPermissions(sender, true)) {
                             if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to modify channel " + args[0] + ".");
                             return true;
@@ -126,8 +126,8 @@ public class RCprotect extends RCCommand {
                     }
                     break;
                 case ADD:
-                    if (rc.broadcastChannels.containsKey(args[0])) {
-                        curChannel = rc.getChannelByName(args[0]);
+                    if (rc.getChannelManager().getBroadcastChannels().containsKey(args[0])) {
+                        curChannel = rc.getChannelManager().getChannelByName(args[0], false);
                         if (!curChannel.checkChanPermissions(sender, true)) {
                             if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to modify channel " + args[0] + ".");
                             return true;
@@ -150,8 +150,8 @@ public class RCprotect extends RCCommand {
                     }
                     break;
                 case REMOVE:
-                    if (rc.broadcastChannels.containsKey(args[0])) {
-                        curChannel = rc.getChannelByName(args[0]);
+                    if (rc.getChannelManager().getBroadcastChannels().containsKey(args[0])) {
+                        curChannel = rc.getChannelManager().getChannelByName(args[0], true);
                         if (!curChannel.checkChanPermissions(sender, true)) {
                             if (sender != null) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permissions to modify channel " + args[0] + ".");
                             return true;

@@ -23,7 +23,7 @@ public class RedstoneChips extends RCCommand {
         sender.sendMessage("");
         sender.sendMessage(ChatColor.YELLOW + "Installed chip libraries:");
 
-        for (CircuitIndex i : org.tal.redstonechips.RedstoneChips.circuitLibraries) {
+        for (CircuitIndex i : rc.getCircuitLoader().getCircuitLibraries()) {
             sender.sendMessage(ChatColor.YELLOW + " - " + color + i.getName() + " " + i.getVersion());
         }
         sender.sendMessage(ChatColor.RED + "-----------------------------------------------------");

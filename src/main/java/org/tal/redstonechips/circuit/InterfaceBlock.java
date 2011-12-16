@@ -1,13 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips.circuit;
 
 import org.bukkit.Location;
 
 /**
- *
+ * Represents a chip interface block.
+ * 
  * @author Tal Eisenberg
  */
 public class InterfaceBlock extends IOBlock {

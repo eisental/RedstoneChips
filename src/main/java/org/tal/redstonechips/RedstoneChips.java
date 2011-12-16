@@ -22,7 +22,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.rcTypeReceiver;
-import org.tal.redstonechips.channel.*;
 import org.tal.redstonechips.command.*;
 
 /**
@@ -33,6 +32,7 @@ import org.tal.redstonechips.command.*;
 public class RedstoneChips extends JavaPlugin {
     
     private static final Logger log = Logger.getLogger("Minecraft");
+    private static List<CircuitIndex> preloadedLibs = new ArrayList<CircuitIndex>();
     
     private BlockListener rcBlockListener;
     private EntityListener rcEntityListener;
@@ -43,11 +43,9 @@ public class RedstoneChips extends JavaPlugin {
     private CircuitManager circuitManager;
     private CircuitPersistence circuitPersistence;
     private CircuitLoader circuitLoader;
-
-    public static List<CircuitIndex> circuitLibraries = new ArrayList<CircuitIndex>();
-
+    private ChannelManager channelManager;
+    
     public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
-    public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
     private Map<String, Material> playerChipProbe = new HashMap<String, Material>();
     
     public RCsel rcsel = new RCsel();
@@ -55,15 +53,15 @@ public class RedstoneChips extends JavaPlugin {
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), 
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), new RCtransmit(),
         new RCname(), new RCenable(), new RCdisable(), new org.tal.redstonechips.command.RedstoneChips()
     };
 
     @Override
     public void onEnable() {
         initManagers();
-        callLibraryRedstoneChipsEnable();
-        loadClasses();
+        loadLibraries();
+        callLibraryRedstoneChipsEnable();        
         prefsManager.loadPrefs();        
         registerEvents();
         registerCommands();
@@ -84,7 +82,7 @@ public class RedstoneChips extends JavaPlugin {
     private void postStartup() {
         if (!circuitPersistence.loadOldFile()) {
             for (World w : getServer().getWorlds()) {
-                if (!circuitPersistence.isWorldChipLoaded(w)) 
+                if (!circuitPersistence.isWorldLoaded(w)) 
                     circuitPersistence.loadCircuits(w);
             }
         }
@@ -108,6 +106,7 @@ public class RedstoneChips extends JavaPlugin {
         circuitManager = new CircuitManager(this);
         circuitPersistence = new CircuitPersistence(this);
         circuitLoader = new CircuitLoader(this);        
+        channelManager = new ChannelManager(this);
     }                
 
     private void registerCommands() {
@@ -128,8 +127,9 @@ public class RedstoneChips extends JavaPlugin {
             pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
-            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.BLOCK_PHYSICS, rcBlockListener, Priority.High, this);
+            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);            
             pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
@@ -146,7 +146,7 @@ public class RedstoneChips extends JavaPlugin {
      * @param lib Any object implementing the CircuitIndex interface.
      */
     public static void addCircuitLibrary(CircuitIndex lib) {
-        circuitLibraries.add(lib);
+        preloadedLibs.add(lib);
     }
 
     /** 
@@ -169,24 +169,32 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * Returns the plugin's circuit loader. The object responsible for creating new instances of Circuit classes.
-     * @return A reference to the plugin's CircuitLoader object.
+     * Returns the plugin circuit loader. The object responsible for creating new instances of Circuit classes.
+     * @return A reference to the plugin CircuitLoader object.
      */
     public CircuitLoader getCircuitLoader() {
         return circuitLoader;
     }
 
     /**
-     * Returns the plugin's circuit manager. The object responsible for creating and managing active circuits.
-     * @return A reference to the plugin's CircuitManager object.
+     * Returns the plugin circuit manager. The object responsible for creating and managing active circuits.
+     * @return A reference to the plugin CircuitManager object.
      */
     public CircuitManager getCircuitManager() {
         return circuitManager;
     }
 
     /**
-     * Returns the plugin's circuit loader. The object responsible for saving and loading the active circuit list from storage.
-     * @return A reference to the plugin's CircuitPresistence object.
+     * Returns the plugin circuit manager. The object responsible for maintaining wireless broadcast channels.
+     * @return A reference to the plugin ChannelManager object.
+     */
+    public ChannelManager getChannelManager() {
+        return channelManager;
+    }
+    
+    /**
+     * Returns the plugin circuit loader. The object responsible for saving and loading the active circuit list from storage.
+     * @return A reference to the plugin CircuitPresistence object.
      */
     public CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
@@ -217,95 +225,6 @@ public class RedstoneChips extends JavaPlugin {
 
         for (Location l : toremove)
             rcTypeReceivers.remove(l);
-    }
-
-    /**
-     * Adds the receiving circuit to listen on a channel and returns the BroadcastChannel object that the receiver
-     * was added to. If a BroadcastChannel by that name was not found a new one is created.
-     * 
-     * @param r The receiving circuit.
-     * @param channelName Name of the receiver's channel.
-     * @return The channel that the receiver was added to.
-     */
-    public BroadcastChannel registerReceiver(final ReceivingCircuit r, String channelName) {
-        final BroadcastChannel channel = getChannelByName(channelName);
-        channel.addReceiver(r);
-
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                channel.sendAllForReceiver(r);
-            }
-        });
-
-        return channel;
-    }
-
-    /**
-     * Adds the transmitter circuit to a channel and returns the BroadcastChannel object that the transmitter
-     * was added to. If a BroadcastChannel by that name was not found a new one is created.
-     *
-     * @param r The receiving circuit.
-     * @param channelName Name of the receiver's channel.
-     * @return The channel that the receiver was added to.
-     */
-    public BroadcastChannel registerTransmitter(TransmittingCircuit t, String channelName) {
-        BroadcastChannel channel = getChannelByName(channelName);
-        channel.addTransmitter(t);
-
-        return channel;
-    }
-
-    /**
-     * Removes this transmitter from the list and removes its channel if it's deserted.
-     * 
-     * @param t a transmitting circuit.
-     * @return true if the transmitter was actually removed.
-     */
-    public boolean removeTransmitter(TransmittingCircuit t) {
-        BroadcastChannel channel = t.getChannel();
-        if (channel==null) return false;
-        
-        boolean res = channel.removeTransmitter(t);
-        if (channel.isDeserted() && !channel.isProtected())
-            broadcastChannels.remove(channel.name);
-
-        return res;
-    }
-
-    /**
-     * Removes this receiver from the list and removes its channel if it's deserted.
-     * 
-     * @param r a receiving circuit.
-     * @return true if the receiver was actually removed.
-     */    
-    public boolean removeReceiver(ReceivingCircuit r) {
-        BroadcastChannel channel = r.getChannel();
-        if (channel==null) return false;
-        
-        boolean res = channel.removeReceiver(r);
-        if (channel.isDeserted() && !channel.isProtected())
-            broadcastChannels.remove(channel.name);
-
-        return res;
-    }
-
-    /**
-     * If the named channel doesn't exist, a new channel is created.
-     * 
-     * @param Channel name
-     * @return a BroadcastChannel instance representing the named channel. 
-     */
-    public BroadcastChannel getChannelByName(String name) {
-        BroadcastChannel channel;
-        if (broadcastChannels.containsKey(name))
-            channel = broadcastChannels.get(name);
-        else {
-            channel = new BroadcastChannel(name);
-            broadcastChannels.put(name, channel);
-        }
-
-        return channel;
     }
     
     /**
@@ -358,10 +277,10 @@ public class RedstoneChips extends JavaPlugin {
         return rcsel;
     }
         
-    private void loadClasses() {
+    private void loadLibraries() {
         String prefix = "[" + getDescription().getName() + "] Loading ";
         
-        for (CircuitIndex lib : circuitLibraries) {
+        for (CircuitIndex lib : preloadedLibs) {
             String libMsg = prefix + lib.getName() + " " + lib.getVersion() + " > ";
             Class<? extends Circuit>[] classes = lib.getCircuitClasses();
             
@@ -381,7 +300,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     private void callLibraryRedstoneChipsEnable() {
-        for (CircuitIndex lib : circuitLibraries) {
+        for (CircuitIndex lib : circuitLoader.getCircuitLibraries()) {
             lib.onRedstoneChipsEnable(this);
         }        
     }

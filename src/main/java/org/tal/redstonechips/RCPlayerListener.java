@@ -18,6 +18,11 @@ class RCPlayerListener extends PlayerListener {
         this.rc = rc;
     }
 
+    /**
+     * Removes the player from chip debugging lists.
+     * 
+     * @param event 
+     */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
         rc.getCircuitManager().checkDebuggerQuit(event.getPlayer());

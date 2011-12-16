@@ -253,12 +253,20 @@ public class PrefsManager {
 
     /**
      *
-     * @return a Map containing every preference keys currently set.
+     * @return a Map containing all preference keys.
      */
     public Map<String, Object> getPrefs() {
         return prefs;
     }
 
+    /**
+     * Tries to find a material according to search string m.
+     * The string can be either a material name or a name and data value combination such as: wool:orange or wood:1.
+     * 
+     * @param m 
+     * @return a MaterialData that matches the search string.
+     * @throws IllegalArgumentException when parameter m is invalid.
+     */
     public static MaterialData findMaterial(String m) throws IllegalArgumentException {
         try {
             // try to parse as int type id.

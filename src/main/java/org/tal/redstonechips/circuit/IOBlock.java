@@ -3,7 +3,8 @@ package org.tal.redstonechips.circuit;
 import org.bukkit.Location;
 
 /**
- *
+ * Represents an IO chip block. Currently, this is either an input, output or interface block.
+ * 
  * @author Tal Eisenberg
  */
 public abstract class IOBlock {
@@ -26,6 +27,15 @@ public abstract class IOBlock {
     protected Location loc = null;
     protected int index = -1;
     
+    /**
+     * Creates an IOBlock instance of the desired type.
+     * 
+     * @param type IO block type.
+     * @param c owner circuit of the block.
+     * @param l block location.
+     * @param index the block pin index in the circuit.
+     * @return new IOBlock instance.
+     */
     public static IOBlock makeIOBlock(Type type, Circuit c, Location l, int index) {
         switch (type) {
             case OUTPUT:

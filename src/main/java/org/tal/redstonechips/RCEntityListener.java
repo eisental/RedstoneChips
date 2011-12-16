@@ -15,6 +15,11 @@ class RCEntityListener extends EntityListener {
         this.rc = rc;
     }
     
+    /**
+     * Breaks a chip if it exploded.
+     * 
+     * @param event 
+     */
     @Override
     public void onEntityExplode(EntityExplodeEvent event) {
         if (event.isCancelled()) return;

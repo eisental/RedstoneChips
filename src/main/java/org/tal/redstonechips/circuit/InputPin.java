@@ -14,7 +14,7 @@ import org.bukkit.block.Block;
  * @author Tal Eisenberg
  */
 public class InputPin extends IOBlock {
-    public enum InputSource { REDSTONE, DIRECT };
+    public enum SourceType { REDSTONE, DIRECT };
     
     private Map<Location, Boolean> sourceBlocks;
     private Location bottomSourceBlock;
@@ -25,7 +25,7 @@ public class InputPin extends IOBlock {
      *
      * @param circuit The circuit this pin belongs to.
      * @param loc The physical location of the input pin.
-     * @param index The input pin's order index in the circuit.
+     * @param index The input pin order index in the circuit.
      */
     public InputPin(Circuit circuit, Location inputBlock, int index) {
         super(circuit, inputBlock, index);
@@ -43,9 +43,7 @@ public class InputPin extends IOBlock {
     }
 
     /**
-     * Calculates the overall state of the pin according to the state of its surrounding blocks - the power blocks.
-     *
-     * @return The OR value of the redstone current state in each of the power blocks.
+     * Calculates the overall state of the pin according to the state of its surrounding source blocks.
      */
     public boolean getPinValue() {
         boolean ret = false;
@@ -80,15 +78,19 @@ public class InputPin extends IOBlock {
      *
      * @param loc The location of the updated block.
      * @param newVal The new redstone current of the block.
-     * @throws IllegalArgumentException If the block in the provided location is not a power block of the input.
+     * @param source The source type.
+     * @throws IllegalArgumentException If the block in the provided location is not a source block of the input.
      */
-    public void updateValue(Block block, boolean newVal, InputSource source) throws IllegalArgumentException {
+    public void updateValue(Block block, boolean newVal, SourceType source) throws IllegalArgumentException {
         Location l = block.getLocation();
 
         if (!sourceBlocks.containsKey(l))
             throw new IllegalArgumentException("Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
         else {
-            if (source==InputSource.REDSTONE && l.equals(bottomSourceBlock)) return;
+            if (source==SourceType.REDSTONE && l.equals(bottomSourceBlock)) {
+                sourceBlocks.put(l, false);
+                return;
+            }
             
             long curTick = circuit.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
@@ -100,14 +102,14 @@ public class InputPin extends IOBlock {
 
             lastRedstoneChangeTick = curTick;
 
-            circuit.redstoneChange(getIndex(), getPinValue());
+            circuit.stateChange(getIndex(), getPinValue());
         }
 
     }
 
     /**
      *
-     * @return The power blocks surrounding this input pin.
+     * @return All source blocks surrounding this input pin.
      */
     public Iterable<Location> getSourceBlocks() {
         return sourceBlocks.keySet();
@@ -146,7 +148,8 @@ public class InputPin extends IOBlock {
         Block b = loc.getBlock();
 
         if (b.getType()==Material.REDSTONE_WIRE) {
-            state = b.getData()>0;
+            if (loc.equals(bottomSourceBlock)) state = false;
+            else state = b.getData()>0;
         } else if (b.getType() == Material.LEVER) {
             byte data = b.getData();
             state = (data&8) == 8;

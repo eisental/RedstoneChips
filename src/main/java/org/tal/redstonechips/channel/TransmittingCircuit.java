@@ -6,5 +6,10 @@ package org.tal.redstonechips.channel;
  * 
  * @author Tal Eisenberg
  */
-public abstract class TransmittingCircuit extends WirelessCircuit{
+public abstract class TransmittingCircuit extends WirelessCircuit {
+    @Override
+    public void circuitShutdown() {
+        if (this.getChannel()!=null) redstoneChips.getChannelManager().removeTransmitter(this);
+    }
+    
 }

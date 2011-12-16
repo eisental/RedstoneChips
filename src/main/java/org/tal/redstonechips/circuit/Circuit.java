@@ -109,7 +109,10 @@ public abstract class Circuit {
     public ChunkLocation[] circuitChunks;
 
     /**
-     *
+     * Initializes the circuit. 
+     * Updates input pin values according to source blocks.
+     * Refreshes the output pins according to input states if the circuit is stateless.
+     * 
      * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
      * @param args The sign arguments of this circuit. Stored in the args field.
      * @return result of call to abstract Circuit.init() method.
@@ -153,14 +156,14 @@ public abstract class Circuit {
     }
 
     /**
-     * Called by the plugin whenever a redstone change event is fired with a new redstone current on blocks surrounding or on top of 
-     * a circuit input. If the new value is different from the corresponding value stored in inputBits the inputBits value is updated
+     * Called by the plugin whenever an input pin changes state.
+     * If the new state is different from the previous state stored in inputBits the inputBits value is updated
      * and the inputChange(idx, newVal) method is called.
      *
-     * @param block The block that changed current level.
+     * @param idx The changed input pin index.
      * @param newVal true if the current is greater than 0.
      */
-    public void redstoneChange(int idx, boolean newVal) {
+    public void stateChange(int idx, boolean newVal) {
         if (disabled) return;
 
         if (inputBits.get(idx)==newVal) return;
@@ -179,6 +182,9 @@ public abstract class Circuit {
         inputChange(idx, newVal);
     }
 
+    /**
+     * Resets outputs, calls circuitShutdown() and circuitDestroyed().
+     */
     public void destroyCircuit() {
         circuitShutdown();
         
@@ -188,15 +194,15 @@ public abstract class Circuit {
     }
     
     /**
-     * Called when a redstone change event occurred on one of the circuit input blocks.
+     * Called when an input pin state is changed.
      *
-     * @param inIdx index of changed input pin. 0 is closest to the sign block.
-     * @param state The new state of the changed input.
+     * @param inIdx index of changed input pin. 
+     * @param state The new state of the input pin.
      */
     public abstract void inputChange(int inIdx, boolean state);
 
     /**
-     * Called when right-clicking the sign or when the plugin reads circuit data from file after restarting the server.
+     * Called after the chip is activated by a user or after the chip is loaded from file.
      * 
      * @param sender The command sender that activated the chip, or null if called on startup.
      * @param args Any words on the sign after the circuit type.
@@ -219,9 +225,9 @@ public abstract class Circuit {
     public void save() { }
 
     /**
-     * Called when the plugin loads a circuit from disk after a server restart.
+     * Called when the plugin loads a circuit from file.
      *
-     * @param state Map containing state data that was read from file. should hold the same data that was returned by saveState()
+     * @param state Map containing state data that was read from the file. The map should hold the same data that was returned by saveState()
      */
     public void setInternalState(Map<String,String> state) {}
 
@@ -239,9 +245,8 @@ public abstract class Circuit {
 
     /**
      * Sets the physical state of one of the outputs.
-     * Changes the data byte of the selected output block to make the lever turn on or off.
      *
-     * @param outIdx Output index. 0 for first output (closest to the sign) and so forth.
+     * @param outIdx Output index. First output is 0.
      * @param state The new state of the output.
      */
     protected void sendOutput(int outIdx, boolean state) {
@@ -282,15 +287,10 @@ public abstract class Circuit {
      * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
      */
     protected void sendBitSet(int startOutIdx, int length, BitSet7 bits) {
-//        BitSet7 original = outputBits.get(startOutIdx, startOutIdx+length);
-
         for (int i=0; i<length; i++) {
             boolean b = bits.get(i);
-//            if (original.get(i)!=b)
             sendOutput(startOutIdx+i, b);
         }
-
-        //sendOutput(startOutIdx+length-1, bits.get(length-1));
     }
 
     /**
@@ -338,6 +338,12 @@ public abstract class Circuit {
                     (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
     }
 
+    /**
+     * Sends a debug message to all io debugging players of this circuit, using the debug chat color preferences key.
+     * Please check that hasDebuggers() returns true before processing any debug messages.
+     *
+     * @param message The error message.
+     */    
     protected void ioDebug(String message) {
         for (CommandSender s : iodebuggers)
             if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
@@ -599,7 +605,7 @@ public abstract class Circuit {
     }
 
     /**
-     * Updates the text of the 1st line of the circuit's activation sign.
+     * Updates the text and color of the 1st line of the circuit activation sign.
      * @param activated When true the class name is colored in the selected signColor preference key. When false the color is removed.
      */
     public void updateCircuitSign(boolean activated) {
@@ -636,7 +642,7 @@ public abstract class Circuit {
 
     /**
      *
-     * @return true if any of the circuit's chunks are loaded.
+     * @return true if any of the circuit chunks are loaded.
      */
     public boolean isCircuitChunkLoaded() {
         return chunksLoaded;
@@ -672,6 +678,9 @@ public abstract class Circuit {
         return true;
     }
 
+    /**
+     * Turns off all outputs.
+     */
     public void resetOutputs() {
         for (OutputPin o : outputs)            
             o.changeOutputState(false);
@@ -681,6 +690,10 @@ public abstract class Circuit {
         return redstoneChips;
     }
 
+    /**
+     * Initalizes the output buffer. Can only be used before calling initCircuit().
+     * @param bits 
+     */
     public void setOutputBits(BitSet7 bits) {
         if (outputBits==null) outputBits = bits;
         else throw new RuntimeException("Trying to set outputBits, but it's already set.");

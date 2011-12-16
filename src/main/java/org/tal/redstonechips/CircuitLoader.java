@@ -32,9 +32,9 @@ public class CircuitLoader {
     }
 
     /**
-     * Adds the class to the circuit pool, allowing players to create circuits of this class.
+     * Adds all class in the circuit library to the circuit pool allowing players to create circuits of this class.
      *
-     * @param c The class to add. must extend org.tal.redstonechips.Circuit.
+     * @param lib The circuit library to add. 
      */
     public void addCircuitIndex(CircuitIndex lib) {
         for (Class c : lib.getCircuitClasses()) {
@@ -55,9 +55,9 @@ public class CircuitLoader {
     }
 
     /**
-     * Removes a class from the circuit pool
+     * Removes a circuit library from the circuit pool.
      *
-     * @param c Class to remove.
+     * @param lib Library to remove.
      * @return result of Map.remove() method.
      */
     public Object removeCircuitIndex(CircuitIndex lib) {
@@ -88,6 +88,10 @@ public class CircuitLoader {
         return circuitClasses;
     }
 
+    /**
+     * 
+     * @return a List of installed circuit libraries.
+     */
     public List<CircuitIndex> getCircuitLibraries() {
         return libraries;
     }
