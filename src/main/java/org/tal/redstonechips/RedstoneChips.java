@@ -1,5 +1,9 @@
 package org.tal.redstonechips;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +92,27 @@ public class RedstoneChips extends JavaPlugin {
         }
         
         circuitPersistence.loadChannels();
-        log(Level.INFO, (isEnabled()?"Enabled.":"Disabled.") + " Running " + circuitManager.getCircuits().size() + " active chip(s).");        
+        log(Level.INFO, "Processing " + circuitManager.getCircuits().size() + " active chip(s).");
+        
+        Runnable updater = new Runnable() {
+
+            @Override
+            public void run() {
+                String ver;
+                try {
+                    ver = checkUpdate();
+                } catch (IOException ex) {
+                    log(Level.WARNING, "Couldn't check for an update (" + ex.getClass().getSimpleName() + ").");
+                    return;
+                }
+                if (ver!=null) {
+                    log(Level.INFO, "A new RedstoneChips version (" + ver + ") is available.\n"
+                            + "To download the update go to: http://eisental.github.com/RedstoneChips");
+                }
+            }
+        };
+        getServer().getScheduler().scheduleAsyncDelayedTask(this, updater);
+        
     }
     
     @Override
@@ -304,4 +328,21 @@ public class RedstoneChips extends JavaPlugin {
             lib.onRedstoneChipsEnable(this);
         }        
     }
+    
+    /**
+     * Checks for a new RedstoneChips version.
+     * 
+     * @return The new version string or null if there is none.
+     * @throws IOException When a network error occurs.
+     */
+    public String checkUpdate() throws IOException {
+        URL currentversion = new URL("http://eisental.github.com/RedstoneChips/currentversion");
+        BufferedReader in = new BufferedReader(new InputStreamReader(currentversion.openStream()));
+        String inputLine = in.readLine().trim().toLowerCase();
+        in.close();        
+        
+        if (inputLine!=null && !inputLine.isEmpty() && !getDescription().getVersion().equals(inputLine)) return inputLine;
+        else return null;                
+    }
+    
 }
