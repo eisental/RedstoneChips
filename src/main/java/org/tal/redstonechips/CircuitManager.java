@@ -130,8 +130,14 @@ public class CircuitManager {
         
         if (params==null || (params.outputs.isEmpty() && params.inputs.isEmpty() && params.interfaces.isEmpty())) return -1;
 
+        for (Block b : params.structure) {
+            if (this.getCircuitByStructureBlock(b.getLocation())!=null) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "One of the chip blocks (" + rc.getPrefs().getInfoColor() + b.getType().name().toLowerCase() + rc.getPrefs().getErrorColor() + ") already belongs to another chip.");
+                return -2;
+            }
+        }
+        
         Circuit c;
-
         try {
             c = rc.getCircuitLoader().getCircuitInstance(signClass);
         } catch (InstantiationException ex) {
@@ -158,13 +164,15 @@ public class CircuitManager {
 
         c.inputs = new InputPin[params.inputs.size()];
         for (int i=0; i<params.inputs.size(); i++) {
-            InputPin ip = new InputPin(c, params.inputs.get(i).getLocation(), i);
+            Location l = params.inputs.get(i).getLocation();
+            InputPin ip = new InputPin(c, l, i);
             c.inputs[i] = ip;
         }
 
         c.outputs = new OutputPin[params.outputs.size()];
         for (int i=0; i<params.outputs.size(); i++) {
-            OutputPin op = new OutputPin(c, params.outputs.get(i).getLocation(), i);
+            Location l = params.outputs.get(i).getLocation();
+            OutputPin op = new OutputPin(c, l, i);
             c.outputs[i] = op;
         }
 

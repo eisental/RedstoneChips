@@ -56,7 +56,8 @@ public class BitSetUtils {
     /**
      * Convert a BitSet to a binary representation string.
      * Converting each bit into "0" or "1".
-     * Result is a binary number with its most significant bit on the left.
+     * The result is a binary number with its most significant bit on the left.
+     * 
      * @param b BitSet to convert
      * @param startBit Start converting from this bit. Treat it as the least significant bit.
      * @param length Number of bits to read from the BitSet after the startBit.
@@ -76,6 +77,32 @@ public class BitSetUtils {
         return ret.toString();
     }
 
+    public static String bitSetToString(BitSet7 bits, int length) {
+        String sbits = "";
+        for (int i=length-1; i>=0; i--)
+            sbits += (bits.get(i)?"1":"0");
+
+        return sbits;
+    }
+    
+    /**
+     * Converts a string into a BitSet. 
+     * The first character is the most significant bit. 
+     * a '1' character is converted to true. 
+     * Every other character is converted to false.
+     * 
+     * @param sbits The string to convert.
+     */
+    public static BitSet7 stringToBitSet(String sbits) {
+        BitSet7 bits = new BitSet7(sbits.length());
+
+        for (int i=sbits.length()-1; i>=0; i--) {
+            bits.set(sbits.length()-1-i, (sbits.charAt(i)=='1'));
+        }
+
+        return bits;
+    }
+    
     /**
      * Shifts bits of a BitSet object one place to the left.
      * Stores new value in the same BitSet.
@@ -149,14 +176,6 @@ public class BitSetUtils {
         return map;
     }
 
-    public static String bitSetToString(BitSet7 bits, int length) {
-        String sbits = "";
-        for (int i=length-1; i>=0; i--)
-            sbits += (bits.get(i)?"1":"0");
-
-        return sbits;
-    }
-
     /**
      * Parses a string representation of a BitSet into a BitSet7 object. Used for loading circuit state from file.
      * @param map The map to read the BitSet string from.
@@ -167,15 +186,5 @@ public class BitSetUtils {
         String sbits = map.get(key);
         if (sbits==null) return null;
         else return stringToBitSet(sbits);
-    }
-
-    public static BitSet7 stringToBitSet(String sbits) {
-        BitSet7 bits = new BitSet7(sbits.length());
-
-        for (int i=sbits.length()-1; i>=0; i--) {
-            bits.set(sbits.length()-1-i, (sbits.charAt(i)=='1'));
-        }
-
-        return bits;
     }
 }

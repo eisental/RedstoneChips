@@ -7,6 +7,9 @@ package org.tal.redstonechips.channel;
  * @author Tal Eisenberg
  */
 public abstract class TransmittingCircuit extends WirelessCircuit {
+    /**
+     * Unregisters the transmitter.
+     */
     @Override
     public void circuitShutdown() {
         if (this.getChannel()!=null) redstoneChips.getChannelManager().removeTransmitter(this);

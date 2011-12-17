@@ -2,18 +2,20 @@ package org.tal.redstonechips.circuit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
- * Represents an input pin of a circuit. Used for finding out if redstone current change in a block
- * should change an input value of a circuit.
- * The class keeps track of the surrounding blocks on the sides of the input location and the block on top of it.
+ * Represents an input pin of a chip. 
  *
  * @author Tal Eisenberg
  */
 public class InputPin extends IOBlock {
+    /**
+     * The type of a signal change source.
+     */
     public enum SourceType { REDSTONE, DIRECT };
     
     private Map<Location, Boolean> sourceBlocks;
@@ -85,7 +87,7 @@ public class InputPin extends IOBlock {
         Location l = block.getLocation();
 
         if (!sourceBlocks.containsKey(l))
-            throw new IllegalArgumentException("Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
+            circuit.getPlugin().log(Level.WARNING, "Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
         else {
             if (source==SourceType.REDSTONE && l.equals(bottomSourceBlock)) {
                 sourceBlocks.put(l, false);

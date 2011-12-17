@@ -32,7 +32,7 @@ import java.nio.LongBuffer;
 import java.util.Arrays;
 
 /**
- * Borrowed from JDK7 so I can use the new valueOf() methods.
+ * Borrowed from JDK7 so I can use the new valueOf() methods.<br/>
  *
  * This class implements a vector of bits that grows as needed. Each
  * component of the bit set has a {@code boolean} value. The

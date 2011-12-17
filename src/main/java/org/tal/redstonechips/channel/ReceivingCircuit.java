@@ -17,6 +17,9 @@ public abstract class ReceivingCircuit extends WirelessCircuit {
      */
     public abstract void receive(BitSet7 bits);
     
+    /**
+     * unregisters the receiver.
+     */
     @Override
     public void circuitShutdown() {
         if (getChannel()!=null) redstoneChips.getChannelManager().removeReceiver(this);

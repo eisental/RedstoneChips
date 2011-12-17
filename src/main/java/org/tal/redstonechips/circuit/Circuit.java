@@ -36,12 +36,12 @@ public abstract class Circuit {
     public String[] args;
 
     /**
-     * Input block locations. The circuit will listen to redstone change events around these blocks.
+     * Ordered list of input pins. 
      */
     public InputPin[] inputs;
 
     /**
-     * List of output blocks.
+     * Ordered list of output pins.
      */
     public OutputPin[] outputs;
 
@@ -92,7 +92,7 @@ public abstract class Circuit {
     public boolean disabled = false;
 
     /**
-     * The circuits id. Set by CircuitManager.
+     * The circuit id. Set by CircuitManager.
      */
     public int id = -1;
 
@@ -686,6 +686,10 @@ public abstract class Circuit {
             o.changeOutputState(false);
     }
 
+    /**
+     * 
+     * @return an instance of the RedstoneChips plugin.
+     */
     public RedstoneChips getPlugin() {
         return redstoneChips;
     }

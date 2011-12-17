@@ -17,7 +17,7 @@ import org.tal.redstonechips.channel.TransmittingCircuit;
 public class ChannelManager {
     private RedstoneChips rc;
     
-    public Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
+    private Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
     
     ChannelManager(RedstoneChips rc) {
         this.rc = rc;
@@ -38,7 +38,7 @@ public class ChannelManager {
         rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
             @Override
             public void run() {
-                channel.sendAllForReceiver(r);
+                channel.updateReceiver(r);
             }
         });
 

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
- * Represents a circuit tat can either transmit or receive wireless messages.
+ * Represents a circuit that can either transmit or receive wireless messages.
  *
  * @author Tal Eisenberg
  */
@@ -45,9 +45,11 @@ public abstract class WirelessCircuit extends Circuit {
     }
 
     /**
-     *
-     * @param channelString
-     * @throws IllegalArgumentException
+     * Parses the channel string and registers the chip as a wireless circuit.
+     * 
+     * @param sender The chip creator.
+     * @param channelString The channel and optionally the starting bit to communicate on. Format: channel-name[:start-bit]
+     * @throws IllegalArgumentException when channelString is invalid or the creator doesn't have channel permissions.
      */
     protected void initWireless(CommandSender sender, String channelString) throws IllegalArgumentException {
         String name;

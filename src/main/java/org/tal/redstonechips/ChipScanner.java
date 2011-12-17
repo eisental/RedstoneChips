@@ -11,7 +11,8 @@ import org.bukkit.material.Wool;
 import org.tal.redstonechips.util.Locations;
 
 /**
- *
+ * A class for scanning chip block structures.
+ * 
  * @author Tal Eisenberg
  */
 public class ChipScanner {
@@ -23,7 +24,7 @@ public class ChipScanner {
     }
 
     /**
-     * Used for passing argument when scanning recursively for chips.
+     * Used for passing arguments when scanning recursively for chips.
      */
     public class ScanParameters {
         /**
@@ -87,8 +88,9 @@ public class ChipScanner {
      * 
      * @param signBlock The sign block of the scanned chip.
      * @return A ScanParameters object describing the chip structure.
+     * @throws ChipScanException if the structure is not a valid chip.
      */
-    public ScanParameters scan(Block signBlock, MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
+    public ScanParameters scan(Block signBlock, MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) throws ChipScanException {
         BlockFace direction = ((org.bukkit.material.Sign)signBlock.getState().getData()).getAttachedFace();
         Block firstChipBlock = signBlock.getRelative(direction);
 

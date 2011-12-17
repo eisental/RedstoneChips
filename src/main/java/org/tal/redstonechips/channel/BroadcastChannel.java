@@ -26,9 +26,13 @@ public class BroadcastChannel {
     public BitSet7 bits = new BitSet7();
 
     /**
-     * Security Information.
+     * Channel owners when it's protected. 
      */
     public List<String> owners = new ArrayList<String>();
+    
+    /**
+     * Channel users when it's protected.
+     */
     public List<String> users = new ArrayList<String>();
 
     private int length = 0;
@@ -171,7 +175,11 @@ public class BroadcastChannel {
         }
     }
 
-    public void sendAllForReceiver(ReceivingCircuit r) {
+    /**
+     * Sends the receiving circuit all current channel bit values.
+     * @param r A receiving circuit.
+     */
+    public void updateReceiver(ReceivingCircuit r) {
         transmitToReceiver(r, 0, length);
     }
     
@@ -179,6 +187,12 @@ public class BroadcastChannel {
         return !owners.isEmpty() || !users.isEmpty();
     }
     
+    /**
+     * 
+     * @param sender
+     * @param admin whether sender should be an admin/owner of this channel.
+     * @return true if the sender have permissions.
+     */
     public boolean checkChanPermissions(CommandSender sender, boolean admin) {
         if (!(sender instanceof Player)) return true;
         
