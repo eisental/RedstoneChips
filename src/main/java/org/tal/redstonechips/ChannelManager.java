@@ -32,15 +32,19 @@ public class ChannelManager {
      * @return The channel that the receiver was added to.
      */
     public BroadcastChannel registerReceiver(final ReceivingCircuit r, String channelName) {
+        boolean exists = broadcastChannels.containsKey(channelName);
+
         final BroadcastChannel channel = getChannelByName(channelName, true);
         channel.addReceiver(r);
 
-        rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
-            @Override
-            public void run() {
-                channel.updateReceiver(r);
-            }
-        });
+        if (exists) {
+            rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
+                @Override
+                public void run() {
+                    channel.updateReceiver(r);
+                }
+            });
+        }
 
         return channel;
     }

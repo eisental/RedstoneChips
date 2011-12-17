@@ -52,7 +52,7 @@ public abstract class Circuit {
     public Location[] structure;
 
     /**
-     * Interface block locations. Used for interaction points with the "physical" world.
+     * Ordered list of interface blocks. Used for interaction points with the "physical" world.
      */
     public InterfaceBlock[] interfaceBlocks;
 
