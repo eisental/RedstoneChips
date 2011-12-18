@@ -1,5 +1,6 @@
 package org.tal.redstonechips;
 
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,7 +11,8 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.material.RedstoneTorch;
+import org.bukkit.material.Attachable;
+import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.circuit.OutputPin;
 
 /**
@@ -78,26 +80,24 @@ class RCBlockListener extends BlockListener {
      */
     @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
-        if (event.isCancelled()) return;
-        
         Block b = event.getBlock();
         if (b.getType()==Material.REDSTONE_TORCH_ON || b.getType()==Material.REDSTONE_TORCH_OFF) {
-            BlockState s = b.getState();
-            if (s.getData().getData()==(byte)5) return;
-            RedstoneTorch t = (RedstoneTorch)s.getData();
-            BlockFace f = t.getAttachedFace();            
+            // check if its an output device of a chip:
+            List<OutputPin> pins = rc.getCircuitManager().getOutputPinByOutputBlock(b.getLocation());            
+            if (pins==null) return;
+            
+            Attachable a = (Attachable)b.getState().getData();
+            BlockFace f = a.getAttachedFace();
             if (f==null) return;
             
             Block attached = b.getRelative(f);
-            byte data = b.getData();
-            OutputPin o = rc.getCircuitManager().getOutputPin(attached.getLocation());
-            if (o!=null) {
-                if (o.getState()) {
-                    s.setType(Material.REDSTONE_TORCH_ON);
-                } else s.setType(Material.REDSTONE_TORCH_OFF);
-                s.getData().setData(data);
-                event.setCancelled(true);
-                s.update();
+
+            for (OutputPin o : pins) {
+                if (attached.getLocation().equals(o.getLocation())) {
+                    Material m = o.getState()?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF;
+                    b.setType(m);
+                    event.setCancelled(true);                    
+                } 
             }
         }  
     }    

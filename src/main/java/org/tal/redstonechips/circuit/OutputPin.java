@@ -139,9 +139,7 @@ public class OutputPin extends IOBlock {
                 s.update();
                 circuit.world.playEffect(outputBlock.getLocation(), Effect.DOOR_TOGGLE, 0);
             }
-        } else if (outputBlock.getType()==Material.REDSTONE_TORCH_OFF || outputBlock.getType()==Material.REDSTONE_TORCH_ON) {
-            if (outputBlock.getData()==(byte)5) return false;
-            
+        } else if (outputBlock.getType()==Material.REDSTONE_TORCH_OFF || outputBlock.getType()==Material.REDSTONE_TORCH_ON) {            
             Attachable a = (Attachable)outputBlock.getState().getData();
             BlockFace f = a.getAttachedFace();
             Block attached;
