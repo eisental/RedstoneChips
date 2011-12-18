@@ -4,10 +4,11 @@ RedstoneChips
 RedstoneChips is a Bukkit plugin that allows you to build custom redstone chips on your craftbukkit minecraft server.
 Circuits can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
-- RedstoneChips - The core plugin that handles circuit detection and activation, managing preferences and handling player commands. You must install this plugin to be able to build redstone chips.
-- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The base circuit library containing many different circuit classes. 
+- RedstoneChips - The core plugin (required). 
 
-- [SensorLibrary](http://github.com/eisental/SensorLibrary) - An extra circuit library for sensor chips.
+- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The basic chip library containing most chip types you might need (required).
+
+- [SensorLibrary](http://github.com/eisental/SensorLibrary) - A chip library for various sensor chips (optional).
 
 Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info about the circuit libraries.
 
@@ -15,12 +16,42 @@ __For much more information, visit the [RedstoneChips](http://eisental.github.co
 
 Installation
 ------------
-* Download latest RedstoneChips.jar file.
-* Download latest BasicCircuits.jar file.
-* Copy both jar files to the plugins folder of your craftbukkit installation. 
+* [Download](http://eisental.github.com/RedstoneChips) the latest version bundle.
+* Copy all jar files to the plugins folder of your craftbukkit installation. 
 
 Changelog
 ----------
+### RedstoneChips 0.93 (19/12/11)
+Features:
+- Redstone torches, doors, trapdoors and powered rails can be directly controlled by an output block in addition to levers.
+- A chip will activate also when one of its output pin has no devices (levers, torches, etc.) connected to it.
+- Multiple output devices can be connected to one output block.
+- An output block that has no output devices will try to send a signal directly to adjacent input blocks (this includes blocks above or below the output block). This doesn't use redstone at all and is considerably faster.  
+- Chips are not allowed to share blocks any more.
+- new /rctransmit (alias /rct) command for transmitting data over wireless channels.
+- New chip probe tool. define an item as a probe using /rctool. Right-click on a chip pin to display pin info, right-click on a chip block to display chip info, right-click on the chip sign to enable/disable debug. You can't change lever state or activate circuits when using the tool.
+- Added ability to name chips using /rcname. Any command that worked with a chip id also works with a chip name. rcdebug uses the chip name in messages.
+- World circuit files are not created unless the world has chips on it. World files that no longer contain any chips are deleted.
+- Added /rcenable and /rcdisable commands. Disabled chips will stay disabled after a server restart.
+- Added permission list for each command in /rchelp.
+- Added /rchelp all, mostly so I could copy paste it to the website.
+- Added a check for plugin updates on plugin startup and in /rc command.
+- /rcpin now works with interface blocks, input blocks (pin or source) and output blocks (pin or output device).
+- The last message on all protected channels is transmitted to the channel receivers on server startup.
+- Block place event is cancelled when trying to activate a chip so that right-clicking a sign with a block in hand won't place the block.
+- /rcclasses displays classes by libraries. 
+- Changes to command messages and help texts.
+
+Bugfixes:
+- Fixed the /reload bug
+- Fixed remote chip break permission.
+- Fixed NPE that occurred when an output lever had an invalid data value. Added a check for invalid output levers in circuit integrity check.
+- Fixed line wrapping and some other things in page maker.
+- Chips are properly shutdown after unloading a world.
+- The plugin will disable on startup if an invalid preference value is found in preferences.yml file
+- Chunks properly load when necessary. This should solve various chunk related bugs.
+- The plugin doesn't save twice on server shutdown.
+
 #### RedstoneChips 0.92 (4/12/11)
 - Compatible with craftbukkit build 1532+- and Minecraft 1.0.
 - Different wool colors act as different materials when used as a chip block (by @AterIgnis). 
