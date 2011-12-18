@@ -3,57 +3,59 @@ layout: main
 title: Integrated circuits plugin for bukkit.
 ---
 
-<p><em>RedstoneChips</em> is a <a href="http://bukkit.org">Bukkit</a> plugin that enhances SMP minecraft allowing you to build custom chips on your minecraft server. 
-</p>
-<img src="http://eisental.github.com/RedstoneChips/images/sevensegment2.png" class="bbCodeImage LbImage" alt="[IMG]" />
-<ul> 
-<li>Build music sequencers, wool graphic displays, motion detectors, light sensors, scrolling signs and much more.</li> 
-<li>Process binary numbers of any size using redstone and send them wirelessly all over your world or to other worlds or servers.</li> 
-<li>Build chips with any amount of inputs and outputs. From compact 1 input / 1 output to monster chips processing hundreds of bits.</li> 
-<li>Customize chips by adding arguments to the chip sign.</li> 
-<li>Use almost any structure you can imagine for your chips.</li> 
-<li>Build your chip from more than 40 different circuit classes (and counting) each supporting many input/output configurations.</li> 
-<li>Infinitely expandable. Use any of the 3rd party circuit libraries and easily write your own libraries to add new circuit classes.</li> 
-</ul>
+<img src="images/title.png" class="bbCodeImage LbImage" alt="[IMG]" />
 
-<h2><a href="http://dev.bukkit.org/server-mods/redstonechips/">Download</a></h2>
-includes:
+<p><em>RedstoneChips</em> is a <a href="http://bukkit.org">bukkit</a> plugin that makes it possible to build custom integrated cicuits on your minecraft server. 
+</p>
+<ul>
+<li>Build chips with any number of input and output pins, from compact 2 block chips up to whatever you can imagine.</li>
+<li>There are currently 50 different chip types to choose from and a number of 3rd party chip libraries.</li>
+<li>Most chip types can work with a wide, or infinte range of input/output configurations. Sign text arguments allow further changes to chip behavior.</li>
+<li>Chips can communicate through redstone, or directly by touching each other. Some chip types can also communicate over wireless channels.</li>
+<li>Chips can be built in almost any imaginable structure allowing very compact circuits.</li>
+<li>The plugin has many chat commands that help getting around or debugging a large project.</li>
+</ul>
+<a href="http://dev.bukkit.org/server-mods/redstonechips/"><img src="images/download.jpg" alt="Download"/></a>
+<p>includes:
 <ul>
 <li><strong>RedstoneChips-0.93</strong> - The core plugin (required). </li>
-<li><strong>BasicCircuits-0.93</strong> - The basic circuit library containing most chip classes you might need (required).</li>
+<li><strong>BasicCircuits-0.93</strong> - The basic circuit library containing most chip types you might need (required).</li>
 <li><strong>SensorLibrary-0.31</strong> - A circuit library for various sensor chips (optional).</li>
 </ul>
-<p>For help on building chips check the <a href="/RedstoneChips/howto.html">how-to</a> page. For a full documentation of available circuits in BasicCircuits and SensorLibrary check the <a href="/RedstoneChips/circuitdocs">circuitdocs</a>.</p>
-
-<p><em>RedstoneChips</em> and the circuit libraries are currently under development. 
-    If you want to report a bug or another issue please use the github project page links below.
-    If you have any question, suggestion or new idea you can send me an email by clicking on the mail link to the left, or post a message
-    in the <a href="http://forums.bukkit.org/threads/1205/">forum thread</a> at Bukkit.org
 </p>
+<p>For help on how to use the plugin check the <a href="/RedstoneChips/howto.html">user guide</a>. For a full documentation of all available chip types in BasicCircuits and SensorLibrary check the <a href="/RedstoneChips/circuitdocs">circuitdocs</a>.</p>
 
 <h2>Installation</h2>
 
 <ul>
-<li>Download the latest craftbukkit release. The current version was tested on builds #1532+ and above and supports Minecraft 1.0.0. </li>
-<li>Download jar files above and any optional 3rd party circuit libraries (see below).</li>
-<li>Copy the downloaded jar files into the plugins folder of your craftbukkit installation, keeping their original filenames.</li>
+<li>Install the latest <a href="http://www.bukkit.org">craftbukkit</a> recommended release. The current RedstoneChips version was tested on craftbukkit 1.0.1-R1 and Minecraft 1.0.0.</li>
+<li>Download the zip file above and any optional 3rd party circuit libraries (see below).</li>
+<li>Unzip the zip file and copy the jar files into your craftbukkit plugins folder.</li>
 </ul>
 
-<p>On first run, the plugin will create a folder inside the craftbukkit plugins folder and a preferences.yml file inside it. Files ending with `.circuits` contains all the information required to reactivate the circuits after a server restart.
-You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the <code>/rcprefs</code> command (see <a href="/RedstoneChips/howto.html">how-to</a> for command info).
+<p>
+You can change the block types used to construct a circuit and other settings by editing preferences.yml or preferably, by using the <code>/rcprefs</code> command (see <a href="/RedstoneChips/howto.html">guide</a> for commands info).
 </p>
 
-<h2>3rd party circuit libraries</h2>
-These are plugins written by other people that add new chip types to choose from.
+<h2>3rd party chip libraries</h2>
 <ul>
 <li><a href="http://forums.bukkit.org/threads/27949/">LightControl</a> by @Mordenkainen - A RedstoneChips library for controlling light sources.</li>
 <li><a href="http://forums.bukkit.org/threads/8248/">MobSensor</a> by @Richard Robertson - Specific mob detection circuits.</li>
 <li><a href="http://forums.bukkit.org/threads/556.10300/">MessageCircuit</a> by @Richard Robertson - a circuit that sends a player a message when any of its inputs receive power.</li>
 </ul>
 
-<h2>Changelogs and source code</h2>
-<p>RedstoneChips <a href="http://github.com/eisental/RedstoneChips">github pages</a></p>
+<h2>Contribute</h2>
+<ul>
+<li>If you have feature suggestions, bug reports and any other issues click <a href="https://github.com/eisental/RedstoneChips/issues">here</a> or send an email to the address in the sidebar.</li>
+<li>Share your circuits with the world. Schematics, sram files and videos are welcome.</li>
+<li>Help making the documentation better. To help improve circuitdocs you can send a pull request to the <a href="https://github.com/eisental/RedstoneChips/tree/gh-pages">gh-pages branch</a> with changes or just send suggestions by mail. Any additions to the <a href="http://editthis.info/RedstoneChips" id="wiki">wiki</a> will be very appreciated.</li>
+<li>Help development. Pull requests will be happily tested and hopefully merged. Check the <a href="http://github.com/eisental/RedstoneChips">github page</a>. If you're 
+interested in maintaining and developing RedstoneChips on a regular basis do let me know. It's a lot of work and I could use some help.</li> 
+<li><a href="/RedstoneChips/donate.html">Donate!</a></li>
+</ul>
 
-<p>BasicCircuits <a href="http://github.com/eisental/BasicCircuits">github pages</a></p>
-
-<p>SensorLibrary <a href="http://github.com/eisental/SensorLibrary">github pages</a></p>
+<h2>Source code</h2>
+<img src="images/github.jpeg"/>RedstoneChips <a href="http://github.com/eisental/RedstoneChips">github pages</a>
+<img src="images/github.jpeg"/>BasicCircuits <a href="http://github.com/eisental/BasicCircuits">github pages</a>
+<img src="images/github.jpeg"/>SensorLibrary <a href="http://github.com/eisental/SensorLibrary">github pages</a>
+</ul>

@@ -4,42 +4,54 @@ title: User Guide
 ---
 
 - [Building a chip](#building_a_chip)
+- [Debugging](#debugging)
 - [Destroying a chip](#destroying_a_chip)
 - [Chip detection scanning rules](#chip_detection_scanning_rules)
 - [Plugin commands](#plugin_commands)
 - [Preference keys](#preference_keys)
 - [Permissions](#permissions)
+- [Writing chip libraries](#writing_chip_libraries)
 
 Building a Chip
 ---------------
-- Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block type must be different than the input/output/interface blocks type (see below).
-- Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the circuit you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
-- Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each block has to be attached to a chip block. Changes in redstone current will be sensed on any side or on top of the input blocks. 
-- The circuit outputs its bits by setting levers on and off. Attach __levers__ to any side or on top of each output block.
+
+![a chip](/RedstoneChips/images/chip.png)
+
+- Start by building the chip's __structure__ out of any block you want. You can't use sand or gravel and the block material must be different than the input/output/interface materials (see below).
+- Place a __wall sign__ attached to one of the chip blocks. This is the starting point of the circuit and affects the order of input and output pins. Set the sign text according to the chip type you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
+- Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each block has to be attached to a chip block. 
 - Some circuits, such as the [synth](/RedstoneChips/circuitdocs/Synth.html) circuit require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a chip block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
-- Last but not least, go back to your circuit sign and __left-click__ it to activate the circuit. If all went well, you should receive a message saying 'Circuit X activated: > a input(s), b output(s), and c interface block(s)'. 
+- Last but not least, go back to your circuit sign and __right-click__ it to activate the chip. If all went well, you should receive an activation message. 
 
-The order of your input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. See [Chip detection scanning rules](#scanning) below, for information on predicting the order of pins in more complex structures.
+An input block can receive redstone signal from the block above it or from any block on its sides.
+An output block sends its signal to any compatible device that's attached to its sides or its top. Possible output devices are levers, redstone torches, powered rails, doors and trap doors. When the output block doesn't have any attached devices it will directly send signal to any input pin whose block is touching the output block. 
 
-If you're having problems or just want to see more information, you can use the debugging commands `/rcdebug`, `/rcinfo` and `/rcpin`. See the description below.
+Output devices:
+![output devices](/RedstoneChips/images/outputdevices.png)
+
+The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. The chip to the right of the sign will always come before the chip to the left. See [Chip detection scanning rules](#chip_detection_scanning_rules) below, for information on finding the order of pins in more complex structures.
 
 
-Simple [adder](/RedstoneChips/circuitdocs/Adder.html) circuit. Input and output 0 lies next to the circuit sign.
+A clock, counter and two synth chips connected directly to each other forming a more complex structure. 
+![music box](/RedstoneChips/images/directconnection.png)
 
-![adder circuit](/RedstoneChips/images/adder.jpg)
+Debugging
+---------
+There are several commands that you can use to debug chips and find problems.
 
-
-A [decoder](/RedstoneChips/circuitdocs/Decoder.html) circuit with a more complex structure. Input and output order is a bit harder to find out.  
-
-![decoder circuit](/RedstoneChips/images/decoder2.png)
+- /rcdebug - Sends debug messages from any number of chips.
+- /rcpin - Prints pin order index and current state.
+- /rcinfo - Prints info about the current state of the chip.
+- /rcname - Give names to chips to be able to identify them better.
+- /rcenable, /rcdisable - Disable parts of you circuit to find problems easier.
+- /rctool - Define a chip probe that prints information when right-clicking any chip block.
 
 Destroying a Chip
 -----------------
 You can destroy a chip by breaking any of its structure blocks, including the output levers or by running the /rcbreak command
 while pointing at a circuit block. Use `/rcdestroy` to destroy the chip and remove all of its blocks. 
-__Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the IC to stop functioning.
-__Power tools__, however, will not cause it to decativate and can result in "phantom" circuits still taking place in memory without an actual chip to make them of any use.
-When the plugin saves it's chip data it will deactivate any circuit that any of it's blocks were broken.
+__Creepers__, __TNT__ explosions and __fire__ (in case you're using flammable blocks) will also cause the chip to stop functioning.
+Destroying a chip block with __Power tools__ or worldedit commands, however, will not cause the chip to decativate until the server shutdowns, and can result in "phantom" circuits still taking place in memory. Whenever the plugin saves data invalid chips should be deactivated. Running /rcsave to force saving.
 
 Chip detection scanning rules
 -----------------------------
@@ -474,3 +486,14 @@ Protecting channels allow users to control who can create and destroy wireless c
 - redstonechips.circuit.*: Grants access to create and destroy all RedstoneChips circuits.
 - redstonechips.circuit.deny: Deny all building or destroying circuits.
 
+Writing chip libraries
+-------------------------
+
+Chip libraries are essentially bukkit plugins that provide RedstoneChips with new chip types. If you have a solid understanding of Java, writing your own chips should be easy enough. 
+
+These should help you get started:
+
+- the [Library template](http://github.com/eisental/LibraryTemplate).
+- [API documentation](/RedstoneChips/apidocs).
+
+Don't hesitate to ask any question by mail or on the forum.
