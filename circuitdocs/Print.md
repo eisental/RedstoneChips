@@ -3,7 +3,7 @@ layout: main
 title: print
 ---
 
-Prints data on signs. Can print its data pins as text on a sign block when the clock pin (input 0) is set to high. 
+Prints data on signs. Prints the value of its data pins as text on a sign block when the clock pin (input 0) is set to high. 
 Any sign attached to an interface block will be updated. Signs must be attached before activating the chip and breaking any will cause the circuit to deactivate.
 
 The first sign argument sets the way the data from the chip's inputs is printed to the sign.
@@ -23,6 +23,9 @@ This mode requires an extra clear pin after the clock pin. When the clear pin is
 and in addition requires a scroll pin. When the scroll pin is triggered the part of the text displayed on the sign is updated to start with the next character.
 Connecting a clock to this pin create a scrolling effect. Once the end of the buffered text is reached the sign will continue scrolling from its 1st character again.
 
+To build a print chip as a wireless receiver add a channel argument using the syntax `#name[:startbit]` 
+The channel argument must be the last. In this mode print requires no inputs or outputs. The bit configuration the receiver expects is the same as the physical inputs but without the need for a clock pin. For example, if a chip is in add mode, the 1st channel bit is the clear bit, and all the following bits are data bits.
+
 It's possible to directly edit the text on the output signs by pointing at the circuit's activation sign and entering the `/rctype <sign text>` command.
 If the circuit is using add or scroll mode the new text will be added to the previous sign text.
 
@@ -37,6 +40,7 @@ If the circuit is using add or scroll mode the new text will be added to the pre
 * At least 2 inputs in replace mode. 1 clock trigger and 1 or more data inputs.
 * At least 3 inputs in add mode. 1 clock trigger, 1 clear pin and 1 or more data inputs.
 * At least 4 inputs in scroll mode. 1 clock trigger, 1 clear pin, 1 scroll pin and 1 or more data inputs
+* Wireless mode doesn't require any inputs.
 
 #### Sign text
 1. `   print   `
