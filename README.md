@@ -2,7 +2,7 @@ RedstoneChips
 =============
 
 RedstoneChips is a Bukkit plugin that allows you to build custom redstone chips on your craftbukkit minecraft server.
-Circuits can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
+Chips can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
 - RedstoneChips - The core plugin (required). 
 
@@ -22,7 +22,9 @@ Installation
 Changelog
 ----------
 ### RedstoneChips 0.93 (19/12/11)
+
 Features:
+
 - Redstone torches, doors, trapdoors and powered rails can be directly controlled by an output block in addition to levers.
 - A chip will activate also when one of its output pin has no devices (levers, torches, etc.) connected to it.
 - Multiple output devices can be connected to one output block.
@@ -43,6 +45,7 @@ Features:
 - Changes to command messages and help texts.
 
 Bugfixes:
+
 - Fixed the /reload bug
 - Fixed remote chip break permission.
 - Fixed NPE that occurred when an output lever had an invalid data value. Added a check for invalid output levers in circuit integrity check.
