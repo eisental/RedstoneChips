@@ -66,6 +66,7 @@ To be able to guess the pin numbering of more complex structures you need to und
 	- The block in the opposite direction.
 	- One block up. If the block above is a chip block the scan will continue in the same direction as before only one level above.
 	- One block below. Will also continue in the same direction.
+
 	
 One very important thing to note is that the recursive scanning process work by branches. It will continue going from block to block in one direction even when chip blocks are found in other directions. Only when it reaches a dead end it will go back to try the other branches.
 
