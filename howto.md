@@ -56,15 +56,16 @@ Destroying a chip block with __Power tools__ or worldedit commands, however, wil
 Chip detection scanning rules
 -----------------------------
 To be able to guess the pin numbering of more complex structures you need to understand how the plugin detects and scans the structure once you activate it by clicking on the sign. It scans the circuit block by block starting at the sign block itself. The pins are numbered as the circuit structure is scanned, therefore when the structure is a straight line the count starts at the sign and onwards. When more than one dimension is used the plugin will scan according to the following rules:
-1. The sign block is added to the structure and then the plugin moves to the chip block the sign is attached to. 
-2. It will try to find input, output or interface blocks at any of the other sides of the chip block and above or below. The important part is the order in which different sides are scanned. First, it will look to the right (relative to the current scan direction), next it will look to the left. After that it will look at the next block in the original direction and finally it will look back, opposite to the scan direction. Finally it checks the block above and below. If going backwards seem like a waste of time see the next point. 
-3. Now the plugin will go to the next chip block. The scan order is 
-	1. The block to the right, relative to the current scan direction.
-	2. The block to the left, relative to the current scan direction.
-	3. The block in the same direction as before.
-	4. The block in the opposite direction.
-	5. One block up. If the block above is a chip block the scan will continue in the same direction as before only one level above.
-	6. One block below. Will also continue in the same direction.
+
+- The sign block is added to the structure and then the plugin moves to the chip block the sign is attached to. 
+- It will try to find input, output or interface blocks at any of the other sides of the chip block and above or below. The important part is the order in which different sides are scanned. First, it will look to the right (relative to the current scan direction), next it will look to the left. After that it will look at the next block in the original direction and finally it will look back, opposite to the scan direction. Finally it checks the block above and below. If going backwards seem like a waste of time see the next point. 
+- Now the plugin will go to the next chip block. The scan order is 
+	- The block to the right, relative to the current scan direction.
+	- The block to the left, relative to the current scan direction.
+	- The block in the same direction as before.
+	- The block in the opposite direction.
+	- One block up. If the block above is a chip block the scan will continue in the same direction as before only one level above.
+	- One block below. Will also continue in the same direction.
 	
 One very important thing to note is that the recursive scanning process work by branches. It will continue going from block to block in one direction even when chip blocks are found in other directions. Only when it reaches a dead end it will go back to try the other branches.
 
