@@ -470,7 +470,7 @@ All commands have an "allow" and "deny" permission. The "deny" permission overri
 
 ###Chip permissions
 All chips have create and destroy permissions. These also have an "allow" and "deny", which function identically as above. Destruction protection prevents a chip from being destroyed via RC commands or by breaking the blocks that make up the circuit. The following node types can be used:
-- `redstonechips.circuit.destroy.*` - allows destroying any circuit type.
+- `redstonechips.circuit.destroy.\*` - allows destroying any circuit type.
 - `redstonechips.circuit.destroy.deny` - denies destroying any circuit type.
 - `redstonechips.circuit.<chip-name>;` - allows destroying a specific circuit type.
 - `redstonechips.circuit.<circuit-name>.deny` - denies destroying a specific circuit type.
@@ -479,14 +479,14 @@ All chips have create and destroy permissions. These also have an "allow" and "d
 Protecting channels allow users to control who can create and destroy wireless chips on particular channels. This system is independent of the other permissions and functions even when permissions are disabled. Users can define admins for the channel, who can change who has access to the channel, and users, who can create chips using the channel, but can not change access. `/rcchannels` does not show a user any channels that they do not have access to, and protected channels the user does have access to are shown with a "P" to identify they are protected. `/rcchannels <channel name>` will show all authorized users and admins of the channel. Use the command `/rcprotect` to manage protected channels. 
 
 ###Top-level permission nodes
-- __redstonechips.admin__: Grants access to all of RedstoneChips including admin commands.
-- __redstonechips.*__: Grants access to all of RedstoneChips excluding admin commands.
-- __redstonechips.deny__: Denys access to all of RedstoneChips.
-- __redstonechips.command.*__: Grants access to all of RedstoneChips commands excluding admin commands.
-- __redstonechips.command.admin__: Grants access to all of RedstoneChips commands including admin commands.
-- __redstonechips.command.deny__: Deny all commands.
-- __redstonechips.circuit.*__: Grants access to create and destroy all RedstoneChips circuits.
-- __redstonechips.circuit.deny__: Deny all building or destroying circuits.
+- `redstonechips.admin`: Grants access to all of RedstoneChips including admin commands.
+- `redstonechips.*`: Grants access to all of RedstoneChips excluding admin commands.
+- `redstonechips.deny`: Denys access to all of RedstoneChips.
+- `redstonechips.command.*`: Grants access to all of RedstoneChips commands excluding admin commands.
+- `redstonechips.command.admin`: Grants access to all of RedstoneChips commands including admin commands.
+- `redstonechips.command.deny`: Deny all commands.
+- `redstonechips.circuit.*`: Grants access to create and destroy all RedstoneChips circuits.
+- `redstonechips.circuit.deny`: Deny all building or destroying circuits.
 
 Writing chip libraries
 -------------------------
