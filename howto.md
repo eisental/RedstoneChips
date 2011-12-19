@@ -473,7 +473,7 @@ All chips have create and destroy permissions. These also have an "allow" and "d
 - `redstonechips.circuit.destroy.\*` - allows destroying any circuit type.
 - `redstonechips.circuit.destroy.deny` - denies destroying any circuit type.
 - `redstonechips.circuit.<chip-name>;` - allows destroying a specific circuit type.
-- `redstonechips.circuit.<circuit-name>.deny` - denies destroying a specific circuit type.
+- `redstonechips.circuit.<chip-name>.deny` - denies destroying a specific circuit type.
 
 ###Protected channels
 Protecting channels allow users to control who can create and destroy wireless chips on particular channels. This system is independent of the other permissions and functions even when permissions are disabled. Users can define admins for the channel, who can change who has access to the channel, and users, who can create chips using the channel, but can not change access. `/rcchannels` does not show a user any channels that they do not have access to, and protected channels the user does have access to are shown with a "P" to identify they are protected. `/rcchannels <channel name>` will show all authorized users and admins of the channel. Use the command `/rcprotect` to manage protected channels. 
