@@ -199,7 +199,8 @@ public class OutputPin extends IOBlock {
             Material m = b.getType();
             if (m==Material.LEVER ||  m==Material.REDSTONE_TORCH_OFF || m==Material.REDSTONE_TORCH_ON) {
                 Attachable a = (Attachable)b.getState().getData();
-                if (b.getRelative(a.getAttachedFace()).equals(loc.getBlock())) return false;
+                BlockFace f = a.getAttachedFace();
+                if (f!=null && b.getRelative(f).equals(loc.getBlock())) return false;
             } else if (m==Material.WOODEN_DOOR || m==Material.IRON_DOOR_BLOCK || m==Material.TRAP_DOOR || m==Material.POWERED_RAIL)
                 return false;
         }
