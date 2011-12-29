@@ -51,6 +51,8 @@ public class CircuitManager {
 
     private List<CommandSender> pausedDebuggers = new ArrayList<CommandSender>();
 
+    private List<ChunkLocation> processedChunks = new ArrayList<ChunkLocation>();
+    
     public CircuitManager(RedstoneChips plugin) { 
         rc = plugin; 
         scanner = new ChipScanner();
@@ -198,6 +200,17 @@ public class CircuitManager {
      * @return The circuit's id or -2 if an error occurred.
      */
     public int activateCircuit(Circuit c, CommandSender sender, int id) {
+        int res;
+        
+        List<ChunkLocation> chunksToUnload = new ArrayList<ChunkLocation>();
+        
+        for (ChunkLocation chunk : c.circuitChunks) {
+            if (!chunk.isChunkLoaded()) {
+                chunksToUnload.add(chunk);
+                workOnChunk(chunk);
+            }
+        }
+        
         if (c.initCircuit(sender, rc)) {
             this.addCircuitLookups(c);
 
@@ -219,12 +232,18 @@ public class CircuitManager {
 
             c.updateCircuitSign(true);
 
-            return c.id;
+            res = c.id;
         } else {
             if (sender!=null)
                 sender.sendMessage(rc.getPrefs().getErrorColor() + c.getClass().getSimpleName() + " was not activated.");
-            return -2;
+            res = -2;
         }
+        
+        for (ChunkLocation chunk : chunksToUnload) {
+            releaseChunk(chunk);
+        }
+
+        return res;
     }
 
     /**
@@ -412,32 +431,12 @@ public class CircuitManager {
      * @param chunk The loaded chunk.
      */
     public void updateOnChunkLoad(ChunkLocation chunk) {
+        if (processedChunks.contains(chunk)) return;
         List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
 
         if (circuitsInChunk!=null) {
             for (Circuit c : circuitsInChunk) {
                 c.circuitChunkLoaded();
-            }
-        }
-    }
-
-    /**
-     * Called on every chunk unload event. Finds any circuits in the unloaded chunks. When all of the chunks of a circuit are
-     * unloaded the circuits circuitChunksUnloaded() method is called.
-     *
-     * @param chunk The unloaded chunk.
-     */
-    public void updateOnChunkUnload(ChunkLocation chunk) {
-        List<Circuit> circuitsInChunk = chunkLookupMap.get(chunk);
-        if (circuitsInChunk!=null) {
-            for (Circuit c : circuitsInChunk) {
-                // if all of the circuit's chunks are unloaded we call the method.
-                boolean call = true;
-                for (ChunkLocation loc : c.circuitChunks)
-                    if (loc.isChunkLoaded())
-                        call = false;
-
-                if (call) c.circuitChunksUnloaded();
             }
         }
     }
@@ -452,7 +451,7 @@ public class CircuitManager {
         List<Integer> invalidIds = new ArrayList<Integer>();
 
         List<ChunkLocation> unloadedChunks = new ArrayList<ChunkLocation>();
-
+        
         for (Circuit c : circuits.values()) {
             if(c.world.equals(world)) {
                 for (ChunkLocation chunk : c.circuitChunks) {
@@ -469,9 +468,9 @@ public class CircuitManager {
             }
         }
 
-        for (ChunkLocation unloaded : unloadedChunks)
-            unloaded.loadChunk();
-
+        for (ChunkLocation c : unloadedChunks)
+            workOnChunk(c);
+        
         for (Circuit c : circuits.values()) {
             if(c.world.equals(world)) {
                 if (!c.checkIntegrity()) {
@@ -497,7 +496,7 @@ public class CircuitManager {
         }
 
         for (ChunkLocation chunk : unloadedChunks) {
-            chunk.unloadChunk();
+            releaseChunk(chunk);
         }
 
         if (!invalidIds.isEmpty()) rc.log(Level.INFO, "Done checking circuits. " + msg);
@@ -844,5 +843,22 @@ public class CircuitManager {
             return true;
         else return false;
     }
+
+    public void workOnChunk(ChunkLocation chunk) {
+        if (!processedChunks.contains(chunk)) {
+            processedChunks.add(chunk);
+            chunk.loadChunk();
+        }
+    }
+    
+    public void releaseChunk(ChunkLocation chunk) {
+        if (processedChunks.remove(chunk))
+            chunk.unloadChunk();
+    }
+
+    public boolean isProcessingChunk(ChunkLocation chunk) {
+        return processedChunks.contains(chunk);
+    }
+    
 
 }

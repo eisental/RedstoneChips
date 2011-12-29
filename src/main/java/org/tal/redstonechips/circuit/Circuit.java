@@ -34,7 +34,7 @@ public abstract class Circuit {
      * Circuit sign arguments. Any word found on the circuit sign from line 2 onward.
      */
     public String[] args;
-
+    
     /**
      * Ordered list of input pins. 
      */
@@ -100,9 +100,7 @@ public abstract class Circuit {
      * An optional circuit instance name.
      */
     public String name = null;
-    
-    private boolean chunksLoaded;
-
+       
     /**
      * Set to the chunk coordinates of the circuit's activation block
      */
@@ -125,21 +123,7 @@ public abstract class Circuit {
 
         inputBits = new BitSet7(inputs.length);
         if (outputBits==null) outputBits = new BitSet7(outputs.length);
-
-        chunksLoaded = false;
-
-        List<ChunkLocation> chunksToUnload = new ArrayList<ChunkLocation>();
-
-        for (ChunkLocation chunk : circuitChunks) {
-            if (chunk.isChunkLoaded()) { 
-                chunksLoaded = true;
-            } else chunksToUnload.add(chunk);
-        }
-
-        for (ChunkLocation chunk : chunksToUnload) {
-            chunk.loadChunk();
-        }
-
+        
         updateInputBits();
         
         boolean result = init(sender, args);
@@ -148,9 +132,6 @@ public abstract class Circuit {
         else if (result!=false && isStateless()) {
             runInputLogic();
         }
-
-        for (ChunkLocation chunk : chunksToUnload)
-            if (chunk.isChunkLoaded()) chunk.unloadChunk();
 
         return result;
     }
@@ -472,22 +453,11 @@ public abstract class Circuit {
      * according to the current values in outputBits.
      */
     public void circuitChunkLoaded() {
-        if (chunksLoaded) return;
-
-        chunksLoaded = true;
-        
         for (InputPin i : inputs)
             i.refreshSourceBlocks();
 
         for (int i=0; i<outputs.length; i++)
             outputs[i].changeOutputState(outputBits.get(i));
-    }
-
-    /**
-     * Called when all of the circuit's chunks have unloaded.
-     */
-    public void circuitChunksUnloaded() {
-        chunksLoaded = false;
     }
 
     /**
@@ -562,12 +532,15 @@ public abstract class Circuit {
         byte interfaceData = redstoneChips.getPrefs().getInterfaceBlockType().getData();
 
         List<ChunkLocation> chunksToUnload = new ArrayList<ChunkLocation>();
-        for (ChunkLocation chunk : circuitChunks)
-            if (!chunk.isChunkLoaded()) chunksToUnload.add(chunk);
+        for (ChunkLocation chunk : circuitChunks) {
+            if (!chunk.isChunkLoaded()) {
+                chunksToUnload.add(chunk);
+                redstoneChips.getCircuitManager().workOnChunk(chunk);
+            }
+            
+        }
 
         for (InputPin i : inputs) {
-            ChunkLocation chunk = ChunkLocation.fromLocation(i.getLocation());
-            if (!chunk.isChunkLoaded() && !chunksToUnload.contains(chunk)) chunksToUnload.add(chunk);
             Block input = i.getLocation().getBlock();
 
             if (input.getTypeId()!=inputType || input.getData()!=inputData) {
@@ -577,8 +550,6 @@ public abstract class Circuit {
         }
 
         for (OutputPin o : outputs) {
-            ChunkLocation chunk = ChunkLocation.fromLocation(o.getLocation());
-            if (!chunk.isChunkLoaded() && !chunksToUnload.contains(chunk)) chunksToUnload.add(chunk);            
             Block output = o.getLocation().getBlock();
 
             if (output.getTypeId()!=outputType || output.getData()!=outputData) {
@@ -588,8 +559,6 @@ public abstract class Circuit {
         }
 
         for (InterfaceBlock t : interfaceBlocks) {
-            ChunkLocation chunk = ChunkLocation.fromLocation(t.getLocation());
-            if (!chunk.isChunkLoaded() && !chunksToUnload.contains(chunk)) chunksToUnload.add(chunk);
             Block tb = t.getLocation().getBlock();
 
             if (tb.getTypeId()!=interfaceType || tb.getData()!=interfaceData) {
@@ -598,8 +567,9 @@ public abstract class Circuit {
             }
         }
 
-        for (ChunkLocation chunk : chunksToUnload)
-            chunk.unloadChunk();
+        for (ChunkLocation chunk : chunksToUnload) {
+            redstoneChips.getCircuitManager().releaseChunk(chunk);
+        }
 
         return blockCount;
     }
@@ -609,7 +579,7 @@ public abstract class Circuit {
      * @param activated When true the class name is colored in the selected signColor preference key. When false the color is removed.
      */
     public void updateCircuitSign(boolean activated) {
-        if (!chunksLoaded) return;
+        if (!ChunkLocation.fromLocation(activationBlock).isChunkLoaded()) return;
         
         BlockState state = activationBlock.getBlock().getState();
         if (!(state instanceof Sign)) return;
@@ -638,14 +608,6 @@ public abstract class Circuit {
                 });
             }
         } catch (NullPointerException ne) { }
-    }
-
-    /**
-     *
-     * @return true if any of the circuit chunks are loaded.
-     */
-    public boolean isCircuitChunkLoaded() {
-        return chunksLoaded;
     }
 
     private void runInputLogic() {

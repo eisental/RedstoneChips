@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.tal.redstonechips.util.ChunkLocation;
 
 /**
  * Represents an input pin of a chip. 
@@ -137,7 +138,7 @@ public class InputPin extends IOBlock {
      */
     public void refreshSourceBlocks() {
         for (Location l : this.sourceBlocks.keySet())
-            sourceBlocks.put(l, findSourceBlockState(l));
+            if (ChunkLocation.fromLocation(l).isChunkLoaded()) sourceBlocks.put(l, findSourceBlockState(l));
     }
 
     /**

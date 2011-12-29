@@ -3,7 +3,6 @@ package org.tal.redstonechips;
 import java.util.logging.Level;
 import org.bukkit.World;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
@@ -15,7 +14,8 @@ import org.tal.redstonechips.util.ChunkLocation;
  * @author Tal Eisenberg
  */
 class RCWorldListener extends WorldListener {
-    RedstoneChips rc;
+    private RedstoneChips rc;
+    private World unloadedWorld = null; 
     
     public RCWorldListener(RedstoneChips rc) {
         this.rc = rc;
@@ -25,14 +25,6 @@ class RCWorldListener extends WorldListener {
     public void onChunkLoad(ChunkLoadEvent event) {
         rc.getCircuitManager().updateOnChunkLoad(ChunkLocation.fromChunk(event.getChunk()));
     }
-
-    @Override
-    public void onChunkUnload(ChunkUnloadEvent event) {
-        if (!event.isCancelled())
-            rc.getCircuitManager().updateOnChunkUnload(ChunkLocation.fromChunk(event.getChunk()));
-    }
-
-    World unloadedWorld = null;
 
     @Override
     public void onWorldUnload(WorldUnloadEvent event) {

@@ -131,7 +131,7 @@ public class CircuitPersistence {
             
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
-
+                    
                     circuits.add(compileCircuitFromMap(circuitMap, internalStates));
 
                 } catch (IllegalArgumentException ie) {

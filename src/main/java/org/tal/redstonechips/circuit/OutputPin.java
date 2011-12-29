@@ -14,6 +14,7 @@ import org.bukkit.material.Door;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.circuit.InputPin.SourceType;
+import org.tal.redstonechips.util.ChunkLocation;
 
 /**
  * Represents a chip output pin.
@@ -70,26 +71,27 @@ public class OutputPin extends IOBlock {
      */
     public void changeOutputState(boolean state) {  
         boolean hasActuator = false;
-        for (Location l : outputBlocks) {            
-            if (changeBlockState(l.getBlock(), state)) hasActuator = true;
+        
+        for (Location l : outputBlocks) { 
+            if (shouldUpdateChunk(l)) {
+                if (changeBlockState(l, state)) hasActuator = true;
+            }
         }
         
         if (!hasActuator) {
             for (Location l : outputBlocks) {
                 InputPin i = circuit.getPlugin().getCircuitManager().getInputPin(l);
-
-                if (i!=null) {
+                
+                if (i!=null && shouldUpdateChunk(i.getLocation())) {
                     i.updateValue(loc.getBlock(), state, SourceType.DIRECT);
                 } 
             }
-            
         }
     }
 
-    private boolean changeBlockState(Block outputBlock, boolean state) {
+    private boolean changeBlockState(Location outputLoc, boolean state) {        
         Block ioBlock = loc.getBlock();        
-        if (!circuit.world.isChunkLoaded(outputBlock.getChunk())) return true;        
-
+        Block outputBlock = outputLoc.getBlock();
         if (outputBlock.getType()==Material.LEVER) {
             Lever lever = (Lever)outputBlock.getState().getData();
             BlockFace f = lever.getAttachedFace();
@@ -233,8 +235,14 @@ public class OutputPin extends IOBlock {
      */
     public void refreshOutputs() {
         boolean state = this.getState();
-        for (Location l : this.outputBlocks)
-            changeBlockState(l.getBlock(), state);
+        for (Location l : this.outputBlocks) {
+            if (ChunkLocation.fromLocation(l).isChunkLoaded()) changeBlockState(l, state);
+        }
+    }
+
+    private boolean shouldUpdateChunk(Location l) {
+        ChunkLocation chunk = ChunkLocation.fromLocation(l);
+        return chunk.isChunkLoaded() && !circuit.getPlugin().getCircuitManager().isProcessingChunk(chunk);        
     }
     
 }

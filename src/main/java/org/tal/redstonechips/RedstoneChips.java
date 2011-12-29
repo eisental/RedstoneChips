@@ -157,7 +157,6 @@ public class RedstoneChips extends JavaPlugin {
             pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
-            pm.registerEvent(Type.CHUNK_UNLOAD, rcWorldListener, Priority.Monitor, this);
             pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
             pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
             pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
