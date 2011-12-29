@@ -1,6 +1,6 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.93a
+version: 0.93b
 author: eisental
 description: Core RedstoneChips plugin for building integrated redstone circuits.
 website: http://eisental.github.com/RedstoneChips
