@@ -72,10 +72,18 @@ public class RChelp extends RCCommand {
             }
         }
         
+        if (commandMap.containsKey("aliases") && commandMap.get("aliases")!=null) {
+            String alist = "";
+            for (String a : (List<String>)commandMap.get("aliases"))
+                alist += "/" + a + ", ";
+            
+            help += "\n" + ChatColor.AQUA + "aliases: " + alist.substring(0, alist.length()-2) + "\n";
+        }
+        
         if (!perms.isEmpty()) {
             help += "\n" + ChatColor.RED + "permissions:\n";
             for (Permission p : perms) 
-                help += ChatColor.YELLOW + p.getName() + "\n   " + ChatColor.WHITE + p.getDescription() + "\n";
+                help += ChatColor.YELLOW + " - " + p.getName() + "\n   " + ChatColor.WHITE + p.getDescription() + "\n";
         }
 
         return help;
