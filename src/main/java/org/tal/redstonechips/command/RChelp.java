@@ -52,7 +52,7 @@ public class RChelp extends RCCommand {
             i++;
         }
 
-        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", lines, infoColor, errorColor, CommandUtils.MaxLines-1);
+        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", new ArrayLineSource(lines), infoColor, errorColor, CommandUtils.MaxLines-1);
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 

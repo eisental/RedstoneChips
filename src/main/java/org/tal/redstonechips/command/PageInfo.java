@@ -10,14 +10,14 @@ import org.bukkit.ChatColor;
 public class PageInfo {
     public int page = 1;
     public int pageCount;
-    public String[] lines;
+    public LineSource src;
     public String title;
     public ChatColor infoColor, errorColor;
     public int linesPerPage;
 
-    PageInfo(String title, int pageCount, String[] lines, int linesPerPage, ChatColor infoColor, ChatColor errorColor) {
+    PageInfo(String title, int pageCount, LineSource src, int linesPerPage, ChatColor infoColor, ChatColor errorColor) {
         this.pageCount = pageCount;
-        this.lines = lines;
+        this.src = src;
         this.linesPerPage = linesPerPage;
         this.title = title;
         this.infoColor = infoColor;

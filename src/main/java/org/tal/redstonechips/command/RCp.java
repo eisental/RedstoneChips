@@ -52,7 +52,7 @@ public class RCp extends RCCommand {
                 }
             } 
 
-            CommandUtils.pageMaker(sender, pageInfo.title, null, pageInfo.lines, pageInfo.infoColor, pageInfo.errorColor, pageInfo.linesPerPage);
+            CommandUtils.pageMaker(sender, pageInfo.title, null, pageInfo.src, pageInfo.infoColor, pageInfo.errorColor, pageInfo.linesPerPage);
             return true;
 
         } else {

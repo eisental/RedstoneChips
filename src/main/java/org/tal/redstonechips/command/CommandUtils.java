@@ -112,21 +112,25 @@ public class CommandUtils {
             lines = wrapText(text);
         else lines = text.split("\n");
         
-        CommandUtils.pageMaker(s, title, commandName, lines, infoColor, errorColor, maxLines);
+        CommandUtils.pageMaker(s, title, commandName, new ArrayLineSource(lines), infoColor, errorColor, maxLines);
     }
     
     public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, title, commandName, lines, infoColor, errorColor, MaxLines);
+        CommandUtils.pageMaker(s, title, commandName, new ArrayLineSource(lines), infoColor, errorColor, MaxLines);
     }
 
-    public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor, int maxLines) {
+    public static void pageMaker(CommandSender s, String title, String commandName, LineSource src, ChatColor infoColor, ChatColor errorColor) {
+        CommandUtils.pageMaker(s, title, commandName, src, infoColor, errorColor, MaxLines);
+    }
+    
+    public static void pageMaker(CommandSender s, String title, String commandName, LineSource src, ChatColor infoColor, ChatColor errorColor, int maxLines) {
         maxLines = maxLines - 4;
         int page;
 
-        int pageCount = (int)(Math.ceil(lines.length/(float)maxLines));
+        int pageCount = (int)(Math.ceil(src.getLineCount()/(float)maxLines));
         if (commandName!=null || !playerPages.containsKey(s)) {
             page = 1;
-            playerPages.put(s, new PageInfo(title, pageCount, lines, maxLines+4, infoColor, errorColor));
+            playerPages.put(s, new PageInfo(title, pageCount, src, maxLines+4, infoColor, errorColor));
         } else {
             PageInfo pageInfo = playerPages.get(s);
             page = pageInfo.page;
@@ -137,8 +141,8 @@ public class CommandUtils {
         else {
             s.sendMessage(infoColor + title + ": " + (pageCount>1?"( page " + page + " / " + pageCount  + " )":""));
             s.sendMessage(infoColor + "----------------------");
-            for (int i=(page-1)*maxLines; i<Math.min(lines.length, page*maxLines); i++) {
-                s.sendMessage(lines[i]);
+            for (int i=(page-1)*maxLines; i<Math.min(src.getLineCount(), page*maxLines); i++) {
+                s.sendMessage(src.getLine(i));
             }
             s.sendMessage(infoColor + "----------------------");
             if (pageCount>1) s.sendMessage("Use " + ChatColor.YELLOW + (s instanceof Player?"/":"") + "rcp [page#|next|prev|last]" + ChatColor.WHITE + " to see other pages.");
