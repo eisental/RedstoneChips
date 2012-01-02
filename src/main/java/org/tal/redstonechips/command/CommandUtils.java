@@ -56,17 +56,21 @@ public class CommandUtils {
      * @param sender 
      * @return The chip pointed by the player or null if one was not found.
      */
-    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender) {
+    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, boolean report) {
         Player player = checkIsPlayer(rc, sender);
         if (player==null) return null;
 
         Block target = targetBlock(player);
         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target.getLocation());
-        if (c==null) {
+        if (c==null && report) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a block of a redstone chip.");
         }
 
-        return c;
+        return c;        
+    }
+    
+    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender) {
+        return findTargetCircuit(rc, sender, true);
     }
 
     /**
