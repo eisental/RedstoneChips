@@ -40,12 +40,16 @@ public class CommandUtils {
      * @param sender The command sender to check.
      * @return the sender object cast to the Player class.
      */
-    public static Player checkIsPlayer(RedstoneChips rc, CommandSender sender) {
+    public static Player checkIsPlayer(RedstoneChips rc, CommandSender sender, boolean report) {
         if (sender instanceof Player) return (Player)sender;
         else {
-            sender.sendMessage(rc.getPrefs().getErrorColor() + "Only players are allowed to use this command.");
+            if (report) sender.sendMessage(rc.getPrefs().getErrorColor() + "Only players are allowed to use this command.");
             return null;
         }
+    }
+    
+    public static Player checkIsPlayer(RedstoneChips rc, CommandSender sender) {
+        return checkIsPlayer(rc, sender, true);
     }
 
     /**
@@ -57,7 +61,7 @@ public class CommandUtils {
      * @return The chip pointed by the player or null if one was not found.
      */
     public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, boolean report) {
-        Player player = checkIsPlayer(rc, sender);
+        Player player = checkIsPlayer(rc, sender, report);
         if (player==null) return null;
 
         Block target = targetBlock(player);
