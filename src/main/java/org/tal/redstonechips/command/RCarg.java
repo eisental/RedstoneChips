@@ -57,7 +57,7 @@ public class RCarg extends RCCommand {
         return true;
     }
 
-    private void editSignArgs(Circuit c, String[] args) {
+    public static void editSignArgs(Circuit c, String[] args) {
         final Sign sign = (Sign)c.activationBlock.getBlock().getState();
         String line = "";
         int curLine = 1;
@@ -77,12 +77,7 @@ public class RCarg extends RCCommand {
         if (curLine<3)
             for (int i=curLine+1; i<4; i++) sign.setLine(i, "");
 
-        rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, new Runnable() {
-            @Override
-            public void run() {
-                sign.update();
-            }
-        });
+        sign.update();
     }
 
     private String[] editArgs(CommandSender sender, String[] args, String index, String value) {
