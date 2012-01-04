@@ -21,7 +21,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Redstone;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
-import org.tal.redstonechips.channel.WirelessCircuit;
 import org.bukkit.World;
 import org.tal.redstonechips.ChipScanner.ChipScanException;
 import org.tal.redstonechips.ChipScanner.ScanParameters;
@@ -29,6 +28,7 @@ import org.tal.redstonechips.circuit.InputPin.SourceType;
 import org.tal.redstonechips.circuit.InterfaceBlock;
 import org.tal.redstonechips.circuit.OutputPin;
 import org.tal.redstonechips.util.ParsingUtils;
+import org.tal.redstonechips.wireless.Wireless;
 
 /**
  *
@@ -343,10 +343,10 @@ public class CircuitManager {
             return false;
         }
         
-        if (destroyed instanceof WirelessCircuit) {
-            WirelessCircuit w = (WirelessCircuit)destroyed;
+        Wireless w = rc.getChannelManager().getCircuitWireless(destroyed);
+        if (w!=null) {            
             if (w.getChannel()!=null && !(w.getChannel().checkChanPermissions(destroyer, false))) {
-                if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + ((WirelessCircuit)destroyed).getChannel().name + ".");
+                if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + w.getChannel().name + ".");
                 return false;
             }
         }

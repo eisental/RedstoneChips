@@ -1,4 +1,4 @@
-package org.tal.redstonechips.channel;
+package org.tal.redstonechips.wireless;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.tal.redstonechips.util.BitSet7;
  * @author Tal Eisenberg
  */
 public class BroadcastChannel {
-    private List<ReceivingCircuit> receivers = new ArrayList<ReceivingCircuit>();
-    private List<TransmittingCircuit> transmitters = new ArrayList<TransmittingCircuit>();
-
+    private List<Receiver> receivers = new ArrayList<Receiver>();
+    private List<Transmitter> transmitters = new ArrayList<Transmitter>();
+    
     /**
      * The channel identifying name.
      */
@@ -49,20 +49,20 @@ public class BroadcastChannel {
      * Adds a receiver to receive broadcasts on this channel.
      * @param r The receiving circuit.
      */
-    public void addReceiver(final ReceivingCircuit r) {
+    public void addReceiver(final Receiver r) {
         if (receivers.contains(r)) return;
 
         receivers.add(r);
         if (r.getStartBit()+r.getChannelLength()>length)
             length = r.getStartBit()+r.getChannelLength();
     }
-
+    
     /**
      * Stops the receiving circuit from receiving broadcasts on this channel.
      * @param r The receiving circuit.
      * @return true if the receiver was actually removed.
      */
-    public boolean removeReceiver(ReceivingCircuit r) {
+    public boolean removeReceiver(Receiver r) {
         boolean res = receivers.remove(r);
         calcChannelLength();
         return res;
@@ -73,7 +73,7 @@ public class BroadcastChannel {
      * Adds a transmitter to transmit broadcasts on this channel.
      * @param r The transmitting circuit.
      */
-    public void addTransmitter(TransmittingCircuit t) {
+    public void addTransmitter(Transmitter t) {
         if (transmitters.contains(t)) return;
         
         transmitters.add(t);
@@ -83,11 +83,11 @@ public class BroadcastChannel {
     }
 
     /**
-     * Stops the transmitting circuit from transmitting broadcasts on this channel.
+     * Stops the transmitter from transmitting broadcasts on this channel.
      * @param r The transmitting circuit.
      * @return true if the transmitter was actually removed.
      */
-    public boolean removeTransmitter(TransmittingCircuit t) {
+    public boolean removeTransmitter(Transmitter t) {
         boolean res = transmitters.remove(t);
         calcChannelLength();
         return res;
@@ -97,7 +97,7 @@ public class BroadcastChannel {
      *
      * @return All transmitters that are broadcasting on this channel.
      */
-    public List<TransmittingCircuit> getTransmitters() {
+    public List<Transmitter> getTransmitters() {
         return transmitters;
     }
 
@@ -105,16 +105,16 @@ public class BroadcastChannel {
      *
      * @return All receivers that are receiving broadcasts on this channel.
      */
-    public List<ReceivingCircuit> getReceivers() {
+    public List<Receiver> getReceivers() {
         return receivers;
     }
 
     private void calcChannelLength() {
         length = 0;
-        for (TransmittingCircuit t : transmitters)
+        for (Transmitter t : transmitters)
             if (t.getStartBit()+t.getChannelLength()>length) length = t.getStartBit()+t.getChannelLength();
 
-        for (ReceivingCircuit r : receivers)
+        for (Receiver r : receivers)
             if (r.getStartBit()+r.getChannelLength()>length) length = r.getStartBit()+r.getChannelLength();
 
     }
@@ -138,7 +138,7 @@ public class BroadcastChannel {
         for (int i=0; i<length; i++)
             bits.set(i+startBit, tbits.get(i));
 
-        for (ReceivingCircuit r : receivers) {
+        for (Receiver r : receivers) {
             transmitToReceiver(r, startBit, length);
         }
     }
@@ -153,7 +153,7 @@ public class BroadcastChannel {
     public void transmit(boolean bit, int position) {
         bits.set(position, bit);
 
-        for (ReceivingCircuit r : receivers) {
+        for (Receiver r : receivers) {
             transmitToReceiver(r, position, 1);
         }
     }
@@ -166,7 +166,7 @@ public class BroadcastChannel {
         return receivers.isEmpty() && transmitters.isEmpty();
     }
 
-    private void transmitToReceiver(ReceivingCircuit r, int startBit, int length) {
+    private void transmitToReceiver(Receiver r, int startBit, int length) {
         if (r.getChannelLength()!=0) {
             // only send to receiver if the change is in its bit range.
             if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getChannelLength()) ||
@@ -179,7 +179,7 @@ public class BroadcastChannel {
      * Sends the receiving circuit all current channel bit values.
      * @param r A receiving circuit.
      */
-    public void updateReceiver(ReceivingCircuit r) {
+    public void updateReceiver(Receiver r) {
         transmitToReceiver(r, 0, length);
     }
     

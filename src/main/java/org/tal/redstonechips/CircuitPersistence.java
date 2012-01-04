@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.tal.redstonechips.util.ChunkLocation;
-import org.tal.redstonechips.channel.BroadcastChannel;
+import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.tal.redstonechips.circuit.IOBlock;
 import org.tal.redstonechips.circuit.InputPin;
 import org.tal.redstonechips.circuit.InterfaceBlock;

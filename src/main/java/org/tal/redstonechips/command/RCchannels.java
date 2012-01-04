@@ -7,9 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.channel.BroadcastChannel;
-import org.tal.redstonechips.channel.ReceivingCircuit;
-import org.tal.redstonechips.channel.TransmittingCircuit;
+import org.tal.redstonechips.wireless.BroadcastChannel;
+import org.tal.redstonechips.wireless.Receiver;
+import org.tal.redstonechips.wireless.Transmitter;
 import org.tal.redstonechips.util.BitSetUtils;
 
 /**
@@ -61,22 +61,22 @@ public class RCchannels extends RCCommand {
             sender.sendMessage(errorColor + "Channel " + channelName + " doesn't exist.");
         } else {
             String sTransmitters = "";
-            for (TransmittingCircuit t : channel.getTransmitters()) {
+            for (Transmitter t : channel.getTransmitters()) {
                 String range = "[";
                 if (t.getChannelLength()>1)
                     range += "bits " + t.getStartBit() + "-" + (t.getChannelLength()+t.getStartBit()-1) + "]";
                 else range += "bit " + t.getStartBit() + "]";
 
-                sTransmitters += t.getChipString() + " " + range + ", ";
+                sTransmitters += t.getCircuit().getChipString() + " " + range + ", ";
             }
 
             String sReceivers = "";
-            for (ReceivingCircuit r : channel.getReceivers()) {
+            for (Receiver r : channel.getReceivers()) {
                 String range = "[";
                 if (r.getChannelLength()>1)
                     range += "bits " + r.getStartBit() + "-" + (r.getChannelLength()+r.getStartBit()-1) + "]";
                 else range += "bit " + r.getStartBit() + "]";
-                sReceivers += r.getChipString() + " " + range + ", ";
+                sReceivers += r.getCircuit().getChipString() + " " + range + ", ";
             }
             
             String owners = "";

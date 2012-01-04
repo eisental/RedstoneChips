@@ -7,7 +7,7 @@ package org.tal.redstonechips.command;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.channel.BroadcastChannel;
+import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
 import org.tal.redstonechips.util.ParsingUtils;

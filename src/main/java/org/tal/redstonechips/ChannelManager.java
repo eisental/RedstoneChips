@@ -6,9 +6,11 @@ package org.tal.redstonechips;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.tal.redstonechips.channel.BroadcastChannel;
-import org.tal.redstonechips.channel.ReceivingCircuit;
-import org.tal.redstonechips.channel.TransmittingCircuit;
+import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.wireless.BroadcastChannel;
+import org.tal.redstonechips.wireless.Receiver;
+import org.tal.redstonechips.wireless.Transmitter;
+import org.tal.redstonechips.wireless.Wireless;
 
 /**
  *
@@ -31,7 +33,7 @@ public class ChannelManager {
      * @param channelName Name of the receiver's channel.
      * @return The channel that the receiver was added to.
      */
-    public BroadcastChannel registerReceiver(final ReceivingCircuit r, String channelName) {
+    public BroadcastChannel registerReceiver(final Receiver r, String channelName) {
         boolean exists = broadcastChannels.containsKey(channelName);
 
         final BroadcastChannel channel = getChannelByName(channelName, true);
@@ -46,9 +48,9 @@ public class ChannelManager {
             });
         }
 
-        return channel;
+        return channel;        
     }
-
+    
     /**
      * Adds the transmitter circuit to a channel and returns the BroadcastChannel object that the transmitter
      * was added to. If a BroadcastChannel by that name was not found a new one is created.
@@ -57,7 +59,7 @@ public class ChannelManager {
      * @param channelName Name of the receiver's channel.
      * @return The channel that the receiver was added to.
      */
-    public BroadcastChannel registerTransmitter(TransmittingCircuit t, String channelName) {
+    public BroadcastChannel registerTransmitter(Transmitter t, String channelName) {
         BroadcastChannel channel = getChannelByName(channelName, true);
         channel.addTransmitter(t);
 
@@ -70,7 +72,7 @@ public class ChannelManager {
      * @param t a transmitting circuit.
      * @return true if the transmitter was actually removed.
      */
-    public boolean removeTransmitter(TransmittingCircuit t) {
+    public boolean removeTransmitter(Transmitter t) {
         BroadcastChannel channel = t.getChannel();
         if (channel==null) return false;
         
@@ -87,7 +89,7 @@ public class ChannelManager {
      * @param r a receiving circuit.
      * @return true if the receiver was actually removed.
      */    
-    public boolean removeReceiver(ReceivingCircuit r) {
+    public boolean removeReceiver(Receiver r) {
         BroadcastChannel channel = r.getChannel();
         if (channel==null) return false;
         
@@ -119,6 +121,18 @@ public class ChannelManager {
 
     public Map<String, BroadcastChannel> getBroadcastChannels() {
         return broadcastChannels;
+    }
+
+    public Wireless getCircuitWireless(Circuit destroyed) {
+        for (BroadcastChannel c : broadcastChannels.values()) {
+            for (Wireless w : c.getReceivers())
+                if (w.getCircuit()==destroyed) return w;
+            
+            for (Wireless w : c.getTransmitters())
+                if (w.getCircuit()==destroyed) return w;
+        }
+        
+        return null;
     }
     
 }
