@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.Door;
 import org.bukkit.material.Lever;
@@ -152,7 +153,11 @@ public class OutputPin extends IOBlock {
                 outputBlock.setType(state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF);
             } else return false;    
             
-            
+        } else if (outputBlock.getType()==Material.NOTE_BLOCK) {
+            if (state) {
+                NoteBlock note = (NoteBlock)outputBlock.getState();
+                note.play();
+            }
         } else return false;
 
         return true;

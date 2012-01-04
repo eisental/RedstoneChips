@@ -1,6 +1,5 @@
 package org.tal.redstonechips;
 
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -32,19 +31,12 @@ class RCPlayerListener extends PlayerListener {
     public void onPlayerInteract(PlayerInteractEvent event) {                
         if (event.isCancelled()) return;
 
-        if (event.getAction()==Action.LEFT_CLICK_BLOCK) {
-            
-            if (!rc.getPrefs().getRightClickToActivate() && event.getPlayer().getGameMode()==GameMode.SURVIVAL) {
-                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
-                if (result == -2 || result >= 0) event.setCancelled(true);
-            }
-
-        } else if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
             if (isUsingChipProbe(event.getPlayer())) {
                 rc.probeChipBlock(event.getPlayer(), event.getClickedBlock());
                 event.setCancelled(true);
                 
-            } else if (rc.getPrefs().getRightClickToActivate() || event.getPlayer().getGameMode()==GameMode.CREATIVE) {
+            } else {
                 int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
                 if (result == -2 || result >= 0) event.setCancelled(true);
             }

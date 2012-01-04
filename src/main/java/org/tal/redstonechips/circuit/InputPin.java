@@ -3,6 +3,7 @@ package org.tal.redstonechips.circuit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -104,8 +105,11 @@ public class InputPin extends IOBlock {
             sourceBlocks.put(l, newVal);
 
             lastRedstoneChangeTick = curTick;
-
-            circuit.stateChange(getIndex(), getPinValue());
+            try {
+                circuit.stateChange(getIndex(), getPinValue());
+            } catch (StackOverflowError e) {
+                abortFeedbackLoop();
+            }
         }
 
     }
@@ -125,9 +129,10 @@ public class InputPin extends IOBlock {
         if (circuit.isDisabled()) return;
         
         if (circuit.hasDebuggers()) {
-            circuit.debug("Possible infinite feedback loop detected in " + circuit.getChipString() + ", at"
-                    + "pin " + index + ". It will no longer process any input changes. ");
-            circuit.debug("Use /rcreset to reactivate the circuit after solving the problem or destroy it normally.");
+            ChatColor errorColor = circuit.getPlugin().getPrefs().getErrorColor();
+            ChatColor debugColor = circuit.getPlugin().getPrefs().getDebugColor();
+            circuit.debug(errorColor + "Possible infinite feedback loop " + debugColor + "detected in input " + errorColor + index + debugColor + ".");
+            circuit.debug("Use /rcenable to reactivate the circuit after solving the problem or destroy it normally.");
         }
 
         circuit.disable();

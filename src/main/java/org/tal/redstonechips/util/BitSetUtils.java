@@ -70,7 +70,7 @@ public class BitSetUtils {
         for (int i=length+startBit-1; i>=startBit; i--) {
             ret.append(b.get(i)?"1":"0");
             
-            if (wordlength>0 && i>0 && i % wordlength==0)
+            if (wordlength!=-1 && wordlength>0 && i>0 && i % wordlength==0)
                 ret.append(' ');
         }
 

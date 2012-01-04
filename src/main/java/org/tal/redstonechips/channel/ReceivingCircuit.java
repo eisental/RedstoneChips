@@ -1,7 +1,6 @@
 
 package org.tal.redstonechips.channel;
 
-import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.util.BitSet7;
 
 /**
