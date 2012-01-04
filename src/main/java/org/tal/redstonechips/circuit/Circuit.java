@@ -17,6 +17,7 @@ import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.util.BitSet7;
 import org.tal.redstonechips.util.BitSetUtils;
 import org.tal.redstonechips.util.ChunkLocation;
+import org.tal.redstonechips.wireless.Wireless;
 
 
 /**
@@ -167,11 +168,18 @@ public abstract class Circuit {
      * Resets outputs, calls circuitShutdown() and circuitDestroyed().
      */
     public void destroyCircuit() {
-        circuitShutdown();
-        
+        shutdownCircuit();
+
         for (OutputPin o : outputs) o.changeOutputState(false);
         
         circuitDestroyed();
+    }
+    
+    public void shutdownCircuit() {
+        circuitShutdown();
+        
+        List<Wireless> wireless = redstoneChips.getChannelManager().getCircuitWireless(this);
+        for (Wireless w : wireless) w.shutdown();
     }
     
     /**
@@ -222,7 +230,7 @@ public abstract class Circuit {
      * Called when the circuit is shutdown. Typically when the server shutsdown or the plugin is disabled and before a circuit is 
      * destroyed.
      */
-    public void circuitShutdown() {}
+    protected void circuitShutdown() {}
 
     /**
      * Sets the physical state of one of the outputs.

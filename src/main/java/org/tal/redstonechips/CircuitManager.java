@@ -343,8 +343,8 @@ public class CircuitManager {
             return false;
         }
         
-        Wireless w = rc.getChannelManager().getCircuitWireless(destroyed);
-        if (w!=null) {            
+        List<Wireless> list = rc.getChannelManager().getCircuitWireless(destroyed);
+        for (Wireless w : list) {
             if (w.getChannel()!=null && !(w.getChannel().checkChanPermissions(destroyer, false))) {
                 if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + w.getChannel().name + ".");
                 return false;
@@ -545,7 +545,7 @@ public class CircuitManager {
      * Calls Circuit.circuitShutdown on every activated circuit.
      */
     public void shutdownAllCircuits() {
-        for (Circuit c : circuits.values()) c.circuitShutdown();
+        for (Circuit c : circuits.values()) c.shutdownCircuit();
     }
 
     /**
@@ -684,7 +684,8 @@ public class CircuitManager {
     public void unloadWorldChips(World unloadedWorld) {
         HashMap<Integer, Circuit> unloadedCircuits = this.getCircuits(unloadedWorld);
         for (Circuit c : unloadedCircuits.values()) {
-            c.circuitShutdown();
+            c.shutdownCircuit();
+            
             circuits.remove(c.id);
         }
         

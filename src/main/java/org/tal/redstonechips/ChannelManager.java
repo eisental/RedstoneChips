@@ -4,7 +4,9 @@
  */
 package org.tal.redstonechips;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.wireless.BroadcastChannel;
@@ -123,16 +125,17 @@ public class ChannelManager {
         return broadcastChannels;
     }
 
-    public Wireless getCircuitWireless(Circuit destroyed) {
+    public List<Wireless> getCircuitWireless(Circuit circuit) {
+        List<Wireless> list = new ArrayList<Wireless>();
+        
         for (BroadcastChannel c : broadcastChannels.values()) {
             for (Wireless w : c.getReceivers())
-                if (w.getCircuit()==destroyed) return w;
+                if (w.getCircuit()==circuit) list.add(w);
             
             for (Wireless w : c.getTransmitters())
-                if (w.getCircuit()==destroyed) return w;
+                if (w.getCircuit()==circuit) list.add(w);
         }
         
-        return null;
+        return list;
     }
-    
 }
