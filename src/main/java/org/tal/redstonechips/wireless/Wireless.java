@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips.wireless;
 
 import org.bukkit.ChatColor;
@@ -71,27 +67,20 @@ public abstract class Wireless {
         
         if (this instanceof Receiver) {
             channel = rc.getChannelManager().registerReceiver((Receiver)this, chanName);
-            if (sender!=null) {
-                String bits;
-                if (this.getChannelLength()>1)
-                    bits = "bits " + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
-                else bits = "bit " + this.getStartBit();
-
-                sender.sendMessage(circuit.getChipString() + " will listen on channel " +
-                        ChatColor.YELLOW + getChannel().name + rc.getPrefs().getInfoColor() + " " + bits + ".");
-            }
         } else if (this instanceof Transmitter) {
             channel = rc.getChannelManager().registerTransmitter((Transmitter)this, chanName);
-            if (sender!=null) {
-                String bits;
-                if (this.getChannelLength()>1)
-                    bits = "bits " + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
-                else bits = "bit " + this.getStartBit();
-                
-                sender.sendMessage(rc.getPrefs().getInfoColor() + circuit.getChipString() + " will broadcast over channel " + 
-                        ChatColor.YELLOW + getChannel().name + rc.getPrefs().getInfoColor() + " " + bits + ".");
-            }
         }
+
+        if (sender!=null) {
+            String bits;
+            if (this.getChannelLength()>1)
+                bits = "bits " + ChatColor.YELLOW + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
+            else bits = "bit " + ChatColor.YELLOW + this.getStartBit();
+
+            sender.sendMessage(ChatColor.YELLOW + circuit.getClass().getSimpleName() + rc.getPrefs().getInfoColor() + " will " + 
+                    (this instanceof Receiver?"listen on channel ":"broadcast over channel ") +
+                    ChatColor.YELLOW + getChannel().name + rc.getPrefs().getInfoColor() + " " + bits + rc.getPrefs().getInfoColor() + ".");
+        }        
     }
     
     private boolean checkChanUserPermissions(CommandSender sender, String name) {

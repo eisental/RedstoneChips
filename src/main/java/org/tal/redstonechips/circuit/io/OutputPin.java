@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.io;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.Door;
-import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
-import org.tal.redstonechips.circuit.InputPin.SourceType;
+import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.util.ChunkLocation;
 
 /**
@@ -24,7 +24,8 @@ import org.tal.redstonechips.util.ChunkLocation;
  */
 public class OutputPin extends IOBlock {
     private static Material[] outputMaterials = new Material[] { Material.LEVER, Material.REDSTONE_TORCH_OFF, 
-        Material.REDSTONE_TORCH_ON, Material.WOODEN_DOOR, Material.IRON_DOOR_BLOCK, Material.TRAP_DOOR, Material.POWERED_RAIL };
+        Material.REDSTONE_TORCH_ON, Material.WOODEN_DOOR, Material.IRON_DOOR_BLOCK, Material.TRAP_DOOR, 
+        Material.POWERED_RAIL, Material.NOTE_BLOCK };
     
     private List<Location> outputBlocks;
     
@@ -70,7 +71,7 @@ public class OutputPin extends IOBlock {
      * 
      * @param state The new output state.
      */
-    public void changeOutputState(boolean state) {  
+    public void setState(boolean state) {  
         boolean hasActuator = false;
         
         for (Location l : outputBlocks) { 
@@ -90,78 +91,103 @@ public class OutputPin extends IOBlock {
         }
     }
 
-    private boolean changeBlockState(Location outputLoc, boolean state) {        
-        Block ioBlock = loc.getBlock();        
+    private boolean changeBlockState(Location outputLoc, boolean state) {
         Block outputBlock = outputLoc.getBlock();
+        
         if (outputBlock.getType()==Material.LEVER) {
-            Lever lever = (Lever)outputBlock.getState().getData();
-            BlockFace f = lever.getAttachedFace();
-            if (f!=null && outputBlock.getRelative(f).equals(ioBlock)) {
-                if (updateBlockData(outputBlock, state)) {
-                    outputBlock.getState().update();
-                    updateAdjacentFaces(outputBlock);
-                }
-            } else return false;    
+            if (!checkAttached(outputBlock)) return false;
+            updateLever(outputBlock, state);
+            
         } else if (outputBlock.getType()==Material.POWERED_RAIL) {
-            if (updateBlockData(outputBlock, state)) {
-                outputBlock.getState().update();
-                updateAdjacentFaces(outputBlock);
-            }
+            updatePoweredRail(outputBlock, state);
+            
         } else if (outputBlock.getType()==Material.WOODEN_DOOR || outputBlock.getType()==Material.IRON_DOOR_BLOCK) {
-            Block otherBlock = outputBlock.getRelative(BlockFace.UP);
-            if (otherBlock.getType()!=outputBlock.getType()) {
-                otherBlock = outputBlock.getRelative(BlockFace.DOWN);
-                if (otherBlock.getType()!=outputBlock.getType())
-                    otherBlock = null;
-            }
-                            
-            if (otherBlock!=null) {
-                BlockState s1 = outputBlock.getState();
-                Door door = (Door)s1.getData();
-                if (door.isOpen()!=state) {
-                    door.setOpen(state);            
-                    s1.setData(door);
-                    s1.update();
-
-                    BlockState s2 = otherBlock.getState();
-                    Door door2 = (Door)s2.getData();
-                    door2.setOpen(state);            
-                    s2.setData(door2);
-                    s2.update();
-                    circuit.world.playEffect(outputBlock.getLocation(), Effect.DOOR_TOGGLE, 0);
-                }
-            }
+            updateDoor(outputBlock, state);
+            
         } else if (outputBlock.getType()==Material.TRAP_DOOR) {
-            BlockState s = outputBlock.getState();
-            MaterialData md = s.getData();
-            byte oldData = md.getData();
-            if (state) md.setData((byte)(md.getData() | 0x4));
-            else md.setData((byte)(md.getData() & 0x3));
-            if (oldData!=md.getData()) {
-                s.setData(md);
-                s.update();
-                circuit.world.playEffect(outputBlock.getLocation(), Effect.DOOR_TOGGLE, 0);
-            }
+            updateTrapDoor(outputBlock, state);
+            
         } else if (outputBlock.getType()==Material.REDSTONE_TORCH_OFF || outputBlock.getType()==Material.REDSTONE_TORCH_ON) {            
-            Attachable a = (Attachable)outputBlock.getState().getData();
-            BlockFace f = a.getAttachedFace();
-            Block attached;
-            if (f!=null) attached = outputBlock.getRelative(f);
-            else return false;
-
-            if (attached.equals(ioBlock)) {
-                outputBlock.setType(state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF);
-            } else return false;    
+            if (!checkAttached(outputBlock)) return false;
+            updateRedstoneTorch(outputBlock, state);
             
         } else if (outputBlock.getType()==Material.NOTE_BLOCK) {
-            if (state) {
-                NoteBlock note = (NoteBlock)outputBlock.getState();
-                note.play();
-            }
+            updateNoteBlock(outputBlock, state);
+            
         } else return false;
 
         return true;
         
+    }
+
+    private boolean checkAttached(Block outputBlock) {
+        Attachable a = (Attachable)outputBlock.getState().getData();
+        BlockFace f = a.getAttachedFace();
+        return f!=null && outputBlock.getRelative(f).equals(loc.getBlock());
+    }
+    
+    private void updateLever(Block outputBlock, boolean state) {
+        if (updateBlockData(outputBlock, state)) {
+            outputBlock.getState().update();
+            updateAdjacentFaces(outputBlock);
+        }
+    }
+    
+    private void updateRedstoneTorch(Block outputBlock, boolean state) {
+        outputBlock.setType(state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF);        
+    }
+    
+    private void updatePoweredRail(Block outputBlock, boolean state) {
+        if (updateBlockData(outputBlock, state)) {
+            outputBlock.getState().update();
+            updateAdjacentFaces(outputBlock);
+        }        
+    }
+    
+    private void updateNoteBlock(Block outputBlock, boolean state) {
+        if (state) {
+            NoteBlock note = (NoteBlock)outputBlock.getState();
+            note.play();
+        }        
+    }
+    
+    private void updateDoor(Block outputBlock, boolean state) {
+        Block otherBlock = outputBlock.getRelative(BlockFace.UP);
+        if (otherBlock.getType()!=outputBlock.getType()) {
+            otherBlock = outputBlock.getRelative(BlockFace.DOWN);
+            if (otherBlock.getType()!=outputBlock.getType())
+                otherBlock = null;
+        }
+
+        if (otherBlock!=null) {
+            BlockState s1 = outputBlock.getState();
+            Door door = (Door)s1.getData();
+            if (door.isOpen()!=state) {
+                door.setOpen(state);            
+                s1.setData(door);
+                s1.update();
+
+                BlockState s2 = otherBlock.getState();
+                Door door2 = (Door)s2.getData();
+                door2.setOpen(state);            
+                s2.setData(door2);
+                s2.update();
+                circuit.world.playEffect(outputBlock.getLocation(), Effect.DOOR_TOGGLE, 0);
+            }
+        }
+    }
+    
+    private void updateTrapDoor(Block outputBlock, boolean state) {
+        BlockState s = outputBlock.getState();
+        MaterialData md = s.getData();
+        byte oldData = md.getData();
+        if (state) md.setData((byte)(md.getData() | 0x4));
+        else md.setData((byte)(md.getData() & 0x3));
+        if (oldData!=md.getData()) {
+            s.setData(md);
+            s.update();
+            circuit.world.playEffect(outputBlock.getLocation(), Effect.DOOR_TOGGLE, 0);
+        }        
     }
     
     private boolean updateBlockData(Block b, boolean state) {
@@ -208,7 +234,8 @@ public class OutputPin extends IOBlock {
                 Attachable a = (Attachable)b.getState().getData();
                 BlockFace f = a.getAttachedFace();
                 if (f!=null && b.getRelative(f).equals(loc.getBlock())) return false;
-            } else if (m==Material.WOODEN_DOOR || m==Material.IRON_DOOR_BLOCK || m==Material.TRAP_DOOR || m==Material.POWERED_RAIL)
+            } else if (m==Material.WOODEN_DOOR || m==Material.IRON_DOOR_BLOCK || m==Material.TRAP_DOOR || 
+                    m==Material.POWERED_RAIL || m==Material.NOTE_BLOCK)
                 return false;
         }
         
@@ -248,6 +275,5 @@ public class OutputPin extends IOBlock {
     private boolean shouldUpdateChunk(Location l) {
         ChunkLocation chunk = ChunkLocation.fromLocation(l);
         return chunk.isChunkLoaded() && !circuit.getPlugin().getCircuitManager().isProcessingChunk(chunk);        
-    }
-    
+    }   
 }

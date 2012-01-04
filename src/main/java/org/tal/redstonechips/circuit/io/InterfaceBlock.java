@@ -1,6 +1,7 @@
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.io;
 
 import org.bukkit.Location;
+import org.tal.redstonechips.circuit.Circuit;
 
 /**
  * Represents a chip interface block.

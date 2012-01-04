@@ -10,9 +10,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.circuit.InputPin;
-import org.tal.redstonechips.circuit.InterfaceBlock;
-import org.tal.redstonechips.circuit.OutputPin;
+import org.tal.redstonechips.circuit.io.InputPin;
+import org.tal.redstonechips.circuit.io.InterfaceBlock;
+import org.tal.redstonechips.circuit.io.OutputPin;
 
 /**
  *

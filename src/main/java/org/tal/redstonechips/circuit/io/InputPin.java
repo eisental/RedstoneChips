@@ -1,4 +1,4 @@
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.io;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.util.ChunkLocation;
 
 /**
@@ -99,7 +100,7 @@ public class InputPin extends IOBlock {
             long curTick = circuit.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;
-                if (changesInTickCount>circuit.redstoneChips.getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
+                if (changesInTickCount>circuit.getPlugin().getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
             } else changesInTickCount = 1;
 
             sourceBlocks.put(l, newVal);

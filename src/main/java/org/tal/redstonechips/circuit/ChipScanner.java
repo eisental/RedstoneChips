@@ -1,8 +1,6 @@
-package org.tal.redstonechips;
+package org.tal.redstonechips.circuit;
 
 import java.util.ArrayList;
-import java.util.List;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -21,66 +19,6 @@ public class ChipScanner {
         public ChipScanException(String string) {
             super(string);
         }
-    }
-
-    /**
-     * Used for passing arguments when scanning recursively for chips.
-     */
-    public class ScanParameters {
-        /**
-         * The chip block material of the scanned chip.
-         */
-        Material chipMaterial;
-        
-        /**
-         * The wool color in case the chip material is wool.
-         */
-        DyeColor woolColor;
-
-        /**
-         * The input block material.
-         */
-        MaterialData inputBlockType;
-
-        /**
-         * The output block material.
-         */
-        MaterialData outputBlockType;
-
-        /**
-         * The interface block material.
-         */
-        MaterialData interfaceBlockType;
-
-        /**
-         * The 1st block right after the activation sign. The block to which the sign is attached.
-         */
-        Block origin;
-
-        /**
-         * The current scanning direction.
-         */
-        BlockFace direction;
-
-        /**
-         * List of discovered input blocks.
-         */
-        List<Block> inputs;
-
-        /**
-         * List of discovered output blocks.
-         */
-        List<Block> outputs;
-
-        /**
-         * List of discovered interface blocks.
-         */
-        List<Block> interfaces;
-
-        /**
-         * List of all discovered structure blocks. Includes any block that would break the circuit when broken.
-         */
-        List<Block> structure;
     }
         
     /**

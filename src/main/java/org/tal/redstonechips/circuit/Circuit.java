@@ -1,5 +1,8 @@
 package org.tal.redstonechips.circuit;
 
+import org.tal.redstonechips.circuit.io.InterfaceBlock;
+import org.tal.redstonechips.circuit.io.OutputPin;
+import org.tal.redstonechips.circuit.io.InputPin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +173,7 @@ public abstract class Circuit {
     public void destroyCircuit() {
         shutdownCircuit();
 
-        for (OutputPin o : outputs) o.changeOutputState(false);
+        for (OutputPin o : outputs) o.setState(false);
         
         circuitDestroyed();
     }
@@ -252,7 +255,7 @@ public abstract class Circuit {
             ioDebug("Output " + outIdx + " is " + (state?"on":"off") + ": " + o + ".");
         }
 
-        outputs[outIdx].changeOutputState(state);
+        outputs[outIdx].setState(state);
     }
 
     /**
@@ -300,7 +303,7 @@ public abstract class Circuit {
      * @param sender The command sender to send the message to.
      * @param message The error message.
      */
-    protected void error(CommandSender sender, String message) {
+    public void error(CommandSender sender, String message) {
         if (sender!=null) sender.sendMessage(redstoneChips.getPrefs().getErrorColor() + message);
         else redstoneChips.log(Level.WARNING, this.getClass().getSimpleName() + "> " + message);
     }
@@ -311,7 +314,7 @@ public abstract class Circuit {
      * @param sender The CommandSender to send the message to.
      * @param message The error message.
      */
-    protected void info(CommandSender sender, String message) {
+    public void info(CommandSender sender, String message) {
         if (sender!=null) sender.sendMessage(redstoneChips.getPrefs().getInfoColor() + message);
     }
 
@@ -321,7 +324,7 @@ public abstract class Circuit {
      *
      * @param message The error message.
      */
-    protected void debug(String message) {        
+    public void debug(String message) {        
         for (CommandSender s : debuggers)
             if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
                     (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
@@ -465,7 +468,7 @@ public abstract class Circuit {
             i.refreshSourceBlocks();
 
         for (int i=0; i<outputs.length; i++)
-            outputs[i].changeOutputState(outputBits.get(i));
+            outputs[i].setState(outputBits.get(i));
     }
 
     /**
@@ -653,7 +656,7 @@ public abstract class Circuit {
      */
     public void resetOutputs() {
         for (OutputPin o : outputs)            
-            o.changeOutputState(false);
+            o.setState(false);
     }
 
     /**

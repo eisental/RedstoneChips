@@ -1,6 +1,10 @@
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.io;
 
+import org.tal.redstonechips.circuit.io.InterfaceBlock;
+import org.tal.redstonechips.circuit.io.OutputPin;
+import org.tal.redstonechips.circuit.io.InputPin;
 import org.bukkit.Location;
+import org.tal.redstonechips.circuit.Circuit;
 
 /**
  * Represents an IO chip block. Currently, this is either an input, output or interface block.

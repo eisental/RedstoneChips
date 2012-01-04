@@ -13,7 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
-import org.tal.redstonechips.circuit.OutputPin;
+import org.tal.redstonechips.circuit.io.OutputPin;
 
 /**
  *
