@@ -67,10 +67,11 @@ public class RCtransmit extends RCCommand {
                         return true;
                     }
                 }
+
+                sender.sendMessage(rc.getPrefs().getInfoColor() + "Transmitting " + 
+                        ChatColor.YELLOW + BitSetUtils.bitSetToString(bits, length) + rc.getPrefs().getInfoColor() + " over channel " + c.name + " bit " + startBit + ".");
                 
                 c.transmit(bits, startBit, length);
-                sender.sendMessage(rc.getPrefs().getInfoColor() + "Transmitted " + 
-                        ChatColor.YELLOW + BitSetUtils.bitSetToString(bits, length) + rc.getPrefs().getInfoColor() + " over channel " + c.name + " bit " + startBit + ".");
             } catch (IllegalArgumentException ie) {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
                 return true;
