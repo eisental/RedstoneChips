@@ -5,7 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.circuit.rcTypeReceiver;
+import org.tal.redstonechips.circuit.RCTypeReceiver;
 
 /**
  *
@@ -21,7 +21,7 @@ public class RCtype extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
         Block block = CommandUtils.targetBlock(player);
-        rcTypeReceiver t = rc.rcTypeReceivers.get(block.getLocation());
+        RCTypeReceiver t = rc.rcTypeReceivers.get(block.getLocation());
     
         if (t==null) {
             player.sendMessage(rc.getPrefs().getErrorColor() + "You must point towards a typing block (check the docs of your chip) to type.");

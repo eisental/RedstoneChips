@@ -11,6 +11,7 @@ import org.tal.redstonechips.circuit.Circuit;
  * @author Tal Eisenberg
  */
 public abstract class Wireless {
+
     protected int startBit;    
     protected BroadcastChannel channel = null;
     protected int channelLength;

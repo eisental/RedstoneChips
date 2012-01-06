@@ -25,7 +25,7 @@ import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.circuit.rcTypeReceiver;
+import org.tal.redstonechips.circuit.RCTypeReceiver;
 import org.tal.redstonechips.command.*;
 
 /**
@@ -49,7 +49,7 @@ public class RedstoneChips extends JavaPlugin {
     private CircuitLoader circuitLoader;
     private ChannelManager channelManager;
     
-    public Map<Location, rcTypeReceiver> rcTypeReceivers = new HashMap<Location, rcTypeReceiver>();
+    public Map<Location, RCTypeReceiver> rcTypeReceivers = new HashMap<Location, RCTypeReceiver>();
     private Map<String, Material> playerChipProbe = new HashMap<String, Material>();
     
     public RCsel rcsel = new RCsel();
@@ -230,7 +230,7 @@ public class RedstoneChips extends JavaPlugin {
      * @param typingBlock The block to point towards while typing.
      * @param circuit The circuit that will receive the typed text.
      */
-    public void registerRcTypeReceiver(Location typingBlock, rcTypeReceiver circuit) {
+    public void addRCTypeReceiver(Location typingBlock, RCTypeReceiver circuit) {
         rcTypeReceivers.put(typingBlock, circuit);
     }
 
@@ -238,7 +238,7 @@ public class RedstoneChips extends JavaPlugin {
      * The rcTypeReceiver will no longer receive /rctype commands.
      * @param circuit The rcTypeReceiver to remove.
      */
-    public void removeRcTypeReceiver(rcTypeReceiver circuit) {
+    public void removeRCTypeReceiver(RCTypeReceiver circuit) {
         List<Location> toremove = new ArrayList<Location>();
 
         for (Location l : rcTypeReceivers.keySet()) {

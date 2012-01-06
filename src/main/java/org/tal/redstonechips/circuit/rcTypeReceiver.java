@@ -8,6 +8,6 @@ import org.bukkit.entity.Player;
  * 
  * @author Tal Eisenberg
  */
-public interface rcTypeReceiver {
+public interface RCTypeReceiver {
     public void type(String[] words, Player player);
 }

@@ -187,4 +187,12 @@ public class BitSetUtils {
         if (sbits==null) return null;
         else return stringToBitSet(sbits);
     }
+
+    public static BitSet7 booleanToBitSet(boolean[] bits, int offset, int length) {
+        BitSet7 bitset = new BitSet7(length-offset);
+        for (int i=offset; i<length; i++) bitset.set(i-offset,bits[i]);
+        
+        return bitset;
+    }
+
 }
