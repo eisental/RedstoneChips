@@ -14,10 +14,21 @@ import org.tal.redstonechips.circuit.CircuitIndex;
 public class RedstoneChips extends RCCommand {
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
     
+        rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, new Runnable() {
 
+            @Override
+            public void run() {
+                showMessage(sender);
+            }
+        });
+
+        return true;
+    }
+    
+    private void showMessage(CommandSender sender) {
         String verMsg = "";
         
         try {
@@ -41,8 +52,7 @@ public class RedstoneChips extends RCCommand {
         for (CircuitIndex i : rc.getCircuitLoader().getCircuitLibraries()) {
             sender.sendMessage(ChatColor.YELLOW + " - " + color + i.getName() + " " + i.getVersion());
         }
-        sender.sendMessage(ChatColor.RED + "-----------------------------------------------------");
-        return true;
+        sender.sendMessage(ChatColor.RED + "-----------------------------------------------------");        
     }
 
 }
