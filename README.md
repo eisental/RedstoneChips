@@ -1,8 +1,8 @@
 RedstoneChips 
 =============
 
-RedstoneChips is a Bukkit plugin that allows you to build custom redstone chips on your craftbukkit minecraft server.
-Chips can be built with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
+RedstoneChips is a Minecraft Bukkit plugin that allows you to build custom integrated circuits on your minecraft server. 
+Chips can be constructed with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
 - RedstoneChips - The core plugin (required). 
 
@@ -10,7 +10,7 @@ Chips can be built with any number of inputs and outputs and in almost any imagi
 
 - [SensorLibrary](http://github.com/eisental/SensorLibrary) - A chip library for various sensor chips (optional).
 
-Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info about the circuit libraries.
+Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info on available RedstoneChips circuits.
 
 __For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
 
@@ -21,6 +21,17 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.94 (Jan 9th, 2012)
+- Note blocks can be used as output devices.
+- removed rightClickToActivate pref. It's now always right-click to activate.
+- Added verbose argument to /rcactivate for finding scan problems. 
+- Rewrote wireless system. Allows one chip to use any number of receivers and transmitters. This could BREAK chip libraries.
+- Improved the feedback loop detector. 
+- Added command aliases to /rchelp
+- /rc command new update check doesn't block the server.
+- Fixed sram /rctype dump crashing the server (http://github.com/eisental/BasicCircuits/issues/9).
+- Many other small bug fixes and changes.
+
 ### RedstoneChips 0.93 (19/12/11)
 
 Features:
