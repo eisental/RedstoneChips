@@ -262,26 +262,24 @@ public class RCsel extends RCCommand {
     }
 
     private void massActivate(CommandSender sender, String[] args, Location[] cuboid, ChatColor infoColor) {
-        MaterialData inputBlockType, outputBlockType, interfaceBlockType;
+        MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
 
-        if (args.length==1) {
-            inputBlockType = rc.getPrefs().getInputBlockType();
-            outputBlockType = rc.getPrefs().getOutputBlockType();
-            interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
-        } else {
-            if (args.length!=4) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcsel activate [<inputBlockType> <outputBlockType> <interfaceBlockType>]");
-                return;
-            }
-            try {
+        try {
+            if (args.length>=2)
                 inputBlockType = PrefsManager.findMaterial(args[1]);
+            if (args.length>=3)
                 outputBlockType = PrefsManager.findMaterial(args[2]);
-                interfaceBlockType = PrefsManager.findMaterial(args[3]);
-            } catch (IllegalArgumentException ie) {
-                sender.sendMessage(ie.getMessage());
-                return;
-            }
+            if (args.length>=4)
+                interfaceBlockType = PrefsManager.findMaterial(args[2]);
+        } catch (IllegalArgumentException ie) {
+            sender.sendMessage(ie.getMessage());
+            return;
         }
+
+        if (inputBlockType==null) inputBlockType = rc.getPrefs().getInputBlockType();
+        if (outputBlockType==null) outputBlockType = rc.getPrefs().getOutputBlockType();
+        if (interfaceBlockType==null) interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
+        
 
         int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
         int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
@@ -301,7 +299,7 @@ public class RCsel extends RCCommand {
                 for (int z=lowz; z<=highz; z++) {
                     Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
                     if (b.getTypeId()==wallSignId) {
-                        if (rc.getCircuitManager().checkForCircuit(b, sender, inputBlockType, outputBlockType, interfaceBlockType)>=0)
+                        if (RCactivate.activate(b, inputBlockType, outputBlockType, interfaceBlockType, sender, false, rc))
                             count++;
                     }
                 }

@@ -129,7 +129,7 @@ public class OutputPin extends IOBlock {
     private void updateLever(Block outputBlock, boolean state) {
         if (updateBlockData(outputBlock, state)) {
             outputBlock.getState().update();
-            updateAdjacentFaces(outputBlock);
+            //loc.getBlock().getState().applyPhysics();
         }
     }
     
@@ -140,7 +140,6 @@ public class OutputPin extends IOBlock {
     private void updatePoweredRail(Block outputBlock, boolean state) {
         if (updateBlockData(outputBlock, state)) {
             outputBlock.getState().update();
-            updateAdjacentFaces(outputBlock);
         }        
     }
     
@@ -200,26 +199,6 @@ public class OutputPin extends IOBlock {
         b.setData(newData, true);
         
         return true;
-    }
-
-    private void updateAdjacentFaces(Block ioBlock) {
-        for (BlockFace f : adjacentFaces) {
-            BlockState adj = ioBlock.getRelative(f).getState();
-
-            if (adj.getType().equals(Material.REDSTONE_WIRE) ||
-                    adj.getType().equals(Material.REDSTONE_TORCH_ON) ||
-                    adj.getType().equals(Material.REDSTONE_TORCH_OFF) ||
-                    adj.getType().equals(Material.RAILS) ||
-                    adj.getType().equals(Material.POWERED_RAIL) ||
-                    adj.getType().equals(Material.PISTON_BASE) ||
-                    adj.getType().equals(Material.PISTON_STICKY_BASE) ||
-                    adj.getType().equals(Material.WOODEN_DOOR) ||
-                    adj.getType().equals(Material.IRON_DOOR_BLOCK) ||
-                    adj.getType().equals(Material.DIODE)) {
-                //adj.getBlock().setData(adj.getData().getData(), true);
-                //adj.update(true);
-            }
-        }        
     }
 
     /**

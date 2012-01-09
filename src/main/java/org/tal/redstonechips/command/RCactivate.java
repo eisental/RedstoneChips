@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.PrefsManager;
+import org.tal.redstonechips.circuit.RecursiveChipScanner;
+import org.tal.redstonechips.circuit.io.IOBlock.Type;
 
 /**
  *
@@ -24,35 +26,54 @@ public class RCactivate extends RCCommand {
 
         Block target = CommandUtils.targetBlock(player);
         if (target.getType()==Material.WALL_SIGN) {
-            MaterialData inputBlockType, outputBlockType, interfaceBlockType;
-
-            if (args.length==0) {
-                inputBlockType = rc.getPrefs().getInputBlockType();
-                outputBlockType = rc.getPrefs().getOutputBlockType();
-                interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
-            } else {
-                if (args.length!=3) {
-                    sender.sendMessage(rc.getPrefs().getErrorColor() + "Bad syntax. Expecting /rcactivate [inputBlockType] [outputBlockType] [interfaceBlockType]");
-                    return true;
+            MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
+            
+            boolean verbose = false;
+            if (args.length>0) {
+                if (args[args.length-1].equalsIgnoreCase("verbose")) {
+                    verbose = true;
                 }
+                
                 try {
-                    inputBlockType = PrefsManager.findMaterial(args[0]);
-                    outputBlockType = PrefsManager.findMaterial(args[1]);
-                    interfaceBlockType = PrefsManager.findMaterial(args[2]);
+                    if (args.length>=(verbose?2:1))
+                        inputBlockType = PrefsManager.findMaterial(args[0]);
+                    if (args.length>=(verbose?3:2))
+                        outputBlockType = PrefsManager.findMaterial(args[1]);
+                    if (args.length>=(verbose?4:3))
+                        interfaceBlockType = PrefsManager.findMaterial(args[2]);
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(ie.getMessage());
                     return true;
-                }
+                }                
+                    
             }
+            
 
-            if (rc.getCircuitManager().checkForCircuit(target, sender, inputBlockType, outputBlockType, interfaceBlockType)==-2) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Could not activate integrated circuit.");
-            }
+            if (inputBlockType==null) inputBlockType = rc.getPrefs().getInputBlockType();
+            if (outputBlockType==null) outputBlockType = rc.getPrefs().getOutputBlockType();
+            if (interfaceBlockType==null) interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
+            
+            activate(target, inputBlockType, outputBlockType, interfaceBlockType, sender, verbose, rc);
+            
         } else {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a wall sign.");
         }
 
         return true;
+    }
+
+    public static boolean activate(Block target, MaterialData inputBlockType, MaterialData outputBlockType, 
+            MaterialData interfaceBlockType, CommandSender sender, boolean verbose, org.tal.redstonechips.RedstoneChips rc) {
+        RecursiveChipScanner scanner = new RecursiveChipScanner();
+        scanner.addIOMaterial(Type.INPUT, inputBlockType);
+        scanner.addIOMaterial(Type.OUTPUT, outputBlockType);
+        scanner.addIOMaterial(Type.INTERFACE, interfaceBlockType);
+        if (verbose) scanner.setDebugger(sender);
+        if (rc.getCircuitManager().checkForCircuit(target, scanner, sender)==-2) {
+            sender.sendMessage(rc.getPrefs().getErrorColor() + "Could not activate chip.");
+            return false;
+        } else return true;
+        
     }
 
 }

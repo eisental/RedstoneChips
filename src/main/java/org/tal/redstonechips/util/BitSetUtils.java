@@ -108,7 +108,7 @@ public class BitSetUtils {
      * Stores new value in the same BitSet.
      *
      * @param s Shifted BitSet object.
-     * @param length Number of bits to shift.
+     * @param length Length of binary number.
      * @return BitSet s after shifting.
      */
     public static BitSet7 shiftLeft(BitSet7 s, int length) {
@@ -125,7 +125,7 @@ public class BitSetUtils {
      * Stores new value in the same BitSet.
      *
      * @param s Shifted BitSet object.
-     * @param length Number of bits to shift.
+     * @param length Length of binary number.
      * @param logical true for logical right shift; false for arithmetic right shift.
      * @return BitSet s after shifting.
      */
@@ -134,7 +134,7 @@ public class BitSetUtils {
             s.set(i, s.get(i+1));
         }
 
-        if (logical) s.set(length-1, 0);
+        if (logical) s.set(length-1, false);
 
         return s;
     }

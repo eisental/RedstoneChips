@@ -37,7 +37,8 @@ class RCPlayerListener extends PlayerListener {
                 event.setCancelled(true);
                 
             } else {
-                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), event.getPlayer());
+                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), 
+                        rc.getPrefs().getDefaultChipScanner(), event.getPlayer());
                 if (result == -2 || result >= 0) event.setCancelled(true);
             }
 

@@ -15,6 +15,9 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.material.MaterialData;
+import org.tal.redstonechips.circuit.ChipScanner;
+import org.tal.redstonechips.circuit.RecursiveChipScanner;
+import org.tal.redstonechips.circuit.io.IOBlock;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -52,6 +55,8 @@ public class PrefsManager {
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
 
+    private ChipScanner defaultScanner;
+    
     /**
      * PrefsManager constructor. Loads the defaults from file to the defaults Map.
      *
@@ -196,6 +201,14 @@ public class PrefsManager {
     }
 
     /**
+     * 
+     * @return The default chip scanner using current interface block types.
+     */
+    public ChipScanner getDefaultChipScanner() {
+        return defaultScanner;
+    }
+    
+    /**
      *
      * @return The current error chat message color preference value.
      */
@@ -333,6 +346,12 @@ public class PrefsManager {
         outputBlockType = findMaterial(toapply.get(Prefs.outputBlockType.name()).toString());
         interfaceBlockType = findMaterial(toapply.get(Prefs.interfaceBlockType.name()).toString());
 
+        RecursiveChipScanner scanner = new RecursiveChipScanner();
+        scanner.addIOMaterial(IOBlock.Type.INPUT, inputBlockType);
+        scanner.addIOMaterial(IOBlock.Type.OUTPUT, outputBlockType);
+        scanner.addIOMaterial(IOBlock.Type.INTERFACE, interfaceBlockType);
+        defaultScanner = scanner;
+        
         infoColor = ChatColor.valueOf((String)toapply.get(Prefs.infoColor.name()));
         errorColor = ChatColor.valueOf((String)toapply.get(Prefs.errorColor.name()));
         debugColor = ChatColor.valueOf((String)toapply.get(Prefs.debugColor.name()));

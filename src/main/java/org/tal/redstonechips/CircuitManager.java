@@ -28,6 +28,8 @@ import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
 import org.tal.redstonechips.circuit.ScanParameters;
+import org.tal.redstonechips.circuit.io.IOBlock;
+import org.tal.redstonechips.circuit.io.IOBlock.Type;
 import org.tal.redstonechips.util.ParsingUtils;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -38,7 +40,6 @@ import org.tal.redstonechips.wireless.Wireless;
 public class CircuitManager {
 
     private RedstoneChips rc;
-    private ChipScanner scanner;
     
     private HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
 
@@ -56,7 +57,6 @@ public class CircuitManager {
     
     public CircuitManager(RedstoneChips plugin) { 
         rc = plugin; 
-        scanner = new ChipScanner();
     }
 
     /**
@@ -78,29 +78,14 @@ public class CircuitManager {
     }
 
     /**
-     * Tries to detect a circuit starting at the specified activation sign block using the i/o block materials in the preferences.
-     *
+     * Tries to scan a chip, starting from the chip sign block.
+     * 
      * @param signBlock The activation sign block.
-     * @param sender The circuit activator.
-     */
-    public int checkForCircuit(Block signBlock, CommandSender sender) {
-        return checkForCircuit(signBlock, sender, rc.getPrefs().getInputBlockType(), rc.getPrefs().getOutputBlockType(),
-                rc.getPrefs().getInterfaceBlockType());
-    }
-    
-    /**
-     * Tries to detect a circuit starting at the specified activation sign block using the specified i/o block materials.
-     *
-     * @param signBlock The activation sign block.
-     * @param sender The circuit activator.
-     * @param inputBlockType Input block material.
-     * @param outputBlockType Output block material.
-     * @param interfaceBlockType Interface block material.
+     * @param scanner ChipScanner to scan with.
+     * @param sender The activator
      * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
      */
-    public int checkForCircuit(Block signBlock, CommandSender sender,
-            MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
-
+    public int checkForCircuit(Block signBlock, ChipScanner scanner, CommandSender sender) {
         if (signBlock.getType()!=Material.WALL_SIGN) return -1;
 
         BlockState state = signBlock.getState();
@@ -126,7 +111,7 @@ public class CircuitManager {
 
         ScanParameters params = null;        
         try {
-            params = scanner.scan(signBlock, inputBlockType, outputBlockType, interfaceBlockType);
+            params = scanner.scan(signBlock);
         } catch (ChipScanException e) {
             if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + e.getMessage());
         }
@@ -189,9 +174,9 @@ public class CircuitManager {
 
         c.args = getArgsFromSign(sign);
 
-        return this.activateCircuit(c, sender, -1);
+        return this.activateCircuit(c, sender, -1);        
     }
-
+    
     /**
      * Activates an already scanned circuit.
      *
@@ -395,7 +380,7 @@ public class CircuitManager {
         String name = c.name;
         
         if (!rc.getCircuitManager().destroyCircuit(c, reseter, false)) return false;
-        int newId = rc.getCircuitManager().checkForCircuit(activationBlock, reseter);                
+        int newId = rc.getCircuitManager().checkForCircuit(activationBlock, rc.getPrefs().getDefaultChipScanner(), reseter);
         Circuit newCircuit = rc.getCircuitManager().getCircuits().get(newId);
 
         if (newCircuit!=null) {
