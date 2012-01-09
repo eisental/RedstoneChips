@@ -1,5 +1,6 @@
 org.tal.redstonechips
-org.tal.redstonechips.channel
 org.tal.redstonechips.circuit
+org.tal.redstonechips.circuit.io
 org.tal.redstonechips.command
 org.tal.redstonechips.util
+org.tal.redstonechips.wireless
