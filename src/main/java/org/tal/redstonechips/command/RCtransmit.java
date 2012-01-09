@@ -75,6 +75,9 @@ public class RCtransmit extends RCCommand {
             } catch (IllegalArgumentException ie) {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
                 return true;
+            } catch (RuntimeException e) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + e.toString());
+                return true;
             }
         }
         
