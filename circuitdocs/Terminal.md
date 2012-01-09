@@ -12,9 +12,13 @@ The first sign argument sets the way the data is encoded.
 * `ascii` (default) - Sends one character's ascii value over the data outputs, triggers the clock output and then moves to the next character. When the chip has 10 outputs its 2nd pin is an end-of-transmission pin, triggered once the terminal is done sending all characters in its message. When an `eot` argument is added to the sign the terminal will send a 0x03 (or EOT ascii control character) out of its data outputs once all characters have been sent.
 * `num` - Reads the whole line as an integer number, sends the integer over the data outputs and then triggers the clock output.
 
-The chip can be built with an optional clear input pin. When the clear pin is triggered any data left on the chip's outputs is set to off.
+The chip can be built with an optional clear input pin. When the clear pin is triggered any data left on the chip's outputs is turned off.
 
 This circuit can be directly connected to a [print](Print.html) circuit. 
+
+__Wireless__
+
+The chip can transmit wirelessly by adding a channel name as the last sign argument. Channel name syntax is `#name[:startbit]`. In this mode physical output pins are not required. 
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/terminal.java)
 
@@ -27,9 +31,12 @@ This circuit can be directly connected to a [print](Print.html) circuit.
 * num mode requires 1 clock output and 1 or more data output pins.
 * Requires at least 1 interface block.
 * Can have 1 optional clear input pin.
+* In wireless mode no inputs or outputs are necessary.
 
 #### Sign text
 1. `   terminal   `
 2. `  [type] ` (ascii by default)
 3. `  [eot]  ` (optional)
+4. `  [#channel]   ` (optional)
+
 __Version history:__ Added to BasicCircuits 0.73

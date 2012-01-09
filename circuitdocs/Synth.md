@@ -31,5 +31,6 @@ The channel argument must be the last. In this mode synth requires no inputs or 
 #### Sign text
 1. `   synth   `
 2. `  [note] ... [note] ` 
+3. ` [#channel]  ` (optional)
 
 __Version history:__ Added to BasicCircuits 0.6

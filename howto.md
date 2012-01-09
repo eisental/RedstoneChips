@@ -24,7 +24,7 @@ Building a Chip
 - Last but not least, go back to your circuit sign and __right-click__ it to activate the chip. If all went well, you should receive an activation message. 
 
 An input block can receive redstone signal from the block above it or from any block on its sides.
-An output block sends its signal to any compatible device that's attached to its sides or its top. Possible output devices are levers, redstone torches, powered rails, doors and trap doors. When the output block doesn't have any attached devices it will directly send signal to any input pin whose block is touching the output block. 
+An output block sends its signal to any compatible device that's attached to its sides or its top. Possible output devices are __levers__, __redstone torches__, __powered rails__, __doors__, __trap doors__, and _note blocks__. When the output block doesn't have any attached devices it will directly send signal to any input pin whose block is touching the output block. 
 
 Output devices:
 
@@ -455,7 +455,6 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 ### Other 
 - `enableDestroyCommand` - Enable or disable /rcdestroy command. Possible values are `true` or `false` (`false` by default).
 - `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
-- `rightClickToActivate` - When set to true chips will be activated by right-clicking their sign. Otherwise circuits are activated by left-click in survival mode and right-click in creative mode.
 - `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
 chip is disabled. Set to 20000 changes per tick by default.
 - `usePermissions` - When set to true the plugin will use the permission system if a permissions plugin is installed. `false` by default.

@@ -11,6 +11,8 @@ There are 2 modes of operation:
 
 The 2nd input number can be a constant number set in the sign arguments. In that case the 1st number is the value of all the input pins and the 2nd number is the argument constant. When the constant argument is not used, the 1st half of input bits are treated as the 1st number and the 2nd half of input bits are treated as the 2nd number.
 
+When the last sign argument is `clockpin` the 1st input of the comparator is the clock input. In this mode the chip outputs will update only after the clock input is triggered. 
+
 on [Wikipedia](http://en.wikipedia.org/wiki/Digital_comparator)
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/comparator.java)
@@ -20,10 +22,12 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Digital_comparator)
 
 #### I/O setup 
 * Can have any number of inputs. When a constant is used, the set of input pins is treated as one number. If a constant is not used, the circuit must have an even number of input pins.
+* In clockpin mode, an additional clock input is required.
 * Can have either 1 output pin for the identity mode, or 3 output pins for the magnitude mode.
 
 #### Sign text
 1. `   comparator   `
 2. `   [constant]   ` (optional)
+3. `   [clockpin]   ` (optional)
 
 __Version history:__ Added to BasicCircuits 0.77

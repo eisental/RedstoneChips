@@ -4,12 +4,12 @@ title: display
 ---
 Creates a wool display with individually addressable pixels.
 
-This chip may be wireless, or use Input Blocks. To make a wireless version, do not attach any Input Blocks and specify a channel Identifier as the last parameter on the sign.
+This chip may be wireless, or use input blocks. To make a wireless version, do not attach any Input Blocks and specify a channel identifier as the last parameter on the sign.
 
 This chip requires two Interface Blocks placed at opposite corners of the display, and a layer of wool making up the display. The display must be flat and can not be built at an angle. If the physical display is larger than the size specified on the sign, the size of the pixels will be adjusted accordingly. For example, if the sign states that the display is 10x10, and the physical display is 40x40, each pixel will be 4x4 wool blocks.
 
 The first sign argument specifies the size of the display in the format `<Width>x<Height>`, for example "10x20". If this argument is omitted the physical size of 
-the display is used and each pixel will be 1 wool block.
+the display is used and each pixel will be 1 block wide.
 
 Additional optional arguments are a color index as detailed in the [pixel](Pixel) chip, and a channel identifier if the display will be wireless.
 

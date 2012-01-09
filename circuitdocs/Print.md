@@ -21,7 +21,7 @@ A second sign argument sets the display mode.
 This mode requires an extra clear pin after the clock pin. When the clear pin is triggered, the all text on the output sign is removed.
 * scroll - Works internally as the add mode but displays only a part of the buffered text on one sign line at each moment. This mode also uses a clear pin
 and in addition requires a scroll pin. When the scroll pin is triggered the part of the text displayed on the sign is updated to start with the next character.
-Connecting a clock to this pin create a scrolling effect. Once the end of the buffered text is reached the sign will continue scrolling from its 1st character again.
+Connecting a clock to this pin create a scrolling effect. Once the end of the buffered text is reached the sign will continue scrolling from the beginning of the message.
 
 To build a print chip as a wireless receiver add a channel argument using the syntax `#name[:startbit]` 
 The channel argument must be the last. In this mode print requires no inputs or outputs. The bit configuration the receiver expects is the same as the physical inputs but without the need for a clock pin. For example, if a chip is in add mode, the 1st channel bit is the clear bit, and all the following bits are data bits.
@@ -46,5 +46,6 @@ If the circuit is using add or scroll mode the new text will be added to the pre
 1. `   print   `
 2. `  [data type] ` (num by default)
 3. ` [display mode] ` (replace by default)
+4. ` [#channel]  ` (optional)
 
 __Version history:__ Added to BasicCircuits 0.1
