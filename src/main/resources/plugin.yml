@@ -12,6 +12,7 @@ commands:
       `/redstonechips`
     aliases: [rc]
   rclist:
+    aliases: [rcls]    
     description: Prints a list of active chips.
     usage: |
       `/rclist [world-name|all|this] [<filter-type>: <arg>,<arg>,<arg>;...]`
@@ -34,6 +35,7 @@ commands:
       - `/rclist this ch: this; cl: pix` - List every pixel circuit in your current world and chunk.
       - `/rclist this loc: this, 10; class: decoder` - List every decoder in a 10 block radius around you.
   rcclasses:
+    aliases: [rccl]    
     description: Prints a list of installed chip classes.
     usage: |
       `/rcclasses`
@@ -65,6 +67,7 @@ commands:
       Point towards an output lever or input redstone source.
       Prints the pin number (starting at 0), pin type (input/output), and current state (on/off) of the pin.
   rcactivate:
+    aliases: [rca]    
     description: Activates a chip.
     usage: |
       Point towards the chip sign and execute the command.
@@ -75,26 +78,30 @@ commands:
       Point towards a block of the chip you wish to destroy and enter the command.
       This command is disabled by default. To enable it use `/rcprefs enableDestroyCommand true`.
   rcbreak:
+    aliases: [rcb]    
     description: Deactivates a chip without removing its blocks.
     usage: |
       `/rcbreak [id]`
 
       Point towards a block of the chip or enter the its id as an argument.
   rctype:
+    aliases: [rct]    
     description: General command for sending input to a chip.
     usage: |
       `/rctype [...]`
 
       Use by pointing at a block and enter the command. Each chip reacts to it differently.
       Check the relevant chip documentation for more information about usage.
-  rctransmit:
+  rcsend:
+    aliases: [rcs]    
     description: Transmit data over a wireless channel.
     usage: |
-      `/rctransmit <channel> [start-bit:]data ... [start-bit:]data
+      `/rcsend <channel> [start-bit:]data ... [start-bit:]data
       
       data can be either an integer number, ascii character, or the letter 'b' followed by a binary number.
-    aliases: [rct]
+      ascii characters may optionally be surrounded by quotes ''. For example, `/rcs chan '8'`
   rcreset:
+    aliases: [rcr]    
     description: Rescans and reactivates a chip.
     usage: |
       `/rcreset [id|all]`
@@ -125,6 +132,7 @@ commands:
       
       Use a channel name as an argument to print info about that channel.
   rcinfo:
+    aliases: [rci]    
     description: Prints a lot of useful information about a chip.
     usage: |
       `/rcinfo [circuit-id]`
@@ -138,26 +146,26 @@ commands:
       Use by pointing at the chip you want to fix, or use its id as an argument.
       Any i/o blocks using a different block type than those set in the plugin's preferences are replaced to the correct material.
   rcsel:
-    description: Mass edit chips within a selection cuboid.
+    description: Select and edit a group of chips.
     usage: |
-      To define a selection type `/rcsel` and right-click on two opposite corners of your cuboid.
-      When no selection is defined /rcsel will try to use WorldEdit's current selection.       
-
-      When either types of selection are defined you can execute any of the following commands.
-
+      To add/remove chips from selection:
+      - `/rcsel` - Switch selection mode on/off. When on, right-clicking a chip block adds it to selection.
+      - `/rcsel cuboid` - Select chips in a WorldEdit cuboid or start to define a cuboid.
+      - `/rcsel id <chip-id>...<chip-id>` - Select chips by a list of ids.
       - `/rcsel list` - Lists all chips in the selection
       - `/rcsel clear` - Clears the current selection.
 
-      The following work the same as their single chip verions, only on all chips within the cuboid:
-        
+      To run a command on all chips in selection:
+      The following work the same as their single chip versions.        
       - `/rcsel activate [<input type> <output type> <interface block type>]`, 
-      - `/rcsel fixioblocks`
       - `/rcsel break`
       - `/rcsel destroy`
       - `/rcsel reset`
       - `/rcsel enable`
       - `/rcsel disable` 
+      - `/rcsel fixioblocks`
       
+      `/rcsel activate` requires a defined cuboid.      
   rcarg:
     description: Replace, add or clear chip sign arguments.
     usage: |
@@ -210,6 +218,7 @@ commands:
       - Use it on the chip sign to print info about the chip.
       - Using it on any other chip block turns chip debug on and off. 
   rcname:
+    aliases: [rcn]    
     description: Name or unname a circuit for easier debugging.
     usage: |
       `/rcname [id] <new-name>` - change the chip name.
@@ -258,7 +267,7 @@ permissions:
       redstonechips.command.rcprotect: true
       redstonechips.command.rctool: true
       redstonechips.command.rcname: true
-      redstonechips.command.rctransmit: true      
+      redstonechips.command.rcsend: true      
   redstonechips.command.admin:
     description: Grants access to all of RedstoneChips commands including admin commands.
     children:
@@ -311,7 +320,7 @@ permissions:
       redstonechips.command.rctool.deny: true
       redstonechips.command.rcname.deny: true
       redstonechips.command.rcname.id.deny: true
-      redstonechips.command.rctransmit.deny: true
+      redstonechips.command.rcsend.deny: true
   redstonechips.circuit.*:
     description: Grants access to create and destroy all RedstoneChips circuits.
     children:
@@ -484,11 +493,11 @@ permissions:
   redstonechips.command.rchelp.deny:
     default: false
     description: Denies the rchelp command.
-  redstonechips.command.rctransmit:
-    description: Grants the rctransmit command.
-  redstonechips.command.rctransmit.deny:
+  redstonechips.command.rcsend:
+    description: Grants the rcsend command.
+  redstonechips.command.rcsend.deny:
     default: false
-    description: Denies the rctransmit command.
+    description: Denies the rcsend command.
   redstonechips.circuit.destroy.*:
     description: Grants permission to destroy all circuits.
   redstonechips.circuit.create.*:

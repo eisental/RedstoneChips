@@ -42,7 +42,7 @@ public class RedstoneChips extends RCCommand {
         ChatColor color = (sender instanceof Player?ChatColor.GRAY:ChatColor.WHITE);
         sender.sendMessage(ChatColor.RED + "---- " + rc.getDescription().getName() + " " + rc.getDescription().getVersion() + " -----------------------------");
         sender.sendMessage(ChatColor.YELLOW + "Website: " + color + rc.getDescription().getWebsite());
-        sender.sendMessage("Type /rchelp for a list of all RedstoneChips commands.");
+        sender.sendMessage("Type /rchelp for a list of all plugin commands.");
         sender.sendMessage("");
         sender.sendMessage(verMsg);
         sender.sendMessage("");

@@ -1,13 +1,11 @@
-
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.tal.redstonechips.command;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,252 +14,185 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
-import org.bukkit.plugin.Plugin;
 import org.tal.redstonechips.PrefsManager;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.user.UserSession;
+import org.tal.redstonechips.user.UserSession.Mode;
+import org.tal.redstonechips.user.WorldEditHook;
 
 /**
  *
  * @author Tal Eisenberg
  */
 public class RCsel extends RCCommand {
+    private static final ChatColor color = ChatColor.AQUA;
 
     private enum SelCommand {
-        ACTIVATE, RESET, BREAK, LIST, DESTROY, FIXIOBLOCKS, CLEAR, ENABLE, DISABLE
+        WORLD(null), CUBOID(null), ID(null), ACTIVATE("Activated"), RESET("Reset"), BREAK("Deactivated"), LIST(null), 
+        DESTROY("Destroyed"), FIXIOBLOCKS("Fixed "), CLEAR(null), ENABLE("Enabled"), DISABLE("Disabled");
+        
+        String verb;
+        
+        SelCommand(String verb) { this.verb = verb; }
+        
+        public static SelCommand startsWith(String s) {
+            s = s.toLowerCase();
+            for (SelCommand c : SelCommand.values())
+                if (c.name().toLowerCase().startsWith(s))
+                    return c;
+            
+            return null;
+        }
     }
-
-    private List<Player> definingCuboids = new ArrayList<Player>();
-    private Map<Player,Location[]> playerCuboids = new HashMap<Player,Location[]>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player p = CommandUtils.checkIsPlayer(rc, sender);
         if (p==null) return true;
-        
+
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
-
+        
+        SelCommand selCommand = null;
+        
         if (args.length==0) {
-            recordSelection(p);
-        } else {
-            ChatColor infoColor = ChatColor.AQUA;
-            SelCommand selCommand;
-
-            try {
-                selCommand = SelCommand.valueOf(args[0].toUpperCase());
-            } catch (IllegalArgumentException ie) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown selection command: " + args[0]);
-                return true;
-            }
-
-            if (selCommand==SelCommand.CLEAR) {
-                clearSelection(p);
-                return true;
-            }
-
-            long start = System.nanoTime();
-
-            Location[] cuboid = getSelectionCuboid(p, infoColor);
-            if (cuboid==null) return true;
+            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
             
-            List<Circuit> circuits;
-            int circuitCount = 0;
-            switch (selCommand) {
-                case ACTIVATE:
-                    massActivate(sender, args, cuboid, infoColor);
-                    break;
+            if (session.getMode()==Mode.SELECTION) {
+                session.setMode(Mode.NORMAL);
+                p.sendMessage(color + "Stopped selecting chips.");
+            } else {
+                session.setMode(Mode.SELECTION);
+                p.sendMessage(rc.getPrefs().getInfoColor() + "rcselection");
+                p.sendMessage(rc.getPrefs().getInfoColor() + "-----------------");
+                p.sendMessage(color + "Right-click a chip block to select it. Run /rcselection again to stop selecting.");
+                p.sendMessage(color + "Enter /rchelp rcselection for more selection commands.");
+            }
+            
+            printSelMessage(p, session);
+            return true;
+        } else {
+            selCommand = SelCommand.startsWith(args[0]);
+            if (selCommand==null) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown selection command: " + args[0]);            
+                return true;
+            }
+        }
 
-                case RESET:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    for (Circuit c : circuits)
-                        if (rc.getCircuitManager().resetCircuit(c, sender)) circuitCount++;
-                    sender.sendMessage(infoColor + "Reset " + circuitCount + " chip(s).");
-                    break;
-
-                case BREAK:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    for (Circuit c : circuits)
-                        if (rc.getCircuitManager().destroyCircuit(c, sender, false)) circuitCount++;
-                    sender.sendMessage(infoColor + "Deactivated " + circuitCount + " chip(s).");
-                    break;
-
-                case DESTROY:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    for (Circuit c : circuits)
-                        if (rc.getCircuitManager().destroyCircuit(c, sender, true)) circuitCount++;
-                    sender.sendMessage(infoColor + "Destroyed " + circuitCount + " chip(s).");
-                    break;
-
-                case FIXIOBLOCKS:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    int blockCount = 0;
-                    for (Circuit c : circuits)
-                        blockCount += c.fixIOBlocks();
-                    sender.sendMessage(infoColor + "Fixed i/o blocks of " + circuits.size() + " chip(s). " + blockCount +" blocks were replaced.");
-                    break;
-                    
-                case ENABLE:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    for (Circuit c : circuits) {
-                        if (c.isDisabled()) {
-                            c.enable();
-                            circuitCount++;
-                        }
-                    }
-                    sender.sendMessage(infoColor + "Enabled " + circuitCount + " chip(s).");
-                    break;
-                    
-                case DISABLE:
-                    circuits = findActiveCircuitsInCuboid(sender, cuboid);
-                    for (Circuit c : circuits) {
-                        if (!c.isDisabled()) {
-                            c.disable();
-                            circuitCount++;
-                        }
-                    }
-                    sender.sendMessage(infoColor + "Disabled " + circuitCount + " chip(s).");
-                    break;                    
-
-                case LIST:
-                    printList(sender, cuboid, args);
-                    break;
+        if (selCommand == SelCommand.CUBOID) {
+            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+            Location[] sel = null;
+            if (WorldEditHook.isWorldEditInstalled(rc)) {
+                sel = WorldEditHook.getWorldEditSelection(p, rc);
+            } 
+            
+            if (sel!=null) {
+                p.sendMessage(rc.getPrefs().getInfoColor() + "Using WorldEdit selection.");
+                session.selectChipsInCuboid(sel, false);
+                session.setCuboid(sel);
+                printSelMessage(p, session);
+            } else {
+                if (session.getMode()==Mode.CUBOID_DEFINE) {
+                    session.clearCuboid();
+                }
+                
+                session.defineCuboid();
+                
+                p.sendMessage(rc.getPrefs().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid.");                
+            }
+            
+        } else if (selCommand == SelCommand.ID) {
+            selectById(p, args);
+        } else if (selCommand == SelCommand.ACTIVATE) {
+            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+            massActivate(p, args, session);            
+        } else {
+            UserSession session = rc.getUserSession(p.getPlayerListName(), false);
+            if (session == null || session.getSelection().isEmpty()) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "Selection is empty.");
+                return true;
             }
 
-            if (selCommand!=SelCommand.LIST) {
-                long delta = System.nanoTime()-start;
-                String timing = String.format( "%.3fms", (float)delta / 1000000d );
-                sender.sendMessage(infoColor + "Mass edit finished in " + timing + ".");
-            }
+            if (selCommand==SelCommand.LIST) {
+                RClist.printCircuitList(p, session.getSelection(), "Selection (" + session.getSelection().size() + ")", rc);
+                
+            } else if (selCommand==SelCommand.CLEAR) {
+                session.getSelection().clear();
+                p.sendMessage(rc.getPrefs().getInfoColor() + "Cleared chip selection.");
+            } else {
+                massCommand(selCommand, p, session);
+            }    
         }
 
         return true;
-    }
-
-    private void recordSelection(Player p) {
-        if (playerCuboids.containsKey(p))
-            p.sendMessage(rc.getPrefs().getInfoColor() + "Clearing previous selection coordinates.");
-
-        p.sendMessage(rc.getPrefs().getInfoColor() + "Right-click 2 blocks at opposite corners of your cuboid. Right-clicking while holding a block in hand is ignored. To clear the selection enter /rcsel clear.");
-        definingCuboids.add(p);
-        playerCuboids.put(p, new Location[2]);
-    }
-
-    private void clearSelection(Player p) {
-        if (definingCuboids.contains(p) || playerCuboids.containsKey(p)) {
-            playerCuboids.remove(p);
-            definingCuboids.remove(p);
-            p.sendMessage(rc.getPrefs().getInfoColor() + "The selection is cleared.");
-        } else p.sendMessage(rc.getPrefs().getErrorColor() + "There's no selection to clear.");
-    }
-
-    public void cuboidLocation(Player p, Location point) {
-        if (definingCuboids.contains(p)) {
-            Location[] coords = playerCuboids.get(p);
-
-            if (coords[0]==null && coords[1]==null) {
-                coords[0] = point;
-                p.sendMessage(rc.getPrefs().getInfoColor() + "1st selection corner selected.");
-            } else if (coords[0] != null && coords[1] == null) {
-                coords[1] = point;
-                p.sendMessage(rc.getPrefs().getInfoColor() + "Cuboid defined: " + coords[0].getBlockX() + "," + coords[0].getBlockY() + "," + coords[0].getBlockZ()
-                        + " to " + coords[1].getBlockX() + "," + coords[1].getBlockY() + "," + coords[1].getBlockZ());
-                p.sendMessage(rc.getPrefs().getInfoColor() + "You can now use any of the /rcsel commands. Type '/rcsel clear' to clear your selection.");
-                definingCuboids.remove(p);
+    }      
+    
+    private void massCommand(SelCommand selCommand, CommandSender sender, UserSession session) {
+        long start = System.nanoTime();
+        int count = 0;
+        
+        for (Circuit c : session.getSelection()) {
+            switch (selCommand) {
+                case RESET:
+                    if (rc.getCircuitManager().resetCircuit(c, sender)) count++;
+                    break;
+                case BREAK:
+                    if (rc.getCircuitManager().destroyCircuit(c, sender, false)) count++;        
+                    break;
+                case DESTROY:
+                    if (rc.getCircuitManager().destroyCircuit(c, sender, true)) count++;
+                    break;
+                case FIXIOBLOCKS:
+                    if (c.fixIOBlocks()>0) count++;
+                    break;
+                case ENABLE:
+                    if (c.isDisabled()) {
+                        c.enable();
+                        count++;
+                    }
+                    break;
+                case DISABLE:
+                    if (!c.isDisabled()) {
+                        c.disable();
+                        count++;
+                    }
             }
         }
+     
+        long delta = System.nanoTime()-start;
+        String timing = String.format( "%.3fms", (float)delta / 1000000d );
+        sender.sendMessage(color + "Mass edit finished in " + timing + ".");
+        
+        if (selCommand.verb!=null)
+            sender.sendMessage(color + selCommand.verb + " " + count + " chip(s)");
+        
     }
-
-    private Location[] getSelectionCuboid(Player p, ChatColor infoColor) {
-        Location[] cuboid = playerCuboids.get(p);
-        if (cuboid==null || cuboid[0]==null || cuboid[1]==null) {
-            // try to use worldedit selection instead
-            if (isWorldEditInstalled()) {
-                cuboid = getWorldEditSelection(p);
-                if (cuboid==null)
-                    p.sendMessage(infoColor + "No /rcsel selection or WorldEdit selection defined. Use /rcsel with no arguments and right-click two opposite corners to define.");
-                else
-                    p.sendMessage(infoColor + "Using WorldEdit selection.");
+    
+    private void selectById(Player p, String[] args) {
+        UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+        List<Circuit> selection = new ArrayList<Circuit>();
+        for (int i=1; i<args.length; i++) {
+            Circuit c = rc.getCircuitManager().getCircuitById(args[i]);
+            if (c!=null) {
+                selection.add(c);
             } else {
-                p.sendMessage(infoColor + "No /rcsel selection defined. Use /rcsel with no arguments and right-click two opposite corners to define.");
-                return null;
-            }
-        } else p.sendMessage(infoColor + "Using /rcsel selection. Type /rcsel clear to use WorldEdit's selection instead.");
-
-        return cuboid;
-    }
-
-    private boolean isWorldEditInstalled() {
-        return rc.getServer().getPluginManager().getPlugin("WorldEdit")!=null;
-    }
-
-    private Location[] getWorldEditSelection(Player player) {
-        Plugin worldEdit = rc.getServer().getPluginManager().getPlugin("WorldEdit");
-        if (worldEdit == null) {
-            return null;
-        }
-
-        // get access to WorldEditPlugin.getSelection(Player player);
-        Method getSelectionMethod = null;
-        for (Method m : worldEdit.getClass().getMethods()) {
-            if (m.getName().equals("getSelection") && m.getParameterTypes().length==1 && m.getParameterTypes()[0]==Player.class) {
-                getSelectionMethod = m;
+                p.sendMessage(ChatColor.DARK_PURPLE + "Can't find chip " + args[i]);                
             }
         }
-
-        if (getSelectionMethod!=null) {
-            try {
-                // try to get the current selection.
-                Object selection = getSelectionMethod.invoke(worldEdit, player);
-                if (selection==null) return null;
-
-                // getting two opposite corners of selection.
-                Location[] ret = new Location[2];
-                ret[0] = (Location)selection.getClass().getMethod("getMinimumPoint").invoke(selection);
-                ret[1] = (Location)selection.getClass().getMethod("getMaximumPoint").invoke(selection);
-
-                return ret;
-            } catch (IllegalAccessException ex) {
-                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
-            } catch (IllegalArgumentException ex) {
-                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
-            } catch (InvocationTargetException ex) {
-                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
-            } catch (NoSuchMethodException ex) {
-                rc.log(Level.SEVERE, "While communicating with WorldEdit: " + ex.toString());
-            }
-        }
-
-        return null;
+        
+        session.getSelection().addAll(selection);
+        p.sendMessage(color + "Added " + selection.size() + " chip(s) to selection. Selection contains " + session.getSelection().size() + " chip(s).");
     }
-
-    public List<Circuit> findActiveCircuitsInCuboid(CommandSender s, Location[] cuboid) {
-        int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
-        int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
-
-        int lowy = Math.min(cuboid[0].getBlockY(), cuboid[1].getBlockY());
-        int highy = Math.max(cuboid[0].getBlockY(), cuboid[1].getBlockY());
-
-        int lowz = Math.min(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
-        int highz = Math.max(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
-
-        List<Circuit> result = new ArrayList<Circuit>();
-
-        for (Circuit c : rc.getCircuitManager().getCircuits().values()) {
-            Location l = c.activationBlock;
-            if (l.getBlockX()>=lowx && l.getBlockX()<=highx
-                    && l.getBlockY()>=lowy && l.getBlockY()<=highy
-                    && l.getBlockZ()>=lowz && l.getBlockZ()<=highz) {
-                result.add(c);
-            }
-        }
-
-        if (result.isEmpty()) {
-            s.sendMessage(rc.getPrefs().getErrorColor() + "Your cuboid doesn't contain any active circuits.");
-        }
-
-        return result;
+        
+    private void printSelMessage(Player p, UserSession s) {
+        p.sendMessage(color + "Selection contains " + s.getSelection().size() + " active chip(s).");
     }
-
-    private void massActivate(CommandSender sender, String[] args, Location[] cuboid, ChatColor infoColor) {
+    
+    private void massActivate(Player p, String[] args, UserSession session) {
+        if (session.getCuboid()==null) {
+            p.sendMessage(rc.getPrefs().getErrorColor() + "You must define a cuboid before using this command.");
+            return;
+        }
+            
         MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
 
         try {
@@ -272,7 +203,7 @@ public class RCsel extends RCCommand {
             if (args.length>=4)
                 interfaceBlockType = PrefsManager.findMaterial(args[2]);
         } catch (IllegalArgumentException ie) {
-            sender.sendMessage(ie.getMessage());
+            p.sendMessage(ie.getMessage());
             return;
         }
 
@@ -280,7 +211,7 @@ public class RCsel extends RCCommand {
         if (outputBlockType==null) outputBlockType = rc.getPrefs().getOutputBlockType();
         if (interfaceBlockType==null) interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
         
-
+        Location[] cuboid = session.getCuboid();
         int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
         int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
 
@@ -299,29 +230,14 @@ public class RCsel extends RCCommand {
                 for (int z=lowz; z<=highz; z++) {
                     Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
                     if (b.getTypeId()==wallSignId) {
-                        if (RCactivate.activate(b, inputBlockType, outputBlockType, interfaceBlockType, sender, false, rc))
+                        if (RCactivate.activate(b, inputBlockType, outputBlockType, interfaceBlockType, p, false, rc))
                             count++;
                     }
                 }
             }
         }
 
-        sender.sendMessage(infoColor + "Activated " + count + " circuit(s).");
+        p.sendMessage(color + "Activated " + count + " circuit(s).");        
     }
-
-    private void printList(CommandSender sender, Location[] cuboid, String[] args) {
-        List<Circuit> circuits = findActiveCircuitsInCuboid(sender, cuboid);
-        if (circuits.isEmpty()) return;
-
-        String selection = "" + ChatColor.YELLOW + cuboid[0].getBlockX() + ", " + cuboid[0].getBlockY() + ", " + cuboid[0].getBlockZ() + " to "
-                + cuboid[1].getBlockX() + "," + cuboid[1].getBlockY() + "," + cuboid[1].getBlockZ();
-
-        String lines = "";
-        for (int i=0; i<circuits.size(); i++) {
-            lines += RClist.makeCircuitDescriptionLine(circuits.get(i), rc.getPrefs().getInfoColor()) + "\n";
-        }
-
-        CommandUtils.pageMaker(sender, "Active circuits in selection", "rcsel", lines, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines-1);
-        sender.sendMessage("selection: " + selection);
-    }
+    
 }

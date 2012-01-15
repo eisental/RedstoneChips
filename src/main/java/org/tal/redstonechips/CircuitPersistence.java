@@ -33,40 +33,40 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class CircuitPersistence {
     private RedstoneChips rc;
-
+    public enum CircuitKey { 
+        CLASS("c", "class"), 
+        WORLD("w", "world"), 
+        SIGN("sign", "activationBlock"),
+        INPUTS("inp", "inputs"),
+        OUTPUTS("out", "outputs"),
+        INTERFACES("int", "interfaces"),
+        STRUCTURE("str", "structure"),
+        ARGS("args", "signArgs"),
+        STATE("state", "state"),
+        ID("id", "id"),
+        NAME("name", "name"),
+        DISABLED("dis", "disabled"),
+        OUTPUT_BITS("bits", "outputBits");
+        
+        
+        String key, longKey; // longKey is for backwards compatibility.        
+        CircuitKey(String key, String longKey) {
+            this.key = key;
+            this.longKey = longKey;
+        }        
+    }
+    
+    public enum ChannelKey {
+        NAME, STATE, OWNERS, USERS;
+        
+        public String key() { return name().toLowerCase(); }
+    }
+    
     public final static String circuitsFileExtension = ".circuits";
     public final static String circuitsFileName = "redstonechips"+circuitsFileExtension;
     public final static String channelsFileExtension = ".channels";
     public final static String channelsFileName = "redstonechips"+channelsFileExtension;
     private final static String backupFileExtension = ".BACKUP";
-    
-    private final static String classKeyLong = "class";
-    private final static String classKey = "c";
-    private final static String worldKeyLong = "world";
-    private final static String worldKey = "w";
-    private final static String activationBlockKey = "activationBlock";
-    private final static String signKey = "sign";
-    private final static String inputsKeyLong = "inputs";
-    private final static String inputsKey = "inp";
-    private final static String outputsKeyLong = "outputs";
-    private final static String outputsKey = "out";
-    private final static String interfacesKeyLong = "interfaces";
-    private final static String interfacesKey = "int";
-    private final static String structureKeyLong = "structure";
-    private final static String structureKey = "str";
-    private final static String argsKeyLong = "signArgs";
-    private final static String argsKey = "args";
-    private final static String stateKey = "state";
-    private final static String idKey = "id";
-    private final static String nameKey = "name";
-    private final static String disabledKey = "disabled";
-    private final static String outputBitsKeyLong = "outputBits";
-    private final static String outputBitsKey = "bits";
-
-    private final static String channelNameKey = "name";
-    private final static String channelStateKey = "state";
-    private final static String channelOwnersKey = "owners";
-    private final static String channelUsersKey = "users";    
     
     private List<String> madeBackup = new ArrayList<String>();
 
@@ -273,78 +273,78 @@ public class CircuitPersistence {
 
     private Map<String, Object> circuitToMap(Circuit c) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put(classKey, c.getCircuitClass());
-        map.put(worldKey, c.world.getName());
-        map.put(signKey, makeBlockList(c.activationBlock));
-        if (c.inputs!=null && c.inputs.length!=0) map.put(inputsKey, makeIOBlockList(c.inputs));
-        if (c.outputs!=null && c.outputs.length!=0) map.put(outputsKey, makeIOBlockList(c.outputs));
-        if (c.interfaceBlocks!=null && c.interfaceBlocks.length!=0) map.put(interfacesKey, makeIOBlockList(c.interfaceBlocks));
-        map.put(structureKey, makeBlockListsList(c.structure));
-        if (c.args!=null && c.args.length!=0) map.put(argsKey, c.args);
+        map.put(CircuitKey.CLASS.key, c.getCircuitClass());
+        map.put(CircuitKey.WORLD.key, c.world.getName());
+        map.put(CircuitKey.SIGN.key, makeBlockList(c.activationBlock));
+        if (c.inputs!=null && c.inputs.length!=0) map.put(CircuitKey.INPUTS.key, makeIOBlockList(c.inputs));
+        if (c.outputs!=null && c.outputs.length!=0) map.put(CircuitKey.OUTPUTS.key, makeIOBlockList(c.outputs));
+        if (c.interfaceBlocks!=null && c.interfaceBlocks.length!=0) map.put(CircuitKey.INTERFACES.key, makeIOBlockList(c.interfaceBlocks));
+        map.put(CircuitKey.STRUCTURE.key, makeBlockListsList(c.structure));
+        if (c.args!=null && c.args.length!=0) map.put(CircuitKey.ARGS.key, c.args);
         
         Map<String,String> state = c.getInternalState();
-        if (state!=null && !state.isEmpty()) map.put(stateKey, c.getInternalState());
+        if (state!=null && !state.isEmpty()) map.put(CircuitKey.STATE.key, c.getInternalState());
         
-        map.put(idKey, c.id);
-        if (c.name!=null) map.put(nameKey, c.name);
-        if (c.isDisabled()) map.put(disabledKey, c.isDisabled());
-        if (c.outputs!=null && c.outputs.length!=0) map.put(outputBitsKey, BitSetUtils.bitSetToString(c.getOutputBits(), c.outputs.length));
+        map.put(CircuitKey.ID.key, c.id);
+        if (c.name!=null) map.put(CircuitKey.NAME.key, c.name);
+        if (c.isDisabled()) map.put(CircuitKey.DISABLED.key, c.isDisabled());
+        if (c.outputs!=null && c.outputs.length!=0) map.put(CircuitKey.OUTPUT_BITS.key, BitSetUtils.bitSetToString(c.getOutputBits(), c.outputs.length));
         
         return map;
     }
 
     private Map<String, Object> channelToMap(BroadcastChannel c) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put(channelNameKey, c.name);
-        map.put(channelStateKey, BitSetUtils.bitSetToString(c.bits, c.getLength()));
-        map.put(channelOwnersKey, c.owners);
-        map.put(channelUsersKey, c.users);
+        map.put(ChannelKey.NAME.key(), c.name);
+        map.put(ChannelKey.STATE.key(), BitSetUtils.bitSetToString(c.bits, c.getLength()));
+        map.put(ChannelKey.OWNERS.key(), c.owners);
+        map.put(ChannelKey.USERS.key(), c.users);
         return map;
     }
 
     private Circuit compileCircuitFromMap(Map<String,Object> map, Map<Circuit, Map<String,String>> internalStates) throws InstantiationException, IllegalAccessException {
         String className;
-        if (map.containsKey(classKeyLong)) className = (String)map.get(classKeyLong);
-        else if (map.containsKey(classKey)) className = (String)map.get(classKey);
+        if (map.containsKey(CircuitKey.CLASS.longKey)) className = (String)map.get(CircuitKey.CLASS.longKey);
+        else if (map.containsKey(CircuitKey.CLASS.key)) className = (String)map.get(CircuitKey.CLASS.key);
         else return null;
         
         World world;
-        if (map.containsKey(worldKeyLong)) world = findWorld((String)map.get(worldKeyLong));
-        else if (map.containsKey(worldKey)) world = findWorld((String)map.get(worldKey));
+        if (map.containsKey(CircuitKey.WORLD.longKey)) world = findWorld((String)map.get(CircuitKey.WORLD.longKey));
+        else if (map.containsKey(CircuitKey.WORLD.key)) world = findWorld((String)map.get(CircuitKey.WORLD.key));
         else return null;
         
         Circuit c = rc.getCircuitLoader().getCircuitInstance(className);
         c.world = world;
         
-        if (map.containsKey(activationBlockKey))
-            c.activationBlock = getLocation(world, (List<Integer>)map.get(activationBlockKey));
-        else if (map.containsKey(signKey))
-            c.activationBlock = getLocation(world, (List<Integer>)map.get(signKey));
+        if (map.containsKey(CircuitKey.SIGN.longKey))
+            c.activationBlock = getLocation(world, (List<Integer>)map.get(CircuitKey.SIGN.longKey));
+        else if (map.containsKey(CircuitKey.SIGN.key))
+            c.activationBlock = getLocation(world, (List<Integer>)map.get(CircuitKey.SIGN.key));
         else return null;
         
-        if (map.containsKey(structureKeyLong))
-            c.structure = getLocationArray(world, (List<List<Integer>>)map.get(structureKeyLong));
-        else if (map.containsKey(structureKey))
-            c.structure = getLocationArray(world, (List<List<Integer>>)map.get(structureKey));
+        if (map.containsKey(CircuitKey.STRUCTURE.longKey))
+            c.structure = getLocationArray(world, (List<List<Integer>>)map.get(CircuitKey.STRUCTURE.longKey));
+        else if (map.containsKey(CircuitKey.STRUCTURE.key))
+            c.structure = getLocationArray(world, (List<List<Integer>>)map.get(CircuitKey.STRUCTURE.key));
         else return null;
         
         IOBlock[] inIO, outIO, interfaceIO;
-        if (map.containsKey(inputsKeyLong))
-            inIO = getIOBlockArray((List<List<Integer>>)map.get(inputsKeyLong), c, IOBlock.Type.INPUT);
-        else if (map.containsKey(inputsKey))
-            inIO = getIOBlockArray((List<List<Integer>>)map.get(inputsKey), c, IOBlock.Type.INPUT);
+        if (map.containsKey(CircuitKey.INPUTS.longKey))
+            inIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.INPUTS.longKey), c, IOBlock.Type.INPUT);
+        else if (map.containsKey(CircuitKey.INPUTS.key))
+            inIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.INPUTS.key), c, IOBlock.Type.INPUT);
         else inIO = new IOBlock[0];
                 
-        if (map.containsKey(outputsKeyLong))
-            outIO = getIOBlockArray((List<List<Integer>>)map.get(outputsKeyLong), c, IOBlock.Type.OUTPUT);
-        else if (map.containsKey(outputsKey))
-            outIO = getIOBlockArray((List<List<Integer>>)map.get(outputsKey), c, IOBlock.Type.OUTPUT);
+        if (map.containsKey(CircuitKey.OUTPUTS.longKey))
+            outIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.OUTPUTS.longKey), c, IOBlock.Type.OUTPUT);
+        else if (map.containsKey(CircuitKey.OUTPUTS.key))
+            outIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.OUTPUTS.key), c, IOBlock.Type.OUTPUT);
         else outIO = new IOBlock[0];
         
-        if (map.containsKey(interfacesKeyLong))
-            interfaceIO = getIOBlockArray((List<List<Integer>>)map.get(interfacesKeyLong), c, IOBlock.Type.INTERFACE);
-        else if (map.containsKey(interfacesKey))
-            interfaceIO = getIOBlockArray((List<List<Integer>>)map.get(interfacesKey), c, IOBlock.Type.INTERFACE);
+        if (map.containsKey(CircuitKey.INTERFACES.longKey))
+            interfaceIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.INTERFACES.longKey), c, IOBlock.Type.INTERFACE);
+        else if (map.containsKey(CircuitKey.INTERFACES.key))
+            interfaceIO = getIOBlockArray((List<List<Integer>>)map.get(CircuitKey.INTERFACES.key), c, IOBlock.Type.INTERFACE);
         else interfaceIO = new IOBlock[0];
 
         c.inputs = new InputPin[inIO.length];
@@ -359,33 +359,37 @@ public class CircuitPersistence {
         c.circuitChunks = rc.getCircuitManager().findCircuitChunks(c);
         
         List<String> argsList = null;
-        if (map.containsKey(argsKeyLong))
-            argsList = (List<String>)map.get(argsKeyLong);
-        else if (map.containsKey(argsKey))
-            argsList = (List<String>)map.get(argsKey);
+        if (map.containsKey(CircuitKey.ARGS.longKey))
+            argsList = (List<String>)map.get(CircuitKey.ARGS.longKey);
+        else if (map.containsKey(CircuitKey.ARGS.key))
+            argsList = (List<String>)map.get(CircuitKey.ARGS.key);
 
         if (argsList!=null) c.args = argsList.toArray(new String[argsList.size()]);
         else c.args = new String[0];
         
-        if (map.containsKey(nameKey)) c.name = (String)map.get(nameKey);
+        if (map.containsKey(CircuitKey.NAME.key)) c.name = (String)map.get(CircuitKey.NAME.key);
 
-        if (map.containsKey(outputBitsKeyLong)) c.setOutputBits(BitSetUtils.stringToBitSet((String)map.get(outputBitsKeyLong)));
-        else if (map.containsKey(outputBitsKey)) c.setOutputBits(BitSetUtils.stringToBitSet((String)map.get(outputBitsKey)));
+        if (map.containsKey(CircuitKey.OUTPUT_BITS.longKey)) 
+            c.setOutputBits(BitSetUtils.stringToBitSet((String)map.get(CircuitKey.OUTPUT_BITS.longKey)));
+        else if (map.containsKey(CircuitKey.OUTPUT_BITS.key)) 
+            c.setOutputBits(BitSetUtils.stringToBitSet((String)map.get(CircuitKey.OUTPUT_BITS.key)));
         
-        if (map.containsKey(idKey)) c.id = (Integer)map.get(idKey);
-        if (map.containsKey(stateKey)) 
-            internalStates.put(c, (Map<String, String>)map.get(stateKey));
-        if (map.containsKey(disabledKey)) c.disabled = (Boolean)map.get(disabledKey);
+        if (map.containsKey(CircuitKey.ID.key)) c.id = (Integer)map.get(CircuitKey.ID.key);
+        if (map.containsKey(CircuitKey.STATE.key)) 
+            internalStates.put(c, (Map<String, String>)map.get(CircuitKey.STATE.key));
+        if (map.containsKey(CircuitKey.DISABLED.key)) c.disabled = (Boolean)map.get(CircuitKey.DISABLED.key);
         
         return c;
     }
 
     private void configureChannelFromMap(Map<String,Object> map) {
         BroadcastChannel channel;
-        channel = rc.getChannelManager().getChannelByName((String)map.get(channelNameKey), true);
-        if (map.containsKey(channelStateKey)) channel.bits = BitSetUtils.stringToBitSet((String)map.get(channelStateKey));        
-        channel.owners = (List<String>)map.get(channelOwnersKey);
-        channel.users = (List<String>)map.get(channelUsersKey);
+        channel = rc.getChannelManager().getChannelByName((String)map.get(ChannelKey.NAME.key()), true);
+        if (map.containsKey(ChannelKey.STATE.key())) 
+            channel.bits = BitSetUtils.stringToBitSet((String)map.get(ChannelKey.STATE.key()));
+        
+        channel.owners = (List<String>)map.get(ChannelKey.OWNERS.key());
+        channel.users = (List<String>)map.get(ChannelKey.USERS.key());
         channel.transmit(channel.bits, 0, channel.getLength());
     }
 

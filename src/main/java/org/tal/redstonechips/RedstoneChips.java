@@ -1,5 +1,6 @@
 package org.tal.redstonechips;
 
+import org.tal.redstonechips.user.UserSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,10 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockListener;
@@ -50,15 +48,13 @@ public class RedstoneChips extends JavaPlugin {
     private ChannelManager channelManager;
     
     public Map<Location, RCTypeReceiver> rcTypeReceivers = new HashMap<Location, RCTypeReceiver>();
-    private Map<String, Material> playerChipProbe = new HashMap<String, Material>();
-    
-    public RCsel rcsel = new RCsel();
+    private Map<String, UserSession> sessions = new HashMap<String, UserSession>();
     
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
-        new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(), rcsel,
-        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), new RCtransmit(),
-        new RCname(), new RCenable(), new RCdisable(), new org.tal.redstonechips.command.RedstoneChips()
+        new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(),
+        new RCtype(), new RCload(), new RCsave(), new RCp(), new RCprotect(), new RCtool(), new RCsend(),
+        new RCname(), new RCenable(), new RCdisable(), new org.tal.redstonechips.command.RedstoneChips(), new RCsel()
     };
 
     @Override
@@ -153,7 +149,8 @@ public class RedstoneChips extends JavaPlugin {
             pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_PHYSICS, rcBlockListener, Priority.Highest, this);
-            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);            
+            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
+            pm.registerEvent(Type.PLAYER_JOIN, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
             pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
@@ -223,6 +220,16 @@ public class RedstoneChips extends JavaPlugin {
         return circuitPersistence;
     }
 
+    public UserSession getUserSession(String username, boolean create) {
+        UserSession s = sessions.get(username);
+        if (s==null && create) {
+            s = new UserSession(username, this);
+            sessions.put(username, s);
+        } 
+        
+        return s;
+    }
+    
     /**
      * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
      * the /rctype command the rcTypeReceiver circuit will receive the typed text.
@@ -248,56 +255,6 @@ public class RedstoneChips extends JavaPlugin {
 
         for (Location l : toremove)
             rcTypeReceivers.remove(l);
-    }
-    
-    /**
-     * Sets the chip probe item for this player
-     * 
-     * @param player 
-     * @param item 
-     */
-    public void setChipProbe(Player player, Material item) {
-        if (item.isBlock()) throw new IllegalArgumentException("Blocks can't be used as a chip probe.");
-        playerChipProbe.put(player.getName(), item);
-    }
-
-    /**
-     * @return a list containing player names and their respective chip probe material, if one is defined.
-     */
-    public Map<String, Material> getPlayerChipProbe() {
-        return playerChipProbe;
-    }
-    
-    /**
-     * Prints a chip block info. 
-     * When block points to a chip pin, the player receives an /rcpin message of this pin.
-     * When block points to an activation block, debug mode is toggled for this player.
-     * When block points to any other structure block the chip info is sent.
-     * 
-     * @param player The player to send the info message to.
-     * @param block Queried block.
-     */
-    public void probeChipBlock(Player player, Block block) {
-        try {
-            RCpin.printPinInfo(block, player, this);
-        } catch (IllegalArgumentException ie) {
-            // not probing a pin
-            Circuit c = circuitManager.getCircuitByStructureBlock(block.getLocation());
-            
-            if (c!=null) {
-                if (c.activationBlock.equals(block.getLocation()))
-                    player.performCommand("rcdebug");
-                else RCinfo.printCircuitInfo(player, c, this);
-            }
-
-        }
-    }
-
-    /**
-     * @return Running instance of the /rcsel command.
-     */
-    public RCsel getRCsel() {
-        return rcsel;
     }
         
     private void loadLibraries() {

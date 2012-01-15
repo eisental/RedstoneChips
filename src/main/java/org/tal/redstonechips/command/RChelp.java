@@ -36,7 +36,7 @@ public class RChelp extends RCCommand {
         } else {
             if (!commands.containsKey(args[0])) {
                 printCommandList(sender, commands, args, infoColor, errorColor);
-            } else CommandUtils.pageMaker(sender, "/" + args[0], "rchelp", getCommandHelp(args[0], rc), infoColor, errorColor);
+            } else printCommandHelp(sender, args[0], rc);
         }
 
         return true;
@@ -89,4 +89,9 @@ public class RChelp extends RCCommand {
         return help;
     }
 
+    public static void printCommandHelp(CommandSender sender, String command, org.tal.redstonechips.RedstoneChips rc) {
+        CommandUtils.pageMaker(sender, "/" + command, "rchelp", getCommandHelp(command, rc), 
+                rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+    }
+    
 }

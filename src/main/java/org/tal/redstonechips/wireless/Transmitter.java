@@ -10,7 +10,7 @@ import org.tal.redstonechips.util.BitSetUtils;
 public class Transmitter extends Wireless {
 
     public void transmit(BitSet7 bits, int length) {
-        getChannel().transmit(bits, startBit, length);        
+        getChannel().transmit(bits, startBit, length);
     }
 
     public void transmit(boolean state) {

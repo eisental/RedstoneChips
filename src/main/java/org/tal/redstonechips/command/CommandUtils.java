@@ -22,6 +22,8 @@ public class CommandUtils {
      */
     public final static int MaxLines = 20;
 
+    private final static int DefaultTargetDistance = 50;
+    
     /**
      * Regards air and water as transparent materials when trying to find the block a player is looking at.
      */
@@ -60,17 +62,21 @@ public class CommandUtils {
      * @param sender 
      * @return The chip pointed by the player or null if one was not found.
      */
-    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, boolean report) {
+    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, int distance, boolean report) {
         Player player = checkIsPlayer(rc, sender, report);
         if (player==null) return null;
 
-        Block target = targetBlock(player);
+        Block target = targetBlock(player, distance);
         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(target.getLocation());
         if (c==null && report) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a block of a redstone chip.");
         }
 
         return c;        
+    }
+    
+    public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, boolean report) {
+        return findTargetCircuit(rc, sender, DefaultTargetDistance, report);
     }
     
     public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender) {
@@ -81,12 +87,17 @@ public class CommandUtils {
      * See transparentMaterials for a list of materials that are considered transparent.
      * 
      * @param player
+     * @param distance The max distance between block and player.
      * @return The block pointed by the player.
      */
-    public static Block targetBlock(Player player) {
-        return player.getTargetBlock(transparentMaterials, 100);
+    public static Block targetBlock(Player player, int distance) {
+        return player.getTargetBlock(transparentMaterials, distance);
     }
 
+    public static Block targetBlock(Player player) {
+        return targetBlock(player, DefaultTargetDistance);
+    }
+    
     /**
      * Checks whether the command sender has a permission to use a command.
      * 

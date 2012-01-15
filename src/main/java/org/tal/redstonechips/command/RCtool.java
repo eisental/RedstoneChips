@@ -6,6 +6,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.tal.redstonechips.user.ChipProbe;
+import org.tal.redstonechips.user.Tool;
+import org.tal.redstonechips.user.UserSession;
 
 /**
  *
@@ -24,7 +27,10 @@ public class RCtool extends RCCommand {
         Material type = item.getType();
         
         try {
-            rc.setChipProbe(player, type);
+            UserSession session = rc.getUserSession(player.getPlayerListName(), true);
+            Tool t = new ChipProbe();
+            t.setItem(type);
+            session.addTool(t);
         } catch (IllegalArgumentException ie) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
             return true;            

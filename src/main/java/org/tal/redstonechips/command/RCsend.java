@@ -12,7 +12,7 @@ import org.tal.redstonechips.util.ParsingUtils;
  *
  * @author Tal Eisenberg
  */
-public class RCtransmit extends RCCommand {
+public class RCsend extends RCCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
