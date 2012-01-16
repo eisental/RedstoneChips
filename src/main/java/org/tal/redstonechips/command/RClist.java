@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.page.Pager;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.util.Locations;
 import org.tal.redstonechips.util.Tokenizer;
@@ -109,7 +110,7 @@ public class RClist extends RCCommand {
 
         sender.sendMessage("");
 
-        CommandUtils.pageMaker(sender, title, "rclist", lines,
+        Pager.beginPaging(sender, title, lines,
                 rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
 

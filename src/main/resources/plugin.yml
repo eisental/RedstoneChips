@@ -1,6 +1,6 @@
 name: RedstoneChips
 main: org.tal.redstonechips.RedstoneChips
-version: 0.94
+version: 0.94#1
 author: eisental
 description: Core RedstoneChips plugin for building integrated redstone circuits.
 website: http://eisental.github.com/RedstoneChips
@@ -70,8 +70,12 @@ commands:
     aliases: [rca]    
     description: Activates a chip.
     usage: |
+      `/rcactivate [verbose]`
+      
       Point towards the chip sign and execute the command.
       To activate a circuit built with different input, output or interface block types then set in the preferences use: `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`.
+      
+      Use `/rcactivate verbose` to receive debug messages from the chip scanner.
   rcdestroy:
     description: Destroys a chip and removes its blocks.
     usage: |

@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.page.Pager;
 import org.tal.redstonechips.wireless.BroadcastChannel;
 
 /**
@@ -22,7 +23,7 @@ public class RCprotect extends RCCommand {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
         if (args.length == 0) {
-            CommandUtils.pageMaker(sender, "rcprotect", "rcprotect", RChelp.getCommandHelp("rcprotect", rc), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            Pager.beginPaging(sender, "rcprotect", RChelp.getCommandHelp("rcprotect", rc), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
             return true;
         }
         

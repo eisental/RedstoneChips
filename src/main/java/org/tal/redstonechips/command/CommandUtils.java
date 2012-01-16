@@ -17,12 +17,7 @@ import org.tal.redstonechips.circuit.Circuit;
  * @author Tal Eisenberg
  */
 public class CommandUtils {
-    /**
-     * Maximum number of lines that can fit on the minecraft screen.
-     */
-    public final static int MaxLines = 20;
-
-    private final static int DefaultTargetDistance = 50;
+    private final static int DefaultBlockTargetDistance = 50;
     
     /**
      * Regards air and water as transparent materials when trying to find the block a player is looking at.
@@ -76,7 +71,7 @@ public class CommandUtils {
     }
     
     public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender, boolean report) {
-        return findTargetCircuit(rc, sender, DefaultTargetDistance, report);
+        return findTargetCircuit(rc, sender, DefaultBlockTargetDistance, report);
     }
     
     public static Circuit findTargetCircuit(RedstoneChips rc, CommandSender sender) {
@@ -95,7 +90,7 @@ public class CommandUtils {
     }
 
     public static Block targetBlock(Player player) {
-        return targetBlock(player, DefaultTargetDistance);
+        return targetBlock(player, DefaultBlockTargetDistance);
     }
     
     /**
@@ -117,131 +112,5 @@ public class CommandUtils {
             if (report) sender.sendMessage(rc.getPrefs().getErrorColor() + "You do not have permission to use command " + commandName + ".");
             return false;
         }
-    }
-
-    public static Map<CommandSender, PageInfo> playerPages = new HashMap<CommandSender, PageInfo>();
-
-    public static void pageMaker(CommandSender s, String title, String commandName, String text, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, title, commandName, text, infoColor, errorColor, MaxLines);
-    }
-
-    public static void pageMaker(CommandSender s, String title, String commandName, String text, ChatColor infoColor, ChatColor errorColor, int maxLines) {
-        String lines[];
-        if (s instanceof Player)
-            lines = wrapText(text);
-        else lines = text.split("\n");
-        
-        CommandUtils.pageMaker(s, title, commandName, new ArrayLineSource(lines), infoColor, errorColor, maxLines);
-    }
-    
-    public static void pageMaker(CommandSender s, String title, String commandName, String[] lines, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, title, commandName, new ArrayLineSource(lines), infoColor, errorColor, MaxLines);
-    }
-
-    public static void pageMaker(CommandSender s, String title, String commandName, LineSource src, ChatColor infoColor, ChatColor errorColor) {
-        CommandUtils.pageMaker(s, title, commandName, src, infoColor, errorColor, MaxLines);
-    }
-    
-    public static void pageMaker(CommandSender s, String title, String commandName, LineSource src, ChatColor infoColor, ChatColor errorColor, int maxLines) {
-        maxLines = maxLines - 4;
-        int page;
-
-        int pageCount = (int)(Math.ceil(src.getLineCount()/(float)maxLines));
-        if (commandName!=null || !playerPages.containsKey(s)) {
-            page = 1;
-            playerPages.put(s, new PageInfo(title, pageCount, src, maxLines+4, infoColor, errorColor));
-        } else {
-            PageInfo pageInfo = playerPages.get(s);
-            page = pageInfo.page;
-        } 
-
-
-        if (page<1 || page>pageCount) s.sendMessage(errorColor + "Invalid page number: " + page + ". Expecting 1-" + pageCount);
-        else {
-            s.sendMessage(infoColor + title + ": " + (pageCount>1?"( page " + page + " / " + pageCount  + " )":""));
-            s.sendMessage(infoColor + "----------------------");
-            for (int i=(page-1)*maxLines; i<Math.min(src.getLineCount(), page*maxLines); i++) {
-                s.sendMessage(src.getLine(i));
-            }
-            s.sendMessage(infoColor + "----------------------");
-            if (pageCount>1) s.sendMessage("Use " + ChatColor.YELLOW + (s instanceof Player?"/":"") + "rcp [page#|next|prev|last]" + ChatColor.WHITE + " to see other pages.");
-        }
-    }
-
-    private static final int CHAT_WINDOW_WIDTH = 320;
-    private static final int CHAT_STRING_LENGTH = 119;
-    private static final char COLOR_CHAR = '\u00A7';
-    
-    // fixed char width until a better solution comes by.
-    private static final int CHAR_WIDTH = 6;
-    private static final int SPACE_WIDTH = 4;
-    private static final String TWO_PIXEL_CHARS = "!,.|:'i;";
-    private static final String THREE_PIXEL_CHARS = "l'";
-    private static final String FOUR_PIXEL_CHARS = "It[]";
-    private static final String FIVE_PIXEL_CHARS = "f<>(){}";
-
-    private static String[] wrapText(String text) {
-        final StringBuilder out = new StringBuilder();
-
-        int lineWidth = 0;
-        int lineLength = 0;
-        char colorChar = 'f';
-        
-        // Go over the message char by char.
-        for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
-
-            if (ch=='\n') {
-                lineLength = 0;
-                lineWidth = 0;
-            }
-            
-            // Get the color
-            if (ch == COLOR_CHAR && i < text.length() - 1) {
-                // We might need a linebreak ... so ugly ;(
-                if (lineLength + 2 > CHAT_STRING_LENGTH) {
-                    out.append('\n');
-                    lineLength = 0;
-                    if (colorChar != 'f' && colorChar != 'F') {
-                        out.append(COLOR_CHAR).append(colorChar);
-                        lineLength += 2;
-                    }
-                }
-                colorChar = text.charAt(++i);
-                out.append(COLOR_CHAR).append(colorChar);
-                lineLength += 2;
-                continue;
-            }
-            
-            // See if we need a linebreak
-            if (lineLength + 1 > CHAT_STRING_LENGTH || lineWidth + CHAR_WIDTH >= CHAT_WINDOW_WIDTH) {
-                out.append('\n');
-                lineLength = 0;
-                lineWidth = getCharWidth(ch);
-
-                // Re-apply the last color if it isn't the default
-                if (colorChar != 'f' && colorChar != 'F') {
-                    out.append(COLOR_CHAR).append(colorChar);
-                    lineLength += 2;
-                }                
-            } else {
-                lineWidth += getCharWidth(ch);
-            }
-            out.append(ch);
-            lineLength++;
-        }
-
-        // Return it split
-        return out.toString().split("\n");
-    }
-    
-    private static int getCharWidth(char ch) {
-        if (ch==' ') return SPACE_WIDTH;
-        else if (TWO_PIXEL_CHARS.indexOf(ch)!=-1) return 2;
-        else if (THREE_PIXEL_CHARS.indexOf(ch)!=-1) return 3;
-        else if (FOUR_PIXEL_CHARS.indexOf(ch)!=-1) return 4;
-        else if (FIVE_PIXEL_CHARS.indexOf(ch)!=-1) return 5;
-        else return CHAR_WIDTH;
-        
     }
 }

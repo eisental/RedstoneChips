@@ -1,12 +1,14 @@
 
 package org.tal.redstonechips.command;
 
+import org.tal.redstonechips.page.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.page.Pager;
 import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.tal.redstonechips.wireless.Receiver;
 import org.tal.redstonechips.wireless.Transmitter;
@@ -43,7 +45,7 @@ public class RCchannels extends RCCommand {
                 }
                 String[] outputLines = lines.toArray(new String[lines.size()]);
                 sender.sendMessage("");
-                CommandUtils.pageMaker(sender, "Active wireless broadcast channels", command.getName(), new ArrayLineSource(outputLines), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), CommandUtils.MaxLines - 1);
+                Pager.beginPaging(sender, "Active wireless broadcast channels", new ArrayLineSource(outputLines), rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor(), Pager.MaxLines - 1);
                 sender.sendMessage("Use " + ChatColor.YELLOW + "/rcchannels <channel name>" + ChatColor.WHITE + " for more info about it.");
             }
         }

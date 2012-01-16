@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.CircuitIndex;
+import org.tal.redstonechips.page.Pager;
 
 /**
  *
@@ -58,7 +59,7 @@ public class RCclasses extends RCCommand {
         
         
         if (!list.isEmpty()) 
-            CommandUtils.pageMaker(sender, "Installed circuit classes", "rcclasses", list, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
+            Pager.beginPaging(sender, "Installed circuit classes", list, rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
     
     private CircuitIndex findLibrary(List<CircuitIndex> libs, String libName) { 

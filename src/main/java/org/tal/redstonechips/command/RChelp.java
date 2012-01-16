@@ -1,6 +1,7 @@
 
 package org.tal.redstonechips.command;
 
+import org.tal.redstonechips.page.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.tal.redstonechips.page.Pager;
 
 /**
  *
@@ -52,7 +54,7 @@ public class RChelp extends RCCommand {
             i++;
         }
 
-        CommandUtils.pageMaker(sender, "RedstoneChips commands", "rchelp", new ArrayLineSource(lines), infoColor, errorColor, CommandUtils.MaxLines-1);
+        Pager.beginPaging(sender, "RedstoneChips commands", new ArrayLineSource(lines), infoColor, errorColor, Pager.MaxLines-1);
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 
@@ -90,7 +92,7 @@ public class RChelp extends RCCommand {
     }
 
     public static void printCommandHelp(CommandSender sender, String command, org.tal.redstonechips.RedstoneChips rc) {
-        CommandUtils.pageMaker(sender, "/" + command, "rchelp", getCommandHelp(command, rc), 
+        Pager.beginPaging(sender, "/" + command, getCommandHelp(command, rc), 
                 rc.getPrefs().getInfoColor(), rc.getPrefs().getErrorColor());
     }
     

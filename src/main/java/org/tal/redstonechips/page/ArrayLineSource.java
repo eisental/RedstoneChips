@@ -1,4 +1,4 @@
-package org.tal.redstonechips.command;
+package org.tal.redstonechips.page;
 
 /**
  *
@@ -17,7 +17,7 @@ public class ArrayLineSource implements LineSource {
     }
 
     @Override
-    public float getLineCount() {
+    public int getLineCount() {
         return lines.length;
     }
 }

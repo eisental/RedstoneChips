@@ -64,8 +64,8 @@ public class RCsel extends RCCommand {
                 session.setMode(Mode.SELECTION);
                 p.sendMessage(rc.getPrefs().getInfoColor() + "rcselection");
                 p.sendMessage(rc.getPrefs().getInfoColor() + "-----------------");
-                p.sendMessage(color + "Right-click a chip block to select it. Run /rcselection again to stop selecting.");
-                p.sendMessage(color + "Enter /rchelp rcselection for more selection commands.");
+                p.sendMessage(color + "Right-click a chip block to select it. Run " + ChatColor.YELLOW + "/rcsel" + color + " again to stop selecting.");
+                p.sendMessage(color + "Run " + ChatColor.YELLOW + "/rchelp rcsel" + color + " for more selection commands.");
             }
             
             printSelMessage(p, session);

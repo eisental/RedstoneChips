@@ -1,4 +1,4 @@
-package org.tal.redstonechips.command;
+package org.tal.redstonechips.page;
 
 /**
  * Provides pageMaker with content lines.
@@ -19,5 +19,5 @@ public interface LineSource {
      * 
      * @return Total number of available lines.
      */
-    public float getLineCount();
+    public int getLineCount();
 }
