@@ -129,7 +129,7 @@ public class InputPin extends IOBlock {
     private void abortFeedbackLoop() {
         if (circuit.isDisabled()) return;
         
-        if (circuit.hasDebuggers()) {
+        if (circuit.hasListeners()) {
             ChatColor errorColor = circuit.getPlugin().getPrefs().getErrorColor();
             ChatColor debugColor = circuit.getPlugin().getPrefs().getDebugColor();
             circuit.debug(errorColor + "Possible infinite feedback loop " + debugColor + "detected in input " + errorColor + index + debugColor + ".");

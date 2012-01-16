@@ -17,19 +17,11 @@ import org.tal.redstonechips.circuit.Circuit;
  * @author Tal Eisenberg
  */
 public class UserSession {
-
-    public void playerQuit() {
-        player = null;
-    }
-
-    public void playerJoined(Player p) {
-        player = p;
-    }
-
     public enum Mode { SELECTION , NORMAL, CUBOID_DEFINE}
     
     private Player player;
     
+    private Debugger debugger;
     private RedstoneChips rc;    
     private Map<Material, Tool> tools;
     private String username;
@@ -45,6 +37,8 @@ public class UserSession {
         tools = new EnumMap<Material, Tool>(Material.class);
         
         player = rc.getServer().getPlayer(username);
+        
+        debugger = new ChatDebugger(this);
     }
 
     public String getUsername() { return username; }
@@ -74,6 +68,15 @@ public class UserSession {
     
     public void setMode(Mode m) {
         this.mode = m;
+    }
+
+    public void playerQuit() {
+        if (debugger!=null) debugger.clear();
+        player = null;
+    }
+
+    public void playerJoined(Player p) {
+        player = p;
     }
     
     public boolean useToolInHand(Block block) {
@@ -168,5 +171,7 @@ public class UserSession {
 
         return result;
     }
-    
+
+    public Debugger getDebugger() { return debugger; }
+    public void setDebugger(Debugger d) { debugger = d; }
 }

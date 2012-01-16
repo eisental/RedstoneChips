@@ -27,15 +27,6 @@ class RCBlockListener extends BlockListener {
     }
     
     /**
-     * Update circuit inputs in case of a relevant redstone signal change.
-     * @param event 
-     */
-    @Override
-    public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-        rc.getCircuitManager().redstoneChange(event);
-    }
-
-    /**
      * Deactivate a circuit if one of its structure blocks was broken. 
      * Refresh an input put if one of its power blocks was broken.
      * @param event 
@@ -43,7 +34,9 @@ class RCBlockListener extends BlockListener {
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
         if (!event.isCancelled()) {
-            if (!rc.getCircuitManager().checkCircuitDestroyed(event.getBlock(), event.getPlayer())) event.setCancelled(true);
+            if (!rc.getCircuitManager().checkCircuitDestroyed(event.getBlock(), event.getPlayer())) 
+                event.setCancelled(true);
+            
             rc.getCircuitManager().checkCircuitInputBlockChanged(event.getBlock(), event.getPlayer(), true);
         }
     }

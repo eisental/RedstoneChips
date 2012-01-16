@@ -22,14 +22,14 @@ import org.bukkit.material.Redstone;
 import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.bukkit.World;
+import org.bukkit.event.block.BlockListener;
 import org.tal.redstonechips.circuit.ChipScanner;
 import org.tal.redstonechips.circuit.ChipScanner.ChipScanException;
+import org.tal.redstonechips.circuit.CircuitListener;
 import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
 import org.tal.redstonechips.circuit.ScanParameters;
-import org.tal.redstonechips.circuit.io.IOBlock;
-import org.tal.redstonechips.circuit.io.IOBlock.Type;
 import org.tal.redstonechips.util.ParsingUtils;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -37,7 +37,7 @@ import org.tal.redstonechips.wireless.Wireless;
  *
  * @author Tal Eisenberg
  */
-public class CircuitManager {
+public class CircuitManager extends BlockListener {
 
     private RedstoneChips rc;
     
@@ -51,8 +51,6 @@ public class CircuitManager {
     private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
     private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
 
-    private List<CommandSender> pausedDebuggers = new ArrayList<CommandSender>();
-
     private List<ChunkLocation> processedChunks = new ArrayList<ChunkLocation>();
     
     public CircuitManager(RedstoneChips plugin) { 
@@ -65,7 +63,7 @@ public class CircuitManager {
      *
      * @param e A redstone change event.
      */
-    public void redstoneChange(BlockRedstoneEvent e) {
+    public void onBlockRedstoneChange(BlockRedstoneEvent e) {
         boolean newVal = (e.getNewCurrent()>0);
         boolean oldVal = (e.getOldCurrent()>0);
         if (newVal==oldVal) return; // not a change
@@ -329,15 +327,17 @@ public class CircuitManager {
             return false;
         }
         
-        List<Wireless> list = rc.getChannelManager().getCircuitWireless(destroyed);
-        for (Wireless w : list) {
-            if (w.getChannel()!=null && !(w.getChannel().checkChanPermissions(destroyer, false))) {
-                if (destroyer!=null) destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + w.getChannel().name + ".");
-                return false;
+        if (destroyer!=null) {
+            List<Wireless> list = rc.getChannelManager().getCircuitWireless(destroyed);
+            for (Wireless w : list) {
+                if (w.getChannel()!=null && !(w.getChannel().checkChanPermissions(destroyer, false))) {
+                    destroyer.sendMessage(rc.getPrefs().getErrorColor()+"You do not have permissions to use channel " + w.getChannel().name + ".");
+                    return false;
+                }
             }
         }
 
-        destroyed.destroyCircuit();
+        destroyed.destroyCircuit(destroyer);
 
         circuits.remove(destroyed.id);
         removeCircuitLookups(destroyed);
@@ -349,24 +349,12 @@ public class CircuitManager {
             destroyed.updateCircuitSign(false);
         }        
 
-        String dName;
-        if (destroyer==null) dName = "an unknown cause";
-        if (destroyer!=null && destroyer instanceof Player) dName = ((Player)destroyer).getDisplayName();
-        else dName = "an unknown command sender";
-        for (CommandSender s : destroyed.getDebuggers()) {
-            if (!s.equals(destroyer)) {
-                s.sendMessage(rc.getPrefs().getDebugColor() + "A " + destroyed.getCircuitClass() + " chip you were debugging was " +
-                        rc.getPrefs().getErrorColor() + "deactivated " + rc.getPrefs().getDebugColor() + "by " + dName +
-                        rc.getPrefs().getDebugColor() + " (@" + destroyed.activationBlock.getX() + "," + destroyed.activationBlock.getY() + "," + destroyed.activationBlock.getZ() + ").");
-            }
-        }
-
         return true;
     }
 
     /**
-     * Resets the specified circuit. First the circuit is destroyed and then reactivated. Any debuggers of the chip are copied over
-     * to the activated circuit.
+     * Resets a circuit. First the circuit is destroyed and then reactivated. Any listeners of the circuit are copied over
+     * to the new circuit.
      *
      * @param c The circuit to reset.
      * @param reseter The reseter.
@@ -374,8 +362,8 @@ public class CircuitManager {
      */
     public boolean resetCircuit(Circuit c, CommandSender reseter) {
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
-        List<CommandSender> debuggers = c.getDebuggers();
-        List<CommandSender> iodebuggers = c.getIODebuggers();
+        List<CircuitListener> listeners = c.getListeners();
+
         int id = c.id;
         String name = c.name;
         
@@ -387,27 +375,12 @@ public class CircuitManager {
 
             newCircuit.id = id;
             newCircuit.name = name;
-            newCircuit.getDebuggers().addAll(debuggers);
-            newCircuit.getIODebuggers().addAll(iodebuggers);
+            newCircuit.getListeners().addAll(listeners);
 
             if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newCircuit.getChipString() + rc.getPrefs().getInfoColor() + ".");
             return true;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Called on every player quit event. Removes the quitting player from any debug lists.
-     *
-     * @param player The quitting player.
-     */
-    public void checkDebuggerQuit(Player player) {
-        for (Circuit c : circuits.values()) {
-            if (c.getDebuggers().contains(player)) {
-                c.getDebuggers().remove(player);
-            }
-
         }
     }
 
@@ -640,28 +613,6 @@ public class CircuitManager {
         this.circuits = circuits;
     }
 
-    /**
-     * 
-     * @param s a CommandSender
-     * @return true if the command sender paused his debugger.
-     */
-    public boolean isDebuggerPaused(CommandSender s) {
-        return pausedDebuggers.contains(s);
-    }
-
-    /**
-     * 
-     * @param s a CommandSender
-     * @param pause Sets whether the debugger of this command sender is paused.
-     */
-    public void pauseDebugger(CommandSender s, boolean pause) {
-        if (pause) {
-            if (!pausedDebuggers.contains(s)) pausedDebuggers.add(s);
-        } else {
-            pausedDebuggers.remove(s);
-        }
-    }    
-    
     /**
      * Unloads all chip in the specified world.
      * 

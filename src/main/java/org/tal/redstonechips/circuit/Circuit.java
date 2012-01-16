@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -71,14 +70,9 @@ public abstract class Circuit {
     public World world;
 
     /**
-     * List of command senders that will receive debug messages from this circuit.
+     * List of circuit listeners that receive events from this circuit.
      */
-    private List<CommandSender> debuggers;
-
-    /**
-     * List of command senders that will receive io debug messages from this circuit.
-     */
-    private List<CommandSender> iodebuggers;
+    private List<CircuitListener> listeners;
 
     /**
      * The current state of each input bit. Should be used only for monitoring. Do not change its value.
@@ -122,14 +116,13 @@ public abstract class Circuit {
     public final boolean initCircuit(CommandSender sender, RedstoneChips rc) {
         this.redstoneChips = rc;
 
-        debuggers = new ArrayList<CommandSender>();
-        iodebuggers = new ArrayList<CommandSender>();
-
+        listeners = new ArrayList<CircuitListener>();
         inputBits = new BitSet7(inputs.length);
         if (outputBits==null) outputBits = new BitSet7(outputs.length);
         
         updateInputBits();
         
+        // circuit class speicifc initialization.
         boolean result = init(sender, args);
 
         if (disabled) disable();
@@ -155,31 +148,33 @@ public abstract class Circuit {
 
         inputBits.set(idx, newVal);
 
-        if (hasIODebuggers()) {
-            int inputInt = BitSetUtils.bitSetToUnsignedInt(inputBits, 0, inputs.length);
-
-            String i = ChatColor.WHITE + BitSetUtils.bitSetToBinaryString(inputBits, 0, inputs.length) + " (0x" +
-                    Integer.toHexString(inputInt) + ")";
-
-            ioDebug("Input " + idx + " is " + (newVal?"on":"off")+ ": " + i + ".");
+        for (CircuitListener l : listeners) {
+            l.inputChanged(this, idx, newVal);
         }
-
+        
         inputChange(idx, newVal);
     }
 
     /**
      * Resets outputs, calls circuitShutdown() and circuitDestroyed().
      */
-    public void destroyCircuit() {
+    public void destroyCircuit(CommandSender destroyer) {
         shutdownCircuit();
 
         for (OutputPin o : outputs) o.setState(false);
         
         circuitDestroyed();
+        
+        for (CircuitListener l : listeners)
+            l.circuitDestroyed(this, destroyer);
+
     }
     
     public void shutdownCircuit() {
         circuitShutdown();
+
+        for (CircuitListener l : listeners)
+            l.circuitShutdown(this);
         
         List<Wireless> wireless = redstoneChips.getChannelManager().getCircuitWireless(this);
         for (Wireless w : wireless) w.shutdown();
@@ -243,18 +238,9 @@ public abstract class Circuit {
      */
     protected void sendOutput(int outIdx, boolean state) {
         outputBits.set(outIdx, state);
-        if (hasIODebuggers()) {
-            int outputInt = BitSetUtils.bitSetToUnsignedInt(outputBits, 0, outputs.length);
-
-            String o;
-            if (outputs.length>0)
-                o = ChatColor.YELLOW + BitSetUtils.bitSetToBinaryString(outputBits, 0, outputs.length) + " (0x" +
-                    Integer.toHexString(outputInt) + ")";
-            else o = "";
-
-            ioDebug("Output " + outIdx + " is " + (state?"on":"off") + ": " + o + ".");
-        }
-
+        
+        for (CircuitListener l : listeners)
+            l.outputChanged(this, outIdx, state);
         outputs[outIdx].setState(state);
     }
 
@@ -325,77 +311,49 @@ public abstract class Circuit {
      * @param message The error message.
      */
     public void debug(String message) {        
-        for (CommandSender s : debuggers)
-            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
-                    (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
+        for (CircuitListener l : listeners) {
+            l.circuitMessage(this, message);
+        }
     }
 
     /**
-     * Sends a debug message to all io debugging players of this circuit, using the debug chat color preferences key.
-     * Please check that hasDebuggers() returns true before processing any debug messages.
+     * Adds a circuit listener.
      *
-     * @param message The error message.
-     */    
-    protected void ioDebug(String message) {
-        for (CommandSender s : iodebuggers)
-            if (!redstoneChips.getCircuitManager().isDebuggerPaused(s)) s.sendMessage(redstoneChips.getPrefs().getDebugColor() + 
-                    (name!=null?name + ": ":this.getClass().getSimpleName() + " (" + id + "): ") + message);
+     * @param d The listener.
+     */
+    public void addListener(CircuitListener l) {
+        if (!listeners.contains(l)) listeners.add(l);
     }
 
     /**
-     * Adds the command sender as a debugger for the circuit.
+     * Removes a circuit listener.
      *
-     * @param d The command sender to add.
-     * @throws IllegalArgumentException If the sender is already in the debuggers list.
+     * @param l The listener.
+     * @return true if the listener was found.
      */
-    public void addDebugger(CommandSender d) throws IllegalArgumentException {
-        if (!debuggers.contains(d)) debuggers.add(d);
+    public boolean removeListener(CircuitListener l) {
+        return listeners.remove(l);
     }
 
     /**
-     * Adds the command sender as an IO debugger for the circuit.
-     * 
-     * @param d The command sender to add.
-     * @throws IllegalArgumentException I the sender is already in the io debuggers list.
-     */
-    public void addIODebugger(CommandSender d) {
-        if (!iodebuggers.contains(d)) iodebuggers.add(d);
-    }
-
-    /**
-     * Removes the command sender from the debuggers list.
      *
-     * @param d The command sender.
-     * @return true if the command sender was found on the debugger list.
+     * @return The circuit listeners list.
      */
-    public boolean removeDebugger(CommandSender d) {
-        return debuggers.remove(d);
+    public List<CircuitListener> getListeners() {
+        return listeners;
     }
-
+    
     /**
-     * Removes the command sender from the IO debuggers list.
-     * 
-     * @param d The command sender.
-     * @return true if the command sender was found on the IO debugger list.
-     */
-    public boolean removeIODebugger(CommandSender d) {
-        return iodebuggers.remove(d);
-    }
-
-    /**
-     * Checks if the circuit has any debuggers waiting for debug messages. This method should be used
-     * before processing any debug information to avoid wasting cpu when no debuggers are listening.
+     * Checks if the circuit has any listeners. This method should be used
+     * before processing any debug messages to avoid wasting cpu when no one is listening.
      *
-     * @return True if the circuit has any debuggers.
+     * @return True if the circuit has any listeners.
      */
-    public boolean hasDebuggers() { return !debuggers.isEmpty(); }
+    public boolean hasListeners() { return !listeners.isEmpty(); }
 
-    /**
-     * 
-     * @return true if the circuit has any IO debuggers.
-     */
-    public boolean hasIODebuggers() { return !iodebuggers.isEmpty(); }
-
+    @Deprecated
+    public boolean hasDebuggers() { return hasListeners(); }
+    
     /**
      *
      * @return a clone of the outputBits field.
@@ -424,22 +382,6 @@ public abstract class Circuit {
         return getCircuitClass() + " (" + (name!=null?name + "/":"") + id + ")";
     }
     
-    /**
-     *
-     * @return The circuit's debuggers list.
-     */
-    public List<CommandSender> getDebuggers() {
-        return debuggers;
-    }
-
-    /**
-     * 
-     * @return The circuit's IO debuggers list.
-     */
-    public List<CommandSender> getIODebuggers() {
-        return iodebuggers;
-    }
-
     /**
      *
      * @param outputIdx The required output pin number.
@@ -508,7 +450,8 @@ public abstract class Circuit {
     public void disable() {
         disabled = true;
         updateCircuitSign(true);
-        if (hasDebuggers()) debug(redstoneChips.getPrefs().getErrorColor() + "Chip is disabled.");
+        for (CircuitListener l : listeners)
+            l.circuitDisabled(this);
     }
 
     /**
@@ -517,7 +460,9 @@ public abstract class Circuit {
     public void enable() {
         disabled = false;
         updateCircuitSign(true);
-        if (hasDebuggers()) debug(redstoneChips.getPrefs().getErrorColor() + "Chip is enabled.");
+        for (CircuitListener l : listeners)
+            l.circuitDisabled(this);
+
     }
     
     /**

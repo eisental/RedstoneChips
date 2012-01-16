@@ -1,5 +1,7 @@
 package org.tal.redstonechips.circuit;
 
+import org.bukkit.command.CommandSender;
+
 /**
  *
  * @author Tal Eisenberg
@@ -15,5 +17,7 @@ public class CircuitListener {
     
     public void circuitShutdown(Circuit c) { }
     
-    public void circuitDestroyed(Circuit c) { }
+    public void circuitDestroyed(Circuit c, CommandSender destroyer) { }
+    
+    public void circuitMessage(Circuit c, String msg) { }
 }

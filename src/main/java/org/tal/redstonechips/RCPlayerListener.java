@@ -27,8 +27,6 @@ class RCPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
-        rc.getCircuitManager().checkDebuggerQuit(event.getPlayer());
-
         UserSession s = rc.getUserSession(event.getPlayer().getPlayerListName(), false);
         if (s!=null) s.playerQuit();
         

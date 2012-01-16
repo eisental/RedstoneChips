@@ -3,6 +3,7 @@ package org.tal.redstonechips.command;
 
 import org.tal.redstonechips.page.ArrayLineSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
@@ -45,16 +46,13 @@ public class RChelp extends RCCommand {
     }
 
     public static void printCommandList(CommandSender sender, Map commands, String[] args, ChatColor infoColor, ChatColor errorColor) {
-        String[] lines = new String[commands.size()];
+        List<String> lines = new ArrayList<String>();
 
-        int i = 0;
-
-        for (Object command : commands.keySet()) {
-            lines[i] = ChatColor.YELLOW + command.toString() + ChatColor.WHITE + " - " + ((Map)commands.get(command)).get("description");
-            i++;
-        }
-
-        Pager.beginPaging(sender, "RedstoneChips commands", new ArrayLineSource(lines), infoColor, errorColor, Pager.MaxLines-1);
+        for (Object command : commands.keySet()) 
+            lines.add(ChatColor.YELLOW + command.toString() + ChatColor.WHITE + " - " + ((Map)commands.get(command)).get("description"));
+        
+        Collections.sort(lines);
+        Pager.beginPaging(sender, "RedstoneChips commands", new ArrayLineSource(lines.toArray(new String[0])), infoColor, errorColor, Pager.MaxLines-1);
         sender.sendMessage("Use " + ChatColor.YELLOW + (sender instanceof Player?"/":"") + "rchelp <command name>" + ChatColor.WHITE + " for help on a specific command.");
     }
 

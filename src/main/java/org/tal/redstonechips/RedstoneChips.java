@@ -144,7 +144,7 @@ public class RedstoneChips extends JavaPlugin {
 
         if (this.isEnabled()) {
             PluginManager pm = getServer().getPluginManager();
-            pm.registerEvent(Type.REDSTONE_CHANGE, rcBlockListener, Priority.Monitor, this);
+            pm.registerEvent(Type.REDSTONE_CHANGE, circuitManager, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
             pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
