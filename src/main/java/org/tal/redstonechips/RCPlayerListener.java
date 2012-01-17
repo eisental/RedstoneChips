@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.circuit.ScanParameters;
 import org.tal.redstonechips.user.UserSession;
 import org.tal.redstonechips.user.UserSession.Mode;
 
@@ -47,10 +48,12 @@ class RCPlayerListener extends PlayerListener {
             if (session != null && session.useToolInHand(event.getClickedBlock())) {
                 event.setCancelled(true);
             } else {
-                int result = rc.getCircuitManager().checkForCircuit(event.getClickedBlock(), 
-                        rc.getPrefs().getDefaultChipScanner(), event.getPlayer());
-                if (result == -2 || result >= 0) event.setCancelled(true);
-                
+                ScanParameters params = ScanParameters.generateDefaultParams(event.getClickedBlock(), rc);
+                if (params!=null) {
+                    int result = rc.getCircuitManager().checkForCircuit(params, event.getPlayer());
+                    if (result == -2 || result >= 0) event.setCancelled(true);
+                }
+
                 else if (session!=null) {
                     if (session.getMode()==Mode.SELECTION) {
                         Circuit c = rc.getCircuitManager().getCircuitByStructureBlock(event.getClickedBlock().getLocation());

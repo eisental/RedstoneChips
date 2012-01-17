@@ -1,6 +1,8 @@
 
 package org.tal.redstonechips.command;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -9,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.PrefsManager;
 import org.tal.redstonechips.circuit.RecursiveChipScanner;
+import org.tal.redstonechips.circuit.ScanParameters;
 import org.tal.redstonechips.circuit.io.IOBlock.Type;
 
 /**
@@ -64,16 +67,15 @@ public class RCactivate extends RCCommand {
 
     public static boolean activate(Block target, MaterialData inputBlockType, MaterialData outputBlockType, 
             MaterialData interfaceBlockType, CommandSender sender, boolean verbose, org.tal.redstonechips.RedstoneChips rc) {
-        RecursiveChipScanner scanner = new RecursiveChipScanner();
-        scanner.addIOMaterial(Type.INPUT, inputBlockType);
-        scanner.addIOMaterial(Type.OUTPUT, outputBlockType);
-        scanner.addIOMaterial(Type.INTERFACE, interfaceBlockType);
-        if (verbose) scanner.setDebugger(sender);
-        if (rc.getCircuitManager().checkForCircuit(target, scanner, sender)==-2) {
+
+        Map<Type, MaterialData> iom = new HashMap<Type, MaterialData>();        
+        iom.put(Type.INPUT, inputBlockType);
+        iom.put(Type.OUTPUT, outputBlockType);
+        iom.put(Type.INTERFACE, interfaceBlockType);
+        if (rc.getCircuitManager().checkForCircuit(ScanParameters.generate(target, iom), sender, verbose)==-2) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "Could not activate chip.");
             return false;
-        } else return true;
-        
+        } else return true;        
     }
 
 }

@@ -23,13 +23,15 @@ import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.bukkit.World;
 import org.bukkit.event.block.BlockListener;
-import org.tal.redstonechips.circuit.ChipScanner;
 import org.tal.redstonechips.circuit.ChipScanner.ChipScanException;
 import org.tal.redstonechips.circuit.CircuitListener;
+import org.tal.redstonechips.circuit.IOChipScanner;
+import org.tal.redstonechips.circuit.RecursiveChipScanner;
 import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
 import org.tal.redstonechips.circuit.ScanParameters;
+import org.tal.redstonechips.circuit.SingleBlockChipScanner;
 import org.tal.redstonechips.util.ParsingUtils;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -75,16 +77,20 @@ public class CircuitManager extends BlockListener {
         
     }
 
+    public int checkForCircuit(ScanParameters params, CommandSender sender) {
+        return checkForCircuit(params, sender, false);
+    }
+    
     /**
      * Tries to scan a chip, starting from the chip sign block.
      * 
      * @param signBlock The activation sign block.
-     * @param scanner ChipScanner to scan with.
+     * @param params Initial scan parameters. Use ScanParameters.generate() or .generateDefaultParams
      * @param sender The activator
      * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
      */
-    public int checkForCircuit(Block signBlock, ChipScanner scanner, CommandSender sender) {
-        if (signBlock.getType()!=Material.WALL_SIGN) return -1;
+    public int checkForCircuit(ScanParameters params, CommandSender sender, boolean verbose) {
+        Block signBlock = params.signBlock;        
 
         BlockState state = signBlock.getState();
         if (!(state instanceof Sign)) return -1;
@@ -107,11 +113,24 @@ public class CircuitManager extends BlockListener {
             return -2;
         }
 
-        ScanParameters params = null;        
-        try {
-            params = scanner.scan(signBlock);
-        } catch (ChipScanException e) {
-            if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + e.getMessage());
+        IOChipScanner scanner = new RecursiveChipScanner();
+        if (verbose) scanner.setDebugger(sender);
+        
+        if (!scanner.isTypeAllowed(params, params.chipMaterial, params.origin.getData())) {
+            try {
+                scanner = new SingleBlockChipScanner();
+                if (verbose) scanner.setDebugger(sender);
+                scanner.scan(params);
+            } catch (ChipScanException e) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "You can't build a redstone chip using this material ("
+                        + params.chipMaterial.name() + ").");
+            }
+        } else {        
+            try {
+                params = scanner.scan(params);
+            } catch (ChipScanException e) {
+                if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + e.getMessage());
+            }
         }
         
         if (params==null || (params.outputs.isEmpty() && params.inputs.isEmpty() && params.interfaces.isEmpty())) return -1;
@@ -368,7 +387,7 @@ public class CircuitManager extends BlockListener {
         String name = c.name;
         
         if (!rc.getCircuitManager().destroyCircuit(c, reseter, false)) return false;
-        int newId = rc.getCircuitManager().checkForCircuit(activationBlock, rc.getPrefs().getDefaultChipScanner(), reseter);
+        int newId = checkForCircuit(ScanParameters.generateDefaultParams(activationBlock, rc), reseter);
         Circuit newCircuit = rc.getCircuitManager().getCircuits().get(newId);
 
         if (newCircuit!=null) {
