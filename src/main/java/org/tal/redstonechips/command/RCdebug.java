@@ -28,7 +28,7 @@ public class RCdebug extends RCCommand {
             Circuit c = CommandUtils.findTargetCircuit(rc, sender);
             if (c==null) return true;
             else {
-                Debugger d = rc.getUserSession(p.getPlayerListName(), true).getDebugger();                
+                Debugger d = rc.getUserSession(p, true).getDebugger();                
                 toggleCircuitDebug(sender, d, c);
             }
 
@@ -38,7 +38,7 @@ public class RCdebug extends RCCommand {
                 return true;
             } 
             
-            Debugger d = rc.getUserSession(p.getPlayerListName(), true).getDebugger();
+            Debugger d = rc.getUserSession(p, true).getDebugger();
             if ("clear".startsWith(args[0].toLowerCase())) {
                 d.clear();
                 sender.sendMessage(rc.getPrefs().getInfoColor() + "Cleared debug list.");
@@ -72,7 +72,7 @@ public class RCdebug extends RCCommand {
     }
 
     private void listDebuggedCircuits(Player player) {
-        UserSession s = rc.getUserSession(player.getPlayerListName(), false);
+        UserSession s = rc.getUserSession(player, false);
         Debugger d = s.getDebugger();
         List<Circuit> circuits = d.getCircuits();
         

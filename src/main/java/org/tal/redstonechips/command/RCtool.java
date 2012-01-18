@@ -27,7 +27,7 @@ public class RCtool extends RCCommand {
         Material type = item.getType();
         
         try {
-            UserSession session = rc.getUserSession(player.getPlayerListName(), true);
+            UserSession session = rc.getUserSession(player, true);
             Tool t = new ChipProbe();
             t.setItem(type);
             session.addTool(t);

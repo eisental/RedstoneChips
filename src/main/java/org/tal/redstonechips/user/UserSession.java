@@ -174,4 +174,5 @@ public class UserSession {
 
     public Debugger getDebugger() { return debugger; }
     public void setDebugger(Debugger d) { debugger = d; }
+    
 }

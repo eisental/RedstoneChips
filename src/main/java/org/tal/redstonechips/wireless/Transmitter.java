@@ -31,7 +31,7 @@ public class Transmitter extends Wireless {
     }
     
     public void send(boolean[] bits, int offset, int length) {
-        BitSet7 bitset = BitSetUtils.booleanToBitSet(bits, 0, length);
+        BitSet7 bitset = BitSetUtils.boolToBitSet(bits, 0, length);
         getChannel().transmit(bitset, startBit+offset, length);
     }
 }

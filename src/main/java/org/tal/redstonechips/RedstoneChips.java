@@ -1,5 +1,6 @@
 package org.tal.redstonechips;
 
+import org.bukkit.entity.Player;
 import org.tal.redstonechips.user.UserSession;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.RCTypeReceiver;
 import org.tal.redstonechips.command.*;
+import org.tal.redstonechips.memory.Memory;
 
 /**
  * RedstoneChips Bukkit JavaPlugin implementation. The main entry point of the plugin.
@@ -127,6 +129,12 @@ public class RedstoneChips extends JavaPlugin {
         circuitPersistence = new CircuitPersistence(this);
         circuitLoader = new CircuitLoader(this);        
         channelManager = new ChannelManager(this);
+        
+        try {
+            Memory.setupDataFolder(getDataFolder());
+        } catch (RuntimeException e) {
+            log(Level.WARNING, e.getMessage());
+        }
     }                
 
     private void registerCommands() {
@@ -230,6 +238,10 @@ public class RedstoneChips extends JavaPlugin {
         return s;
     }
     
+    public UserSession getUserSession(Player player, boolean create) {
+        return getUserSession(player.getName(), create);
+    }
+    
     /**
      * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
      * the /rctype command the rcTypeReceiver circuit will receive the typed text.
@@ -299,6 +311,5 @@ public class RedstoneChips extends JavaPlugin {
         
         if (inputLine!=null && !inputLine.isEmpty() && !getDescription().getVersion().equals(inputLine)) return inputLine;
         else return null;                
-    }
-    
+    }    
 }

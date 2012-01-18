@@ -98,7 +98,7 @@ public abstract class Circuit {
      * An optional circuit instance name.
      */
     public String name = null;
-       
+    
     /**
      * Set to the chunk coordinates of the circuit's activation block
      */

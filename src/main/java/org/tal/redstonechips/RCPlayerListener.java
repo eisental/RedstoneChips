@@ -28,14 +28,14 @@ class RCPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
-        UserSession s = rc.getUserSession(event.getPlayer().getPlayerListName(), false);
+        UserSession s = rc.getUserSession(event.getPlayer(), false);
         if (s!=null) s.playerQuit();
         
     }
 
     @Override
     public void onPlayerJoin(PlayerJoinEvent event) {
-        UserSession s = rc.getUserSession(event.getPlayer().getPlayerListName(), false);
+        UserSession s = rc.getUserSession(event.getPlayer(), false);
         if (s!=null) s.playerJoined(event.getPlayer());
     }
     
@@ -44,7 +44,7 @@ class RCPlayerListener extends PlayerListener {
         if (event.isCancelled()) return;
 
         if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
-            UserSession session = rc.getUserSession(event.getPlayer().getPlayerListName(), false);
+            UserSession session = rc.getUserSession(event.getPlayer(), false);
             if (session != null && session.useToolInHand(event.getClickedBlock())) {
                 event.setCancelled(true);
             } else {

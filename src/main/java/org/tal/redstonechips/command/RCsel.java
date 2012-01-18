@@ -55,7 +55,7 @@ public class RCsel extends RCCommand {
         SelCommand selCommand = null;
         
         if (args.length==0) {
-            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+            UserSession session = rc.getUserSession(p, true);
             
             if (session.getMode()==Mode.SELECTION) {
                 session.setMode(Mode.NORMAL);
@@ -79,7 +79,7 @@ public class RCsel extends RCCommand {
         }
 
         if (selCommand == SelCommand.CUBOID) {
-            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+            UserSession session = rc.getUserSession(p, true);
             Location[] sel = null;
             if (WorldEditHook.isWorldEditInstalled(rc)) {
                 sel = WorldEditHook.getWorldEditSelection(p, rc);
@@ -103,10 +103,10 @@ public class RCsel extends RCCommand {
         } else if (selCommand == SelCommand.ID) {
             selectById(p, args);
         } else if (selCommand == SelCommand.ACTIVATE) {
-            UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+            UserSession session = rc.getUserSession(p, true);
             massActivate(p, args, session);            
         } else {
-            UserSession session = rc.getUserSession(p.getPlayerListName(), false);
+            UserSession session = rc.getUserSession(p, false);
             if (session == null || session.getSelection().isEmpty()) {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + "Selection is empty.");
                 return true;
@@ -168,7 +168,7 @@ public class RCsel extends RCCommand {
     }
     
     private void selectById(Player p, String[] args) {
-        UserSession session = rc.getUserSession(p.getPlayerListName(), true);
+        UserSession session = rc.getUserSession(p, true);
         List<Circuit> selection = new ArrayList<Circuit>();
         for (int i=1; i<args.length; i++) {
             Circuit c = rc.getCircuitManager().getCircuitById(args[i]);

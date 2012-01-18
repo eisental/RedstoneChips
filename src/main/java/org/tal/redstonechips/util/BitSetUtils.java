@@ -1,6 +1,7 @@
 
 package org.tal.redstonechips.util;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 /**
@@ -29,8 +30,8 @@ public class BitSetUtils {
         }
 
         return val;
-    }
-
+    }    
+    
     /**
      * Convert a BitSet to a signed integer using two's complement encoding.
      *
@@ -49,6 +50,14 @@ public class BitSetUtils {
         return signed;
     }
 
+    public static BigInteger bitSetToBigInt(BitSet7 b, int startBit, int length) {
+        return new BigInteger(b.get(startBit, startBit+length).toByteArray());
+    }
+
+    public static BitSet7 bigIntToBitSet(BigInteger i) {
+        return BitSet7.valueOf(i.toByteArray());
+    }
+    
     public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
         return bitSetToBinaryString(b, startBit, length, 4);
     }
@@ -188,7 +197,7 @@ public class BitSetUtils {
         else return stringToBitSet(sbits);
     }
 
-    public static BitSet7 booleanToBitSet(boolean[] bits, int offset, int length) {
+    public static BitSet7 boolToBitSet(boolean[] bits, int offset, int length) {
         BitSet7 bitset = new BitSet7(length-offset);
         for (int i=offset; i<length; i++) bitset.set(i-offset,bits[i]);
         
