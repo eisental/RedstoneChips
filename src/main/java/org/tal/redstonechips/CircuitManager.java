@@ -23,15 +23,15 @@ import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.bukkit.World;
 import org.bukkit.event.block.BlockListener;
-import org.tal.redstonechips.circuit.ChipScanner.ChipScanException;
+import org.tal.redstonechips.circuit.scan.ChipScanner.ChipScanException;
 import org.tal.redstonechips.circuit.CircuitListener;
-import org.tal.redstonechips.circuit.IOChipScanner;
-import org.tal.redstonechips.circuit.RecursiveChipScanner;
+import org.tal.redstonechips.circuit.scan.IOChipScanner;
+import org.tal.redstonechips.circuit.scan.RecursiveChipScanner;
 import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
-import org.tal.redstonechips.circuit.ScanParameters;
-import org.tal.redstonechips.circuit.SingleBlockChipScanner;
+import org.tal.redstonechips.circuit.scan.ScanParameters;
+import org.tal.redstonechips.circuit.scan.SingleBlockChipScanner;
 import org.tal.redstonechips.util.ParsingUtils;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -78,7 +78,7 @@ public class CircuitManager extends BlockListener {
     }
 
     public int checkForCircuit(ScanParameters params, CommandSender sender) {
-        return checkForCircuit(params, sender, false);
+        return checkForCircuit(params, sender, 0);
     }
     
     /**
@@ -89,7 +89,7 @@ public class CircuitManager extends BlockListener {
      * @param sender The activator
      * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
      */
-    public int checkForCircuit(ScanParameters params, CommandSender sender, boolean verbose) {
+    public int checkForCircuit(ScanParameters params, CommandSender sender, int debugLevel) {
         Block signBlock = params.signBlock;        
 
         BlockState state = signBlock.getState();
@@ -114,12 +114,12 @@ public class CircuitManager extends BlockListener {
         }
 
         IOChipScanner scanner = new RecursiveChipScanner();
-        if (verbose) scanner.setDebugger(sender);
+        scanner.setDebugger(sender, debugLevel);
         
         if (!scanner.isTypeAllowed(params, params.chipMaterial, params.origin.getData())) {
             try {
                 scanner = new SingleBlockChipScanner();
-                if (verbose) scanner.setDebugger(sender);
+                scanner.setDebugger(sender, debugLevel);
                 scanner.scan(params);
             } catch (ChipScanException e) {
                 sender.sendMessage(rc.getPrefs().getErrorColor() + "You can't build a redstone chip using this material ("

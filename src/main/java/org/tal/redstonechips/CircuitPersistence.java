@@ -1,14 +1,6 @@
 package org.tal.redstonechips;
 
-import java.io.BufferedWriter;
-import org.tal.redstonechips.circuit.Circuit;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,13 +8,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.tal.redstonechips.util.ChunkLocation;
-import org.tal.redstonechips.wireless.BroadcastChannel;
+import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.io.IOBlock;
 import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
 import org.tal.redstonechips.util.BitSetUtils;
+import org.tal.redstonechips.util.ChunkLocation;
+import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -477,8 +470,8 @@ public class CircuitPersistence {
             File original = getCircuitsFile(filename);
             File backup = getBackupFileName(original.getParentFile(),filename);
 
-            rc.log(Level.INFO, "An error occurred while loading redstone chips. To make sure you won't lose any data, a backup copy of "
-                + circuitsFileName + " is being created. The backup can be found at " + backup.getPath());
+            rc.log(Level.INFO, "An error occurred while loading redstone chips. To make sure you won't lose any data, a backup copy is"
+                    + " being created at " + backup.getPath());
             copy(original, backup);
         } catch (IOException ex) {
             rc.log(Level.SEVERE, "Error while trying to write backup file: " + ex);

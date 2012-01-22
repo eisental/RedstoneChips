@@ -6,7 +6,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.circuit.ScanParameters;
+import org.tal.redstonechips.circuit.scan.ScanParameters;
 import org.tal.redstonechips.user.UserSession;
 import org.tal.redstonechips.user.UserSession.Mode;
 
@@ -34,9 +34,11 @@ class RCPlayerListener extends PlayerListener {
     }
 
     @Override
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        UserSession s = rc.getUserSession(event.getPlayer(), false);
-        if (s!=null) s.playerJoined(event.getPlayer());
+    public void onPlayerJoin(PlayerJoinEvent event) {        
+        if (UserSession.getPlayerFileFor(event.getPlayer(), rc.getDataFolder()).exists()) {
+            UserSession s = rc.getUserSession(event.getPlayer(), true);
+            s.playerJoined(event.getPlayer());
+        }
     }
     
     @Override

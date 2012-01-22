@@ -2,19 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.scan;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
-import org.tal.redstonechips.circuit.ChipScanner.ChipScanException;
-import org.tal.redstonechips.circuit.io.IOBlock;
+import org.tal.redstonechips.circuit.scan.ChipScanner.ChipScanException;
 import org.tal.redstonechips.util.Locations;
 
 /**
@@ -31,7 +26,7 @@ public class RecursiveChipScanner extends IOChipScanner {
      */
     public ScanParameters scan(ScanParameters params) throws ChipScanException {        
         if (debugger!=null) {
-            debug("Origin block: " + prettyLoc(params.origin));
+            debug(1, "Origin block: " + prettyLoc(params.origin));
         }
         
         try {            
@@ -122,7 +117,7 @@ public class RecursiveChipScanner extends IOChipScanner {
     private void checkForIO(ScanParameters params) {
         Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
-            if (debugger!=null) debug(ChatColor.LIGHT_PURPLE + "Looking for IO block @" + prettyLoc(b) + " (" + prettyMaterial(b) + ")");
+            if (debugger!=null) debug(2, ChatColor.LIGHT_PURPLE + "Looking for IO block @" + prettyLoc(b) + " (" + prettyMaterial(b) + ")");
             if (b.getType()==params.inputBlockType.getItemType()
                     && (b.getData()==params.inputBlockType.getData() || params.inputBlockType.getData()==-1)) {
                 addInput(params, b);
@@ -139,7 +134,7 @@ public class RecursiveChipScanner extends IOChipScanner {
     private void checkForChipBlockOnSideFace(ScanParameters params) {
         Block b = params.origin.getRelative(params.direction);
         if (!params.structure.contains(b)) {
-            if (debugger!=null) debug(ChatColor.LIGHT_PURPLE + "Looking for chip block @" + prettyLoc(b) + " (" + prettyMaterial(b) + ")");
+            if (debugger!=null) debug(2, ChatColor.LIGHT_PURPLE + "Looking for chip block @" + prettyLoc(b) + " (" + prettyMaterial(b) + ")");
             if ((!b.getType().equals(Material.WOOL) && b.getType()==params.chipMaterial) || 
                     (b.getType().equals(Material.WOOL) && ((Wool)(b.getState().getData())).getColor().equals(params.woolColor))) {
                 params.structure.add(b);
@@ -154,7 +149,7 @@ public class RecursiveChipScanner extends IOChipScanner {
     }
         
     private void stepTo(ScanParameters params, Block b) {
-        if (debugger!=null) debug("Adding chip block @" + prettyLoc(b));
+        if (debugger!=null) debug(1, "Found chip block @" + prettyLoc(b));
         params.origin = b;        
     }
 }

@@ -1,9 +1,11 @@
 package org.tal.redstonechips.user;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,12 +13,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.circuit.Circuit;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  *
  * @author Tal Eisenberg
  */
 public class UserSession {
+
     public enum Mode { SELECTION , NORMAL, CUBOID_DEFINE}
     
     private Player player;
@@ -28,12 +33,13 @@ public class UserSession {
     private List<Circuit> selection;
     private Mode mode;
     private Location[] cuboid = null;
+    private Map<String, Object> playerData;
     
     public UserSession(String username, RedstoneChips rc) {
         this.username = username;
         this.rc = rc;
         selection = new ArrayList<Circuit>();
-        
+        playerData = new HashMap<String, Object>();
         tools = new EnumMap<Material, Tool>(Material.class);
         
         player = rc.getServer().getPlayer(username);
@@ -71,12 +77,28 @@ public class UserSession {
     }
 
     public void playerQuit() {
+        try {
+            save();
+        } catch (IOException ex) {
+            rc.log(Level.WARNING, "Error while saving player file: " + ex.getMessage());
+        }
+        
         if (debugger!=null) debugger.clear();
+        rc.removeUserSession(username);
         player = null;
     }
 
     public void playerJoined(Player p) {
         player = p;
+        try {
+            load();
+        } catch (ClassNotFoundException ex) {
+            rc.log(Level.INFO, "Error while loading player file: " + ex.getMessage());
+        } catch (InstantiationException ex) {
+            rc.log(Level.INFO, "Error while loading player file: " + ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            rc.log(Level.INFO, "Error while loading player file: " + ex.getMessage());
+        }
     }
     
     public boolean useToolInHand(Block block) {
@@ -175,4 +197,66 @@ public class UserSession {
     public Debugger getDebugger() { return debugger; }
     public void setDebugger(Debugger d) { debugger = d; }
     
+    public void putPlayerData(String key, Object data) {
+        playerData.put(key, data);
+    }
+    
+    public Object getPlayerData(String key) {
+        return playerData.get(key);
+    }
+
+    public void save() throws IOException {
+        DumperOptions opt = new DumperOptions();
+        opt.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(opt);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("tools", saveTools());
+        map.put("data", playerData);
+        yaml.dump(map, new FileWriter(getPlayerFile()));        
+    }
+    
+    public void load() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        File f = getPlayerFile();
+
+        try {
+            Yaml yaml = new Yaml();
+            Map<String,Object> map = (Map<String, Object>)yaml.load(new FileInputStream(f));
+
+            if (map.containsKey("tools")) loadTools((Map<Material, String>)map.get("tools"));
+            if (map.containsKey("data")) playerData = (Map<String, Object>)map.get("data");
+        } catch (IOException ex) {
+        } 
+        
+    }
+    
+    private void loadTools(Map<Material, String> tools) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        this.tools.clear();
+        for (Material m : tools.keySet()) {
+            Tool t = (Tool)Class.forName(tools.get(m)).newInstance();
+            t.setItem(m);
+            t.setSession(this);
+            this.tools.put(m, t);
+        }
+    }
+    
+    private Map<Material, String> saveTools() {
+        Map<Material, String> map = new HashMap<Material, String>();
+        for (Material m : tools.keySet()) {
+            map.put(m, tools.get(m).getClass().getCanonicalName());
+        }
+        
+        return map;
+    }
+    
+    public File getPlayerFile() {
+        return new File(rc.getDataFolder(), username + ".player");        
+    }
+    
+    public static File getPlayerFileFor(String name, File folder) {
+        return new File(folder, name + ".player");
+    }
+    
+    public static File getPlayerFileFor(Player p, File folder) {
+        return new File(folder, p.getName() + ".player");
+    }
 }

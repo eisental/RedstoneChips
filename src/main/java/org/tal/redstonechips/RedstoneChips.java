@@ -1,12 +1,9 @@
 package org.tal.redstonechips;
 
-import org.bukkit.entity.Player;
-import org.tal.redstonechips.user.UserSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import org.tal.redstonechips.circuit.CircuitIndex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockListener;
@@ -24,9 +22,11 @@ import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.circuit.CircuitIndex;
 import org.tal.redstonechips.circuit.RCTypeReceiver;
 import org.tal.redstonechips.command.*;
 import org.tal.redstonechips.memory.Memory;
+import org.tal.redstonechips.user.UserSession;
 
 /**
  * RedstoneChips Bukkit JavaPlugin implementation. The main entry point of the plugin.
@@ -61,6 +61,7 @@ public class RedstoneChips extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (!getDataFolder().exists()) getDataFolder().mkdir();
         initManagers();
         loadLibraries();
         callLibraryRedstoneChipsEnable();        
@@ -68,6 +69,12 @@ public class RedstoneChips extends JavaPlugin {
         registerEvents();
         registerCommands();
 
+        try {
+            Memory.setupDataFolder(getDataFolder());
+        } catch (RuntimeException e) {
+            log(Level.WARNING, e.getMessage());
+        }
+        
         String msg = getDescription().getName() + " " + getDescription().getVersion() + " enabled.";
         log.info(msg);
 
@@ -115,6 +122,9 @@ public class RedstoneChips extends JavaPlugin {
     
     @Override
     public void onDisable() {
+        for (UserSession s : sessions.values())
+            s.playerQuit();
+        
         circuitPersistence.saveCircuits();
         circuitManager.shutdownAllCircuits();
         circuitPersistence.clearLoadedWorldsList();
@@ -129,12 +139,6 @@ public class RedstoneChips extends JavaPlugin {
         circuitPersistence = new CircuitPersistence(this);
         circuitLoader = new CircuitLoader(this);        
         channelManager = new ChannelManager(this);
-        
-        try {
-            Memory.setupDataFolder(getDataFolder());
-        } catch (RuntimeException e) {
-            log(Level.WARNING, e.getMessage());
-        }
     }                
 
     private void registerCommands() {
@@ -241,6 +245,14 @@ public class RedstoneChips extends JavaPlugin {
     public UserSession getUserSession(Player player, boolean create) {
         return getUserSession(player.getName(), create);
     }
+
+    public UserSession removeUserSession(Player player) {
+        return removeUserSession(player.getName());
+    }
+    
+    public UserSession removeUserSession(String name) {
+        return sessions.remove(name);
+    }
     
     /**
      * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
@@ -311,5 +323,6 @@ public class RedstoneChips extends JavaPlugin {
         
         if (inputLine!=null && !inputLine.isEmpty() && !getDescription().getVersion().equals(inputLine)) return inputLine;
         else return null;                
-    }    
+    }
+
 }

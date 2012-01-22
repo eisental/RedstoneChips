@@ -230,7 +230,7 @@ public class RCsel extends RCCommand {
                 for (int z=lowz; z<=highz; z++) {
                     Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
                     if (b.getTypeId()==wallSignId) {
-                        if (RCactivate.activate(b, inputBlockType, outputBlockType, interfaceBlockType, p, false, rc))
+                        if (RCactivate.activate(b, inputBlockType, outputBlockType, interfaceBlockType, p, 0, rc))
                             count++;
                     }
                 }

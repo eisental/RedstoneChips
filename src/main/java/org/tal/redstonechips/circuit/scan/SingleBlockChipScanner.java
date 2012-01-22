@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.scan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
-import org.tal.redstonechips.circuit.ChipScanner.ChipScanException;
+import org.tal.redstonechips.circuit.scan.ChipScanner.ChipScanException;
 import org.tal.redstonechips.circuit.io.IOBlock;
 
 /**

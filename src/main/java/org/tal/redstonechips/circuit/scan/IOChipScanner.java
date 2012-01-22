@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.scan;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,31 +17,33 @@ import org.bukkit.material.Wool;
  */
 public abstract class IOChipScanner implements ChipScanner {
     protected CommandSender debugger = null;
+    protected int debugLevel;
     
-    public void setDebugger(CommandSender debugger) {
+    public void setDebugger(CommandSender debugger, int level) {
         this.debugger = debugger;
+        this.debugLevel = level;
     }
     
-    protected void debug(String msg) {
-        if (debugger!=null) {
+    protected void debug(int level, String msg) {
+        if (debugger!=null && level<=debugLevel) {
             debugger.sendMessage(ChatColor.AQUA + msg);
         }
     }
 
     protected void addInput(ScanParameters params, Block b) {
-        if (debugger!=null) debug("Found input @" + prettyLoc(b));
+        if (debugger!=null) debug(1, "Found input #" + (params.inputs.size()) + " @" + prettyLoc(b));
         params.structure.add(b);
         params.inputs.add(b);
     }    
     
     protected void addOutput(ScanParameters params, Block b) {
-        if (debugger!=null) debug("Found output @" + prettyLoc(b));
+        if (debugger!=null) debug(1, "Found output #" + (params.outputs.size()) + " @" + prettyLoc(b));
         params.structure.add(b);
         params.outputs.add(b);
     }
 
     protected void addInterface(ScanParameters params, Block b) {
-        if (debugger!=null) debug("Found interface @" + prettyLoc(b));
+        if (debugger!=null) debug(1, "Found interface #" + (params.interfaces.size()) + " @" + prettyLoc(b));
         params.structure.add(b);
         params.interfaces.add(b);
     }

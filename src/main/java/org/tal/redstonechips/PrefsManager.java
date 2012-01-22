@@ -15,10 +15,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.material.MaterialData;
-import org.tal.redstonechips.circuit.ChipScanner;
-import org.tal.redstonechips.circuit.RecursiveChipScanner;
-import org.tal.redstonechips.circuit.ScanParameters;
-import org.tal.redstonechips.circuit.io.IOBlock;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -83,9 +79,7 @@ public class PrefsManager {
     /**
      * Loads the preferences from the preferences yaml file.
      */
-    public void loadPrefs() {
-        if (!rc.getDataFolder().exists()) rc.getDataFolder().mkdir();
-
+    public void loadPrefs() {       
         File propFile = new File(rc.getDataFolder(), prefsFileName);
         if (!propFile.exists()) { // create empty file if doesn't already exist
             try {

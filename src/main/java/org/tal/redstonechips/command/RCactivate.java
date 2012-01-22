@@ -1,7 +1,7 @@
 
 package org.tal.redstonechips.command;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,9 +10,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.PrefsManager;
-import org.tal.redstonechips.circuit.RecursiveChipScanner;
-import org.tal.redstonechips.circuit.ScanParameters;
+import org.tal.redstonechips.circuit.scan.ScanParameters;
+import org.tal.redstonechips.circuit.io.IOBlock;
 import org.tal.redstonechips.circuit.io.IOBlock.Type;
+import org.tal.redstonechips.util.ParsingUtils;
 
 /**
  *
@@ -31,32 +32,40 @@ public class RCactivate extends RCCommand {
         if (target.getType()==Material.WALL_SIGN) {
             MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
             
-            boolean verbose = false;
+            int verboseLevel = -1;
             if (args.length>0) {
-                if (args[args.length-1].equalsIgnoreCase("verbose")) {
-                    verbose = true;
+                String lastArg = args[args.length-1];
+                if (lastArg.equalsIgnoreCase("-v")) {
+                    verboseLevel = 1;
+                } else if (lastArg.startsWith("-v")) {
+                    String sl = lastArg.substring(2);
+                    if (ParsingUtils.isInt(sl))
+                        verboseLevel = Integer.parseInt(sl);
+                    else sender.sendMessage(rc.getPrefs().getErrorColor() + "Unknown option: " + lastArg);
                 }
                 
                 try {
-                    if (args.length>=(verbose?2:1))
+                    if (args.length>=(verboseLevel!=-1?2:1))
                         inputBlockType = PrefsManager.findMaterial(args[0]);
-                    if (args.length>=(verbose?3:2))
+                    if (args.length>=(verboseLevel!=-1?3:2))
                         outputBlockType = PrefsManager.findMaterial(args[1]);
-                    if (args.length>=(verbose?4:3))
+                    if (args.length>=(verboseLevel!=-1?4:3))
                         interfaceBlockType = PrefsManager.findMaterial(args[2]);
+                    
+                    if (verboseLevel==-1) verboseLevel = 0;
+                    System.out.println("verboseLevel=" + verboseLevel);
                 } catch (IllegalArgumentException ie) {
-                    sender.sendMessage(ie.getMessage());
+                    sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
                     return true;
                 }                
                     
             }
             
-
             if (inputBlockType==null) inputBlockType = rc.getPrefs().getInputBlockType();
             if (outputBlockType==null) outputBlockType = rc.getPrefs().getOutputBlockType();
             if (interfaceBlockType==null) interfaceBlockType = rc.getPrefs().getInterfaceBlockType();
             
-            activate(target, inputBlockType, outputBlockType, interfaceBlockType, sender, verbose, rc);
+            activate(target, inputBlockType, outputBlockType, interfaceBlockType, sender, verboseLevel, rc);
             
         } else {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "You need to point at a wall sign.");
@@ -66,13 +75,13 @@ public class RCactivate extends RCCommand {
     }
 
     public static boolean activate(Block target, MaterialData inputBlockType, MaterialData outputBlockType, 
-            MaterialData interfaceBlockType, CommandSender sender, boolean verbose, org.tal.redstonechips.RedstoneChips rc) {
+            MaterialData interfaceBlockType, CommandSender sender, int verboseLevel, org.tal.redstonechips.RedstoneChips rc) {
 
-        Map<Type, MaterialData> iom = new HashMap<Type, MaterialData>();        
+        Map<Type, MaterialData> iom = new EnumMap<Type, MaterialData>(IOBlock.Type.class);
         iom.put(Type.INPUT, inputBlockType);
         iom.put(Type.OUTPUT, outputBlockType);
         iom.put(Type.INTERFACE, interfaceBlockType);
-        if (rc.getCircuitManager().checkForCircuit(ScanParameters.generate(target, iom), sender, verbose)==-2) {
+        if (rc.getCircuitManager().checkForCircuit(ScanParameters.generate(target, iom), sender, verboseLevel)==-2) {
             sender.sendMessage(rc.getPrefs().getErrorColor() + "Could not activate chip.");
             return false;
         } else return true;        

@@ -1,4 +1,4 @@
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.scan;
 
 /**
  * A class for scanning chip block structures.

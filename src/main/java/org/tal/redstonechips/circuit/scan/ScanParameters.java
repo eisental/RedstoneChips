@@ -1,4 +1,4 @@
-package org.tal.redstonechips.circuit;
+package org.tal.redstonechips.circuit.scan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
