@@ -1,18 +1,18 @@
 
 package org.tal.redstonechips.command;
 
-import org.tal.redstonechips.page.ArrayLineSource;
+import net.eisental.common.page.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.page.Pager;
+import net.eisental.common.page.Pager;
 import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.tal.redstonechips.wireless.Receiver;
 import org.tal.redstonechips.wireless.Transmitter;
-import org.tal.redstonechips.util.BitSetUtils;
+import org.tal.redstonechips.bitset.BitSetUtils;
 
 /**
  *

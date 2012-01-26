@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.util.BitSet7;
+import org.tal.redstonechips.bitset.BitSet7;
 
 /**
  * Represents a wireless broadcast channel that receivers and transmitters can communicate over.

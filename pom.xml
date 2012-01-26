@@ -36,10 +36,15 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>net.eisental</groupId>
+            <artifactId>etCommon</artifactId>
+            <version>beta</version>
+        </dependency>
+        <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.0.1-R1</version>
-        </dependency>        
+            <version>1.1-R1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <version>beta</version>   
     <properties>

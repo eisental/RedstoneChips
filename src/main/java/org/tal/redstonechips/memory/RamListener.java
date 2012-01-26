@@ -1,6 +1,6 @@
 package org.tal.redstonechips.memory;
 
-import org.tal.redstonechips.util.BitSet7;
+import org.tal.redstonechips.bitset.BitSet7;
 
 /**
  *

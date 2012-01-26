@@ -1,7 +1,7 @@
 package org.tal.redstonechips.wireless;
 
-import org.tal.redstonechips.util.BitSet7;
-import org.tal.redstonechips.util.BitSetUtils;
+import org.tal.redstonechips.bitset.BitSet7;
+import org.tal.redstonechips.bitset.BitSetUtils;
 
 /**
  *

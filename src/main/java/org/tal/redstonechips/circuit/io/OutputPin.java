@@ -120,21 +120,31 @@ public class OutputPin extends IOBlock {
         
     }
 
-    private boolean checkAttached(Block outputBlock) {
-        Attachable a = (Attachable)outputBlock.getState().getData();
+    private boolean checkAttached(Block outputDevice) {
+        if (outputDevice.getData()==0) outputDevice.setData((byte)0x5, false);
+        Attachable a = (Attachable)outputDevice.getState().getData();
         BlockFace f = a.getAttachedFace();
-        return f!=null && outputBlock.getRelative(f).equals(loc.getBlock());
+        return f!=null && outputDevice.getRelative(f).equals(loc.getBlock());
     }
     
     private void updateLever(Block outputBlock, boolean state) {
         if (updateBlockData(outputBlock, state)) {
             outputBlock.getState().update();
-            //loc.getBlock().getState().applyPhysics();
+            Block b = loc.getBlock();
+            byte oldData = b.getData();
+            byte notData;
+            if (oldData>1) notData = (byte)(oldData-1);
+            else if (oldData<15) notData = (byte)(oldData+1);
+            else notData = 0;
+            b.setData(notData, true);
+            b.setData(oldData, true);
         }
     }
     
     private void updateRedstoneTorch(Block outputBlock, boolean state) {
-        outputBlock.setType(state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF);        
+        byte oldData = outputBlock.getData();
+        int type = (state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF).getId();
+        outputBlock.setTypeIdAndData(type, oldData, false);
     }
     
     private void updatePoweredRail(Block outputBlock, boolean state) {

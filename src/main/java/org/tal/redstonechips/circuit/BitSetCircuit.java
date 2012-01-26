@@ -1,7 +1,7 @@
 package org.tal.redstonechips.circuit;
 
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.util.BitSet7;
+import org.tal.redstonechips.bitset.BitSet7;
 
 /**
  * A Redstone Circuit that treats its inputs as multiple bit sets.

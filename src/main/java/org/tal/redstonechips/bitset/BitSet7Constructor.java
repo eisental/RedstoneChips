@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.util;
+package org.tal.redstonechips.bitset;
 
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Constructor;

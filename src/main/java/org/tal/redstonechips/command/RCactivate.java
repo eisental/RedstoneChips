@@ -3,6 +3,7 @@ package org.tal.redstonechips.command;
 
 import java.util.EnumMap;
 import java.util.Map;
+import net.eisental.common.parsing.ParsingUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -10,10 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.PrefsManager;
-import org.tal.redstonechips.circuit.scan.ScanParameters;
 import org.tal.redstonechips.circuit.io.IOBlock;
 import org.tal.redstonechips.circuit.io.IOBlock.Type;
-import org.tal.redstonechips.util.ParsingUtils;
+import org.tal.redstonechips.circuit.scan.ScanParameters;
 
 /**
  *

@@ -4,9 +4,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.wireless.BroadcastChannel;
-import org.tal.redstonechips.util.BitSet7;
-import org.tal.redstonechips.util.BitSetUtils;
-import org.tal.redstonechips.util.ParsingUtils;
+import org.tal.redstonechips.bitset.BitSet7;
+import org.tal.redstonechips.bitset.BitSetUtils;
+import net.eisental.common.parsing.ParsingUtils;
 
 /**
  *

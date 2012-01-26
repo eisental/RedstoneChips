@@ -8,7 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.CircuitIndex;
-import org.tal.redstonechips.page.Pager;
+import net.eisental.common.page.Pager;
 
 /**
  *

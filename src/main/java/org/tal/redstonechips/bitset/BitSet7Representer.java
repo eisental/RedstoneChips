@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.util;
+package org.tal.redstonechips.bitset;
 
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;

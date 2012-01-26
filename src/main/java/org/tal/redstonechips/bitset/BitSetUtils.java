@@ -1,5 +1,5 @@
 
-package org.tal.redstonechips.util;
+package org.tal.redstonechips.bitset;
 
 import java.math.BigInteger;
 import java.util.Map;

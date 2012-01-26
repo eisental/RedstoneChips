@@ -1,9 +1,10 @@
 package org.tal.redstonechips;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.scan.ScanParameters;
@@ -14,26 +15,20 @@ import org.tal.redstonechips.user.UserSession.Mode;
  *
  * @author Tal Eisenberg
  */
-class RCPlayerListener extends PlayerListener {
-    RedstoneChips rc;
-    
-    public RCPlayerListener(RedstoneChips rc) {
-        this.rc = rc;
-    }
-
+class RCPlayerListener extends RCListener {
     /**
      * Removes the player from chip debugging lists.
      * 
      * @param event 
      */
-    @Override
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         UserSession s = rc.getUserSession(event.getPlayer(), false);
         if (s!=null) s.playerQuit();
         
     }
 
-    @Override
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {        
         if (UserSession.getPlayerFileFor(event.getPlayer(), rc.getDataFolder()).exists()) {
             UserSession s = rc.getUserSession(event.getPlayer(), true);
@@ -41,7 +36,7 @@ class RCPlayerListener extends PlayerListener {
         }
     }
     
-    @Override
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {                
         if (event.isCancelled()) return;
 

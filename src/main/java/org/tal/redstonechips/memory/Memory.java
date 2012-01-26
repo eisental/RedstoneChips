@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.tal.redstonechips.util.BitSet7;
-import org.tal.redstonechips.util.BitSet7Constructor;
-import org.tal.redstonechips.util.BitSet7Representer;
+import org.tal.redstonechips.bitset.BitSet7;
+import org.tal.redstonechips.bitset.BitSet7Constructor;
+import org.tal.redstonechips.bitset.BitSet7Representer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 

@@ -3,8 +3,8 @@ package org.tal.redstonechips.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.tal.redstonechips.page.Pager;
-import org.tal.redstonechips.util.ParsingUtils;
+import net.eisental.common.page.Pager;
+import net.eisental.common.parsing.ParsingUtils;
 
 /**
  *

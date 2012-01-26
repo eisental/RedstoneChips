@@ -13,12 +13,7 @@ import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.world.WorldListener;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
@@ -38,10 +33,7 @@ public class RedstoneChips extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
     private static List<CircuitIndex> preloadedLibs = new ArrayList<CircuitIndex>();
     
-    private BlockListener rcBlockListener;
-    private EntityListener rcEntityListener;
-    private PlayerListener rcPlayerListener;
-    private WorldListener rcWorldListener;
+    private Listener[] eventListeners;
 
     private PrefsManager prefsManager;
     private CircuitManager circuitManager;
@@ -75,9 +67,6 @@ public class RedstoneChips extends JavaPlugin {
             log(Level.WARNING, e.getMessage());
         }
         
-        String msg = getDescription().getName() + " " + getDescription().getVersion() + " enabled.";
-        log.info(msg);
-
         // schedule loading channel and old circuits file (if exists) until after server startup is complete.
         if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 public void run() { postStartup();} })==-1) {
@@ -127,10 +116,7 @@ public class RedstoneChips extends JavaPlugin {
         
         circuitPersistence.saveCircuits();
         circuitManager.shutdownAllCircuits();
-        circuitPersistence.clearLoadedWorldsList();
-        
-        String msg = getDescription().getName() + " " + getDescription().getVersion() + " disabled.";
-        log.info(msg);
+        circuitPersistence.clearLoadedWorldsList();        
     }
 
     private void initManagers() {
@@ -149,26 +135,15 @@ public class RedstoneChips extends JavaPlugin {
     }
     
     private void registerEvents() {
-        if (rcBlockListener==null) rcBlockListener = new RCBlockListener(this);
-        if (rcEntityListener==null) rcEntityListener = new RCEntityListener(this);
-        if (rcPlayerListener==null) rcPlayerListener = new RCPlayerListener(this);
-        if (rcWorldListener==null) rcWorldListener = new RCWorldListener(this);
+        eventListeners = new Listener[] { new RCBlockListener().setPlugin(this),
+          new RCPlayerListener().setPlugin(this),
+          new RCWorldListener().setPlugin(this), circuitManager
+        };
 
         if (this.isEnabled()) {
             PluginManager pm = getServer().getPluginManager();
-            pm.registerEvent(Type.REDSTONE_CHANGE, circuitManager, Priority.Monitor, this);
-            pm.registerEvent(Type.BLOCK_BREAK, rcBlockListener, Priority.Monitor, this);
-            pm.registerEvent(Type.BLOCK_PLACE, rcBlockListener, Priority.Monitor, this);
-            pm.registerEvent(Type.BLOCK_BURN, rcBlockListener, Priority.Monitor, this);
-            pm.registerEvent(Type.BLOCK_PHYSICS, rcBlockListener, Priority.Highest, this);
-            pm.registerEvent(Type.ENTITY_EXPLODE, rcEntityListener, Priority.Monitor, this);
-            pm.registerEvent(Type.PLAYER_JOIN, rcPlayerListener, Priority.Monitor, this);
-            pm.registerEvent(Type.PLAYER_QUIT, rcPlayerListener, Priority.Monitor, this);
-            pm.registerEvent(Type.PLAYER_INTERACT, rcPlayerListener, Priority.Monitor, this);
-            pm.registerEvent(Type.CHUNK_LOAD, rcWorldListener, Priority.Monitor, this);
-            pm.registerEvent(Type.WORLD_SAVE, rcWorldListener, Priority.Monitor, this);
-            pm.registerEvent(Type.WORLD_LOAD, rcWorldListener, Priority.Monitor, this);
-            pm.registerEvent(Type.WORLD_UNLOAD, rcWorldListener, Priority.Monitor, this);
+            for (Listener l : eventListeners)
+                pm.registerEvents(l, this);
         }
     }
 

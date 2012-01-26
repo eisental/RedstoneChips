@@ -85,5 +85,14 @@ public abstract class IOBlock {
 
         return false;
     }
+
+    public static Location[] locationsOf(IOBlock[] blocks) {
+        Location[] locs = new Location[blocks.length];
+
+        for (int i=0; i<locs.length; i++)
+            locs[i] = blocks[i].getLocation();
+        
+        return locs;
+    }
     
 }

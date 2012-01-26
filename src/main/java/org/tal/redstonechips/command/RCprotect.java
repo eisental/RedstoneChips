@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.page.Pager;
+import net.eisental.common.page.Pager;
 import org.tal.redstonechips.wireless.BroadcastChannel;
 
 /**

@@ -5,17 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
+import net.eisental.common.page.Pager;
+import net.eisental.common.parsing.Tokenizer;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.page.Pager;
-import org.tal.redstonechips.util.ChunkLocation;
-import org.tal.redstonechips.util.Locations;
-import org.tal.redstonechips.util.Tokenizer;
+import org.tal.redstonechips.circuit.filter.*;
 
 /**
  *
@@ -32,7 +29,7 @@ public class RClist extends RCCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
 
-        List<Filter> filters = new ArrayList<Filter>();
+        List<CircuitFilter> filters = new ArrayList<CircuitFilter>();
 
         boolean bthis = false;
 
@@ -46,9 +43,9 @@ public class RClist extends RCCommand {
                     return true;
                 } 
             } else {
-                Filter f = new WorldFilter();
+                CircuitFilter f = new WorldFilter().setPlugin(rc);
                 try {
-                    f.parseFilter(sender, tokenizeFilter(args[0]));
+                    f.parse(sender, tokenizeFilter(args[0]));
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
                     return true;
@@ -58,7 +55,7 @@ public class RClist extends RCCommand {
         }
 
         if (bthis || (filters.isEmpty() && (sender instanceof Player))) {
-            Filter f = new WorldFilter();
+            CircuitFilter f = new WorldFilter().setPlugin(rc);
             ((WorldFilter)f).world = ((Player)sender).getWorld();
             filters.add(f);
         }
@@ -75,7 +72,7 @@ public class RClist extends RCCommand {
 
             try {
                 for (String sf : afilters) {
-                    Filter f = parseFilter(sender, sf);
+                    CircuitFilter f = parseFilter(sender, sf);
                     filters.add(f);
                 }
             } catch (IllegalArgumentException ie) {
@@ -84,7 +81,8 @@ public class RClist extends RCCommand {
             }
         }
 
-        Collection<Circuit> circuits = filterCircuits(rc.getCircuitManager().getCircuits().values(), filters.toArray(new Filter[filters.size()]));
+        Collection<Circuit> circuits = filterCircuits(rc.getCircuitManager().getCircuits().values(), 
+                filters.toArray(new CircuitFilter[filters.size()]));
         TreeMap<Integer, Circuit> sorted = new TreeMap<Integer,Circuit>();
         for (Circuit c : circuits) sorted.put(c.id, c);
 
@@ -135,11 +133,11 @@ public class RClist extends RCCommand {
                 + " " + sworld + argsColor + cargs;
     }
 
-    private Collection<Circuit> filterCircuits(Collection<Circuit> values, Filter[] filters) {
+    private Collection<Circuit> filterCircuits(Collection<Circuit> values, CircuitFilter[] filters) {
         Collection<Circuit> circuits = new ArrayList<Circuit>();
-        circuits.addAll(rc.getCircuitManager().getCircuits().values());
+        circuits.addAll(values);
 
-        for (Filter filter : filters) {
+        for (CircuitFilter filter : filters) {
             circuits = filter.filter(circuits);
         }
 
@@ -150,7 +148,7 @@ public class RClist extends RCCommand {
         return new Tokenizer(string, ',').getTokens();
     }
 
-    private Filter parseFilter(CommandSender sender, String sf) throws IllegalArgumentException {
+    private CircuitFilter parseFilter(CommandSender sender, String sf) throws IllegalArgumentException {
         int colonIdx = sf.indexOf(":");
         if (colonIdx==-1)
             throw new IllegalArgumentException("Bad filter syntax: " + sf);
@@ -160,182 +158,18 @@ public class RClist extends RCCommand {
         if (type.length()<=1)
             throw new IllegalArgumentException("Bad filter syntax: " + sf);
 
-        Filter f;
+        CircuitFilter f;
 
         if ("location".startsWith(type)) {
-            f = new LocationFilter();
+            f = new LocationFilter().setPlugin(rc);
         } else if ("chunk".startsWith(type)) {
-            f = new ChunkFilter();
+            f = new ChunkFilter().setPlugin(rc);
         } else if ("class".startsWith(type)) {
-            f = new ClassFilter();
+            f = new ClassFilter().setPlugin(rc);
         } else throw new IllegalArgumentException("Unknown filter type: " + type);
 
-        f.parseFilter(sender, tokenizeFilter(sf.substring(colonIdx+1)));
+        f.parse(sender, tokenizeFilter(sf.substring(colonIdx+1)));
 
         return f;
-    }
-
-    interface Filter {
-        public void parseFilter(CommandSender s, String[] string) throws IllegalArgumentException;
-        public Collection<Circuit> filter(Collection<Circuit> circuits);
-    }
-
-    class LocationFilter implements Filter {
-        Location location;
-        int radius = 0;
-
-        @Override
-        public Collection<Circuit> filter(Collection<Circuit> circuits) {
-            List<Circuit> filtered = new ArrayList<Circuit>();
-
-            for (Circuit circuit : circuits) {
-                if (Locations.isInRadius(location, circuit.activationBlock, radius))
-                    filtered.add(circuit);
-            }
-
-            return filtered;
-        }
-
-        @Override
-        public void parseFilter(CommandSender sender, String[] string) throws IllegalArgumentException {
-            try {
-                if ((string.length==1 || string.length==2) && string[0].equalsIgnoreCase("this")) {
-                    if ((sender instanceof Player)) {
-                        location = ((Player)sender).getLocation();
-                    }
-
-                    if (string.length==2) {
-                        radius = Integer.decode(string[1]);
-                    }
-
-                    return;
-                }
-
-                if (string.length!=3 && string.length!=4) {
-                    StringBuilder sb = new StringBuilder();
-                    for (String s : string) sb.append(s);
-
-                    throw new IllegalArgumentException("Bad location filter syntax: " + sb.toString() + ". Expecting 'location: x,y,z,[radius]'");
-                }
-
-                int x = Integer.decode(string[0]);
-                int y = Integer.decode(string[1]);
-                int z = Integer.decode(string[2]);
-
-                if (string.length==4) radius = Integer.decode(string[3]);
-                location = new Location(null, x, y, z);
-            } catch (NumberFormatException ne) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : string) sb.append(s);
-
-                throw new IllegalArgumentException("Bad location filter syntax: " + sb.toString() + ". Expecting 'location: x,y,z,[radius]'");
-            }
-        }
-    }
-
-    class ChunkFilter implements Filter {
-        ChunkLocation chunk;
-
-        @Override
-        public Collection<Circuit> filter(Collection<Circuit> circuits) {
-            List<Circuit> filtered = new ArrayList<Circuit>();
-
-            for (Circuit circuit : circuits) {
-                for (ChunkLocation c : circuit.circuitChunks)
-                    if (c.getX()==chunk.getX() && c.getZ()==chunk.getZ()) filtered.add(circuit);
-            }
-
-            return filtered;
-        }
-
-        @Override
-        public void parseFilter(CommandSender sender, String[] string) throws IllegalArgumentException {
-            if (string.length==1 && string[0].equalsIgnoreCase("this") && (sender instanceof Player)) {
-                chunk = ChunkLocation.fromLocation(((Player)sender).getLocation());
-            } else if (string.length==2) {
-                try {
-                    int x = Integer.decode(string[0]);
-                    int z = Integer.decode(string[1]);
-                    chunk = new ChunkLocation(x,z,null);
-                } catch (NumberFormatException ne) {
-                    StringBuilder sb = new StringBuilder();
-                    for (String s : string) sb.append(s);
-
-                    throw new IllegalArgumentException("Bad chunk filter: " + sb.toString() + ". Expecting 'chunk: <x>,<z>'.");
-                }
-            } else  {
-                StringBuilder sb = new StringBuilder();
-                for (String s : string) sb.append(s);
-
-                throw new IllegalArgumentException("Bad chunk filter: " + sb.toString() + ". Expecting 'chunk: <x>,<z>'.");
-            }
-
-        }
-    }
-
-    class WorldFilter implements Filter {
-        World world;
-
-        @Override
-        public void parseFilter(CommandSender sender, String[] string) throws IllegalArgumentException {
-            if (string.length!=1) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : string) sb.append(s);
-
-                throw new IllegalArgumentException("Bad world filter: " + sb.toString() + ". Expecting 'world: <world-name>'.");
-            } else {
-                world = rc.getServer().getWorld(string[0]);
-                if (world==null)
-                    throw new IllegalArgumentException("Unknown world: " + string[0]);
-            }
-        }
-
-        @Override
-        public Collection<Circuit> filter(Collection<Circuit> circuits) {
-            List<Circuit> filtered = new ArrayList<Circuit>();
-
-            for (Circuit circuit : circuits) {
-                if (circuit.world.getName().equals(world.getName())) filtered.add(circuit);
-            }
-
-            return filtered;
-        }
-
-    }
-
-    class ClassFilter implements Filter {
-        String cclass;
-
-        @Override
-        public void parseFilter(CommandSender sender, String[] string) throws IllegalArgumentException {
-            if (string.length!=1) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : string) sb.append(s);
-
-                throw new IllegalArgumentException("Bad class filter: " + sb.toString() + ". Expecting 'class: <chip class>'.");
-            } else {
-                for (String sclass : rc.getCircuitLoader().getCircuitClasses().keySet()) {
-                    if (sclass.startsWith(string[0])) {
-                        cclass = sclass;
-                        break;
-                    }
-                }
-
-                if (cclass==null)
-                    throw new IllegalArgumentException("Unknown chip class: " + string[0]);
-            }
-        }
-
-        @Override
-        public Collection<Circuit> filter(Collection<Circuit> circuits) {
-            List<Circuit> filtered = new ArrayList<Circuit>();
-
-            for (Circuit circuit : circuits) {
-                if (circuit.getCircuitClass().equalsIgnoreCase(cclass)) filtered.add(circuit);
-            }
-
-            return filtered;
-        }
-
     }
 }

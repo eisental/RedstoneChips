@@ -1,45 +1,43 @@
 
 package org.tal.redstonechips;
 
-import org.tal.redstonechips.circuit.Circuit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.logging.Level;
+import net.eisental.common.parsing.ParsingUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Redstone;
-import org.tal.redstonechips.circuit.io.InputPin;
-import org.tal.redstonechips.util.ChunkLocation;
-import org.bukkit.World;
-import org.bukkit.event.block.BlockListener;
-import org.tal.redstonechips.circuit.scan.ChipScanner.ChipScanException;
+import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.CircuitListener;
-import org.tal.redstonechips.circuit.scan.IOChipScanner;
-import org.tal.redstonechips.circuit.scan.RecursiveChipScanner;
+import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.circuit.io.InputPin.SourceType;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
+import org.tal.redstonechips.circuit.scan.ChipScanner.ChipScanException;
+import org.tal.redstonechips.circuit.scan.IOChipScanner;
+import org.tal.redstonechips.circuit.scan.RecursiveChipScanner;
 import org.tal.redstonechips.circuit.scan.ScanParameters;
 import org.tal.redstonechips.circuit.scan.SingleBlockChipScanner;
-import org.tal.redstonechips.util.ParsingUtils;
+import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.wireless.Wireless;
 
 /**
  *
  * @author Tal Eisenberg
  */
-public class CircuitManager extends BlockListener {
+public class CircuitManager implements Listener {
 
     private RedstoneChips rc;
     
@@ -65,7 +63,8 @@ public class CircuitManager extends BlockListener {
      *
      * @param e A redstone change event.
      */
-    public void onBlockRedstoneChange(BlockRedstoneEvent e) {
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onBlockRedstoneChange(BlockRedstoneEvent e) { 
         boolean newVal = (e.getNewCurrent()>0);
         boolean oldVal = (e.getOldCurrent()>0);
         if (newVal==oldVal) return; // not a change
@@ -136,8 +135,12 @@ public class CircuitManager extends BlockListener {
         if (params==null || (params.outputs.isEmpty() && params.inputs.isEmpty() && params.interfaces.isEmpty())) return -1;
 
         for (Block b : params.structure) {
-            if (this.getCircuitByStructureBlock(b.getLocation())!=null) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "One of the chip blocks (" + rc.getPrefs().getInfoColor() + b.getType().name().toLowerCase() + rc.getPrefs().getErrorColor() + ") already belongs to another chip.");
+            Circuit c = this.getCircuitByStructureBlock(b.getLocation());
+            if (c!=null) {
+                sender.sendMessage(rc.getPrefs().getErrorColor() + "One of the chip blocks (" + 
+                        rc.getPrefs().getInfoColor() + b.getType().name().toLowerCase() + 
+                        rc.getPrefs().getErrorColor() + ") already belongs to another chip: " + 
+                        rc.getPrefs().getInfoColor() + c.getChipString());
                 return -2;
             }
         }
@@ -306,16 +309,16 @@ public class CircuitManager extends BlockListener {
         if (OutputPin.isOutputMaterial(block.getType())) {
             final List<OutputPin> outputs = outputLookupMap.get(block.getLocation());
             if (outputs!=null && !outputs.isEmpty()) {
-                rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, 
+/*                rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, 
                         new Runnable() {
                             @Override
-                            public void run() {
+                            public void run() {*/
                                 for (OutputPin pin : outputs) {
                                     pin.refreshOutputs();
                                 }
-                            }
+                           /* }
                         }
-                    );
+                    );*/
                 return true;
             }
 

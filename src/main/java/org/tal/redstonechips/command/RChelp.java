@@ -1,7 +1,7 @@
 
 package org.tal.redstonechips.command;
 
-import org.tal.redstonechips.page.ArrayLineSource;
+import net.eisental.common.page.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-import org.tal.redstonechips.page.Pager;
+import net.eisental.common.page.Pager;
 
 /**
  *

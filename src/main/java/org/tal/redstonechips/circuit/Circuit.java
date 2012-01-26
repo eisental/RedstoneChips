@@ -16,8 +16,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.RedstoneChips;
-import org.tal.redstonechips.util.BitSet7;
-import org.tal.redstonechips.util.BitSetUtils;
+import org.tal.redstonechips.bitset.BitSet7;
+import org.tal.redstonechips.bitset.BitSetUtils;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.wireless.Wireless;
 

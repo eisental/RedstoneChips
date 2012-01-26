@@ -23,7 +23,7 @@
  * questions.
  */
 
-package org.tal.redstonechips.util;
+package org.tal.redstonechips.bitset;
 
 import java.io.*;
 import java.nio.ByteBuffer;
