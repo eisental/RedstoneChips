@@ -1,11 +1,7 @@
 
 package org.tal.redstonechips.memory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -32,6 +28,8 @@ public abstract class Memory {
 
     private String id;
 
+    private int allocatorsCount;
+    
     public abstract BitSet7 read(BitSet7 address);
 
     public abstract void write(BitSet7 address, BitSet7 data);
@@ -163,8 +161,13 @@ public abstract class Memory {
                 file.createNewFile();
             }
             
+            memory.alloc();
             return memory;
-        } else return Memory.memories.get(memId);
+        } else {
+            Memory m = Memory.memories.get(memId);
+            m.alloc();
+            return m;
+        }
         
     }
     
@@ -172,4 +175,17 @@ public abstract class Memory {
         return Memory.getMemory(getFreeMemId(), type);
     }
     
+    public void alloc() {
+        allocatorsCount++;
+    }
+    
+    public void release() {
+        if (allocatorsCount>0) allocatorsCount--;
+        else allocatorsCount=0;
+        
+        if (allocatorsCount==0) {
+            getData().clear();
+            Memory.memories.remove(id);
+        }
+    }
 }

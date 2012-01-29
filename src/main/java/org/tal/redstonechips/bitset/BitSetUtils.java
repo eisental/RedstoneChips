@@ -50,12 +50,49 @@ public class BitSetUtils {
         return signed;
     }
 
-    public static BigInteger bitSetToBigInt(BitSet7 b, int startBit, int length) {
-        return new BigInteger(b.get(startBit, startBit+length).toByteArray());
+    public static BigInteger bitSetToBigInt(BitSet7 b, int offset, int length) {
+        BigInteger val = BigInteger.ZERO;
+        for (int i=0; i<length; i++) {
+            if (b.get(i+offset)) val = val.add(BigTwo.pow(i));
+        }
+
+        return val;
     }
 
+    public static BigInteger bitSetToBigInt(BitSet7 b) {
+        return bitSetToBigInt(b, 0, b.length());
+    }
+    
+    public final static BigInteger BigTwo = new BigInteger("2");
+    
     public static BitSet7 bigIntToBitSet(BigInteger i) {
-        return BitSet7.valueOf(i.toByteArray());
+        BitSet7 bits = new BitSet7();
+        int index = 0;
+        while (!i.equals(BigInteger.ZERO)) {
+            if (!i.mod(BigTwo).equals(BigInteger.ZERO)) {
+                bits.set(index);
+            }
+            ++index;
+
+            i = i.shiftRight(1).clearBit(i.bitLength()-1);
+        }
+        
+        return bits;
+}
+        
+    public static BitSet7 intToBitSet(int value) {
+        BitSet7 bits = new BitSet7();
+        int index = 0;
+        while (value != 0) {
+            if (value % 2 != 0) {
+                bits.set(index);
+            }
+            ++index;
+            value = value >>> 1;
+        }
+
+        return bits;
+        
     }
     
     public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {

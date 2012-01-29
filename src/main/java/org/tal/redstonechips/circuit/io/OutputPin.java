@@ -121,7 +121,6 @@ public class OutputPin extends IOBlock {
     }
 
     private boolean checkAttached(Block outputDevice) {
-        if (outputDevice.getData()==0) outputDevice.setData((byte)0x5, false);
         Attachable a = (Attachable)outputDevice.getState().getData();
         BlockFace f = a.getAttachedFace();
         return f!=null && outputDevice.getRelative(f).equals(loc.getBlock());

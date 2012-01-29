@@ -32,13 +32,22 @@ public class Ram extends Memory {
     
     @Override
     public void write(BitSet7 address, BitSet7 data) {
+        if (address==null || data==null) throw new IllegalArgumentException("Can't write memory. Data or address is null.");
         words.put(address, data);
-        
+
         for (RamListener l : listeners) l.dataChanged(this, address, data);        
     }
 
-    public void write(int address, BitSet7 data) {
-        write(BitSetUtils.intToBitSet(address, 32), data);
+    public void write(long address, BitSet7 data) {
+        write(BitSet7.valueOf(new long[] {address}), data);
+    }
+    
+    public void write(long address, long data) {
+        write(address, BitSet7.valueOf(new long[] {data}));
+    }
+    
+    public void write(BigInteger address, BigInteger data) {
+        write(BitSetUtils.bigIntToBitSet(address), BitSetUtils.bigIntToBitSet(data));
     }
     
     @Override

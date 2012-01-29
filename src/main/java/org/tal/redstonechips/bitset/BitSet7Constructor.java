@@ -1,6 +1,7 @@
 
 package org.tal.redstonechips.bitset;
 
+import java.math.BigInteger;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
@@ -23,12 +24,20 @@ public class BitSet7Constructor extends Constructor {
             if (val.isEmpty()) return new BitSet7();
 
             try {
-                long l = Long.decode(val);
-                return BitSet7.valueOf(new long[] {l});
+                BigInteger i = new BigInteger(val);
+                return BitSetUtils.bigIntToBitSet(i);
             } catch (NumberFormatException ne) {
                 if (val.length()==1) return BitSetUtils.intToBitSet((int)val.charAt(0), 32);
-                else if (val.startsWith("b")) {
-                    String bits = val.substring(1);
+                else if (val.startsWith("0x")) {
+                    try {
+                        BigInteger i = new BigInteger(val.substring(2), 16);
+                        return BitSetUtils.bigIntToBitSet(i);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                } else if (val.startsWith("b") || val.startsWith("0b")) {
+                    int s = (val.startsWith("b")?1:2);
+                    String bits = val.substring(s);
                     return BitSetUtils.stringToBitSet(bits);
 
                 } else if (val.startsWith("l")) {

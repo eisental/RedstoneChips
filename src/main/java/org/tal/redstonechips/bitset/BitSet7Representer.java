@@ -19,17 +19,7 @@ public class BitSet7Representer extends Representer {
         @Override
         public Node representData(Object data) {
             BitSet7 bits = (BitSet7)data;
-            long[] longs = bits.toLongArray();
-
-            String value;
-            if (longs.length==0) value = "0";
-            else if (longs.length==1) value = Long.toString(longs[0]);
-            else {
-                value = "l";
-                for (long l : longs) value += l + ",";
-                if (!value.isEmpty() && !value.trim().isEmpty()) value = value.substring(0, value.length()-1);
-            }
-
+            String value = BitSetUtils.bitSetToBigInt(bits).toString();
             return representScalar(new Tag("!b"), value);
         }
 
