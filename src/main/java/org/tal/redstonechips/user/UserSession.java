@@ -60,6 +60,8 @@ public class UserSession {
         tools.put(t.getItem(), t);
     }
 
+    public Map<Material, Tool> getTools() { return tools; }
+    
     public RedstoneChips getPlugin() {
         return rc;
     }

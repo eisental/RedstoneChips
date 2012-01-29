@@ -6,9 +6,11 @@ package org.tal.redstonechips.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,8 +30,8 @@ public class RCsel extends RCCommand {
     private static final ChatColor color = ChatColor.AQUA;
 
     private enum SelCommand {
-        WORLD(null), CUBOID(null), ID(null), ACTIVATE("Activated"), RESET("Reset"), BREAK("Deactivated"), LIST(null), 
-        DESTROY("Destroyed"), FIXIOBLOCKS("Fixed "), CLEAR(null), ENABLE("Enabled"), DISABLE("Disabled");
+        WORLD(null), CUBOID(null), ID(null), TARGET(null), ACTIVATE("Activated"), RESET("Reset"), BREAK("Deactivated"), LIST(null), 
+        DESTROY("Destroyed"), FIXIOBLOCKS("Fixed"), CLEAR(null), ENABLE("Enabled"), DISABLE("Disabled");
         
         String verb;
         
@@ -52,7 +54,7 @@ public class RCsel extends RCCommand {
 
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
         
-        SelCommand selCommand = null;
+        SelCommand selCommand;
         
         if (args.length==0) {
             UserSession session = rc.getUserSession(p, true);
@@ -102,6 +104,10 @@ public class RCsel extends RCCommand {
             
         } else if (selCommand == SelCommand.ID) {
             selectById(p, args);
+        } else if (selCommand == SelCommand.TARGET) {
+            selectTarget(p);
+        } else if (selCommand == SelCommand.WORLD) {
+            selectWorld(p, args);
         } else if (selCommand == SelCommand.ACTIVATE) {
             UserSession session = rc.getUserSession(p, true);
             massActivate(p, args, session);            
@@ -182,7 +188,47 @@ public class RCsel extends RCCommand {
         session.getSelection().addAll(selection);
         p.sendMessage(color + "Added " + selection.size() + " chip(s) to selection. Selection contains " + session.getSelection().size() + " chip(s).");
     }
+     
+    private void selectWorld(Player p, String[] args) {
+        UserSession session = rc.getUserSession(p, true);
+        session.getSelection().clear();
         
+        Map<Integer, Circuit> clist;
+        if (args.length<2) {
+            clist = rc.getCircuitManager().getCircuits(p.getWorld());
+            if (clist!=null) session.getSelection().addAll(clist.values());
+        } else {
+            for (int i=1; i<args.length; i++) {
+                World world = rc.getServer().getWorld(args[i]);
+                if (world==null) {
+                    p.sendMessage(ChatColor.DARK_PURPLE + "Unknown world name: " + args[i]);
+                } else {
+                    clist = rc.getCircuitManager().getCircuits(world);
+                    if (clist!=null) session.getSelection().addAll(clist.values());
+                }
+            }
+        }
+        
+        p.sendMessage(color + "Selected " + session.getSelection().size() + " chip(s).");
+    }
+    
+    private void selectTarget(Player p) {
+        Circuit c = CommandUtils.findTargetCircuit(rc, p, 20, true);
+        
+        if (c!=null) {
+            UserSession session = rc.getUserSession(p, true);
+            if (!session.getSelection().contains(c)) {
+                session.getSelection().add(c);
+                p.sendMessage(color + "Selected " + ChatColor.YELLOW + c.getChipString() + color + ".");
+            } else {
+                session.getSelection().remove(c);
+                p.sendMessage(color + "Removed " + ChatColor.YELLOW + c.getChipString() + color + " from selection.");
+            }
+            
+            
+        }
+    }
+    
     private void printSelMessage(Player p, UserSession s) {
         p.sendMessage(color + "Selection contains " + s.getSelection().size() + " active chip(s).");
     }
