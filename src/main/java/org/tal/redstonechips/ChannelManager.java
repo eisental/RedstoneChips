@@ -24,11 +24,11 @@ public class ChannelManager {
     }
     
     /**
-     * Adds the receiving circuit to listen on a channel and returns the BroadcastChannel object that the receiver
+     * Adds the receiver as listener on a channel and returns the BroadcastChannel object that the receiver
      * was added to. If a BroadcastChannel by that name was not found a new one is created.
      * 
-     * @param r The receiving circuit.
-     * @param channelName Name of the receiver's channel.
+     * @param r The receiver.
+     * @param channelName Name of the receiver channel.
      * @return The channel that the receiver was added to.
      */
     public BroadcastChannel registerReceiver(final Receiver r, String channelName) {
@@ -50,11 +50,11 @@ public class ChannelManager {
     }
     
     /**
-     * Adds the transmitter circuit to a channel and returns the BroadcastChannel object that the transmitter
+     * Registers the transmitter to a channel and returns the BroadcastChannel object that the transmitter
      * was added to. If a BroadcastChannel by that name was not found a new one is created.
      *
-     * @param r The receiving circuit.
-     * @param channelName Name of the receiver's channel.
+     * @param r The receiver.
+     * @param channelName Name of the receiver channel.
      * @return The channel that the receiver was added to.
      */
     public BroadcastChannel registerTransmitter(Transmitter t, String channelName) {
@@ -67,7 +67,6 @@ public class ChannelManager {
     /**
      * Removes this transmitter from the list and removes its channel if it's deserted.
      * 
-     * @param t a transmitting circuit.
      * @return true if the transmitter was actually removed.
      */
     public boolean removeTransmitter(Transmitter t) {
@@ -84,7 +83,6 @@ public class ChannelManager {
     /**
      * Removes this receiver from the list and removes its channel if it's deserted.
      * 
-     * @param r a receiving circuit.
      * @return true if the receiver was actually removed.
      */    
     public boolean removeReceiver(Receiver r) {
@@ -99,6 +97,7 @@ public class ChannelManager {
     }
 
     /**
+     * Finds a BroadcastChannel with the specified name.
      * If the named channel doesn't exist and create is true, a new channel is created.
      * 
      * @param Channel name
@@ -117,10 +116,20 @@ public class ChannelManager {
         return channel;
     }
 
+    /**
+     * 
+     * @return All broadcast channels running on the server.
+     */
     public Map<String, BroadcastChannel> getBroadcastChannels() {
         return broadcastChannels;
     }
 
+    /**
+     * Finds all Wireless objects (Receivers or Transmitters) that are associated with a circuit.
+     * 
+     * @param circuit The circuit to match
+     * @return A list of Wireless objects that are associated with circuit.
+     */
     public List<Wireless> getCircuitWireless(Circuit circuit) {
         List<Wireless> list = new ArrayList<Wireless>();
         

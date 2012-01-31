@@ -60,6 +60,19 @@ class RCBlockListener extends RCListener {
     }
 
     /**
+     * Breaks a chip if it exploded.
+     * 
+     * @param event 
+     */
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onEntityExplode(EntityExplodeEvent event) {
+        if (event.isCancelled()) return;
+
+        for (Block b : event.blockList())
+            rc.getCircuitManager().checkCircuitDestroyed(b, null);
+    }
+    
+    /**
      * Forces output redstone torches to stay at the right state.
      * 
      * @param event 
@@ -86,18 +99,5 @@ class RCBlockListener extends RCListener {
                 } 
             }
         }  
-    }  
-    
-    /**
-     * Breaks a chip if it exploded.
-     * 
-     * @param event 
-     */
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onEntityExplode(EntityExplodeEvent event) {
-        if (event.isCancelled()) return;
-
-        for (Block b : event.blockList())
-            rc.getCircuitManager().checkCircuitDestroyed(b, null);
-    }    
+    }         
 }

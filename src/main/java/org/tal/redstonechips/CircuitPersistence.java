@@ -26,6 +26,8 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class CircuitPersistence {
     private RedstoneChips rc;
+    
+    /** YAML Map keys for .circuits files. */
     public enum CircuitKey { 
         CLASS("c", "class"), 
         WORLD("w", "world"), 
@@ -49,6 +51,7 @@ public class CircuitPersistence {
         }        
     }
     
+    /** YAML Map keys for .channels files. */
     public enum ChannelKey {
         NAME, STATE, OWNERS, USERS;
         
@@ -395,18 +398,6 @@ public class CircuitPersistence {
         return list;
     }
 
-    private Object makeChunksList(ChunkLocation[] locs) {
-        List<List<Integer>> list = new ArrayList<List<Integer>>();
-        for (ChunkLocation l : locs) {
-            List<Integer> loc = new ArrayList<Integer>();
-            loc.add(l.getX());
-            loc.add(l.getZ());
-            list.add(loc);
-        }
-
-        return list;
-    }
-
     private Object makeIOBlockList(IOBlock[] blocks) {
         List<List<Integer>> list = new ArrayList<List<Integer>>();
         for (IOBlock b : blocks)
@@ -431,16 +422,6 @@ public class CircuitPersistence {
 
     private Location getLocation(World w, List<Integer> coords) {
         return new Location(w, coords.get(0), coords.get(1), coords.get(2));
-    }
-
-    private ChunkLocation[] getChunkLocations(World world, List<List<Integer>> locs) {
-        List<ChunkLocation> ret = new ArrayList<ChunkLocation>();
-
-        for (List<Integer> loc : locs) {
-            ret.add(new ChunkLocation(loc.get(0), loc.get(1), world));
-        }
-
-        return ret.toArray(new ChunkLocation[ret.size()]);
     }
 
     private Location[] getLocationArray(World w, List<List<Integer>> list) {

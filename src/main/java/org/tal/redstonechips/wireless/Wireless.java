@@ -7,32 +7,60 @@ import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.circuit.Circuit;
 
 /**
- *
+ * A Wireless device for sending or receiving over a BroadcastChannel.
+ * 
  * @author Tal Eisenberg
  */
 public abstract class Wireless {
 
-    protected int startBit;    
+    /** The 1st channel bit this Wireless will send or receive on. */
+    protected int startBit;
+    
+    /** BroadcastChannel used by this Wireless object. */
     protected BroadcastChannel channel = null;
+    
+    /** The Wireless channel length in bits. */
     protected int channelLength;
     
     private RedstoneChips rc;
     private Circuit circuit;
     
+    /**
+     * @return The BoradcastChannel used by this Wireless object.
+     */
     public BroadcastChannel getChannel() { return channel; }
 
+    /**
+     * @return The 1st channel bit this Wireless will send or receive on.
+     */
     public int getStartBit() { return startBit; }
 
+    /**
+     * Sets the Wireless object 1st channel bit.
+     * 
+     * @param startBit 
+     */
     public void setStartBit(int startBit) {
         this.startBit = startBit;
     } 
 
+    /**
+     * Sets the Wireless channel length in bits. This is the maximum number of bits the Wireless will use
+     * and doesn't necessarily needs to be the same as the BroadcastChannel length.
+     * @param length 
+     */
     public void setChannelLength(int length) {
         channelLength = length;
     }
     
+    /**
+     * @return The Wireless channel length.
+     */
     public int getChannelLength() { return channelLength; }
 
+    /**
+     * @return The circuit that uses this Wireless object.
+     */
     public Circuit getCircuit() { return circuit; }
     
     /**
@@ -100,6 +128,9 @@ public abstract class Wireless {
         return false;
     }
  
+    /**
+     * Deregisters and shuts down the Wireless.
+     */
     public void shutdown() {
         if (getChannel()!=null) {
             if (this instanceof Receiver) rc.getChannelManager().removeReceiver((Receiver)this);

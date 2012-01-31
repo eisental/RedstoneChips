@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -30,20 +29,21 @@ import org.tal.redstonechips.user.UserSession;
  */
 public class RedstoneChips extends JavaPlugin {
     
-    private static final Logger log = Logger.getLogger("Minecraft");
     private static List<CircuitIndex> preloadedLibs = new ArrayList<CircuitIndex>();
     
-    private Listener[] eventListeners;
-
     private PrefsManager prefsManager;
     private CircuitManager circuitManager;
     private CircuitPersistence circuitPersistence;
     private CircuitLoader circuitLoader;
     private ChannelManager channelManager;
     
+    /** List of registered /rctype receivers. */
     public Map<Location, RCTypeReceiver> rcTypeReceivers = new HashMap<Location, RCTypeReceiver>();
-    private Map<String, UserSession> sessions = new HashMap<String, UserSession>();
     
+    private Map<String, UserSession> sessions = new HashMap<String, UserSession>();
+    private Listener[] eventListeners;
+
+    /** All plugin commands */
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
         new RCfixioblocks(), new RChelp(), new RCinfo(), new RClist(), new RCpin(), new RCprefs(), new RCreset(),
@@ -148,7 +148,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * Tells the plugin to load circuit classes from this circuit library when enabled.
+     * Tells the plugin to load circuit classes from this circuit library when it's enabled.
      *
      * @param lib Any object implementing the CircuitIndex interface.
      */
@@ -163,50 +163,50 @@ public class RedstoneChips extends JavaPlugin {
      * @param message 
      */
     public void log(Level level, String message) {
-        String logMsg = "[" + this.getDescription().getName() + "] " + message;
-        log.log(level, logMsg);
+        getLogger().log(level, message);
     }
 
     /**
-     * Returns the plugin's preference manager. The object responsible for loading, saving and editing the plugin preferences.
-     * @return A reference to the plugin's PrefsManager object.
+     * Returns the preference manager. The object responsible for loading, saving and editing the plugin preferences.
      */
     public PrefsManager getPrefs() {
         return prefsManager;
     }
 
     /**
-     * Returns the plugin circuit loader. The object responsible for creating new instances of Circuit classes.
-     * @return A reference to the plugin CircuitLoader object.
+     * Returns the circuit loader. The object responsible for creating new instances of Circuit classes.
      */
     public CircuitLoader getCircuitLoader() {
         return circuitLoader;
     }
 
     /**
-     * Returns the plugin circuit manager. The object responsible for creating and managing active circuits.
-     * @return A reference to the plugin CircuitManager object.
+     * Returns the circuit manager. The object responsible for creating and managing active circuits.
      */
     public CircuitManager getCircuitManager() {
         return circuitManager;
     }
 
     /**
-     * Returns the plugin circuit manager. The object responsible for maintaining wireless broadcast channels.
-     * @return A reference to the plugin ChannelManager object.
+     * Returns the channel manager. The object responsible for handling wireless broadcast channels.
      */
     public ChannelManager getChannelManager() {
         return channelManager;
     }
     
     /**
-     * Returns the plugin circuit loader. The object responsible for saving and loading the active circuit list from storage.
-     * @return A reference to the plugin CircuitPresistence object.
+     * Returns the circuit persistence handle. The object responsible for saving and loading the active circuit list from storage.
      */
     public CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
     }
 
+    /**
+     * Returns the UserSession object tied to this username.
+     * @param username The player name.
+     * @param create Whether to create a new UserSession if none exists yet or not.
+     * @return The player UserSession or null if none was found and create is false.
+     */
     public UserSession getUserSession(String username, boolean create) {
         UserSession s = sessions.get(username);
         if (s==null && create) {
@@ -217,21 +217,35 @@ public class RedstoneChips extends JavaPlugin {
         return s;
     }
     
+    /**
+     * Returns the UserSession object tied to this player.
+     * @param player The requested UserSession player.
+     * @param create Whether to create a new UserSession if none exists yet or not.
+     * @return The player UserSession or null if none was found and create if false.
+     */
     public UserSession getUserSession(Player player, boolean create) {
         return getUserSession(player.getName(), create);
     }
 
+    /**
+     * Removes the UserSession for the specified player.
+     * @return The UserSession object that was removed or null if it was not found.
+     */
     public UserSession removeUserSession(Player player) {
         return removeUserSession(player.getName());
     }
     
+    /**
+     * Removes the UserSession for the specified username.
+     * @return The UserSession object that was removed or null if it was not found.
+     */
     public UserSession removeUserSession(String name) {
         return sessions.remove(name);
     }
     
     /**
-     * Registers a typingBlock to be used by the rcTypeReceiver. When a player points towards the typingBlock and uses
-     * the /rctype command the rcTypeReceiver circuit will receive the typed text.
+     * Registers a typingBlock to be used by an RCTypeReceiver. When a player points towards the typingBlock and uses
+     * the /rctype command the RCTypeReceiver will receive the typed text.
      * 
      * @param typingBlock The block to point towards while typing.
      * @param circuit The circuit that will receive the typed text.
@@ -241,7 +255,7 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * The rcTypeReceiver will no longer receive /rctype commands.
+     * The RCTypeReceiver will no longer receive /rctype commands.
      * @param circuit The rcTypeReceiver to remove.
      */
     public void removeRCTypeReceiver(RCTypeReceiver circuit) {
@@ -257,10 +271,8 @@ public class RedstoneChips extends JavaPlugin {
     }
         
     private void loadLibraries() {
-        String prefix = "[" + getDescription().getName() + "] Loading ";
-        
         for (CircuitIndex lib : preloadedLibs) {
-            String libMsg = prefix + lib.getName() + " " + lib.getVersion() + " > ";
+            String libMsg = "Loading " + lib.getName() + " " + lib.getVersion() + " > ";
             Class<? extends Circuit>[] classes = lib.getCircuitClasses();
             
             if (classes != null && classes.length>0) {
@@ -268,12 +280,12 @@ public class RedstoneChips extends JavaPlugin {
                     libMsg += c.getSimpleName() + ", ";
 
                 libMsg = libMsg.substring(0, libMsg.length()-2) + ".";
-                log.info(libMsg);
+                getLogger().info(libMsg);
 
                 circuitLoader.addCircuitIndex(lib);
             } else {
                 libMsg += "No circuit classes were loaded.";
-                log.info(libMsg);
+                getLogger().info(libMsg);
             }
         }        
     }

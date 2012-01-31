@@ -50,6 +50,14 @@ public class BitSetUtils {
         return signed;
     }
 
+    /**
+     * Convert a BitSet to an unsigned BigInteger.
+     * 
+     * @param b BitSet to convert.
+     * @param offset starting bit of the integer.
+     * @param length number of bits to convert.
+     * @return 
+     */
     public static BigInteger bitSetToBigInt(BitSet7 b, int offset, int length) {
         BigInteger val = BigInteger.ZERO;
         for (int i=0; i<length; i++) {
@@ -59,12 +67,25 @@ public class BitSetUtils {
         return val;
     }
 
+    /**
+     * Convert a BitSet to an unsigned BigInteger.
+     * @param b BitSet to convert.
+     * @return 
+     */
     public static BigInteger bitSetToBigInt(BitSet7 b) {
         return bitSetToBigInt(b, 0, b.length());
     }
     
+    /**
+     * BigInteger object representing the number 2.
+     */
     public final static BigInteger BigTwo = new BigInteger("2");
     
+    /**
+     * Convert a BigInteger into a BitSet.
+     * @param i BigInteger to convert.
+     * @return 
+     */
     public static BitSet7 bigIntToBitSet(BigInteger i) {
         BitSet7 bits = new BitSet7();
         int index = 0;
@@ -79,7 +100,12 @@ public class BitSetUtils {
         
         return bits;
 }
-        
+   
+    /**
+     * Convert an integer to BitSet.
+     * @param value Value to convert.
+     * @return 
+     */
     public static BitSet7 intToBitSet(int value) {
         BitSet7 bits = new BitSet7();
         int index = 0;
@@ -95,6 +121,15 @@ public class BitSetUtils {
         
     }
     
+    /**
+     * Convert a BitSet to a binary representation string.
+     * Each bit is converted into "0" or "1" and added to the string.
+     * The result is a binary number with its most significant bit on the left.
+     * 
+     * @param b BitSet to convert
+     * @param startBit Start converting from this bit. Treat it as the least significant bit.
+     * @param length Number of bits to read from the BitSet after the startBit.
+     */    
     public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
         return bitSetToBinaryString(b, startBit, length, 4);
     }
@@ -123,6 +158,12 @@ public class BitSetUtils {
         return ret.toString();
     }
 
+    /**
+     * Converts a BitSet to String
+     * @param bits
+     * @param length
+     * @return 
+     */
     public static String bitSetToString(BitSet7 bits, int length) {
         String sbits = "";
         for (int i=length-1; i>=0; i--)
@@ -206,7 +247,6 @@ public class BitSetUtils {
         return bits;
     }
 
-
     /**
      * Stores a BitSet object as a string in a map. Used for state persistence.
      * Basically converts the BitSet into a string of "1" and "0" according to its bit values.
@@ -234,6 +274,13 @@ public class BitSetUtils {
         else return stringToBitSet(sbits);
     }
 
+    /**
+     * Converts a boolean array into a BitSet
+     * @param bits Boolean array to convert.
+     * @param offset Array index to start reading from.
+     * @param length Number of bits to convert.
+     * @return 
+     */
     public static BitSet7 boolToBitSet(boolean[] bits, int offset, int length) {
         BitSet7 bitset = new BitSet7(length-offset);
         for (int i=offset; i<length; i++) bitset.set(i-offset,bits[i]);

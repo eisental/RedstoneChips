@@ -1,8 +1,5 @@
 package org.tal.redstonechips.circuit;
 
-import org.tal.redstonechips.circuit.io.InterfaceBlock;
-import org.tal.redstonechips.circuit.io.OutputPin;
-import org.tal.redstonechips.circuit.io.InputPin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +15,9 @@ import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.RedstoneChips;
 import org.tal.redstonechips.bitset.BitSet7;
 import org.tal.redstonechips.bitset.BitSetUtils;
+import org.tal.redstonechips.circuit.io.InputPin;
+import org.tal.redstonechips.circuit.io.InterfaceBlock;
+import org.tal.redstonechips.circuit.io.OutputPin;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -170,6 +170,10 @@ public abstract class Circuit {
 
     }
     
+    /**
+     * Shuts down the circuit and any Wireless classes associated with it and informs all CircuitListeners.
+     * Additional shut down code can be inserted by overriding Circuit.circuitShutdown().
+     */
     public void shutdownCircuit() {
         circuitShutdown();
 
@@ -207,7 +211,7 @@ public abstract class Circuit {
     public Map<String,String> getInternalState() { return new HashMap<String,String>(); }
 
     /**
-     * Called whenever the plugin is requested to save it's data. 
+     * Called whenever the plugin is requested to save its data. 
      */
     public void save() { }
 
@@ -280,8 +284,6 @@ public abstract class Circuit {
     protected void sendBitSet(BitSet7 bits) {
         sendBitSet(0, outputs.length, bits);
     }
-
-
 
     /**
      * Useful method for posting error messages. Sends an error message to the requested command sender using the error chat color as
@@ -613,11 +615,11 @@ public abstract class Circuit {
     }
 
     /**
-     * Initalizes the output buffer. Can only be used before calling initCircuit().
+     * Initializes the output buffer. Can only be used before calling initCircuit().
      * @param bits 
      */
     public void setOutputBits(BitSet7 bits) {
         if (outputBits==null) outputBits = bits;
-        else throw new RuntimeException("Trying to set outputBits, but it's already set.");
+        else throw new RuntimeException("Trying to set outputBits while it's already set.");
     }
 }

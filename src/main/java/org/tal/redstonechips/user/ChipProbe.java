@@ -7,7 +7,8 @@ import org.tal.redstonechips.command.RCinfo;
 import org.tal.redstonechips.command.RCpin;
 
 /**
- *
+ * A Tool that sends chip info messages to its user.
+ * 
  * @author Tal Eisenberg
  */
 public class ChipProbe extends Tool {

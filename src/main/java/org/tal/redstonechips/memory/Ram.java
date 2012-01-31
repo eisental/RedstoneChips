@@ -17,20 +17,35 @@ public class Ram extends Memory {
     private Map<BitSet7, BitSet7> words;
     private List<RamListener> listeners = new ArrayList<RamListener>();
         
-    @Override
+    /**
+     * Read data from memory.
+     * 
+     * @param address Address to read from.
+     * @return The data at the specified address.
+     */
     public BitSet7 read(BitSet7 address) {
         BitSet7 data = words.get(address);
         if (data==null) data = new BitSet7();
         return data;
     }
 
+    /**
+     * Read data from memory.
+     * 
+     * @param address Address to read from.
+     * @return The data at the specified address.
+     */
     public BitSet7 read(int address) {
         BitSet7 data = words.get(BitSetUtils.intToBitSet(address, 32));
         if (data==null) data = new BitSet7();
         return data;
     }
     
-    @Override
+    /**
+     * Write a BitSet to the specified address.
+     * @param address Memory address.
+     * @param data Bits to write.
+     */
     public void write(BitSet7 address, BitSet7 data) {
         if (address==null || data==null) throw new IllegalArgumentException("Can't write memory. Data or address is null.");
         words.put(address, data);
@@ -38,14 +53,30 @@ public class Ram extends Memory {
         for (RamListener l : listeners) l.dataChanged(this, address, data);        
     }
 
+    /**
+     * Writes a BitSet to the specified address.
+     * @param address Memory address.
+     * @param data Bits to write.
+     */
     public void write(long address, BitSet7 data) {
         write(BitSet7.valueOf(new long[] {address}), data);
     }
-    
+
+    /**
+     * Writes a long integer to the specified address.
+     * @param address Memory address.
+     * @param data long value to write.
+     */    
     public void write(long address, long data) {
         write(address, BitSet7.valueOf(new long[] {data}));
     }
     
+    /**
+     * Writes a BigInteger to the specified address.
+     * 
+     * @param address Memory address.
+     * @param data BigInteger value to write.
+     */
     public void write(BigInteger address, BigInteger data) {
         write(BitSetUtils.bigIntToBitSet(address), BitSetUtils.bigIntToBitSet(data));
     }
@@ -55,16 +86,20 @@ public class Ram extends Memory {
         super.init(id);
         words = new HashMap<BitSet7, BitSet7>();
     }
-    
-    public void init() {
-        init(Memory.getFreeMemId());
-    }
 
+    /**
+     * 
+     * @return a Map<BitSet, BitSet> containing all memory data.
+     */
     @Override
     protected Map getData() {
         return words;
     }
 
+    /**
+     * Replace the memory data with a data Map. Tries to convert non BitSet Map values.
+     * @param data New memory data.
+     */
     @Override
     protected void setData(Map data) {
         words.clear();
@@ -78,10 +113,17 @@ public class Ram extends Memory {
         }
     }
     
+    /**
+     * Registers a RamListener with this Ram.
+     * @param l Ram listener.
+     */
     public void addListener(RamListener l) { 
         if (!listeners.contains(l)) listeners.add(l);
     }
     
+    /**
+     * @return All RamListeners listening to this Ram.
+     */
     public List<RamListener> getListeners() { return listeners; }
     
     private BitSet7 convert(Object obj) {

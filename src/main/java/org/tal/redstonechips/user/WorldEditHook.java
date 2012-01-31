@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips.user;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,14 +9,25 @@ import org.bukkit.plugin.Plugin;
 import org.tal.redstonechips.RedstoneChips;
 
 /**
- *
+ * Responsible for hooking into WorldEdit //wand selection.
+ * 
  * @author Tal Eisenberg
  */
 public class WorldEditHook {
+    /**
+     * 
+     * @param rc A plugin reference.
+     * @return true if WorldEdit plugin is installed on the server.
+     */
     public static boolean isWorldEditInstalled(RedstoneChips rc) {
         return rc.getServer().getPluginManager().getPlugin("WorldEdit")!=null;
     }
 
+    /**
+     * @param player a Player
+     * @param rc Plugin reference.
+     * @return The wand selection of the specified Player or null if not defined.
+     */
     public static Location[] getWorldEditSelection(Player player, RedstoneChips rc) {
         Plugin worldEdit = rc.getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {

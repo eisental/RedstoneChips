@@ -1,16 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips.circuit.filter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.tal.redstonechips.util.ChunkLocation;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
+import org.tal.redstonechips.util.ChunkLocation;
 
 /**
  *

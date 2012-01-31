@@ -1,8 +1,5 @@
 package org.tal.redstonechips.circuit.io;
 
-import org.tal.redstonechips.circuit.io.InterfaceBlock;
-import org.tal.redstonechips.circuit.io.OutputPin;
-import org.tal.redstonechips.circuit.io.InputPin;
 import org.bukkit.Location;
 import org.tal.redstonechips.circuit.Circuit;
 
@@ -13,6 +10,7 @@ import org.tal.redstonechips.circuit.Circuit;
  */
 public abstract class IOBlock {
 
+    /** IOBlock type - output pin, input pin or interface block. */
     public static enum Type {
         OUTPUT(OutputPin.class),
         INPUT(InputPin.class),
@@ -86,6 +84,10 @@ public abstract class IOBlock {
         return false;
     }
 
+    /**
+     * @param blocks An array of IOBlocks
+     * @return A Location array containing the locations of each IOBlock in the same order.
+     */
     public static Location[] locationsOf(IOBlock[] blocks) {
         Location[] locs = new Location[blocks.length];
 

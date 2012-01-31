@@ -9,7 +9,14 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
 /**
+ * Parses !b tag yaml values into BitSet. The following strings will be convered:
+ * 
+ * a decimal big integer - !b '2456789272879238976' 
+ * a hexadecimal big integer with '0x' prefix - !b '0x1FFFFFFFFFFFFFFF' 
+ * a binary value with '0b' or 'b' prefix - !b '0b11101010101110101' 
+ * a list of longs with 'l' prefix - !b 'l12334,13425,2353452679,342'
  *
+ * All values are unlimited in size.
  * @author Tal Eisenberg
  */
 public class BitSet7Constructor extends Constructor {

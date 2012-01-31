@@ -143,7 +143,7 @@ public class OutputPin extends IOBlock {
     private void updateRedstoneTorch(Block outputBlock, boolean state) {
         byte oldData = outputBlock.getData();
         int type = (state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF).getId();
-        outputBlock.setTypeIdAndData(type, oldData, false);
+        outputBlock.setTypeIdAndData(type, oldData, true);
     }
     
     private void updatePoweredRail(Block outputBlock, boolean state) {

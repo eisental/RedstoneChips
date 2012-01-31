@@ -32,7 +32,7 @@ public class CircuitLoader {
     }
 
     /**
-     * Adds all class in the circuit library to the circuit pool allowing players to create circuits of this class.
+     * Adds all classes in the circuit library to the circuit pool allowing players to create circuits of this class.
      *
      * @param lib The circuit library to add. 
      */

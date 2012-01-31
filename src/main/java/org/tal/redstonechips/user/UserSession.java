@@ -17,12 +17,23 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- *
+ * Manages player specific data.
  * @author Tal Eisenberg
  */
 public class UserSession {
 
-    public enum Mode { SELECTION , NORMAL, CUBOID_DEFINE}
+    /** User session operation mode */
+    public enum Mode { 
+        /** Chip selection by clicking on a chip block. */
+        SELECTION , 
+        
+        /** User is defining a cuboid. */
+        CUBOID_DEFINE,
+        
+        /** Normal operation mode */
+        NORMAL
+        
+    }
     
     private Player player;
     
@@ -35,6 +46,11 @@ public class UserSession {
     private Location[] cuboid = null;
     private Map<String, Object> playerData;
     
+    /**
+     * 
+     * @param username Player name.
+     * @param rc a Plugin reference.
+     */
     public UserSession(String username, RedstoneChips rc) {
         this.username = username;
         this.rc = rc;
@@ -47,37 +63,72 @@ public class UserSession {
         debugger = new ChatDebugger(this);
     }
 
+    /**
+     * 
+     * @return the username of this session.
+     */
     public String getUsername() { return username; }
     
+    /**
+     * 
+     * @return The player this session points to.
+     */
     public Player getPlayer() {
         if (player==null)
             return rc.getServer().getPlayer(username);
         else return player;
     }
     
+    /**
+     * Register a Tool. Tool.setItem() must be called before calling this method.
+     * @param t 
+     */
     public void addTool(Tool t) {
         t.setSession(this);
         tools.put(t.getItem(), t);
     }
 
+    /**
+     * @return All registered tools for this session.
+     */
     public Map<Material, Tool> getTools() { return tools; }
     
+    /**
+     * @return A plugin reference.
+     */
     public RedstoneChips getPlugin() {
         return rc;
     }
     
+    /**
+     * @return Current session chip selection.
+     */
     public List<Circuit> getSelection() { return selection; }
 
+    /**
+     * Replaces any selected circuits with a new selection list.
+     * 
+     * @param selection a list of Circuits.
+     */
     public void setSelection(List<Circuit> selection) {
         this.selection = selection;
     }
 
+    /**
+     * @return Current player operation mode.
+     */
     public Mode getMode() { return mode; }
     
+    /**
+     * @param m Sets player operation mode.
+     */
     public void setMode(Mode m) {
         this.mode = m;
     }
 
+    /**
+     * Called when the player tied to this session quits the server. Player data is saved to file.
+     */
     public void playerQuit() {
         try {
             save();
@@ -90,6 +141,10 @@ public class UserSession {
         player = null;
     }
 
+    /**
+     * Called when the session player joins the server. Player data is loaded from its player file if it exists.
+     * @param p The new Player object of the session player.
+     */
     public void playerJoined(Player p) {
         player = p;
         try {
@@ -103,6 +158,11 @@ public class UserSession {
         }
     }
     
+    /**
+     * Uses the tool in the player's hand on the specified Block.
+     * @param block used Block.
+     * @return true if a Tool was used.
+     */
     public boolean useToolInHand(Block block) {
         Player p = getPlayer();
         if (p==null) return false;
@@ -113,6 +173,11 @@ public class UserSession {
         return true;
     }
     
+    /**
+     * Adds or removes a Circuit from the chip selection and notifies the player.
+     * 
+     * @param c a Circuit.
+     */
     public void selectChip(Circuit c) {
         if (c==null) return;
         ChatColor infoColor = rc.getPrefs().getInfoColor();
@@ -126,15 +191,26 @@ public class UserSession {
         }
     }    
     
+    /**
+     * Clears the session cuboid and returns to Mode.NORMAL if the player was defining a cuboid.
+     */
     public void clearCuboid() {
         if (mode==Mode.CUBOID_DEFINE) mode = Mode.NORMAL;
         cuboid = null;
     }
 
+    /**
+     * Sets the session cuboid.
+     * 
+     * @param cuboid Location array of two opposite cuboid corners.
+     */
     public void setCuboid(Location[] cuboid) {
         this.cuboid = cuboid;
     }
 
+    /**
+     * @return The players WorldEdit selection cuboid if defined, the session cuboid if defined or null.
+     */
     public Location[] getCuboid() {
         if (cuboid==null && WorldEditHook.isWorldEditInstalled(rc)) {
             cuboid = WorldEditHook.getWorldEditSelection(getPlayer(), rc);
@@ -142,11 +218,20 @@ public class UserSession {
         return cuboid;
     }
     
+    /**
+     * Switch to Mode.CUBOID_DEFINE mode.
+     */
     public void defineCuboid() {
         cuboid = new Location[2];
         mode = Mode.CUBOID_DEFINE;
     }
 
+    /**
+     * Adds a cuboid corner location. When the cuboid has two locations it's set as the session cuboid and
+     * all chips inside it are added to the selection. the selection is cleared of any other chips.
+     * 
+     * @param location a Location.
+     */
     public void addCuboidLocation(Location location) {
         Player p = getPlayer();
         
@@ -166,12 +251,23 @@ public class UserSession {
         }
     }
     
+    /**
+     * Select all chips inside a cuboid region.
+     * @param sel an array with two opposite corner Locations of the cuboid.
+     * @param add When true chips are added to the current selection, otherwise the previous selection is cleared.
+     */
     public void selectChipsInCuboid(Location[] sel, boolean add) {
         List<Circuit> chips = findChipsInCuboid(sel, rc);
         if (add) selection.addAll(chips);
         else selection = chips;
     }
     
+    /**
+     * 
+     * @param cuboid an array with two opposite corner Locations of the cuboid.
+     * @param rc Plugin reference.
+     * @return a List of all Circuits found inside the cuboid.
+     */
     public static List<Circuit> findChipsInCuboid(Location[] cuboid, RedstoneChips rc) {
         int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());
         int highx = Math.max(cuboid[0].getBlockX(), cuboid[1].getBlockX());
@@ -196,17 +292,42 @@ public class UserSession {
         return result;
     }
 
+    /**
+     * @return This session's debugger.
+     */
     public Debugger getDebugger() { return debugger; }
+    
+    /**
+     * Sets the session debugger.
+     * 
+     * @param d a Debugger.
+     */
     public void setDebugger(Debugger d) { debugger = d; }
     
+    /**
+     * Adds custom persistent player data. Player data is saved when the player quits and reloaded when he 
+     * rejoins the server.
+     * 
+     * @param key Map key.
+     * @param data 
+     */
     public void putPlayerData(String key, Object data) {
         playerData.put(key, data);
     }
     
+    /**
+     * @param key Map key.
+     * @return Player data for this key or null.
+     */
     public Object getPlayerData(String key) {
         return playerData.get(key);
     }
 
+    /**
+     * Save all session data to file. This currently includes tools settings and custom player data.
+     * 
+     * @throws IOException 
+     */
     public void save() throws IOException {
         DumperOptions opt = new DumperOptions();
         opt.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -217,6 +338,13 @@ public class UserSession {
         yaml.dump(map, new FileWriter(getPlayerFile()));        
     }
     
+    /**
+     * Loads session data from file.
+     * 
+     * @throws InstantiationException When a tool can't be reconstructed.
+     * @throws IllegalAccessException When a tool can't be reconstructed.
+     * @throws ClassNotFoundException When a tool can't be reconstructed.
+     */
     public void load() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         File f = getPlayerFile();
 
@@ -242,7 +370,7 @@ public class UserSession {
     }
     
     private Map<Material, String> saveTools() {
-        Map<Material, String> map = new HashMap<Material, String>();
+        Map<Material, String> map = new EnumMap<Material, String>(Material.class);
         for (Material m : tools.keySet()) {
             map.put(m, tools.get(m).getClass().getCanonicalName());
         }
@@ -250,14 +378,27 @@ public class UserSession {
         return map;
     }
     
+    /**
+     * @return the File that this session saves data to.
+     */
     public File getPlayerFile() {
         return new File(rc.getDataFolder(), username + ".player");        
     }
     
+    /**
+     * @param name a player name.
+     * @param folder Where player files are stored.
+     * @return The session file for this player name.
+     */
     public static File getPlayerFileFor(String name, File folder) {
         return new File(folder, name + ".player");
     }
     
+    /**
+     * @param p a Player.
+     * @param folder Where player files are stored.
+     * @return The session file for this Player.
+     */
     public static File getPlayerFileFor(Player p, File folder) {
         return new File(folder, p.getName() + ".player");
     }

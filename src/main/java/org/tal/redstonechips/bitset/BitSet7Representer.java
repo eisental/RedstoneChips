@@ -7,7 +7,9 @@ import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
 /**
- *
+ * Converts a BitSet into a YAML !b tag value.
+ * The BitSet is converted to a BigInteger that is printed as a decimal integer.
+ * 
  * @author Tal Eisenberg
  */
 public class BitSet7Representer extends Representer {

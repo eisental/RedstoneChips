@@ -58,8 +58,8 @@ public class CircuitManager implements Listener {
     }
 
     /**
-     * Checks if this redstone event reports an input change in any of the circuit input pins.
-     * When the new redstone state is different than the current, the input pin is updated and the circuit is notified.
+     * Redstone change event handler. Checks if this event reports an input change in any circuit's input pins.
+     * When the new redstone state is different than the current one, the input pin is updated and the circuit is notified.
      *
      * @param e A redstone change event.
      */
@@ -76,17 +76,24 @@ public class CircuitManager implements Listener {
         
     }
 
+    /**
+     * Scans a chip starting at params.signBlock, debug level set to 0.
+     * 
+     * @param params An initialized ScanParameters object.
+     * @param sender The circuit activator
+     * @return The new chip id or -1 if a chip was not found or -2 if an error occurred.
+     */
     public int checkForCircuit(ScanParameters params, CommandSender sender) {
         return checkForCircuit(params, sender, 0);
     }
-    
+
     /**
-     * Tries to scan a chip, starting from the chip sign block.
+     * Scans a chip starting at params.signBlock.
      * 
-     * @param signBlock The activation sign block.
-     * @param params Initial scan parameters. Use ScanParameters.generate() or .generateDefaultParams
-     * @param sender The activator
-     * @return The new circuit's id when a chip was activated, -1 when a reported error has occured or -2 when a circuit was not found.
+     * @param params An initialized ScanParameters object.
+     * @param sender The circuit activator.
+     * @param debugLevel Scanning debug level. 0 - no debug messages.
+     * @return The new chip id or -1 if a chip was not found or -2 if an error occurred.
      */
     public int checkForCircuit(ScanParameters params, CommandSender sender, int debugLevel) {
         Block signBlock = params.signBlock;        
@@ -423,7 +430,7 @@ public class CircuitManager implements Listener {
     }
 
     /**
-     * Check each active circuit to see if all its blocks are in place. See Circuit.checkIntegrity().
+     * Check each active circuit to see if all of its blocks are in place. See Circuit.checkIntegrity().
      * Any unloaded circuit chunks are first loaded and then unloaded after the check is over.
      */
     public void checkCircuitsIntegrity(World world) {
@@ -530,7 +537,6 @@ public class CircuitManager implements Listener {
     }
 
     /**
-     *
      * @return a map of all active circuits. The map keys are circuit ids.
      */
     public HashMap<Integer, Circuit> getCircuits() {
@@ -538,8 +544,7 @@ public class CircuitManager implements Listener {
     }
 
     /**
-     *
-     * @return a map of all active circuits in world world. The map keys are circuit ids.
+     * @return a map of all active circuits in the specified world. The map keys are circuit ids.
      */
     public HashMap<Integer, Circuit> getCircuits(World world) {
         HashMap<Integer, Circuit> worldCircuits = new HashMap<Integer, Circuit>();
@@ -804,6 +809,12 @@ public class CircuitManager implements Listener {
         else return false;
     }
 
+    /**
+     * Mark a chunk as a processed chunk. While marked the chunk would not be allowed to unload.
+     * Call releaseChunk(chunk) to release it.
+     * 
+     * @param chunk The chunk to keep alive.
+     */
     public void workOnChunk(ChunkLocation chunk) {
         if (!processedChunks.contains(chunk)) {
             processedChunks.add(chunk);
@@ -811,11 +822,21 @@ public class CircuitManager implements Listener {
         }
     }
     
+    /**
+     * Release a used chunk and allow it to unload.
+     * 
+     * @param chunk The chunk to release
+     */
     public void releaseChunk(ChunkLocation chunk) {
         if (processedChunks.remove(chunk))
             chunk.unloadChunk();
     }
 
+    /**
+     * 
+     * @param chunk The chunk to test.
+     * @return true if the chunk was loaded, or is kept loaded, for processing.
+     */
     public boolean isProcessingChunk(ChunkLocation chunk) {
         return processedChunks.contains(chunk);
     }

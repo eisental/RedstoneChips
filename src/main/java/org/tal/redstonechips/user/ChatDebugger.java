@@ -1,18 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.tal.redstonechips.user;
 
+import java.math.BigInteger;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.bitset.BitSetUtils;
+import org.tal.redstonechips.circuit.Circuit;
 
 /**
- *
+ * A circuit debugger that uses chat messages.
+ * 
  * @author Tal Eisenberg
  */
 class ChatDebugger extends Debugger {
@@ -54,9 +52,9 @@ class ChatDebugger extends Debugger {
     public void inputChanged(Circuit c, int idx, boolean state) {
         List<Flag> cflags = flags.get(c);
         if (cflags!=null && cflags.contains(Flag.IO)) {
-            int inputInt = BitSetUtils.bitSetToUnsignedInt(c.getInputBits(), 0, c.inputs.length);
+            BigInteger inputInt = BitSetUtils.bitSetToBigInt(c.getInputBits(), 0, c.inputs.length);
             String i = ChatColor.WHITE + BitSetUtils.bitSetToBinaryString(c.getInputBits(), 0, c.inputs.length) + " (0x" +
-                    Integer.toHexString(inputInt) + ")";
+                    inputInt.toString(16) + ")";
 
             debug(c, "Input " + idx + " is " + (state?"on":"off")+ ": " + i + ".");
         }
@@ -68,9 +66,9 @@ class ChatDebugger extends Debugger {
         List<Flag> cflags = flags.get(c);
         if (cflags!=null && cflags.contains(Flag.IO)) {
 
-            int outputInt = BitSetUtils.bitSetToUnsignedInt(c.getOutputBits(), 0, c.outputs.length);
+            BigInteger outputInt = BitSetUtils.bitSetToBigInt(c.getOutputBits(), 0, c.outputs.length);
             String o = ChatColor.YELLOW + BitSetUtils.bitSetToBinaryString(c.getOutputBits(), 0, c.outputs.length) + " (0x" +
-                    Integer.toHexString(outputInt) + ")";
+                    outputInt.toString(16) + ")";
 
             debug(c, "Output " + idx + " is " + (state?"on":"off") + ": " + o + ".");            
         }
