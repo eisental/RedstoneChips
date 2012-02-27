@@ -2,11 +2,11 @@
 package org.tal.redstonechips;
 
 import java.util.ArrayList;
-import org.tal.redstonechips.circuit.Circuit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.CircuitIndex;
 
 /**

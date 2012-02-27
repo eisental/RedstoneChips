@@ -6,15 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.tal.redstonechips.util.ChunkLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.tal.redstonechips.bitset.BitSetUtils;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.io.IOBlock;
 import org.tal.redstonechips.circuit.io.InputPin;
 import org.tal.redstonechips.circuit.io.InterfaceBlock;
 import org.tal.redstonechips.circuit.io.OutputPin;
-import org.tal.redstonechips.bitset.BitSetUtils;
 import org.tal.redstonechips.wireless.BroadcastChannel;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -66,6 +65,8 @@ public class CircuitPersistence {
     
     private List<String> madeBackup = new ArrayList<String>();
 
+    private World unloadedWorld = null;
+    
     /**
      * Used to prevent saving state more than once per game tick.
      */
@@ -212,6 +213,10 @@ public class CircuitPersistence {
      * @param world 
      */
     public void saveCircuits(World world) {
+        if (!rc.isEnabled()) return;
+        
+        rc.log(Level.INFO, "Saving " + world.getName() + " chip data...");                
+        
         if (dontSaveCircuits.contains(world)) return;
         
         File file = getCircuitsFile(world.getName()+circuitsFileExtension);
@@ -265,6 +270,15 @@ public class CircuitPersistence {
                 rc.log(Level.SEVERE, ex.getMessage());
             }
         }
+        
+        // if world is unloaded remove circuits.
+        if (unloadedWorld==world) {
+            int size = rc.getCircuitManager().getCircuits().size();
+            rc.getCircuitManager().unloadWorldChips(unloadedWorld);
+            rc.log(Level.INFO, "Unloaded " + (size-rc.getCircuitManager().getCircuits().size()) + " chip(s).");                    
+            unloadedWorld = null;
+        }
+        
     }
 
     private Map<String, Object> circuitToMap(Circuit c) {
@@ -493,15 +507,20 @@ public class CircuitPersistence {
         return backup;
     }
 
-    boolean isWorldLoaded(World w) {
+    public boolean isWorldLoaded(World w) {
         return loadedWorlds.contains(w);
     }
 
-    void clearLoadedWorldsList() {
+    public void clearLoadedWorldsList() {
         loadedWorlds.clear();
     }
 
-    void removeLoadedWorld(World unloadedWorld) {
+    public void removeLoadedWorld(World unloadedWorld) {
         loadedWorlds.remove(unloadedWorld);
     }
+    
+    public void setUnloadedWorld(World world) {
+        unloadedWorld = world;
+    }
+    
 }

@@ -12,6 +12,7 @@ import org.tal.redstonechips.RedstoneChips;
  * @author Tal Eisenberg
  */
 public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex {
+    @Deprecated
     public static final Logger logger = Logger.getLogger("Minecraft");
 
     /**

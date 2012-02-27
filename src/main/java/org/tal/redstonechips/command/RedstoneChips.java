@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.tal.redstonechips.UpdateChecker;
 import org.tal.redstonechips.circuit.CircuitIndex;
 
 /**
@@ -29,10 +30,10 @@ public class RedstoneChips extends RCCommand {
     }
     
     private void showMessage(CommandSender sender) {
-        String verMsg = "";
+        String verMsg;
         
         try {
-            String curver = rc.checkUpdate();
+            String curver = UpdateChecker.checkUpdate(rc.getDescription().getVersion());
             if (curver==null) verMsg = " - RedstoneChips is up to date.";
             else verMsg = ChatColor.GREEN + " - A new RedstoneChips version (" + curver + ") is available.";
         } catch (IOException ex) {

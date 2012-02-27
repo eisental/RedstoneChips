@@ -63,16 +63,15 @@ public class CircuitManager implements Listener {
      *
      * @param e A redstone change event.
      */
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onBlockRedstoneChange(BlockRedstoneEvent e) { 
-        boolean newVal = (e.getNewCurrent()>0);
-        boolean oldVal = (e.getOldCurrent()>0);
+    public void onBlockRedstoneChange(Block b, int newCurrent, int oldCurrent) { 
+        boolean newVal = (newCurrent>0);
+        boolean oldVal = (oldCurrent>0);
         if (newVal==oldVal) return; // not a change
 
-        List<InputPin> inputList = sourceLookupMap.get(e.getBlock().getLocation());
+        List<InputPin> inputList = sourceLookupMap.get(b.getLocation());
         if (inputList==null) return;
         for (InputPin inputPin : inputList)
-            inputPin.updateValue(e.getBlock(), newVal, SourceType.REDSTONE);
+            inputPin.updateValue(b, newVal, SourceType.REDSTONE);
         
     }
 

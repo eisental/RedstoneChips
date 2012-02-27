@@ -1,9 +1,6 @@
 package org.tal.redstonechips;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.tal.redstonechips.circuit.Circuit;
 import org.tal.redstonechips.circuit.CircuitIndex;
@@ -58,7 +54,8 @@ public class RedstoneChips extends JavaPlugin {
         loadLibraries();
         callLibraryRedstoneChipsEnable();        
         prefsManager.loadPrefs();        
-        registerEvents();
+        getServer().getPluginManager().registerEvents(new RCBukkitEventHandler(this), this);
+
         registerCommands();
 
         try {
@@ -74,7 +71,6 @@ public class RedstoneChips extends JavaPlugin {
             // couldn't schedule task. Try running it before server startup is finished (could fail).
             postStartup();
         }
-
     }
 
     private void postStartup() {
@@ -94,7 +90,7 @@ public class RedstoneChips extends JavaPlugin {
             public void run() {
                 String ver;
                 try {
-                    ver = checkUpdate();
+                    ver = UpdateChecker.checkUpdate(getDescription().getVersion());
                 } catch (IOException ex) {
                     log(Level.WARNING, "Couldn't check for an update (" + ex.getClass().getSimpleName() + ").");
                     return;
@@ -134,19 +130,6 @@ public class RedstoneChips extends JavaPlugin {
         }
     }
     
-    private void registerEvents() {
-        eventListeners = new Listener[] { new RCBlockListener().setPlugin(this),
-          new RCPlayerListener().setPlugin(this),
-          new RCWorldListener().setPlugin(this), circuitManager
-        };
-
-        if (this.isEnabled()) {
-            PluginManager pm = getServer().getPluginManager();
-            for (Listener l : eventListeners)
-                pm.registerEvents(l, this);
-        }
-    }
-
     /**
      * Tells the plugin to load circuit classes from this circuit library when it's enabled.
      *
@@ -295,21 +278,4 @@ public class RedstoneChips extends JavaPlugin {
             lib.onRedstoneChipsEnable(this);
         }        
     }
-    
-    /**
-     * Checks for a new RedstoneChips version.
-     * 
-     * @return The new version string or null if there is none.
-     * @throws IOException When a network error occurs.
-     */
-    public String checkUpdate() throws IOException {
-        URL currentversion = new URL("http://eisental.github.com/RedstoneChips/currentversion");
-        BufferedReader in = new BufferedReader(new InputStreamReader(currentversion.openStream()));
-        String inputLine = in.readLine().trim().toLowerCase();
-        in.close();        
-        
-        if (inputLine!=null && !inputLine.isEmpty() && !getDescription().getVersion().equals(inputLine)) return inputLine;
-        else return null;                
-    }
-
 }
