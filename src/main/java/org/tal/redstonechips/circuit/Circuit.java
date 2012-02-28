@@ -218,24 +218,9 @@ public abstract class Circuit {
     /**
      * Called when the plugin loads a circuit from file.
      *
-     * @param state Map containing state data that was read from the file. The map should hold the same data that was returned by getInternalState()
+     * @param state Map containing state data that was read from the file. The map should hold the same data that was returned by saveState()
      */
     public void setInternalState(Map<String,String> state) {}
-
-    /**
-     * Called before the plugin resets the circuit.
-     * The circuit should return a map containing any data that may not be available on a reset condition.
-     *
-     * @return Map containing reset data.
-     */
-    public Map<String,Object> getResetData() { return new HashMap<String,Object>(); }
-
-    /**
-     * Called after the plugin resets the circuit.
-     *
-     * @param reset Map containing reset data to be restored. The map should hold the same data that was returned by setResetData()
-     */
-    public void setResetData(Map<String,Object> data) {}
 
     /**
      * Called when the circuit is physically destroyed.
