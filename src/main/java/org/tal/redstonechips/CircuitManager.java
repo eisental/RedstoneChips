@@ -392,7 +392,7 @@ public class CircuitManager implements Listener {
         Block activationBlock = c.world.getBlockAt(c.activationBlock.getBlockX(), c.activationBlock.getBlockY(), c.activationBlock.getBlockZ());
         List<CircuitListener> listeners = c.getListeners();
         Map<String,Object> data = c.getResetData();
-		
+
         int id = c.id;
         String name = c.name;
         
@@ -404,7 +404,7 @@ public class CircuitManager implements Listener {
 
             newCircuit.id = id;
             newCircuit.name = name;
-			newCircuit.setResetData(data);
+            newCircuit.setResetData(data);
             newCircuit.getListeners().addAll(listeners);
 
             if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newCircuit.getChipString() + rc.getPrefs().getInfoColor() + ".");
