@@ -33,7 +33,7 @@ public class RCclasses extends RCCommand {
     private void printClassesList(CommandSender sender, List<CircuitIndex> libs) {
         String list = "";        
         List<String> libNames = new ArrayList<String>();
-        for (CircuitIndex lib : libs) libNames.add(lib.getName());
+        for (CircuitIndex lib : libs) libNames.add(lib.getCircuitName());
         Collections.sort(libNames);
         
         for (String libName : libNames) {
@@ -47,7 +47,7 @@ public class RCclasses extends RCCommand {
             for (Class c : lib.getCircuitClasses()) names.add(c.getSimpleName());
             Collections.sort(names);
             
-            list += ChatColor.WHITE + lib.getName() + " " + lib.getVersion() + ":\n   ";
+            list += ChatColor.WHITE + lib.getCircuitName() + " " + lib.getCircuitVersion() + ":\n   ";
             for (String name : names) {
                 list += color + name + ", ";
                 if (color==rc.getPrefs().getInfoColor()) color = ChatColor.YELLOW;
@@ -64,7 +64,7 @@ public class RCclasses extends RCCommand {
     
     private CircuitIndex findLibrary(List<CircuitIndex> libs, String libName) { 
         for (CircuitIndex lib : libs) 
-            if (lib.getName().equals(libName)) return lib;
+            if (lib.getCircuitName().equals(libName)) return lib;
         
         return null;
     }
