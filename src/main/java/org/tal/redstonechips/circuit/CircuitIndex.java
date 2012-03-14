@@ -24,12 +24,12 @@ public interface CircuitIndex {
      * 
      * @return the index name
      */
-    public String getName();
+    public String getCircuitName();
 
     /**
      *
      * @return the index version
      */
-    public String getVersion();
+    public String getCircuitVersion();
     
 }
