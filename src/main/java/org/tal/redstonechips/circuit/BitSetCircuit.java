@@ -48,7 +48,7 @@ public abstract class BitSetCircuit extends Circuit {
         if ((inputs.length % outputs.length)==0) {
             int inBitSetCount = inputs.length / outputs.length;
             wordlength = outputs.length;
-            info(sender, "Activating" + this.getCircuitClass() + " with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
+            info(sender, "Activating " + this.getCircuitClass() + " with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
             inputBitSets = new BitSet7[inBitSetCount];
             for (int i=0; i<inBitSetCount; i++) {
                 inputBitSets[i] = new BitSet7(wordlength);

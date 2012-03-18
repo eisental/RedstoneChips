@@ -255,7 +255,7 @@ public class RedstoneChips extends JavaPlugin {
         
     private void loadLibraries() {
         for (CircuitIndex lib : preloadedLibs) {
-            String libMsg = "Loading " + lib.getName() + " " + lib.getVersion() + " > ";
+            String libMsg = "Loading " + lib.getIndexName() + " " + lib.getVersion() + " > ";
             Class<? extends Circuit>[] classes = lib.getCircuitClasses();
             
             if (classes != null && classes.length>0) {

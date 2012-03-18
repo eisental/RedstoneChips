@@ -36,10 +36,10 @@ public abstract class CircuitLibrary extends JavaPlugin implements CircuitIndex 
     }
 
     @Override
-    public String getName() {
-        return this.getDescription().getName();
+    public String getIndexName() {
+        return getName();
     }
-
+    
     @Override
     public String getVersion() {
         return this.getDescription().getVersion();

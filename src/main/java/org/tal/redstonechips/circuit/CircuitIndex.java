@@ -24,7 +24,7 @@ public interface CircuitIndex {
      * 
      * @return the index name
      */
-    public String getName();
+    public String getIndexName();
 
     /**
      *

@@ -4,11 +4,11 @@ package org.tal.redstonechips.command;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.eisental.common.page.Pager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.tal.redstonechips.circuit.CircuitIndex;
-import net.eisental.common.page.Pager;
 
 /**
  *
@@ -33,7 +33,7 @@ public class RCclasses extends RCCommand {
     private void printClassesList(CommandSender sender, List<CircuitIndex> libs) {
         String list = "";        
         List<String> libNames = new ArrayList<String>();
-        for (CircuitIndex lib : libs) libNames.add(lib.getName());
+        for (CircuitIndex lib : libs) libNames.add(lib.getIndexName());
         Collections.sort(libNames);
         
         for (String libName : libNames) {
@@ -47,7 +47,7 @@ public class RCclasses extends RCCommand {
             for (Class c : lib.getCircuitClasses()) names.add(c.getSimpleName());
             Collections.sort(names);
             
-            list += ChatColor.WHITE + lib.getName() + " " + lib.getVersion() + ":\n   ";
+            list += ChatColor.WHITE + lib.getIndexName() + " " + lib.getVersion() + ":\n   ";
             for (String name : names) {
                 list += color + name + ", ";
                 if (color==rc.getPrefs().getInfoColor()) color = ChatColor.YELLOW;
@@ -64,7 +64,7 @@ public class RCclasses extends RCCommand {
     
     private CircuitIndex findLibrary(List<CircuitIndex> libs, String libName) { 
         for (CircuitIndex lib : libs) 
-            if (lib.getName().equals(libName)) return lib;
+            if (lib.getIndexName().equals(libName)) return lib;
         
         return null;
     }
