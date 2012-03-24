@@ -135,7 +135,7 @@ public class CircuitPersistence {
 
         if (circuitsList!=null) {
             Map<Circuit, Map<String, String>> internalStates = new HashMap<Circuit, Map<String, String>>();
-            
+
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
                     Circuit c = compileCircuitFromMap(circuitMap, internalStates);

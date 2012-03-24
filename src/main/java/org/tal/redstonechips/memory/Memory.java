@@ -135,10 +135,8 @@ public abstract class Memory {
         File oldFolder = new File(pluginFolder, oldMemoryFolderName);
         if (oldFolder.listFiles()!=null) {
             for (File f : oldFolder.listFiles())  {
-                System.out.println("checking " + f.getName());
                 if (isMemoryFile(f)) {
                     f.renameTo(new File(memoryFolder, renameMem(f)));
-                    System.out.println("ismemoryfile!");
                 }
             }
         }
