@@ -92,6 +92,11 @@ public class CircuitManager implements Listener {
      * @return The new chip id or -1 if a chip was not found or -2 if an error occurred.
      */
     public int checkForCircuit(ScanParameters params, CommandSender sender, int debugLevel) {
+        if (params==null) {
+            if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + "Weird error occured: params==null.");
+            return -2;
+        }
+        
         Block signBlock = params.signBlock;        
 
         BlockState state = signBlock.getState();
