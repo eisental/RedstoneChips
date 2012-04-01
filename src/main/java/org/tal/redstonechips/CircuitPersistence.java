@@ -212,9 +212,7 @@ public class CircuitPersistence {
      * 
      * @param world 
      */
-    public void saveCircuits(World world) {
-        if (!rc.isEnabled()) return;
-        
+    public void saveCircuits(World world) {        
         rc.log(Level.INFO, "Saving " + world.getName() + " chip data...");                
         
         if (dontSaveCircuits.contains(world)) return;
