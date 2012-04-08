@@ -21,6 +21,25 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.95 (Apr 8th, 2012)
+- Updated for MC1.2.5
+- Rewrote /rcsel. Added /rcsel target for selecting chips by pointing at them and /rcsel world <world> … <world> for selecting all chips in specified worlds.
+- Added /rctool <material> - sets the chip probe tool material and /rctool clear for removing all tools.
+- Added many command aliases. 
+- Memory data that's no longer used by any other chip is properly released.
+- Split some functionality into etCommon library. 
+- Uses new bukkit event system.
+- Player data, including the chip probe material is saved on player quit and loaded on player join.
+- /rcactivate - renamed verbose option to -v. -v1 and -v2 print different amount of debug messages.
+- Chips can be built with one io block and a sign attached to the io block.
+- /rctransmit renamed to /rcsend. 
+- Added support for saving circuit state data on a reset.
+- Fixed memory file support for integers with more than 64bits. 
+- Fixed bit set and big integer conversion methods. 
+- Fixed redstone torch output CB1.1 bug.
+- Fixed lever update doesn't apply physics around the output block.
+- Fixed an update bug in redstone torch output devices.
+
 #### RedstoneChips 0.94 (Jan 9th, 2012)
 - Note blocks can be used as output devices.
 - removed rightClickToActivate pref. It's now always right-click to activate.
