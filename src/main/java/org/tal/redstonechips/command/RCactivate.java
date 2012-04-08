@@ -53,7 +53,6 @@ public class RCactivate extends RCCommand {
                         interfaceBlockType = PrefsManager.findMaterial(args[2]);
                     
                     if (verboseLevel==-1) verboseLevel = 0;
-                    System.out.println("verboseLevel=" + verboseLevel);
                 } catch (IllegalArgumentException ie) {
                     sender.sendMessage(rc.getPrefs().getErrorColor() + ie.getMessage());
                     return true;
