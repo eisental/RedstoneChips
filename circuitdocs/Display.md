@@ -25,7 +25,7 @@ there must be enough inputs to represent the index, otherwise 4 pins are require
 
 The channel name can specify a start bit using the syntax `<channel name>:<start bit>`.
 
-####Direct memory access
+###Direct memory access
 The chip can directly access the contents of a memory by specifying a memory id argument in the syntax of `$<memory-id>`.
 In this mode the chip inputs, from the 2nd and above, set the ram page that will be displayed on the screen. Each memory address
 is mapped to one pixel. The memory word length should match the color bit length of the display chip. 

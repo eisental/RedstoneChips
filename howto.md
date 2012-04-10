@@ -28,7 +28,7 @@ An output block sends its signal to any compatible device that's attached to its
 __redstone torches__, __powered rails__, __doors__, __trap doors__, and _note blocks__. When the output block doesn't have any attached devices 
 it will directly send signal to any input pin whose block is touching the output block. 
 
-####Output devices
+###Output devices
 ![output devices](/RedstoneChips/images/outputdevices.png)
 
 The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the 
@@ -37,10 +37,12 @@ See [Chip detection scanning rules](#chip_detection_scanning_rules) below, for i
 structures.
 
 A clock, counter and two synth chips connected directly to each other forming a more complex structure. 
+
 ![music box](/RedstoneChips/images/directconnection.png)
 
-####One block chips
+###One block chips
 When all you need is a chip with one i/o block a sign can be directly attached to the single i/o block without needing any extra chip blocks.
+
 ![one block chip](/RedstoneChips/images/oneblockchip.png)
 
 Debugging
