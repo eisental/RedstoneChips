@@ -24,17 +24,24 @@ Building a Chip
 - Last but not least, go back to your circuit sign and __right-click__ it to activate the chip. If all went well, you should receive an activation message. 
 
 An input block can receive redstone signal from the block above it or from any block on its sides.
-An output block sends its signal to any compatible device that's attached to its sides or its top. Possible output devices are __levers__, __redstone torches__, __powered rails__, __doors__, __trap doors__, and _note blocks__. When the output block doesn't have any attached devices it will directly send signal to any input pin whose block is touching the output block. 
+An output block sends its signal to any compatible device that's attached to its sides or its top. Possible output devices are __levers__, 
+__redstone torches__, __powered rails__, __doors__, __trap doors__, and _note blocks__. When the output block doesn't have any attached devices 
+it will directly send signal to any input pin whose block is touching the output block. 
 
-Output devices:
-
+####Output devices
 ![output devices](/RedstoneChips/images/outputdevices.png)
 
-The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the pin numbering starts at the chip sign onwards. The chip to the right of the sign will always come before the chip to the left. See [Chip detection scanning rules](#chip_detection_scanning_rules) below, for information on finding the order of pins in more complex structures.
-
+The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the 
+pin numbering starts at the chip sign onwards. The pin to the right of the sign will always come before the pin to the left. 
+See [Chip detection scanning rules](#chip_detection_scanning_rules) below, for information on finding the order of pins in more complex 
+structures.
 
 A clock, counter and two synth chips connected directly to each other forming a more complex structure. 
 ![music box](/RedstoneChips/images/directconnection.png)
+
+####One block chips
+When all you need is a chip with one i/o block a sign can be directly attached to the single i/o block without needing any extra chip blocks.
+![one block chip](/RedstoneChips/images/oneblockchip.png)
 
 Debugging
 ---------
@@ -113,9 +120,11 @@ permissions:
 
 * * *
 
-###/rcclasses: Prints a list of installed chip classes.
+###/rcclasses: Prints a list of installed chip types.
 
 `/rcclasses`
+
+aliases: `/rccl`
 
 permissions:
 - redstonechips.command.rcclasses - Grants the rcclasses command.
@@ -152,6 +161,8 @@ permissions:
 You can use `/rcdb` as a shortcut or type only part of the command. 
 For ex. `/rcdb l` is equivalent to `/rcdebug list`.
 
+aliases: `/rcdb`
+
 permissions:
 - redstonechips.command.rcdebug - Grants the rcdebug command.
 - redstonechips.command.rcdebug.deny - Denies the rcdebug command.
@@ -171,8 +182,14 @@ permissions:
 
 ###/rcactivate: Activates a chip.
 
+`/rcactivate [-v|-v1|-v2]`
+
 Point towards the chip sign and execute the command.
 To activate a circuit built with different input, output or interface block types then set in the preferences use: `/rcactivate <inputBlockType> <outputBlockType> <interfaceBlockType>`.
+
+Use `/rcactivate <-v|-v1|-v2>` to receive debug messages from the chip scanner.
+
+aliases: `/rca`
 
 permissions:
 - redstonechips.command.rcactivate - Grants the rcactivate command.
@@ -197,6 +214,8 @@ permissions:
 
 Point towards a block of the chip or enter the its id as an argument.
 
+aliases: `/rcb`
+
 permissions:
 - redstonechips.command.rcbreak - Grants the rcbreak command.
 - redstonechips.command.rcbreak.id - Grants the rcbreak command with a circuit id.
@@ -211,16 +230,21 @@ permissions:
 Use by pointing at a block and enter the command. Each chip reacts to it differently.
 Check the relevant chip documentation for more information about usage.
 
+aliases: `/rct`
+
 permissions:
 - redstonechips.command.rctype - Grants the rctype command.
 - redstonechips.command.rctype.deny - Denies the rctype command.
 
 * * *
 
-###/rctransmit: Transmit data over a wireless channel.
-`/rctransmit <channel> [start-bit:]data ... [start-bit:]data
+###/rcsend: Transmit data over a wireless channel.
+`/rcsend <channel> [start-bit:]data ... [start-bit:]data
 
 data can be either an integer number, ascii character, or the letter 'b' followed by a binary number.
+ascii characters may optionally be surrounded by quotes ''. For example, `/rcs chan '8'`
+
+aliases: `/rcs`
 
 permissions:
 - redstonechips.command.rctransmit - Grants the rctransmit command.
@@ -235,6 +259,8 @@ Use by pointing towards the chip or by using the its id as an argument.
 Reset a circuit to scan for new i/o blocks or sign arguments and apply any changes.
 
 Running `/rcreset all` will reset all active chips. Use with caution!
+
+aliases: `/rcr`
 
 permissions:
 - redstonechips.command.rcreset - Grants the rcreset command.
@@ -279,6 +305,8 @@ permissions:
 
 Use a channel name as an argument to print info about that channel.
 
+aliases: `/rcch`
+
 permissions:
 - redstonechips.command.rcchannels - Grants the rcchannels command.
 - redstonechips.command.rcchannels.deny - Denies the rcchannels command.
@@ -289,6 +317,8 @@ permissions:
 `/rcinfo [circuit-id]`
 
 Use by pointing at a block of the chip you want to get info about or use it's id as an argument.
+
+aliases: `/rci`
 
 permissions:
 - redstonechips.command.rcinfo - Grants the rcinfo command.
@@ -310,24 +340,27 @@ permissions:
 
 * * *
 
-###/rcsel: Mass edit chips within a selection cuboid.
-To define a selection type `/rcsel` and right-click on two opposite corners of your cuboid.
-When no selection is defined /rcsel will try to use WorldEdit's current selection.       
+###/rcsel: Select and edit a group of chips.
+To add/remove chips from selection:
 
-When either types of selection are defined you can execute any of the following commands.
-
+- `/rcsel` - Switch selection mode on/off. When on, right-clicking a chip block adds it to selection.
+- `/rcsel cuboid` - Select chips in a WorldEdit cuboid or start to define a cuboid.
+- `/rcsel id <chip-id>...<chip-id>` - Select chips by a list of ids.
 - `/rcsel list` - Lists all chips in the selection
 - `/rcsel clear` - Clears the current selection.
 
-The following work the same as their single chip verions, only on all chips within the cuboid:
+To run a command on all chips in selection:
+The following work the same as their single chip versions.
   
 - `/rcsel activate [<input type> <output type> <interface block type>]`, 
-- `/rcsel fixioblocks`
 - `/rcsel break`
 - `/rcsel destroy`
 - `/rcsel reset`
 - `/rcsel enable`
 - `/rcsel disable` 
+- `/rcsel fixioblocks`
+
+`/rcsel activate` requires a defined cuboid (either a WorldEdit cuboid or a RedstoneChips one). 
 
 permissions:
 - redstonechips.command.rcsel - Grants the rcsel command.
@@ -362,6 +395,8 @@ permissions:
 - redstonechips.command.rcsave - Grants the rcsave command.
 - redstonechips.command.rcsave.deny - Denies the rcsave command.
 
+* * *
+
 ###/rcload: Reloads chip data from file.
 This will reset any changes made to the chips state since the last save occured.
 
@@ -385,16 +420,6 @@ permissions:
 `/rcp [page #|prev|next|last]`
 Running the command without arguments will cause it to move to the next page or go back to the first if the last page was reached.
 
-permissions:
-- redstonechips.command.rcprefs - Grants the rcprefs command.
-- redstonechips.command.rcprefs.set - Grants using the rcprefs command to set preferences.
-- redstonechips.command.rcprefs.deny - Denies the rcprefs command.
-- redstonechips.command.rcprefs.set.deny - Denies using the rcprefs command to set preferences.
-- redstonechips.command.rcpin - Grants the rcpin command.
-- redstonechips.command.rcpin.deny - Denies the rcpin command.
-- redstonechips.command.rcportect - Grants the rcprotect command.
-- redstonechips.command.rcprotect.deny - Denies the rcprotect command.
-
 * * *
 
 ###/rcprotect: Creates, removes, and configures protected wireless channels.
@@ -413,11 +438,17 @@ permissions:
 
 * * *
 
-###/rctool: Turns the item in your hand into a chip probe.
+###/rctool: Set an item as a chip probe.
+`/rctool [clear|<item>]`
+
+Run the command w/o arguments to set the item in your hand as the chip probe. 
+Run `/rctool clear` to clear the tool item setting.
+Run `/rctool <item>` to set the chip probe to the specified item.
+
 - Use the chip probe on a chip i/o block to print information about the pin state.
 - Use it on the chip sign to print info about the chip.
-- Using it on any other chip block turns chip debug on and off. 
-
+- Using it on any other chip block turns chip debug on and off.
+	
 permissions:
 - redstonechips.command.rctool - Grants the rctool command.
 - redstonechips.command.rctool.deny - Denies the rctool command.
@@ -471,6 +502,7 @@ All commands have an "allow" and "deny" permission. The "deny" permission overri
 
 ###Chip permissions
 All chips have create and destroy permissions. These also have an "allow" and "deny", which function identically as above. Destruction protection prevents a chip from being destroyed via RC commands or by breaking the blocks that make up the circuit. The following node types can be used:
+
 - `redstonechips.circuit.destroy.\*` - allows destroying any circuit type.
 - `redstonechips.circuit.destroy.deny` - denies destroying any circuit type.
 - `redstonechips.circuit.<chip-name>;` - allows destroying a specific circuit type.

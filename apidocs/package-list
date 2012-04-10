@@ -1,6 +1,11 @@
 org.tal.redstonechips
+org.tal.redstonechips.bitset
 org.tal.redstonechips.circuit
+org.tal.redstonechips.circuit.filter
 org.tal.redstonechips.circuit.io
+org.tal.redstonechips.circuit.scan
 org.tal.redstonechips.command
+org.tal.redstonechips.memory
+org.tal.redstonechips.user
 org.tal.redstonechips.util
 org.tal.redstonechips.wireless

@@ -5,6 +5,9 @@ title: daytime
 
 A chip for sending the current real, or game time. 
 Use 'earthtime' as 1st sign argument to sync with real world time or use 'gametime' to sync with game ticks. 
+To specify an hour offset for different timezones or for syncing the gametime with the sun, add a semicolon (:) after the time argument
+and the number of hours to shift by. For ex: `gametime:6` or `earthtime:1`.
+
 The 2nd sign argument determines the time field that will be sent to the chip's outputs.
 
 Possible time field argument values:
@@ -34,14 +37,13 @@ Using 5 outputs leaves the chip enough bits to output the unmapped value ranging
     
 * * *
 
-
 #### I/O setup 
 * 1 clock input pin.
 * Any number of output pins.
 
 #### Sign text
 1. `   daytime   `
-2. `   [earthtime/gametime]   ` (optional, defaults to gametime)
+2. `   [earthtime/gametime][:<hour-offset>]   ` (optional, defaults to gametime)
 3. `   [time field]   ` (optional, gametime defaults to tick, earthtime defaults to second)
 4. `   [world]    ` (optional, defaults to the world the chip is built in) 
 
