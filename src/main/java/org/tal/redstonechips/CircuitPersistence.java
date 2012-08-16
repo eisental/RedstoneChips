@@ -521,4 +521,8 @@ public class CircuitPersistence {
         unloadedWorld = world;
     }
     
+    public boolean isWorldUnloading(World world) {
+        return unloadedWorld==world && world!=null;
+    }
+    
 }

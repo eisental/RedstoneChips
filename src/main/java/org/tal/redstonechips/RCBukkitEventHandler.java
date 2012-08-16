@@ -198,7 +198,8 @@ public class RCBukkitEventHandler implements Listener {
      */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onWorldSave(WorldSaveEvent event) {
-        rc.getCircuitPersistence().saveCircuits(event.getWorld());
+        if (rc.getCircuitPersistence().isWorldUnloading(event.getWorld()))
+            rc.getCircuitPersistence().saveCircuits(event.getWorld());
     }
 
     /**

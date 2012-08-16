@@ -61,7 +61,7 @@ public class InputPin extends IOBlock {
     private void addSourceBlock(Location loc) {
 
         if (!isPartOfStructure(loc)) {
-            boolean state = false;
+            boolean state;
 
             int type = circuit.world.getBlockTypeIdAt(loc);
             if (type==Material.REDSTONE_WIRE.getId()) {
