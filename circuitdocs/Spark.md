@@ -5,7 +5,9 @@ title: spark
 
 Fires a lightning bolt over an interface block. The chip can have any number of input and interface block pairs. When one of the inputs is triggered, a lightning will fire over the corresponding interface block. 
 
-When adding 'bin' as a sign argument, it is possible to set an interface block to fire by setting the chips data pins (inputs 2 and above) to the desired binary number and then triggering the 1st input pin.
+When adding __'bin'__ as a sign argument, it is possible to set an interface block to fire by setting the chips data pins (inputs 2 and above) to the desired binary number and then triggering the 1st input pin.
+
+Use __'fake'__ as a sign argument to prevent the lightning bolt from causing actual damage.
 
 [source code](https://github.com/eisental/SensorLibrary/blob/master/src/main/java/org/tal/sensorlibrary/spark.java)
     
@@ -19,5 +21,6 @@ When adding 'bin' as a sign argument, it is possible to set an interface block t
 #### Sign text
 1. `   spark   `
 2. `   bin     ` (optional)
+3. `   fake    ` (optional)
 
 __Version history:__ Added to SensorLibrary 0.3
