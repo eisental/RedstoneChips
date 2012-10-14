@@ -68,6 +68,10 @@ a:hover {
 	margin: 5px 0;
 }
 
+.content ul {
+	font-size: 1-2em;
+}
+
 .content dt {
 	font-size: 1.2em;
 }
