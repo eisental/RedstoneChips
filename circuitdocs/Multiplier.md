@@ -10,8 +10,8 @@ If an optional constant argument is added to the sign text, the IC will multiply
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/multiplier.java)
 
 For a detailed example of building a chip that uses a number of input bit sets read the [AND gate documentation](And).
-* * *
 
+* * *
 
 #### I/O setup 
 * Can have any number of outputs. 

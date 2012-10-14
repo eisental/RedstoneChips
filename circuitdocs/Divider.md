@@ -22,7 +22,8 @@ For a detailed example of building a chip that uses a variable number of input s
 
 #### Sign text
 1. `   divider   `
-2. ` [wordlength] '
+2. ` [wordlength] `
 3. ` [constant number]  ` (optional)
 4. ` [round/mod] ` (optional)
+
 __Version history:__ Added to BasicCircuits 0.1

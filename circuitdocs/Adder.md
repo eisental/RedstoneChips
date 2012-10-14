@@ -19,7 +19,8 @@ The adder can work in subtraction mode if its 3rd argument is `subtract`. In thi
 
 #### Sign text
 1. `   adder   `
-2. ` [wordlength] '
+2. ` [wordlength] `
 3. ` [constant number]  ` (optional)
 4. ` [subtract] ` (optional)
+
 __Version history:__ Added to BasicCircuits 0.1

@@ -25,6 +25,7 @@ on [Wikipedia](http://en.wikipedia.org/wiki/Shift_register)
 #### Sign text
 1. `   shiftregister   `
 2. `   [left|right]   ` (optional)
+
 ![a 4-bit shiftregister](/RedstoneChips/images/shiftregister.png "a 4-bit shiftregister")
 
 __Version history:__ Added to BasicCircuits 0.1
