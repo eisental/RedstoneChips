@@ -52,9 +52,10 @@ public class InputPin extends IOBlock {
      */
     public boolean getPinValue() {
         boolean ret = false;
-        for (Boolean val : sourceBlocks.values())
+        for (Boolean val : sourceBlocks.values()) {
             ret = ret | val;
-
+        }
+        
         return ret;
     }
 
@@ -89,9 +90,9 @@ public class InputPin extends IOBlock {
     public void updateValue(Block block, boolean newVal, SourceType source) throws IllegalArgumentException {
         Location l = block.getLocation();
 
-        if (!sourceBlocks.containsKey(l))
+        if (!sourceBlocks.containsKey(l)) {
             circuit.getPlugin().log(Level.WARNING, "Block @ " + block + " is not a power block of input " + index + " of circuit " + circuit);
-        else {
+        } else {
             if (source==SourceType.REDSTONE && l.equals(bottomSourceBlock)) {
                 sourceBlocks.put(l, false);
                 return;
@@ -100,8 +101,12 @@ public class InputPin extends IOBlock {
             long curTick = circuit.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;
-                if (changesInTickCount>circuit.getPlugin().getPrefs().getMaxInputChangesPerTick()) abortFeedbackLoop();
-            } else changesInTickCount = 1;
+                if (changesInTickCount>circuit.getPlugin().getPrefs().getMaxInputChangesPerTick()) {
+                    abortFeedbackLoop();
+                }
+            } else {
+                changesInTickCount = 1;
+            }
 
             sourceBlocks.put(l, newVal);
 
@@ -127,7 +132,9 @@ public class InputPin extends IOBlock {
      * Deactivates the circuit and sends a debug message of a detected feedback loop.
      */
     private void abortFeedbackLoop() {
-        if (circuit.isDisabled()) return;
+        if (circuit.isDisabled()) {
+            return;
+        }
         
         if (circuit.hasListeners()) {
             ChatColor errorColor = circuit.getPlugin().getPrefs().getErrorColor();
@@ -143,8 +150,11 @@ public class InputPin extends IOBlock {
      * refreshes the state of all source blocks according to their block state.
      */
     public void refreshSourceBlocks() {
-        for (Location l : this.sourceBlocks.keySet())
-            if (ChunkLocation.fromLocation(l).isChunkLoaded()) sourceBlocks.put(l, findSourceBlockState(l));
+        for (Location l : this.sourceBlocks.keySet()) {
+            if (ChunkLocation.fromLocation(l).isChunkLoaded()) {
+                sourceBlocks.put(l, findSourceBlockState(l));
+            }
+        }
     }
 
     /**
@@ -157,8 +167,11 @@ public class InputPin extends IOBlock {
         Block b = loc.getBlock();
 
         if (b.getType()==Material.REDSTONE_WIRE) {
-            if (loc.equals(bottomSourceBlock)) state = false;
-            else state = b.getData()>0;
+            if (loc.equals(bottomSourceBlock)) {
+                state = false;
+            } else {
+                state = b.getData()>0;
+            }
         } else if (b.getType() == Material.LEVER) {
             byte data = b.getData();
             state = (data&8) == 8;
@@ -169,8 +182,9 @@ public class InputPin extends IOBlock {
         } else {
             // looking for direct connection to an output block.
             OutputPin out = circuit.getPlugin().getCircuitManager().getOutputPin(loc);
-            if (out!=null && out.isDirect())  
-                state = out.getState();            
+            if (out!=null && out.isDirect()) {
+                state = out.getState();
+            }            
         }
 
         return state;
