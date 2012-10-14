@@ -63,13 +63,13 @@ a:hover {
 	margin: 10px 0 0 0;
 	}
 
-li p {
-	font-size: 1em;
-}
-
 .content p {
 	font-size: 1.2em;
 	margin: 5px 0;
+}
+
+.content li p {
+	font-size: 1em;
 }
 
 .content ul {
