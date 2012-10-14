@@ -8,7 +8,7 @@ When the reset pin (input 1) is triggered, the register is cleared and all of th
 
 Using this circuit it's possible to make any chip's asynchronous inputs to be clock synchronized.
 
-D-flipflop on [Wikipeda](http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop)
+D-flipflop on [Wikipeda]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop")
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/dregister.java)
     
