@@ -8,7 +8,17 @@ When the reset pin (input 1) is triggered, the register is cleared and all of th
 
 Using this circuit it's possible to make any chip's asynchronous inputs to be clock synchronized.
 
-D-flipflop on [Wikipeda]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop")
+###Memory backed registers
+The dregister normally maintains it's state internally, but can be instead
+backed by an arbitrary memory object by specifying a memory id in the syntax
+of `$<memory-id>`. The address to look at is provided as an additional
+argument, and may be given in hexadecimal (as 0x1234). (Defaults to 0.)
+In this mode, the chip's output state will be based on the value of the memory
+at that address. If another chip changes that address, this chip will update
+accordingly, and vice versa. This feature can be used to allow ram addresses
+to control "hardware" without setting up an entire sram chip.
+
+D-flipflop on [Wikipedia]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop")
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/dregister.java)
     
@@ -20,5 +30,7 @@ D-flipflop on [Wikipeda]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D
 
 #### Sign text
 1. `   dregister   `
+2. ` $<memory-id>` (optional)
+3. ` [memory-address] ` (optional)
 
 __Version history:__ Added to BasicCircuits 0.87

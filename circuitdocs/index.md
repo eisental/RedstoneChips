@@ -11,7 +11,7 @@ Here you can find documentation for circuit classes in both BasicCircuits and Se
 [adder](Adder.html), [multiplier](Multiplier.html), [divider](Divider.html), [random](Random.html)
 
 ## registers and memory
-[flipflop](Flipflop.html), [dregister](Dregister.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html), [srnor](SRNor.html), [sram](Sram.html)
+[flipflop](Flipflop.html), [dregister](Dregister.html), [shiftregister](Shiftregister.html), [pisoregister](Pisoregister.html), [srnor](SRNor.html), [sram](Sram.html), [ramwatch](Ramwatch.html)
 
 ## combinational logic circuits
 [encoder](Encoder.html), [decoder](Decoder.html), [multiplexer](Multiplexer.html), [demultiplexer](Demultiplexer.html), [router](Router.html), [comparator](Comparator.html), [repeater](Repeater.html), [bintobcd](Bintobcd.html), [segdriver](Segdriver.html)
