@@ -21,6 +21,9 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 0.96 (Dec 1st, 2012)
+- Fix for too frequent saving on bukkit 1.3.1+
+
 #### RedstoneChips 0.95 (Apr 8th, 2012)
 - Updated for MC1.2.5
 - Rewrote /rcsel. Added /rcsel target for selecting chips by pointing at them and /rcsel world <world> … <world> for selecting all chips in specified worlds.
