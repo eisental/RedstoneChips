@@ -18,7 +18,7 @@ at that address. If another chip changes that address, this chip will update
 accordingly, and vice versa. This feature can be used to allow ram addresses
 to control "hardware" without setting up an entire sram chip.
 
-D-flipflop on [Wikipedia]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop")
+D-flipflop on [Wikipedia][1]
 
 [source code](https://github.com/eisental/BasicCircuits/blob/master/src/main/java/org/tal/basiccircuits/dregister.java)
     
@@ -34,3 +34,6 @@ D-flipflop on [Wikipedia]("http://en.wikipedia.org/wiki/Flip-flop_(electronics)#
 3. ` [memory-address] ` (optional)
 
 __Version history:__ Added to BasicCircuits 0.87
+
+
+[1]: http://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop
