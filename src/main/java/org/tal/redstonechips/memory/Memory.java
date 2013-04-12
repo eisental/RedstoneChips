@@ -233,7 +233,7 @@ public abstract class Memory {
      * @throws IOException 
      */
     public static Memory getMemory(Class<? extends Memory> type) throws IOException {
-        return Memory.getMemory(getFreeMemId(), type);
+        return Memory.getMemory("anon" + getFreeMemId(), type);
     }
     
     /**
