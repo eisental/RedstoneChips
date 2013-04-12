@@ -73,13 +73,6 @@ public class CircuitPersistence {
     private List<World> dontSaveCircuits = new ArrayList<World>();
     private List<World> loadedWorlds = new ArrayList<World>();
     
-    private Runnable dontSaveCircuitsReset = new Runnable() {
-        @Override
-        public void run() {
-            dontSaveCircuits.clear();
-        }
-    };
-
     public CircuitPersistence(RedstoneChips plugin) {
         rc = plugin;
     }
@@ -229,7 +222,14 @@ public class CircuitPersistence {
 
         Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits(world);
         dontSaveCircuits.add(world);
-        rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, dontSaveCircuitsReset, 1);
+        if (rc.isEnabled()) {
+            rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, new Runnable() {
+                @Override
+                public void run() {
+                    dontSaveCircuits.clear();
+                }
+            }, 1);
+        }
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
