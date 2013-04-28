@@ -17,6 +17,7 @@ In this operation mode it's possible to use a transmitter to set the pixel's col
 The channel name can specify a start bit using the syntax `<channel name>:<start bit>`. When used, the pixel will receive data from this bit in the channel.
 
 The default wool painting range is 3 blocks away from the interface blocks. To use a different range add a `d{<distance>}` or `dist{<distance>}` argument to the chip sign. For example adding a dist{1} argument will make the pixel only paint blocks that are directly attached to its interface block.
+The distance argument is limited to 7 blocks by default. To change this, use `/rcprefs pixel.maxDistance <distance>`.
 
 It's possible to build the chip without a clock pin when only 1 data pin is used.  
 
