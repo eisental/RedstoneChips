@@ -195,7 +195,6 @@ public class CircuitPersistence {
      * Saves all the circuits on the server.
      */
     public void saveCircuits() {
-      rc.log(Level.INFO, "Saving chip data of all worlds...");
       for(World wrld : rc.getServer().getWorlds())
         saveCircuits(wrld);
     }
