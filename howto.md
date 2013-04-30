@@ -491,6 +491,7 @@ To add specific data values use `<material name/id>:<data value>` such as `wood:
 - `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
 chip is disabled. Set to 20000 changes per tick by default.
 - `usePermissions` - When set to true the plugin will use the permission system if a permissions plugin is installed. `false` by default.
+- `checkForUpdates` - Determines whether the plugin will check for new versions on server startup. `true` by default.
 
 Permissions
 -----------
