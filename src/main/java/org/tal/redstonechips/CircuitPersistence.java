@@ -222,7 +222,7 @@ public class CircuitPersistence {
         Map<Integer, Circuit> circuits = rc.getCircuitManager().getCircuits(world);
         dontSaveCircuits.add(world);
         if (rc.isEnabled()) {
-            rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, new Runnable() {
+            rc.getServer().getScheduler().runTaskLaterAsynchronously(rc, new Runnable() {
                 @Override
                 public void run() {
                     dontSaveCircuits.clear();

@@ -26,7 +26,7 @@ public class PrefsManager {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions;
+        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, checkForUpdates;
     };
 
     private RedstoneChips rc;
@@ -44,7 +44,8 @@ public class PrefsManager {
 
     private int maxInputChangesPerTick;
     private boolean usePermissions;
-
+    private boolean checkForUpdates;
+    
     private Map<String,Object> prefs;
     private Map<String, Object> defaults;
 
@@ -230,6 +231,14 @@ public class PrefsManager {
     }
 
     /**
+     * 
+     * @return The current value of checkForUpdates preference.
+     */
+    public boolean getCheckForUpdates() {
+        return checkForUpdates;
+    }
+    
+    /**
      *
      * @return The current debug chat message color preference value.
      */
@@ -334,7 +343,9 @@ public class PrefsManager {
         signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
         
         usePermissions = Boolean.parseBoolean(toapply.get(Prefs.usePermissions.name()).toString());
-
+           
+        checkForUpdates = Boolean.parseBoolean(toapply.get(Prefs.checkForUpdates.name()).toString());
+        
         maxInputChangesPerTick = Integer.parseInt(toapply.get(Prefs.maxInputChangesPerTick.name()).toString());
 
         prefs.putAll(toapply);

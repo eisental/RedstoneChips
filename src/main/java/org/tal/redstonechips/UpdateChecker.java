@@ -33,7 +33,7 @@ public class UpdateChecker {
      * @throws IOException When a network error occurs.
      */
     public static String checkUpdate(String currentVersion) throws IOException {
-
+        
         BufferedReader in = new BufferedReader(new InputStreamReader(currentversionURL.openStream()));
         String inputLine = in.readLine().trim().toLowerCase();
         in.close();        

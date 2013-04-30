@@ -18,8 +18,7 @@ public class RedstoneChips extends RCCommand {
     public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
         if (!CommandUtils.checkPermission(rc, sender, command.getName(), false, true)) return true;
     
-        rc.getServer().getScheduler().scheduleAsyncDelayedTask(rc, new Runnable() {
-
+        rc.getServer().getScheduler().runTaskAsynchronously(rc, new Runnable() {
             @Override
             public void run() {
                 showMessage(sender);
@@ -33,9 +32,13 @@ public class RedstoneChips extends RCCommand {
         String verMsg;
         
         try {
-            String curver = UpdateChecker.checkUpdate(rc.getDescription().getVersion());
-            if (curver==null) verMsg = " - RedstoneChips is up to date.";
-            else verMsg = ChatColor.GREEN + " - A new RedstoneChips version (" + curver + ") is available.";
+            if (rc.getPrefs().getCheckForUpdates()) {
+                String curver = UpdateChecker.checkUpdate(rc.getDescription().getVersion());            
+                if (curver==null) verMsg = " - RedstoneChips is up to date.";
+                else verMsg = ChatColor.GREEN + " - A new RedstoneChips version (" + curver + ") is available.";
+            } else {
+                verMsg = "Update checking is disabled.";
+            }                            
         } catch (IOException ex) {
             verMsg = " - Couldn't check for a new plugin version (" + ex.getClass().getSimpleName() + ".";
         }

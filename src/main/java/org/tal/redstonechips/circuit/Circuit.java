@@ -554,22 +554,22 @@ public abstract class Circuit {
     public void updateCircuitSign(boolean activated) {
         if (!ChunkLocation.fromLocation(activationBlock).isChunkLoaded()) return;
         
-        BlockState state = activationBlock.getBlock().getState();
-        if (!(state instanceof Sign)) return;
-
-        final Sign sign = (Sign)state;
-        if (sign==null) return;
-        String line;
-        if (activated) {
-            String signColor;
-            if (isDisabled()) signColor = "8";
-            else signColor = redstoneChips.getPrefs().getSignColor();
-            line = (char)167 + signColor + this.getCircuitClass();
-        } else {
-            line = this.getCircuitClass();
-        }
-
         try {
+            BlockState state = activationBlock.getBlock().getState();
+            if (!(state instanceof Sign)) return;
+
+            final Sign sign = (Sign)state;
+            if (sign==null) return;
+            String line;
+            if (activated) {
+                String signColor;
+                if (isDisabled()) signColor = "8";
+                else signColor = redstoneChips.getPrefs().getSignColor();
+                line = (char)167 + signColor + this.getCircuitClass();
+            } else {
+                line = this.getCircuitClass();
+            }
+        
             if (!line.equals(sign.getLine(0))) {
                 sign.setLine(0, line);
 

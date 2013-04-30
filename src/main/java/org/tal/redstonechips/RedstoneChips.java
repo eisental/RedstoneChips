@@ -63,12 +63,10 @@ public class RedstoneChips extends JavaPlugin {
         }
         
         // schedule loading channel and old circuits file (if exists) until after server startup is complete.
-        if (getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                public void run() { postStartup();} })==-1) {
-
-            // couldn't schedule task. Try running it before server startup is finished (could fail).
-            postStartup();
-        }
+        getServer().getScheduler().runTaskLater(this, new Runnable() { 
+            @Override
+            public void run() { postStartup();}            
+        }, 1);
     }
 
     private void postStartup() {
@@ -82,24 +80,26 @@ public class RedstoneChips extends JavaPlugin {
         circuitPersistence.loadChannels();
         log(Level.INFO, "Processing " + circuitManager.getCircuits().size() + " active chip(s).");
         
-        Runnable updater = new Runnable() {
+        if (prefsManager.getCheckForUpdates()) {
+            Runnable updater = new Runnable() {
 
-            @Override
-            public void run() {
-                String ver;
-                try {
-                    ver = UpdateChecker.checkUpdate(getDescription().getVersion());
-                } catch (IOException ex) {
-                    log(Level.WARNING, "Couldn't check for an update (" + ex.getClass().getSimpleName() + ").");
-                    return;
+                @Override
+                public void run() {
+                    String ver;
+                    try {
+                        ver = UpdateChecker.checkUpdate(getDescription().getVersion());
+                    } catch (IOException ex) {
+                        log(Level.WARNING, "Couldn't check for an update (" + ex.getClass().getSimpleName() + ").");
+                        return;
+                    }
+                    if (ver!=null) {
+                        log(Level.INFO, "A new RedstoneChips version (" + ver + ") is available.\n"
+                                + "To download the update go to: http://eisental.github.com/RedstoneChips");
+                    }
                 }
-                if (ver!=null) {
-                    log(Level.INFO, "A new RedstoneChips version (" + ver + ") is available.\n"
-                            + "To download the update go to: http://eisental.github.com/RedstoneChips");
-                }
-            }
-        };
-        getServer().getScheduler().scheduleAsyncDelayedTask(this, updater);
+            };
+            getServer().getScheduler().runTaskAsynchronously(this, updater);
+        }
         
     }
     

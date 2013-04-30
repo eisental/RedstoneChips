@@ -19,3 +19,6 @@ maxInputChangesPerTick: 20000
 
 ## Use permissions?
 usePermissions: false
+
+## Enable/disable update check
+checkForUpdates: true
