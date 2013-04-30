@@ -22,8 +22,9 @@ Installation
 Changelog
 ----------
 
-#### RedstoneChips 0.97 (28th April, 2013)
+#### RedstoneChips 0.97 (Apr 30th, 2013)
 - Fixed the saving bug on cb 1.5.1.
+- Added an option to disable update checking.
 
 #### RedstoneChips 0.96 (Dec 1st, 2012)
 - Fix for too frequent saving on bukkit 1.3.1+
