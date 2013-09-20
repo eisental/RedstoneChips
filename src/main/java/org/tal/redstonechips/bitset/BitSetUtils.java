@@ -96,14 +96,8 @@ public class BitSetUtils {
      * @return 
      */
     public static BitSet7 bigIntToBitSet(BigInteger i) {
-        int bitLength = i.bitLength();
-        BitSet7 bits = new BitSet7(bitLength);
-        for (int index = 0; index < bitLength; index++) {
-            bits.set(index, i.testBit(index));
-        }
-        
-        return bits;
-}
+        return BitSet7.valueOf(i.toByteArray());
+    }
    
     /**
      * Convert an integer to BitSet.
