@@ -25,10 +25,11 @@ public class BitSetUtils {
      */
     public static int bitSetToUnsignedInt(BitSet7 b, int startBit, int length) {
         int val = 0;
-		int bitval = 1;
+        int bitval = 1;
         for (int i=0; i<length; i++) {
             if (b.get(i+startBit)) val += bitval;
-			bitval += bitval;
+            // Computationally-cheap addition by itself to multiply by two
+            bitval += bitval;
         }
 
         return val;
@@ -45,10 +46,11 @@ public class BitSetUtils {
     public static int bitSetToSignedInt(BitSet7 b, int startBit, int length) {
         // treats the bit set as a two's complement encoding binary number.
         int signed = -(b.get(startBit+length-1)?1:0) * (int)Math.pow(2, length-1);
-		int bitval = 1;
+        int bitval = 1;
         for (int i=0; i<length-1; i++) {
             if (b.get(startBit+i)) signed += bitval;
-			bitval += bitval;
+            // Computationally-cheap addition by itself to multiply by two
+            bitval += bitval;
         }
 
         return signed;
@@ -64,10 +66,11 @@ public class BitSetUtils {
      */
     public static BigInteger bitSetToBigInt(BitSet7 b, int offset, int length) {
         BigInteger val = BigInteger.ZERO;
-		BigInteger bitval = BigInteger.ONE;
+        BigInteger bitval = BigInteger.ONE;
         for (int i=0; i<length; i++) {
             if (b.get(i+offset)) val = val.add(bitval);
-			bitval = bitval.add(bitval);
+            // Computationally-cheap addition by itself to multiply by two
+            bitval = bitval.add(bitval);
         }
 
         return val;
@@ -93,15 +96,10 @@ public class BitSetUtils {
      * @return 
      */
     public static BitSet7 bigIntToBitSet(BigInteger i) {
-        BitSet7 bits = new BitSet7();
-        int index = 0;
-        while (!i.equals(BigInteger.ZERO)) {
-            if (!i.mod(BigTwo).equals(BigInteger.ZERO)) {
-                bits.set(index);
-            }
-            ++index;
-
-            i = i.shiftRight(1).clearBit(i.bitLength()-1);
+        int bitLength = i.bitLength();
+        BitSet7 bits = new BitSet7(bitLength);
+        for (int index = 0; index < bitLength; index++) {
+            bits.set(i.testBit(index));
         }
         
         return bits;
