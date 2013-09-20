@@ -99,7 +99,7 @@ public class BitSetUtils {
         int bitLength = i.bitLength();
         BitSet7 bits = new BitSet7(bitLength);
         for (int index = 0; index < bitLength; index++) {
-            bits.set(i.testBit(index));
+            bits.set(index, i.testBit(index));
         }
         
         return bits;
@@ -114,7 +114,7 @@ public class BitSetUtils {
         BitSet7 bits = new BitSet7();
         int index = 0;
         while (value != 0) {
-            if (value & 1 != 0) {
+            if ((value & 1) != 0) {
                 bits.set(index);
             }
             ++index;
