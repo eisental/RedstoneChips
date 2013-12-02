@@ -11,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.material.Attachable;
+import org.bukkit.material.Command;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 import org.tal.redstonechips.circuit.Circuit;
@@ -110,6 +111,7 @@ public class OutputPin extends IOBlock {
                 break;
             case NOTE_BLOCK: updateNoteBlock(outputBlock, state);
                 break;
+            case COMMAND: updateCommandBlock(outputBlock, state);
             default:
                 return false;
         }
@@ -215,13 +217,24 @@ public class OutputPin extends IOBlock {
         for (Location l : outputBlocks) {
             Block b = l.getBlock();
             Material m = b.getType();
-            if (m==Material.LEVER ||  m==Material.REDSTONE_TORCH_OFF || m==Material.REDSTONE_TORCH_ON) {
-                Attachable a = (Attachable)b.getState().getData();
-                BlockFace f = a.getAttachedFace();
-                if (f!=null && b.getRelative(f).equals(loc.getBlock())) return false;
-            } else if (m==Material.WOODEN_DOOR || m==Material.IRON_DOOR_BLOCK || m==Material.TRAP_DOOR || 
-                    m==Material.POWERED_RAIL || m==Material.NOTE_BLOCK)
-                return false;
+            switch (m) {
+                case LEVER:
+                case REDSTONE_TORCH_OFF:
+                case REDSTONE_TORCH_ON:
+                    Attachable a = (Attachable)b.getState().getData();
+                    BlockFace f = a.getAttachedFace();
+                    if (f!=null && b.getRelative(f).equals(loc.getBlock())) return false;
+                    break;
+                case WOODEN_DOOR:
+                case IRON_DOOR_BLOCK:
+                case TRAP_DOOR:
+                case POWERED_RAIL:
+                case NOTE_BLOCK:
+                case COMMAND:
+                default:
+                    return false;
+                    
+            }
         }
         
         return true; 
@@ -261,4 +274,10 @@ public class OutputPin extends IOBlock {
         ChunkLocation chunk = ChunkLocation.fromLocation(l);
         return chunk.isChunkLoaded() && !circuit.getPlugin().getCircuitManager().isProcessingChunk(chunk);        
     }   
+
+    private void updateCommandBlock(Block outputBlock, boolean state) {
+        Command command = (Command)outputBlock.getState().getData();
+        command.setPowered(false);
+        command.setPowered(true);
+    }
 }
