@@ -44,7 +44,7 @@ public class ChannelManager {
                     channel.updateReceiver(r);
                 }
             });
-        }
+        } 
 
         return channel;        
     }

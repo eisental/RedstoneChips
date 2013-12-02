@@ -12,8 +12,8 @@ import org.tal.redstonechips.bitset.BitSet7;
  * @author Tal Eisenberg
  */
 public class BroadcastChannel {
-    private List<Receiver> receivers = new ArrayList<Receiver>();
-    private List<Transmitter> transmitters = new ArrayList<Transmitter>();
+    private final List<Receiver> receivers = new ArrayList<Receiver>();
+    private final List<Transmitter> transmitters = new ArrayList<Transmitter>();
     
     /**
      * The channel identifying name.
@@ -71,7 +71,7 @@ public class BroadcastChannel {
 
     /**
      * Adds a transmitter to transmit broadcasts on this channel.
-     * @param r The transmitting circuit.
+     * @param t The transmitting circuit.
      */
     public void addTransmitter(Transmitter t) {
         if (transmitters.contains(t)) return;
@@ -84,7 +84,7 @@ public class BroadcastChannel {
 
     /**
      * Stops the transmitter from transmitting broadcasts on this channel.
-     * @param r The transmitting circuit.
+     * @param t The transmitting circuit.
      * @return true if the transmitter was actually removed.
      */
     public boolean removeTransmitter(Transmitter t) {
