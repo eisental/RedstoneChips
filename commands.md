@@ -1,6 +1,6 @@
 ---
 layout: main
-title: User Guide
+title: Plugin Commands
 ---
 
 * * *
@@ -387,27 +387,3 @@ permissions:
 - redstonechips.command.rcname.deny - Denies the rcname command.
 - redstonechips.command.rcname.id - Grants the rcname command with a circuit id.
 - redstonechips.command.rcname.id.deny - Denies the rcname command with a circuit id.
-   
-Preference keys
----------------
-To change any of the preferences while playing, you can use the `/rcprefs` command. All values are stored in `<craftbukkit folder>/plugins/RedstoneChips/preferences.yml`.
-
-### Block types - these can be any material name or id. 
-- `inputBlockType` - Sets the input indicator block material (`IRON_BLOCK` by default).
-- `outputBlockType` - Sets the output indicator block material (`GOLD_BLOCK` by default).
-- `interfaceBlockType` - Sets the interface indicator block material (`LAPIS_BLOCK` by default).
-
-To add specific data values use `<material name/id>:<data value>` such as `wood:2` for example for birch wood. Using specific wool colors is also possible, `wool:yellow` for example.
-
-### Message colors - these can be any chat color name.
-- `infoColor` - Color of info messages (`GREEN` by default)
-- `errorColor` - Color of error messages (`RED` by default)
-- `debugColor` - Color of debug messages (`AQUA` by default)
-
-### Other 
-- `enableDestroyCommand` - Enable or disable /rcdestroy command. Possible values are `true` or `false` (`false` by default).
-- `signColor` - Sets the text color used for the circuit name when the circuit is activated. A hex code between 0-f. 4 (red) by default.
-- `maxInputChangesPerTick` - Sets the maximum number of input pin state changes per game tick. When this limit is reached the infinite loop detector is switched on and the 
-chip is disabled. Set to 20000 changes per tick by default.
-- `usePermissions` - When set to true the plugin will use the permission system if a permissions plugin is installed. `false` by default.
-- `checkForUpdates` - Determines whether the plugin will check for new versions on server startup. `true` by default.
