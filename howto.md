@@ -12,6 +12,38 @@ title: User Guide
 - [Permissions](#permissions)
 - [Writing chip libraries](#writing_chip_libraries)
 
+Building a Chip
+---------------
+
+![a chip](/RedstoneChips/images/chip.png)
+
+- Start by building the chip __structure__ out of any block you want. You can't use sand or gravel. The block material must be different than the input/output/interface materials (see below).
+- Place a __wall sign__ attached to one of the chip blocks. This will be the starting point of the chip and affects the order of I/O pins. Set the sign text according to the circuit type you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
+- Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each I/O block has to be attached to one of the structure blocks. 
+- Some circuits, such as [synth](/RedstoneChips/circuitdocs/Synth.html) require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a structure block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
+- Last but not least, go back to your circuit sign and __right-click__ it to activate the chip. If all went well, you should receive an activation message. 
+
+An input block can receive redstone signal from the block above it or from any block on its sides.
+An output block sends its signal to any compatible device that's attached to its sides or to its top. Possible output devices are __levers__, 
+__redstone torches__, __powered rails__, __doors__, __trap doors__, and _note blocks__. When the output block doesn't have any attached devices 
+it will directly send signal to any input pin whose block is touching the output block. 
+
+###Output devices
+![output devices](/RedstoneChips/images/outputdevices.png)
+
+The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the 
+pin numbering starts at the chip sign onwards. The pin to the right of the sign will always come before the pin to the left. 
+See [Chip detection scanning rules](#chip_detection_scanning_rules) below, for information on finding the order of pins in more complex 
+structures.
+
+A clock, counter and two synth chips connected directly to each other forming a more complex structure. 
+
+![music box](/RedstoneChips/images/directconnection.png)
+
+###One block chips
+When all you need is a chip with one i/o block a sign can be directly attached to the single i/o block without needing any extra chip blocks.
+
+![one block chip](/RedstoneChips/images/oneblockchip.png)
 
 Debugging
 ---------
