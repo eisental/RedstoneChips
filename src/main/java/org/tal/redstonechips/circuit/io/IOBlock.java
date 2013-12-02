@@ -1,5 +1,7 @@
 package org.tal.redstonechips.circuit.io;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.tal.redstonechips.circuit.Circuit;
 
@@ -10,7 +12,7 @@ import org.tal.redstonechips.circuit.Circuit;
  */
 public abstract class IOBlock {
 
-    /** IOBlock type - output pin, input pin or interface block. */
+    /** IOBlock type */
     public static enum Type {
         OUTPUT(OutputPin.class),
         INPUT(InputPin.class),
@@ -39,16 +41,21 @@ public abstract class IOBlock {
      * @return new IOBlock instance.
      */
     public static IOBlock makeIOBlock(Type type, Circuit c, Location l, int index) {
-        switch (type) {
-            case OUTPUT:
-                return new OutputPin(c, l, index);
-            case INPUT:
-                return new InputPin(c, l, index);
-            case INTERFACE:
-                return new InterfaceBlock(c, l, index);
-            default:
-                return null;
+        for (Type t : Type.values()) {
+            if (type==t) {
+                try {
+                    return t.getIOClass().getConstructor(Circuit.class, Location.class, int.class).newInstance(c,l,index);
+                } catch (ReflectiveOperationException ex) {
+                    Logger.getLogger(IOBlock.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(IOBlock.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(IOBlock.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
+        
+        return null;
     }
     
     public IOBlock(Circuit c, Location l, int index) {

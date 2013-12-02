@@ -15,9 +15,9 @@ import org.tal.redstonechips.wireless.Wireless;
  * @author Tal Eisenberg
  */
 public class ChannelManager {
-    private RedstoneChips rc;
+    private final RedstoneChips rc;
     
-    private Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
+    private final Map<String, BroadcastChannel> broadcastChannels = new HashMap<String, BroadcastChannel>();
     
     ChannelManager(RedstoneChips rc) {
         this.rc = rc;
@@ -27,8 +27,8 @@ public class ChannelManager {
      * Adds the receiver as listener on a channel and returns the BroadcastChannel object that the receiver
      * was added to. If a BroadcastChannel by that name was not found a new one is created.
      * 
-     * @param r The receiver.
-     * @param channelName Name of the receiver channel.
+     * @param r 
+     * @param channelName 
      * @return The channel that the receiver was added to.
      */
     public BroadcastChannel registerReceiver(final Receiver r, String channelName) {
@@ -53,8 +53,8 @@ public class ChannelManager {
      * Registers the transmitter to a channel and returns the BroadcastChannel object that the transmitter
      * was added to. If a BroadcastChannel by that name was not found a new one is created.
      *
-     * @param r The receiver.
-     * @param channelName Name of the receiver channel.
+     * @param t
+     * @param channelName
      * @return The channel that the receiver was added to.
      */
     public BroadcastChannel registerTransmitter(Transmitter t, String channelName) {
@@ -67,6 +67,7 @@ public class ChannelManager {
     /**
      * Removes this transmitter from the list and removes its channel if it's deserted.
      * 
+     * @param t
      * @return true if the transmitter was actually removed.
      */
     public boolean removeTransmitter(Transmitter t) {
@@ -83,6 +84,7 @@ public class ChannelManager {
     /**
      * Removes this receiver from the list and removes its channel if it's deserted.
      * 
+     * @param r
      * @return true if the receiver was actually removed.
      */    
     public boolean removeReceiver(Receiver r) {
@@ -98,10 +100,9 @@ public class ChannelManager {
 
     /**
      * Finds a BroadcastChannel with the specified name.
-     * If the named channel doesn't exist and create is true, a new channel is created.
      * 
-     * @param Channel name
-     * @param boolean create
+     * @param name
+     * @param create If True creates a new channel when no channel is found.
      * @return a BroadcastChannel instance representing the named channel. 
      */
     public BroadcastChannel getChannelByName(String name, boolean create) {

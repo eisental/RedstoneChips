@@ -16,11 +16,11 @@ public class CircuitLoader {
     /**
      * Contains all circuit classes from every loaded chip library.
      */
-    private Map<String,Class<? extends Circuit>> circuitClasses = new HashMap<String,Class<? extends Circuit>>();
+    private final Map<String,Class<? extends Circuit>> circuitClasses = new HashMap<String,Class<? extends Circuit>>();
     
-    private List<CircuitIndex> libraries = new ArrayList<CircuitIndex>();
+    private final List<CircuitIndex> libraries = new ArrayList<CircuitIndex>();
     
-    private RedstoneChips rc;
+    private final RedstoneChips rc;
 
     /**
      * Maximum number of characters for class names to fit into the 1st line of a sign excluding 2 color chars (13).
@@ -34,7 +34,7 @@ public class CircuitLoader {
     /**
      * Adds all classes in the circuit library to the circuit pool allowing players to create circuits of this class.
      *
-     * @param lib The circuit library to add. 
+     * @param lib
      */
     public void addCircuitIndex(CircuitIndex lib) {
         for (Class c : lib.getCircuitClasses()) {
@@ -57,7 +57,7 @@ public class CircuitLoader {
     /**
      * Removes a circuit library from the circuit pool.
      *
-     * @param lib Library to remove.
+     * @param lib
      * @return result of Map.remove() method.
      */
     public Object removeCircuitIndex(CircuitIndex lib) {

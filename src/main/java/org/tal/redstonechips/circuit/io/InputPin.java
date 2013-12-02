@@ -21,15 +21,15 @@ public class InputPin extends IOBlock {
      */
     public enum SourceType { REDSTONE, DIRECT };
     
-    private Map<Location, Boolean> sourceBlocks;
-    private Location bottomSourceBlock;
+    private final Map<Location, Boolean> sourceBlocks;
+    private final Location bottomSourceBlock;
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
 
     /**
      *
      * @param circuit The circuit this pin belongs to.
-     * @param loc The physical location of the input pin.
+     * @param inputBlock The physical location of the input pin.
      * @param index The input pin order index in the circuit.
      */
     public InputPin(Circuit circuit, Location inputBlock, int index) {
@@ -48,7 +48,7 @@ public class InputPin extends IOBlock {
     }
 
     /**
-     * Calculates the overall state of the pin according to the state of its surrounding source blocks.
+     * @return the state of the pin according to the state of its surrounding source blocks.
      */
     public boolean getPinValue() {
         boolean ret = false;
@@ -60,7 +60,6 @@ public class InputPin extends IOBlock {
     }
 
     private void addSourceBlock(Location loc) {
-
         if (!isPartOfStructure(loc)) {
             boolean state;
 
@@ -80,9 +79,9 @@ public class InputPin extends IOBlock {
     }
 
     /**
-     * Update the state of one of the blocks surrounding the input block.
+     * Updates the known state of one of the blocks surrounding the input block.
      *
-     * @param loc The location of the updated block.
+     * @param block The location of the updated block.
      * @param newVal The new redstone current of the block.
      * @param source The source type.
      * @throws IllegalArgumentException If the block in the provided location is not a source block of the input.

@@ -24,7 +24,7 @@ import org.yaml.snakeyaml.Yaml;
  * @author Tal Eisenberg
  */
 public class CircuitPersistence {
-    private RedstoneChips rc;
+    private final RedstoneChips rc;
     
     /** YAML Map keys for .circuits files. */
     public enum CircuitKey { 
@@ -63,44 +63,22 @@ public class CircuitPersistence {
     public final static String channelsFileName = "redstonechips"+channelsFileExtension;
     private final static String backupFileExtension = ".BACKUP";
     
-    private List<String> madeBackup = new ArrayList<String>();
+    private final List<String> madeBackup = new ArrayList<String>();
 
     private World unloadedWorld = null;
     
     /**
      * Used to prevent saving state more than once per game tick.
      */
-    private List<World> dontSaveCircuits = new ArrayList<World>();
-    private List<World> loadedWorlds = new ArrayList<World>();
+    private final List<World> dontSaveCircuits = new ArrayList<World>();
+    private final List<World> loadedWorlds = new ArrayList<World>();
     
     public CircuitPersistence(RedstoneChips plugin) {
         rc = plugin;
     }
 
     /**
-     * Attempts to load the old circuits file (redstonechips.circuits). 
-     * This is only used in case the old file name is found in the plugin folder.
-     * File is renamed to redstonechips.circuits.old.
-     * 
-     * @return true if the old file exists. false otherwise.
-     */
-    public boolean loadOldFile() {
-        File file = getCircuitsFile();
-        if (file.exists()) {
-            rc.log(Level.INFO, "Reading old circuits file "+file.getName()+"...");
-            try {
-                loadCircuitsFromFile(file);
-            } catch (IOException ex) {
-                rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
-            }                
-            
-            file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
-            return true;
-        } else return false;
-    }
-
-    /**
-     * Loads all of the world chips from file.
+     * Loads a circuits file of one world.
      * @param world 
      */
     public void loadCircuits(World world) {
@@ -524,4 +502,25 @@ public class CircuitPersistence {
         return unloadedWorld==world && world!=null;
     }
     
+    /**
+     * Attempts to load the old circuits file (redstonechips.circuits). 
+     * This is only used in case the old file name is found in the plugin folder.
+     * File is renamed to redstonechips.circuits.old.
+     * 
+     * @return true if the old file exists. false otherwise.
+     */
+    public boolean loadOldFile() {
+        File file = getCircuitsFile();
+        if (file.exists()) {
+            rc.log(Level.INFO, "Reading old circuits file "+file.getName()+"...");
+            try {
+                loadCircuitsFromFile(file);
+            } catch (IOException ex) {
+                rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
+            }                
+            
+            file.renameTo(new File(file.getParentFile(),circuitsFileName+".old"));
+            return true;
+        } else return false;
+    }    
 }

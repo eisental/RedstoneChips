@@ -23,11 +23,11 @@ import org.tal.redstonechips.util.ChunkLocation;
  * @author Tal Eisenberg
  */
 public class OutputPin extends IOBlock {
-    private static Material[] outputMaterials = new Material[] { Material.LEVER, Material.REDSTONE_TORCH_OFF, 
+    private static final Material[] outputMaterials = new Material[] { Material.LEVER, Material.REDSTONE_TORCH_OFF, 
         Material.REDSTONE_TORCH_ON, Material.WOODEN_DOOR, Material.IRON_DOOR_BLOCK, Material.TRAP_DOOR, 
-        Material.POWERED_RAIL, Material.NOTE_BLOCK };
+        Material.POWERED_RAIL, Material.NOTE_BLOCK, Material.COMMAND };
     
-    private List<Location> outputBlocks;
+    private final List<Location> outputBlocks;
     
     /**
      * Constructs an OutputPin object.
@@ -46,8 +46,7 @@ public class OutputPin extends IOBlock {
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX()+1, outputBlock.getBlockY(), outputBlock.getBlockZ()));
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX()-1, outputBlock.getBlockY(), outputBlock.getBlockZ()));
         addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY(), outputBlock.getBlockZ()+1));
-        addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY(), outputBlock.getBlockZ()-1));
-        
+        addOutputBlock(new Location(circuit.world, outputBlock.getBlockX(), outputBlock.getBlockY(), outputBlock.getBlockZ()-1));        
     }
 
     private void addOutputBlock(Location loc) {
@@ -63,8 +62,6 @@ public class OutputPin extends IOBlock {
     public List<Location> getOutputBlocks() {
         return outputBlocks;
     }
-
-    private static final BlockFace[] adjacentFaces = new BlockFace[] { BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
 
     /**
      * Updates the state of blocks that are touching the output block.
@@ -94,30 +91,30 @@ public class OutputPin extends IOBlock {
     private boolean changeBlockState(Location outputLoc, boolean state) {
         Block outputBlock = outputLoc.getBlock();
         
-        if (outputBlock.getType()==Material.LEVER) {
-            if (!checkAttached(outputBlock)) return false;
-            updateLever(outputBlock, state);
-            
-        } else if (outputBlock.getType()==Material.POWERED_RAIL) {
-            updatePoweredRail(outputBlock, state);
-            
-        } else if (outputBlock.getType()==Material.WOODEN_DOOR || outputBlock.getType()==Material.IRON_DOOR_BLOCK) {
-            updateDoor(outputBlock, state);
-            
-        } else if (outputBlock.getType()==Material.TRAP_DOOR) {
-            updateTrapDoor(outputBlock, state);
-            
-        } else if (outputBlock.getType()==Material.REDSTONE_TORCH_OFF || outputBlock.getType()==Material.REDSTONE_TORCH_ON) {            
-            if (!checkAttached(outputBlock)) return false;
-            updateRedstoneTorch(outputBlock, state);
-            
-        } else if (outputBlock.getType()==Material.NOTE_BLOCK) {
-            updateNoteBlock(outputBlock, state);
-            
-        } else return false;
-
-        return true;
+        switch (outputBlock.getType()) {
+            case LEVER:
+                if (!checkAttached(outputBlock)) return false;
+                updateLever(outputBlock, state);
+                break;
+            case REDSTONE_TORCH_ON:
+            case REDSTONE_TORCH_OFF:
+                if (!checkAttached(outputBlock)) return false;
+                updateRedstoneTorch(outputBlock, state);                
+                break;                
+            case POWERED_RAIL: updatePoweredRail(outputBlock, state);
+                break;
+            case IRON_DOOR_BLOCK:
+            case WOODEN_DOOR: updateDoor(outputBlock, state);
+                break;
+            case TRAP_DOOR: updateTrapDoor(outputBlock, state);
+                break;
+            case NOTE_BLOCK: updateNoteBlock(outputBlock, state);
+                break;
+            default:
+                return false;
+        }
         
+        return true;
     }
 
     private boolean checkAttached(Block outputDevice) {
@@ -211,8 +208,8 @@ public class OutputPin extends IOBlock {
     }
 
     /**
-     * Returns whether this output pin uses direct connections. 
-     * This is true only when there are no other output devices connected to the output block.
+     * Return true only when there are no other output devices connected to the output block.
+     * @return whether this output pin uses direct connections. 
      */
     public boolean isDirect() {
         for (Location l : outputBlocks) {

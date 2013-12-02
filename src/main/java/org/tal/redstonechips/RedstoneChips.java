@@ -24,7 +24,7 @@ import org.tal.redstonechips.user.UserSession;
  */
 public class RedstoneChips extends JavaPlugin {
     
-    private static List<CircuitIndex> preloadedLibs = new ArrayList<CircuitIndex>();
+    private static final List<CircuitIndex> preloadedLibs = new ArrayList<CircuitIndex>();
     
     private PrefsManager prefsManager;
     private CircuitManager circuitManager;
@@ -35,7 +35,7 @@ public class RedstoneChips extends JavaPlugin {
     /** List of registered /rctype receivers. */
     public Map<Location, RCTypeReceiver> rcTypeReceivers = new HashMap<Location, RCTypeReceiver>();
     
-    private Map<String, UserSession> sessions = new HashMap<String, UserSession>();
+    private final Map<String, UserSession> sessions = new HashMap<String, UserSession>();
 
     /** All plugin commands */
     public RCCommand[] commands = new RCCommand[] {
@@ -50,7 +50,7 @@ public class RedstoneChips extends JavaPlugin {
         if (!getDataFolder().exists()) getDataFolder().mkdir();
         initManagers();
         loadLibraries();
-        callLibraryRedstoneChipsEnable();        
+        notifyEnabledToLibraries();
         prefsManager.loadPrefs();        
         getServer().getPluginManager().registerEvents(new RCBukkitEventHandler(this), this);
 
@@ -62,7 +62,7 @@ public class RedstoneChips extends JavaPlugin {
             log(Level.WARNING, e.getMessage());
         }
         
-        // schedule loading channel and old circuits file (if exists) until after server startup is complete.
+        // delay some tasks until after the server startup is complete.
         getServer().getScheduler().runTaskLater(this, new Runnable() { 
             @Override
             public void run() { postStartup();}            
@@ -129,9 +129,9 @@ public class RedstoneChips extends JavaPlugin {
     }
     
     /**
-     * Tells the plugin to load circuit classes from this circuit library when it's enabled.
+     * Called by CircuitLibrary to register the library with the plugin.
      *
-     * @param lib Any object implementing the CircuitIndex interface.
+     * @param lib
      */
     public static void addCircuitLibrary(CircuitIndex lib) {
         preloadedLibs.add(lib);
@@ -141,42 +141,42 @@ public class RedstoneChips extends JavaPlugin {
      * Sends a RedstoneChips log message to the console.
      * 
      * @param level
-     * @param message 
+     * @param message
      */
     public void log(Level level, String message) {
         getLogger().log(level, message);
     }
 
     /**
-     * Returns the preference manager. The object responsible for loading, saving and editing the plugin preferences.
+     * @return the preference manager. The object responsible for loading, saving and editing the plugin preferences.
      */
     public PrefsManager getPrefs() {
         return prefsManager;
     }
 
     /**
-     * Returns the circuit loader. The object responsible for creating new instances of Circuit classes.
+     * @return the circuit loader. The object responsible for creating new instances of Circuit classes.
      */
     public CircuitLoader getCircuitLoader() {
         return circuitLoader;
     }
 
     /**
-     * Returns the circuit manager. The object responsible for creating and managing active circuits.
+     * @return the circuit manager. The object responsible for creating and managing active circuits.
      */
     public CircuitManager getCircuitManager() {
         return circuitManager;
     }
 
     /**
-     * Returns the channel manager. The object responsible for handling wireless broadcast channels.
+     * @return the channel manager. The object responsible for handling wireless broadcast channels.
      */
     public ChannelManager getChannelManager() {
         return channelManager;
     }
     
     /**
-     * Returns the circuit persistence handle. The object responsible for saving and loading the active circuit list from storage.
+     * @return the circuit persistence handler. The object responsible for saving and loading the active circuit list from storage.
      */
     public CircuitPersistence getCircuitPersistence() {
         return circuitPersistence;
@@ -210,6 +210,8 @@ public class RedstoneChips extends JavaPlugin {
 
     /**
      * Removes the UserSession for the specified player.
+     * 
+     * @param player
      * @return The UserSession object that was removed or null if it was not found.
      */
     public UserSession removeUserSession(Player player) {
@@ -218,6 +220,8 @@ public class RedstoneChips extends JavaPlugin {
     
     /**
      * Removes the UserSession for the specified username.
+     * 
+     * @param name
      * @return The UserSession object that was removed or null if it was not found.
      */
     public UserSession removeUserSession(String name) {
@@ -271,7 +275,7 @@ public class RedstoneChips extends JavaPlugin {
         }        
     }
 
-    private void callLibraryRedstoneChipsEnable() {
+    private void notifyEnabledToLibraries() {
         for (CircuitIndex lib : circuitLoader.getCircuitLibraries()) {
             lib.onRedstoneChipsEnable(this);
         }        

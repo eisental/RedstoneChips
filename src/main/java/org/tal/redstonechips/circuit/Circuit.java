@@ -110,7 +110,7 @@ public abstract class Circuit {
      * Refreshes the output pins according to input states if the circuit is stateless.
      * 
      * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
-     * @param args The sign arguments of this circuit. Stored in the args field.
+     * @param rc Plugin reference.
      * @return result of call to abstract Circuit.init() method.
      */
     public final boolean initCircuit(CommandSender sender, RedstoneChips rc) {
@@ -157,6 +157,7 @@ public abstract class Circuit {
 
     /**
      * Resets outputs, calls circuitShutdown() and circuitDestroyed().
+     * @param destroyer
      */
     public void destroyCircuit(CommandSender destroyer) {
         shutdownCircuit();
@@ -167,7 +168,6 @@ public abstract class Circuit {
         
         for (CircuitListener l : listeners)
             l.circuitDestroyed(this, destroyer);
-
     }
     
     /**
@@ -233,7 +233,7 @@ public abstract class Circuit {
     /**
      * Called after the plugin resets the circuit.
      *
-     * @param reset Map containing reset data to be restored. The map should hold the same data that was returned by setResetData()
+     * @param data Map containing reset data to be restored. The map should hold the same data that was returned by setResetData()
      */
     public void setResetData(Map<String,Object> data) {}
 
@@ -244,7 +244,7 @@ public abstract class Circuit {
     public void circuitDestroyed() {}
 
     /**
-     * Called when the circuit is shutdown. Typically when the server shutsdown or the plugin is disabled and before a circuit is 
+     * Called when the circuit is shutdown. Typically when the server shuts down or the plugin is disabled and before a circuit is 
      * destroyed.
      */
     protected void circuitShutdown() {}
@@ -336,7 +336,7 @@ public abstract class Circuit {
     /**
      * Adds a circuit listener.
      *
-     * @param d The listener.
+     * @param l The listener.
      */
     public void addListener(CircuitListener l) {
         if (!listeners.contains(l)) listeners.add(l);
@@ -556,10 +556,10 @@ public abstract class Circuit {
         
         try {
             BlockState state = activationBlock.getBlock().getState();
-            if (!(state instanceof Sign)) return;
+            if (state==null || !(state instanceof Sign)) return;
 
             final Sign sign = (Sign)state;
-            if (sign==null) return;
+
             String line;
             if (activated) {
                 String signColor;

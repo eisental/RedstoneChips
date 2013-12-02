@@ -17,6 +17,7 @@ public interface CircuitIndex {
 
     /**
      * Called by the RedstoneChips plugin before starting to load circuit classes.
+     * @param instance
      */
     public void onRedstoneChipsEnable(RedstoneChips instance);
 

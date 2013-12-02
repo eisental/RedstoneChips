@@ -1,6 +1,11 @@
 
 package org.tal.redstonechips.command;
 
+import org.tal.redstonechips.command.filters.CircuitFilter;
+import org.tal.redstonechips.command.filters.ChunkFilter;
+import org.tal.redstonechips.command.filters.WorldFilter;
+import org.tal.redstonechips.command.filters.LocationFilter;
+import org.tal.redstonechips.command.filters.ClassFilter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +17,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.tal.redstonechips.circuit.Circuit;
-import org.tal.redstonechips.circuit.filter.*;
 
 /**
  *

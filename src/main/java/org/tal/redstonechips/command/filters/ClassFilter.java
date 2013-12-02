@@ -1,4 +1,4 @@
-package org.tal.redstonechips.circuit.filter;
+package org.tal.redstonechips.command.filters;
 
 import java.util.ArrayList;
 import java.util.Collection;

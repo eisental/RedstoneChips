@@ -36,19 +36,18 @@ import org.tal.redstonechips.wireless.Wireless;
  */
 public class CircuitManager implements Listener {
 
-    private RedstoneChips rc;
+    private final RedstoneChips rc;
     
     private HashMap<Integer, Circuit> circuits = new HashMap<Integer, Circuit>();
 
-    private Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
-    private Map<Location, List<InputPin>> sourceLookupMap = new HashMap<Location, List<InputPin>>();
-    private Map<Location, InputPin> inputPinLookupMap = new HashMap<Location, InputPin>();
-    private Map<Location, OutputPin> outputPinLookupMap = new HashMap<Location, OutputPin>();
-    private Map<Location, List<OutputPin>> outputLookupMap = new HashMap<Location, List<OutputPin>>();
-    private Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
-    private Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
-
-    private List<ChunkLocation> processedChunks = new ArrayList<ChunkLocation>();
+    private final Map<ChunkLocation, List<Circuit>> chunkLookupMap = new HashMap<ChunkLocation, List<Circuit>>();
+    private final Map<Location, List<InputPin>> sourceLookupMap = new HashMap<Location, List<InputPin>>();
+    private final Map<Location, InputPin> inputPinLookupMap = new HashMap<Location, InputPin>();
+    private final Map<Location, OutputPin> outputPinLookupMap = new HashMap<Location, OutputPin>();
+    private final Map<Location, List<OutputPin>> outputLookupMap = new HashMap<Location, List<OutputPin>>();
+    private final Map<Location, Circuit> structureLookupMap = new HashMap<Location, Circuit>();
+    private final Map<Location, Circuit> activationLookupMap = new HashMap<Location, Circuit>();
+    private final List<ChunkLocation> processedChunks = new ArrayList<ChunkLocation>();
     
     public CircuitManager(RedstoneChips plugin) { 
         rc = plugin; 
@@ -58,7 +57,9 @@ public class CircuitManager implements Listener {
      * Redstone change event handler. Checks if this event reports an input change in any circuit's input pins.
      * When the new redstone state is different than the current one, the input pin is updated and the circuit is notified.
      *
-     * @param e A redstone change event.
+     * @param b
+     * @param newCurrent
+     * @param oldCurrent
      */
     public void onBlockRedstoneChange(Block b, int newCurrent, int oldCurrent) { 
         boolean newVal = (newCurrent>0);
@@ -145,7 +146,7 @@ public class CircuitManager implements Listener {
         for (Block b : params.structure) {
             Circuit c = this.getCircuitByStructureBlock(b.getLocation());
             if (c!=null) {
-                sender.sendMessage(rc.getPrefs().getErrorColor() + "One of the chip blocks (" + 
+                if (sender!=null) sender.sendMessage(rc.getPrefs().getErrorColor() + "One of the chip blocks (" + 
                         rc.getPrefs().getInfoColor() + b.getType().name().toLowerCase() + 
                         rc.getPrefs().getErrorColor() + ") already belongs to another chip: " + 
                         rc.getPrefs().getInfoColor() + c.getChipString());
@@ -208,7 +209,7 @@ public class CircuitManager implements Listener {
     /**
      * Activates an already scanned circuit.
      *
-     * @param c The circuit to activate
+     * @param c
      * @param sender The activator.
      * @param id The desired circuit id. When less than 0, a new id is generated.
      * @return The circuit's id or -2 if an error occurred.
@@ -265,6 +266,7 @@ public class CircuitManager implements Listener {
      *
      * @param b The block that was broken.
      * @param s The breaker. Can be null.
+     * @return True if a circuit was deactivated.
      */
     public boolean checkCircuitDestroyed(Block b, CommandSender s) {
         Circuit destroyed = structureLookupMap.get(b.getLocation());
@@ -317,16 +319,9 @@ public class CircuitManager implements Listener {
         if (OutputPin.isOutputMaterial(block.getType())) {
             final List<OutputPin> outputs = outputLookupMap.get(block.getLocation());
             if (outputs!=null && !outputs.isEmpty()) {
-/*                rc.getServer().getScheduler().scheduleSyncDelayedTask(rc, 
-                        new Runnable() {
-                            @Override
-                            public void run() {*/
-                                for (OutputPin pin : outputs) {
-                                    pin.refreshOutputs();
-                                }
-                           /* }
-                        }
-                    );*/
+                for (OutputPin pin : outputs) {
+                    pin.refreshOutputs();
+                }
                 return true;
             }
 
@@ -340,7 +335,7 @@ public class CircuitManager implements Listener {
      *
      * @param destroyed The circuit that was destroyed.
      * @param destroyer The circuit's destroyer.
-     * @param destroyBlocks True if the circuit's blocks should turn into air.
+     * @param destroyBlocks Whether the circuit's blocks should turn into air.
      * @return true if successful.
      */
     public boolean destroyCircuit(Circuit destroyed, CommandSender destroyer, boolean destroyBlocks) {
@@ -383,7 +378,7 @@ public class CircuitManager implements Listener {
     }
 
     /**
-     * Resets a circuit. First the circuit is destroyed and then reactivated. Any listeners of the circuit are copied over
+     * Resets a circuit. First the circuit is deactivated and then reactivated. Any listeners of the circuit are copied over
      * to the new circuit.
      *
      * @param c The circuit to reset.
@@ -435,6 +430,8 @@ public class CircuitManager implements Listener {
     /**
      * Check each active circuit to see if all of its blocks are in place. See Circuit.checkIntegrity().
      * Any unloaded circuit chunks are first loaded and then unloaded after the check is over.
+     * 
+     * @param world Check circuits in this world.
      */
     public void checkCircuitsIntegrity(World world) {
         if (circuits==null) return;
@@ -503,28 +500,27 @@ public class CircuitManager implements Listener {
         List<ChunkLocation> circuitChunks = new ArrayList<ChunkLocation>();
 
         circuitChunks.add(ChunkLocation.fromLocation(c.activationBlock));
-
-        for (int i=0; i<c.outputs.length; i++) {
-            for (Location out : c.outputs[i].getOutputBlocks()) {
+        
+        for (OutputPin output : c.outputs) {
+            for (Location out : output.getOutputBlocks()) {
                 ChunkLocation chunk = ChunkLocation.fromLocation(out);
 
                 if (!circuitChunks.contains(chunk))
                     circuitChunks.add(chunk);
             }
         }
-
-        for (int i=0; i<c.inputs.length; i++) {
-            for (Location in : c.inputs[i].getSourceBlocks()) {
+        
+        for (InputPin input : c.inputs) {
+            for (Location in : input.getSourceBlocks()) {
                 ChunkLocation chunk = ChunkLocation.fromLocation(in);
 
                 if (!circuitChunks.contains(chunk))
                     circuitChunks.add(chunk);
             }
         }
-
-        for (int i=0; i<c.interfaceBlocks.length; i++) {
-            ChunkLocation chunk = ChunkLocation.fromLocation(c.interfaceBlocks[i].getLocation());
-
+        
+        for (InterfaceBlock interfaceBlock : c.interfaceBlocks) {
+            ChunkLocation chunk = ChunkLocation.fromLocation(interfaceBlock.getLocation());
             if (!circuitChunks.contains(chunk))
                 circuitChunks.add(chunk);
         }
@@ -547,6 +543,7 @@ public class CircuitManager implements Listener {
     }
 
     /**
+     * @param world
      * @return a map of all active circuits in the specified world. The map keys are circuit ids.
      */
     public HashMap<Integer, Circuit> getCircuits(World world) {
@@ -693,31 +690,27 @@ public class CircuitManager implements Listener {
     }
 
     private void addCircuitLookups(Circuit c) {
-        for (int i=0; i<c.structure.length; i++)
-            structureLookupMap.put(c.structure[i], c);
+        for (Location structure : c.structure)
+            structureLookupMap.put(structure, c);
 
         activationLookupMap.put(c.activationBlock, c);
-
-        for (int i=0; i<c.inputs.length; i++) {
-            for (Location l : c.inputs[i].getSourceBlocks()) {
+        
+        for (InputPin input : c.inputs) {
+            for (Location l : input.getSourceBlocks()) {
                 if (!sourceLookupMap.containsKey(l))
                     sourceLookupMap.put(l, new ArrayList<InputPin>());
-
-                sourceLookupMap.get(l).add(c.inputs[i]);
+                sourceLookupMap.get(l).add(input);
             }
-            
-            inputPinLookupMap.put(c.inputs[i].getLocation(), c.inputs[i]);
+            inputPinLookupMap.put(input.getLocation(), input);
         }
-
-        for (int i=0; i<c.outputs.length; i++) {
-            for (Location l : c.outputs[i].getOutputBlocks()) {
+        
+        for (OutputPin output : c.outputs) {
+            for (Location l : output.getOutputBlocks()) {
                 if (!outputLookupMap.containsKey(l))
                     outputLookupMap.put(l, new ArrayList<OutputPin>());
-                
-                outputLookupMap.get(l).add(c.outputs[i]);
+                outputLookupMap.get(l).add(output);
             }
-            
-            outputPinLookupMap.put(c.outputs[i].getLocation(), c.outputs[i]);
+            outputPinLookupMap.put(output.getLocation(), output);
         }
         
         for (ChunkLocation chunk : c.circuitChunks) {
@@ -806,10 +799,8 @@ public class CircuitManager implements Listener {
         if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || 
                 player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny")) 
             return false;
-        else if (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || 
-                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname)) 
-            return true;
-        else return false;
+        else return player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || 
+                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname);
     }
 
     /**

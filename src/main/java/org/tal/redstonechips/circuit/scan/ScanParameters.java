@@ -81,7 +81,7 @@ public class ScanParameters {
     
     public static ScanParameters generate(Block signBlock, Map<IOBlock.Type,MaterialData> ioMaterials) {
         if (signBlock.getType()!=Material.WALL_SIGN) return null;
-        
+
         BlockFace direction = ((org.bukkit.material.Sign)signBlock.getState().getData()).getAttachedFace();
         Block firstChipBlock = signBlock.getRelative(direction);
         
