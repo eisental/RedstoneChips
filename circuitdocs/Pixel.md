@@ -56,7 +56,7 @@ Note that wool blocks that are not attached directly or indirectly (through othe
 1. `   pixel   `
 2. `  [color] ... [color] ` 
 3. ` [dist{<distance>}] ` (optional)
-4. ` [broadcast-channel] (optional. must be the last argument)
+4. ` [broadcast-channel] ` (optional. must be the last argument)
 
 ![pixel chip](/RedstoneChips/images/pixel4.png "pixel chip")
 

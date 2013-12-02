@@ -1,1 +1,4 @@
 target/
+_site/
+Gemfile
+Gemfile.lock
