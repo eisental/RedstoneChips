@@ -7,7 +7,7 @@ title: Getting started
 - [Debugging](#debugging)
 - [Destroying a chip](#destroying_a_chip)
 - [Chip detection scanning rules](#chip_detection_scanning_rules)
-- [Plugin commands](/commands.html)
+- [Plugin commands](/RedstoneChips/commands.html)
 - [Preference keys](#preference_keys)
 - [Permissions](#permissions)
 - [Writing chip libraries](#writing_chip_libraries)
@@ -18,9 +18,9 @@ Building a Chip
 ![a chip](images/chip.png)
 
 - Start by building the chip __structure__ out of any block you want. You can't use sand or gravel. The block material must be different than the input/output/interface materials (see below).
-- Place a __wall sign__ attached to one of the chip blocks. This will be the starting point of the chip and affects the order of I/O pins. Set the sign text according to the circuit type you're trying to build. See the [circuitdocs](/circuitdocs) for more info.
+- Place a __wall sign__ attached to one of the chip blocks. This will be the starting point of the chip and affects the order of I/O pins. Set the sign text according to the circuit type you're trying to build. See the [circuitdocs](/RedstoneChips/circuitdocs) for more info.
 - Add __output blocks__ (gold block by default) and __input blocks__ (iron block by default). Each I/O block has to be attached to one of the structure blocks. 
-- Some circuits, such as [synth](/circuitdocs/Synth.html) require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a structure block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
+- Some circuits, such as [synth](/RedstoneChips/circuitdocs/Synth.html) require you to add __interface blocks__ (lapis blocks by default). Again, make sure that each interface block is attached to a structure block. The circuit will then use blocks on any side, on top, or below as a point of interaction with the "physical" world or the player. In the case of the synth circuit, it will play a note on any noteblock attached to its interface blocks.
 - Last but not least, go back to your circuit sign and __right-click__ it to activate the chip. If all went well, you should receive an activation message. 
 
 An input block can receive redstone signal from the block above it or from any block on its sides.
@@ -29,7 +29,7 @@ __redstone torches__, __powered rails__, __doors__, __trap doors__, and __note b
 it will directly send signal to any input pin whose block is touching the output block. 
 
 ###Output devices
-![output devices](/images/outputdevices.png)
+![output devices](/RedstoneChips/images/outputdevices.png)
 
 The order of the input and output blocks is very important as different pin numbers have different functions. In simple circuit structures the 
 pin numbering starts at the chip sign onwards. The pin to the right of the sign will always come before the pin to the left. 
@@ -38,18 +38,18 @@ structures.
 
 A clock, counter and two synth chips connected directly to each other forming a more complex structure. 
 
-![music box](/images/directconnection.png)
+![music box](/RedstoneChips/images/directconnection.png)
 
 ###One block chips
 When all you need is a chip with one i/o block, a sign can be directly attached to the single i/o block without needing any extra chip blocks.
 
-![one block chip](/images/oneblockchip.png)
+![one block chip](/RedstoneChips/images/oneblockchip.png)
 
 Debugging
 ---------
 There are several commands for investigating problems.
 
-- [/rcdebug](/commands.html#rcdebug_register_yourself_as_a_chip_debugger) - Sends debug messages from any number of chips.
+- [/rcdebug](/RedstoneChips/commands.html#rcdebug_register_yourself_as_a_chip_debugger) - Sends debug messages from any number of chips.
 - [/rcpin](#rcpin_prints_information_about_a_chip_pin) - Prints pin number and current state.
 - [/rcinfo](#rcinfo_prints_a_lot_of_useful_information_about_a_chip) - Prints info about the current state of the chip.
 - [/rcname](#rcname_name_or_unname_a_circuit_for_easier_debugging) - Give names to chips to be able to identify them better.
