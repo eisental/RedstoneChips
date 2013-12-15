@@ -45,7 +45,8 @@ public abstract class Memory {
         memories.put(id, this);
     }
 
-    /** Returns the memory id string */
+    /** Returns the memory id string
+     * @return  */
     public String getId() { return id; }
 
     /**

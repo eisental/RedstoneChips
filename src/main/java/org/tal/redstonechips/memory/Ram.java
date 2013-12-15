@@ -15,7 +15,7 @@ import org.tal.redstonechips.bitset.BitSetUtils;
  */
 public class Ram extends Memory {
     private Map<BitSet7, BitSet7> words;
-    private List<RamListener> listeners = new ArrayList<RamListener>();
+    private final List<RamListener> listeners = new ArrayList<RamListener>();
         
     /**
      * Read data from memory.
@@ -80,6 +80,15 @@ public class Ram extends Memory {
     public void write(BigInteger address, BigInteger data) {
         write(BitSetUtils.bigIntToBitSet(address), BitSetUtils.bigIntToBitSet(data));
     }
+
+    public void writeInt(int address, int value) {
+        write(address, value);
+    }
+        
+    public int readInt(int address) {
+        BitSet7 val = read(address);
+        return BitSetUtils.bitSetToUnsignedInt(val, 0, val.length());
+    }    
     
     @Override
     public void init(String id) {

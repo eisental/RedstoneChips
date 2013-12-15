@@ -25,15 +25,17 @@ public class BitSetUtils {
      */
     public static int bitSetToUnsignedInt(BitSet7 b, int startBit, int length) {
         int val = 0;
+        int bitval = 1;
         for (int i=0; i<length; i++) {
-            if (b.get(i+startBit)) val += Math.pow(2,i);
+            if (b.get(startBit+i)) val += bitval;
+            bitval+=bitval;                    
         }
-
+                
         return val;
-    }    
+    }
     
     /**
-     * Convert a BitSet to a signed integer using two's complement encoding.
+     * Convert a BitSet to a signed integer using two's complement encoding. The BitSet is treated as a two's complement encoding binary number.
      *
      * @param b BitSet to convert.
      * @param startBit LSB bit of the integer.
@@ -41,15 +43,15 @@ public class BitSetUtils {
      * @return a signed integer number.
      */
     public static int bitSetToSignedInt(BitSet7 b, int startBit, int length) {
-        // treats the bit set as a two's complement encoding binary number.
-        int signed = -(b.get(startBit+length-1)?1:0) * (int)Math.pow(2, length-1);
+        int signed = -(b.get(startBit+length-1)?1:0) * (1 << length-1);
+        int bitval = 1;
         for (int i=0; i<length-1; i++) {
-            if (b.get(startBit+i)) signed += Math.pow(2, i);
+            if (b.get(startBit+i)) signed += bitval;
+            bitval+=bitval;
         }
-
+        
         return signed;
     }
-
     /**
      * Convert a BitSet to an unsigned BigInteger.
      * 
@@ -59,12 +61,7 @@ public class BitSetUtils {
      * @return 
      */
     public static BigInteger bitSetToBigInt(BitSet7 b, int offset, int length) {
-        BigInteger val = BigInteger.ZERO;
-        for (int i=0; i<length; i++) {
-            if (b.get(i+offset)) val = val.add(BigTwo.pow(i));
-        }
-
-        return val;
+        return new BigInteger(BitSetUtils.toByteArray(b.get(offset, offset+length)));
     }
 
     /**
@@ -73,13 +70,8 @@ public class BitSetUtils {
      * @return 
      */
     public static BigInteger bitSetToBigInt(BitSet7 b) {
-        return bitSetToBigInt(b, 0, b.length());
+        return new BigInteger(BitSetUtils.toByteArray(b));
     }
-    
-    /**
-     * BigInteger object representing the number 2.
-     */
-    public final static BigInteger BigTwo = new BigInteger("2");
     
     /**
      * Convert a BigInteger into a BitSet.
@@ -87,19 +79,8 @@ public class BitSetUtils {
      * @return 
      */
     public static BitSet7 bigIntToBitSet(BigInteger i) {
-        BitSet7 bits = new BitSet7();
-        int index = 0;
-        while (!i.equals(BigInteger.ZERO)) {
-            if (!i.mod(BigTwo).equals(BigInteger.ZERO)) {
-                bits.set(index);
-            }
-            ++index;
-
-            i = i.shiftRight(1).clearBit(i.bitLength()-1);
-        }
-        
-        return bits;
-}
+        return BitSetUtils.fromByteArray(i.toByteArray());
+    }
    
     /**
      * Convert an integer to BitSet.
@@ -120,7 +101,26 @@ public class BitSetUtils {
         return bits;
         
     }
-    
+
+    public static BitSet7 fromByteArray(byte[] bytes) {
+        BitSet7 bits = new BitSet7();
+        for (int i = 0; i < bytes.length * 8; i++) {
+            if ((bytes[bytes.length - i / 8 - 1] & (1 << (i % 8))) > 0) {
+                bits.set(i);
+            }
+        }
+        return bits;
+    }
+
+    public static byte[] toByteArray(BitSet7 bits) {
+        byte[] bytes = new byte[bits.length()/8+1];
+        for (int i=0; i<bits.length(); i++) {
+            if (bits.get(i)) {
+                bytes[bytes.length-i/8-1] |= 1<<(i%8);
+            }
+        }
+        return bytes;
+    }    
     /**
      * Convert a BitSet to a binary representation string.
      * Each bit is converted into "0" or "1" and added to the string.
@@ -129,6 +129,7 @@ public class BitSetUtils {
      * @param b BitSet to convert
      * @param startBit Start converting from this bit. Treat it as the least significant bit.
      * @param length Number of bits to read from the BitSet after the startBit.
+     * @return String representation of b.
      */    
     public static String bitSetToBinaryString(BitSet7 b, int startBit, int length) {
         return bitSetToBinaryString(b, startBit, length, 4);
@@ -179,6 +180,7 @@ public class BitSetUtils {
      * Every other character is converted to false.
      * 
      * @param sbits The string to convert.
+     * @return BitSet representing the binary value.
      */
     public static BitSet7 stringToBitSet(String sbits) {
         BitSet7 bits = new BitSet7(sbits.length());
