@@ -68,6 +68,8 @@ public abstract class Wireless {
      * 
      * @param sender The chip creator.
      * @param channelString The channel and optionally the starting bit to communicate on. Format: channel-name[:start-bit]
+     * @param channelLength
+     * @param c
      * @throws IllegalArgumentException when channelString is invalid or the creator doesn't have channel permissions.
      */
     public void init(CommandSender sender, String channelString, int channelLength, Circuit c) throws IllegalArgumentException {
@@ -120,16 +122,12 @@ public abstract class Wireless {
         if (!(rc.getChannelManager().getChannelByName(name, false).isProtected())) return true;
         
         String playerName = ((Player)sender).getName();
-        if (((Player)sender).hasPermission("redstonechips.channel.admin") || rc.getChannelManager().getChannelByName(name, false).users.contains(playerName.toLowerCase()) 
-                || rc.getChannelManager().getChannelByName(name, false).owners.contains(playerName.toLowerCase())) {
-            return true;
-        }
-        
-        return false;
+        return (((Player)sender).hasPermission("redstonechips.channel.admin") || rc.getChannelManager().getChannelByName(name, false).users.contains(playerName.toLowerCase()) 
+                || rc.getChannelManager().getChannelByName(name, false).owners.contains(playerName.toLowerCase()));
     }
  
     /**
-     * Deregisters and shuts down the Wireless.
+     * Unregister and shuts down the Wireless.
      */
     public void shutdown() {
         if (getChannel()!=null) {

@@ -240,12 +240,12 @@ public abstract class Memory {
     /**
      * Increases the alloc count of this memory by 1.
      */
-    public void alloc() {
+    private void alloc() {
         allocatorsCount++;
     }
     
     /**
-     * Decreases the alloc count of this memory by 1 and release it when the count reaches 0.
+     * Decreases the allocators count by 1 and release it when the count reaches 0.
      */
     public void release() {
         if (allocatorsCount>0) allocatorsCount--;

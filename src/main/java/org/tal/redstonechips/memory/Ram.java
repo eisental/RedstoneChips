@@ -122,6 +122,13 @@ public class Ram extends Memory {
         }
     }
     
+   private BitSet7 convert(Object obj) {
+        if (obj instanceof BitSet7) return (BitSet7)obj;
+        else if (obj instanceof Integer) return BitSetUtils.intToBitSet((Integer)obj, 32);
+        else if (obj instanceof BigInteger) return BitSetUtils.bigIntToBitSet((BigInteger)obj);
+        else throw new IllegalArgumentException("Unsupported memory data class: " + obj.getClass().getCanonicalName());
+    }
+   
     /**
      * Registers a RamListener with this Ram.
      * @param l Ram listener.
@@ -133,12 +140,5 @@ public class Ram extends Memory {
     /**
      * @return All RamListeners listening to this Ram.
      */
-    public List<RamListener> getListeners() { return listeners; }
-    
-    private BitSet7 convert(Object obj) {
-        if (obj instanceof BitSet7) return (BitSet7)obj;
-        else if (obj instanceof Integer) return BitSetUtils.intToBitSet((Integer)obj, 32);
-        else if (obj instanceof BigInteger) return BitSetUtils.bigIntToBitSet((BigInteger)obj);
-        else throw new IllegalArgumentException("Unsupported memory data class: " + obj.getClass().getCanonicalName());
-    }
+    public List<RamListener> getListeners() { return listeners; }    
 }
