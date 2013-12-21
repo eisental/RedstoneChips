@@ -1,7 +1,7 @@
 package org.tal.redstonechips.circuit.scan;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.DyeColor;
@@ -110,7 +110,7 @@ public class ScanParameters {
     }
     
     public static ScanParameters generateDefaultParams(Block signBlock, RedstoneChips rc) {
-        Map<IOBlock.Type, MaterialData> iom = new HashMap<IOBlock.Type, MaterialData>();
+        Map<IOBlock.Type, MaterialData> iom = new EnumMap<IOBlock.Type, MaterialData>(IOBlock.Type.class);
         iom.put(IOBlock.Type.INPUT, rc.getPrefs().getInputBlockType());
         iom.put(IOBlock.Type.OUTPUT, rc.getPrefs().getOutputBlockType());
         iom.put(IOBlock.Type.INTERFACE, rc.getPrefs().getInterfaceBlockType());

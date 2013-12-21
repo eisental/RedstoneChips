@@ -27,6 +27,7 @@ import org.tal.redstonechips.circuit.scan.IOChipScanner;
 import org.tal.redstonechips.circuit.scan.RecursiveChipScanner;
 import org.tal.redstonechips.circuit.scan.ScanParameters;
 import org.tal.redstonechips.circuit.scan.SingleBlockChipScanner;
+import org.tal.redstonechips.user.Debugger;
 import org.tal.redstonechips.util.ChunkLocation;
 import org.tal.redstonechips.wireless.Wireless;
 
@@ -402,8 +403,12 @@ public class CircuitManager implements Listener {
             newCircuit.id = id;
             newCircuit.name = name;
             newCircuit.setResetData(data);
-            newCircuit.getListeners().addAll(listeners);
-
+            
+            for (CircuitListener l : listeners) {
+                if (l instanceof Debugger) ((Debugger)l).addCircuit(newCircuit);
+                else newCircuit.addListener(l);
+            }             
+            
             if (reseter!=null) reseter.sendMessage(rc.getPrefs().getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newCircuit.getChipString() + rc.getPrefs().getInfoColor() + ".");
             return true;
         } else {

@@ -137,9 +137,9 @@ public class RCBukkitEventHandler implements Listener {
     }
     
     @EventHandler (priority = EventPriority.MONITOR)
-    public void onPlayerInteract(PlayerInteractEvent event) {                
+    public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.isCancelled()) return;
-
+        
         if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
             UserSession session = rc.getUserSession(event.getPlayer(), false);
             if (session != null && session.useToolInHand(event.getClickedBlock())) {
