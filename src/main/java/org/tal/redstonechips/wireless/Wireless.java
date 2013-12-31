@@ -74,6 +74,14 @@ public abstract class Wireless {
      */
     public void init(CommandSender sender, String channelString, int channelLength, Circuit c) throws IllegalArgumentException {
         String chanName;
+        
+        if (channelString.length()==0) throw new IllegalArgumentException("Empty channel name.");
+        
+        if (channelString.charAt(0)=='#') {
+            channelString = channelString.substring(1);
+            if (channelString.length()==0) throw new IllegalArgumentException("Empty channel name.");
+        }
+       
         int colonIdx = channelString.indexOf(":");
         if (colonIdx!=-1) {
             chanName = channelString.substring(0, colonIdx);
