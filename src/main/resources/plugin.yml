@@ -5,7 +5,6 @@ author: eisental
 description: Core RedstoneChips plugin for building integrated redstone circuits.
 website: http://eisental.github.com/RedstoneChips
 load: startup
-depend: [etCommon]
 commands:
   redstonechips:
     description: General plugin information.
