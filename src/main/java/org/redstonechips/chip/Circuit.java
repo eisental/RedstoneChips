@@ -276,15 +276,28 @@ public abstract class Circuit {
      * Turns off all outputs.
      */
     protected void clearOutputs() {
-        this.writeBits(BooleanArrays.zero);
+        for (int i=0; i<outputlen; i++) 
+            write(false, i);
     }
     
-    // -- metadata
+    // -- metadata --
     
     private final Map<String, Object> metadata = new HashMap<>();
     
     public void putMeta(String key, Object val) { metadata.put(key, val); }
     
     public Object getMeta(String key) { return metadata.get(key); }
+ 
+    // -- static --
     
+    public static Circuit initalizeCircuit(Circuit circuit, CommandSender sender, String[] args) {
+        if (circuit==null) return null;
+        
+        circuit.activator = sender;        
+        Circuit initalizedCircuit = circuit.init(args);        
+        circuit.activator = null;        
+        
+        if (circuit != initalizedCircuit) return Circuit.initalizeCircuit(initalizedCircuit, sender, args);
+        else return circuit;
+    }
 }

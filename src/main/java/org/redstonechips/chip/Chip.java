@@ -89,36 +89,24 @@ public class Chip implements IOWriter {
      * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
      * @return result of call to abstract Circuit.init() method.
      */
-    public final boolean init(CommandSender sender) {                
-        updateInputBits();
-        
-        // circuit initialization.
-        circuit.activator = sender;
-        Circuit initedCircuit;
-        
+    public final boolean init(CommandSender sender) {
         try {
-            initedCircuit = circuit.init(args);            
+            Circuit c = Circuit.initalizeCircuit(circuit, sender, args);
+            if (c==null) return false;
+            else circuit = c;
+            
+            if (disabled) disable();
+            else runInputLogic();
+            
+            return true;        
+            
         } catch (Exception e) {
-            if (sender!=null) sender.sendMessage(RedstoneChips.inst().prefs().getErrorColor() + e.getMessage());
+            if (sender!=null)
+                sender.sendMessage(RedstoneChips.inst().prefs().getErrorColor() + e.getMessage());
             else RedstoneChips.inst().log(Level.WARNING, e.getMessage());
             e.printStackTrace();
             return false;
-        }            
-        
-        circuit.activator = null;        
-        
-        if (initedCircuit==null) return false;        
-        else if (initedCircuit == circuit) {
-            if (disabled) disable();
-            else runInputLogic();
-            return true;
-            
-        } else {
-            // When a circuit returns another circuit as a result of init we need to reinit the chip with the new circuit object.
-            circuit = initedCircuit;
-            return init(sender);
         }
-        
     }
     
     /** 
@@ -187,10 +175,13 @@ public class Chip implements IOWriter {
         for (ChipListener l : listeners) l.outputChanged(Chip.this, index, state);        
     }    
     
-    private void runInputLogic() {
-        if (circuit.isStateless())
-            for (int i=0; i<inputPins.length; i++)
-                inputChange(i, circuit.inputs[i]);
+    private void runInputLogic() {        
+        for (int i=0; i<inputPins.length; i++) {
+            inputPins[i].refreshSourceBlocks();
+            if (circuit.isStateless())
+                inputChange(i, inputPins[i].getPinValue());
+            else circuit.inputs[i] = inputPins[i].getPinValue();
+        }
     }
 
    /**
@@ -204,17 +195,7 @@ public class Chip implements IOWriter {
         for (int i=0; i<outputPins.length; i++)
             outputPins[i].setState(circuit.outputs[i]);
     }
-    
-    /**
-     * Update the inputBits BitSet according to the current input pin values.
-     */
-    public void updateInputBits() {
-        for (int i=0; i<inputPins.length; i++) {
-            inputPins[i].refreshSourceBlocks();
-            circuit.inputs[i] = inputPins[i].getPinValue();
-        }
-    }
-    
+        
     // -- Enable / Disable
     /**
      * When set to true any input changes will be ignored.
