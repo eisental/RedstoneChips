@@ -8,7 +8,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
-import org.redstonechips.CircuitLoader;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
+import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
@@ -60,8 +62,8 @@ public class ChipFactory {
     
     public static MaybeChip maybeCreateChip(ChipParameters params, CommandSender activator, int debugLevel) {
         RedstoneChips rc = RedstoneChips.inst();
-        ChatColor infoColor = rc.prefs().getInfoColor();
-        ChatColor errorColor = rc.prefs().getErrorColor();
+        ChatColor infoColor = RCPrefs.getInfoColor();
+        ChatColor errorColor = RCPrefs.getErrorColor();
         ChipCollection chips = rc.chipManager().getAllChips();
         
         if (params==null) return MaybeChip.NotAChip;
@@ -83,7 +85,7 @@ public class ChipFactory {
             return MaybeChip.ChipError.withError(infoColor + "Chip is already active - " + existingChip + ".");
         }
         
-        if (!rc.permissionManager().checkChipPermission(activator, signClass, true)) {
+        if (!RCPermissions.checkChipPermission(activator, signClass, true)) {
             return MaybeChip.ChipError.withError(errorColor + "You do not have permission to create circuits of type " + signClass + ".");
         }
 
@@ -131,58 +133,43 @@ public class ChipFactory {
     }
 
     public static MaybeChip maybeInstantiateChip(ChipParameters params, ChipCollection chips, String type, String[] args) {
-        try {
-            Chip c = new Chip();
-            c.setType(type);
-            
-            c.world = params.signBlock.getWorld();
+        Chip c = new Chip();
+        c.setType(type);
 
-            c.activationBlock = params.signBlock.getLocation();
+        c.world = params.signBlock.getWorld();
 
-            c.structure = new Location[params.structure.size()];
-            for (int i = 0; i < params.structure.size(); i++) {
-                c.structure[i] = params.structure.get(i).getLocation();
-            }
+        c.activationBlock = params.signBlock.getLocation();
 
-            c.inputPins = new InputPin[params.inputs.size()];
-            for (int i = 0; i < params.inputs.size(); i++) {
-                Location l = params.inputs.get(i).getLocation();
-                InputPin ip = new InputPin(c, l, i);
-                c.inputPins[i] = ip;
-            }
-
-            c.outputPins = new OutputPin[params.outputs.size()];
-            for (int i = 0; i < params.outputs.size(); i++) {
-                Location l = params.outputs.get(i).getLocation();
-                OutputPin op = new OutputPin(c, l, i);
-                c.outputPins[i] = op;
-            }
-
-            c.interfaceBlocks = new InterfaceBlock[params.interfaces.size()];
-            for (int i = 0; i < params.interfaces.size(); i++) {
-                InterfaceBlock ib = new InterfaceBlock(c, params.interfaces.get(i).getLocation(), i);
-                c.interfaceBlocks[i] = ib;
-            }
-
-            c.chunks = findChipChunks(c);
-
-            c.args = args;
-
-            Circuit cr = CircuitLoader.getCircuitInstance(type);
-            cr.constructWith(c, c);
-            c.circuit = cr;
-            
-            return MaybeChip.AChip.withChip(c);
-            
-        } catch (InstantiationException | IllegalAccessException ex) {
-            ex.printStackTrace();
-            return MaybeChip.ChipError.withError(ex.toString());
-        } catch (IllegalArgumentException ex) {
-            // unknown circuit name. shouldn't happen at this stage.
-            return MaybeChip.ChipError.withError(ex.toString());
+        c.structure = new Location[params.structure.size()];
+        for (int i = 0; i < params.structure.size(); i++) {
+            c.structure[i] = params.structure.get(i).getLocation();
         }
 
- 
+        c.inputPins = new InputPin[params.inputs.size()];
+        for (int i = 0; i < params.inputs.size(); i++) {
+            Location l = params.inputs.get(i).getLocation();
+            InputPin ip = new InputPin(c, l, i);
+            c.inputPins[i] = ip;
+        }
+
+        c.outputPins = new OutputPin[params.outputs.size()];
+        for (int i = 0; i < params.outputs.size(); i++) {
+            Location l = params.outputs.get(i).getLocation();
+            OutputPin op = new OutputPin(c, l, i);
+            c.outputPins[i] = op;
+        }
+
+        c.interfaceBlocks = new InterfaceBlock[params.interfaces.size()];
+        for (int i = 0; i < params.interfaces.size(); i++) {
+            InterfaceBlock ib = new InterfaceBlock(c, params.interfaces.get(i).getLocation(), i);
+            c.interfaceBlocks[i] = ib;
+        }
+
+        c.chunks = findChipChunks(c);
+
+        c.args = args;
+
+        return MaybeChip.AChip.withChip(c);
     }
     
     /**

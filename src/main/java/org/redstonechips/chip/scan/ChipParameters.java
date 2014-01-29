@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.chip.io.IOBlock;
@@ -122,9 +123,9 @@ public class ChipParameters {
         RedstoneChips rc = RedstoneChips.inst();
         
         Map<IOBlock.Type, MaterialData> iom = new EnumMap<>(IOBlock.Type.class);
-        iom.put(IOBlock.Type.INPUT, rc.prefs().getInputBlockType());
-        iom.put(IOBlock.Type.OUTPUT, rc.prefs().getOutputBlockType());
-        iom.put(IOBlock.Type.INTERFACE, rc.prefs().getInterfaceBlockType());
+        iom.put(IOBlock.Type.INPUT, RCPrefs.getInputBlockType());
+        iom.put(IOBlock.Type.OUTPUT, RCPrefs.getOutputBlockType());
+        iom.put(IOBlock.Type.INTERFACE, RCPrefs.getInterfaceBlockType());
         
         return iom;
     }

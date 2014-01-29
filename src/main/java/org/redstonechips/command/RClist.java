@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.parsing.Tokenizer;
 
@@ -80,7 +81,7 @@ public class RClist extends RCCommand {
         int chipCount = 0;
         
         for (Chip c : chips) {
-            lines += (makeCircuitDescriptionLine(c, rc.prefs().getInfoColor())) + "\n";
+            lines += (makeCircuitDescriptionLine(c, RCPrefs.getInfoColor())) + "\n";
             chipCount++;
         }
 
@@ -89,8 +90,7 @@ public class RClist extends RCCommand {
 
         sender.sendMessage("");
 
-        Pager.beginPaging(sender, title, lines,
-                rc.prefs().getInfoColor(), rc.prefs().getErrorColor());
+        Pager.beginPaging(sender, title, lines, RCPrefs.getInfoColor(), RCPrefs.getErrorColor());
     }
 
     public static final int lineLength = 20;

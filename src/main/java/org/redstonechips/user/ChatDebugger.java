@@ -4,7 +4,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.redstonechips.RedstoneChips;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.util.BooleanArrays;
 
@@ -21,8 +21,8 @@ class ChatDebugger extends Debugger {
 
     @Override
     public void chipDestroyed(Chip c, CommandSender destroyer) {
-        ChatColor ecolor = RedstoneChips.inst().prefs().getErrorColor();
-        ChatColor dcolor = RedstoneChips.inst().prefs().getDebugColor();
+        ChatColor ecolor = RCPrefs.getErrorColor();
+        ChatColor dcolor = RCPrefs.getDebugColor();
         String dname;
         if (destroyer==null)
             dname = "unknown cause";
@@ -35,7 +35,7 @@ class ChatDebugger extends Debugger {
 
     @Override
     public void chipDisabled(Chip c) {
-        debug(c, RedstoneChips.inst().prefs().getErrorColor() + "Chip is disabled.");
+        debug(c, RCPrefs.getErrorColor() + "Chip is disabled.");
     }
 
     @Override
@@ -78,7 +78,7 @@ class ChatDebugger extends Debugger {
     private void debug(Chip c, String msg) {
         Player p = session.getPlayer();
         if (p!=null)
-            p.sendMessage(RedstoneChips.inst().prefs().getDebugColor() + c.toString() + ": " + msg);        
+            p.sendMessage(RCPrefs.getDebugColor() + c.toString() + ": " + msg);        
     }
     
 }

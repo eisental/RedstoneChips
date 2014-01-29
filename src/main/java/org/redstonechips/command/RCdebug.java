@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.user.Debugger;
 import org.redstonechips.user.Debugger.Flag;
@@ -69,7 +70,7 @@ public class RCdebug extends RCCommand {
         } else {
             String title;
             if (d.isPaused())
-                title = chips.size() + " debugged IC(s) " + ChatColor.AQUA + "(Debugging Paused)" + rc.prefs().getInfoColor();
+                title = chips.size() + " debugged IC(s) " + ChatColor.AQUA + "(Debugging Paused)" + RCPrefs.getInfoColor();
             else title = chips.size() + " debugged IC(s)";
             
             RClist.printCircuitList(player, chips, title);

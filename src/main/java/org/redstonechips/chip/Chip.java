@@ -1,14 +1,15 @@
 
 package org.redstonechips.chip;
 
+import org.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
@@ -79,35 +80,6 @@ public class Chip implements IOWriter {
      * Set to the chunk coordinates of the circuit's activation block
      */
     public ChunkLocation[] chunks;    
-
-    /**
-     * 
-     * Initializes the circuit. 
-     * Updates input pin values according to source blocks.
-     * Refreshes the output pins according to input states if the circuit is stateless.
-     * 
-     * @param sender The sender that activated the circuit. Used for sending error or status messages after activation.
-     * @return result of call to abstract Circuit.init() method.
-     */
-    public final boolean init(CommandSender sender) {
-        try {
-            Circuit c = Circuit.initalizeCircuit(circuit, sender, args);
-            if (c==null) return false;
-            else circuit = c;
-            
-            if (disabled) disable();
-            else runInputLogic();
-            
-            return true;        
-            
-        } catch (Exception e) {
-            if (sender!=null)
-                sender.sendMessage(RedstoneChips.inst().prefs().getErrorColor() + e.getMessage());
-            else RedstoneChips.inst().log(Level.WARNING, e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
     
     /** 
      * 
@@ -129,7 +101,7 @@ public class Chip implements IOWriter {
         try {
             circuit.input(newVal, idx);
         } catch (Exception e) {
-            circuit.debug(RedstoneChips.inst().prefs().getErrorColor() + "On input: " + e.getMessage());
+            circuit.debug(RCPrefs.getErrorColor() + "On input: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -153,10 +125,9 @@ public class Chip implements IOWriter {
         notifyChipDestroyed(destroyer);
     }
     
-    /** @@@@ Should Also release memory. @@@@
-     * 
-     * Shuts down the circuit and informs all CircuitListeners.
-     * Additional shut down code can be inserted by overriding Circuit.shutdown().
+    /**
+     * Shuts down the chip and informs all ChipListeners.
+     * invokes Circuit.shutdown().
      */
     public void shutdown() {
         try {
@@ -175,15 +146,6 @@ public class Chip implements IOWriter {
         for (ChipListener l : listeners) l.outputChanged(Chip.this, index, state);        
     }    
     
-    private void runInputLogic() {        
-        for (int i=0; i<inputPins.length; i++) {
-            inputPins[i].refreshSourceBlocks();
-            if (circuit.isStateless())
-                inputChange(i, inputPins[i].getPinValue());
-            else circuit.inputs[i] = inputPins[i].getPinValue();
-        }
-    }
-
    /**
      * Called when any of the circuit's chunks has loaded. Causes the circuit to update the state of its output levers 
      * according to the current values in outputBits.
@@ -196,7 +158,8 @@ public class Chip implements IOWriter {
             outputPins[i].setState(circuit.outputs[i]);
     }
         
-    // -- Enable / Disable
+    // -- Enable / Disable --
+    
     /**
      * When set to true any input changes will be ignored.
      */
@@ -214,7 +177,7 @@ public class Chip implements IOWriter {
     public void disable() {
         disabled = true;
         circuit.disable();
-        updateCircuitSign(true);        
+        updateSign(true);        
         notifyChipDisabled();
     }
 
@@ -223,7 +186,7 @@ public class Chip implements IOWriter {
      */
     public void enable() {
         disabled = false;
-        updateCircuitSign(true);
+        updateSign(true);
         circuit.enable();
         notifyChipEnabled();
     }
@@ -232,7 +195,7 @@ public class Chip implements IOWriter {
      * Updates the text and color of the 1st line of the circuit activation sign.
      * @param activated When true the class name is colored in the selected signColor preference key. When false the color is removed.
      */
-    public void updateCircuitSign(boolean activated) {
+    public void updateSign(boolean activated) {
         if (!ChunkLocation.fromLocation(activationBlock).isChunkLoaded()) return;
         
         try {
@@ -245,7 +208,7 @@ public class Chip implements IOWriter {
             if (activated) {
                 String signColor;
                 if (isDisabled()) signColor = "8";
-                else signColor = RedstoneChips.inst().prefs().getSignColor();
+                else signColor = RCPrefs.getSignColor();
                 line = (char)167 + signColor + type;
             } else {
                 line = type;

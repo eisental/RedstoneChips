@@ -21,9 +21,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @author Tal Eisenberg
  */
-public class CircuitPersistence {
-    private final RedstoneChips rc;
-           
+public class RCPersistence {
     public final static String circuitsFileExtension = ".circuits";
     public final static String channelsFileExtension = ".channels";
     public final static String channelsFileName = "redstonechips"+channelsFileExtension;
@@ -31,11 +29,9 @@ public class CircuitPersistence {
     /**
      * Used to prevent saving state more than once per game tick.
      */
-    private final List<World> dontSaveCircuits = new ArrayList<>();
+    private static final List<World> dontSaveCircuits = new ArrayList<>();
     
-    public CircuitPersistence(RedstoneChips plugin) {
-        rc = plugin;
-    }
+    private RCPersistence() {}
 
     // -- Chip persistence --
     
@@ -43,7 +39,8 @@ public class CircuitPersistence {
      * Loads a circuits file of one world.
      * @param world 
      */
-    public void loadChipsOf(World world) {
+    public static void loadChipsOf(World world) {
+        RedstoneChips rc = RedstoneChips.inst();
         File file = new File(rc.getDataFolder(), world.getName()+circuitsFileExtension);
         if (file.exists()) {
             rc.log(Level.INFO, "Loading chips for world '" + world.getName() + "'...");
@@ -56,7 +53,9 @@ public class CircuitPersistence {
         }        
     }
         
-    private void loadChipsFromFile(File file) throws IOException {        
+    private static void loadChipsFromFile(File file) throws IOException {        
+        RedstoneChips rc = RedstoneChips.inst();
+        
         Yaml yaml = new Yaml();
         List<Map<String, Object>> circuitsList;
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -70,7 +69,7 @@ public class CircuitPersistence {
 
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
-                    MaybeChip mChip = s.deserialize(rc, circuitMap);
+                    MaybeChip mChip = s.deserialize(circuitMap);
                     if (mChip==MaybeChip.AChip) {
                         Map<String, String> state = (Map<String, String>)circuitMap.get(ChipSerializer.Key.STATE.key);
                         chipsAndState.put(mChip.getChip(), state);
@@ -84,9 +83,9 @@ public class CircuitPersistence {
                 }
             }
                         
-            // Initialize all compiled chips.
+            // Activate all compiled chips.
             for (Chip c : chipsAndState.keySet()) {
-                if (rc.chipManager().initializeChip(c, null, c.id)) {
+                if (rc.chipManager().activateChip(c, null, c.id)) {
                     Map<String, String> state = chipsAndState.get(c);
                     if (state!=null) c.circuit.setInternalState(state);
                 } 
@@ -97,8 +96,8 @@ public class CircuitPersistence {
     /**
      * Saves all the circuits on the server.
      */
-    public void saveAll() {
-      for(World wrld : rc.getServer().getWorlds())
+    public static void saveAll() {
+      for(World wrld : RedstoneChips.inst().getServer().getWorlds())
         saveChipsOf(wrld);
     }
 
@@ -107,7 +106,9 @@ public class CircuitPersistence {
      * 
      * @param world 
      */
-    public void saveChipsOf(World world) {        
+    public static void saveChipsOf(World world) {        
+        RedstoneChips rc = RedstoneChips.inst();
+        
         rc.log(Level.INFO, "Saving " + world.getName() + " chip data...");                
         
         if (dontSaveCircuits.contains(world)) return;
@@ -151,7 +152,7 @@ public class CircuitPersistence {
         
     }
     
-    private void serialize(Collection values, Serializer serializer, File file) {
+    private static void serialize(Collection values, Serializer serializer, File file) {
         List<Map<String,Object>> map = new ArrayList<>();
         for (Object o : values) {
             map.add(serializer.serialize(o));
@@ -161,7 +162,7 @@ public class CircuitPersistence {
             dumpYaml(map, file);
     }
     
-    private void dumpYaml(List<Map<String, Object>> circuitMap, File file) {
+    private static void dumpYaml(List<Map<String, Object>> circuitMap, File file) {        
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);
         Yaml yaml = new Yaml(options);
@@ -170,12 +171,12 @@ public class CircuitPersistence {
             yaml.dump(circuitMap, new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
             fos.flush();
         } catch (IOException ex) {
-            rc.log(Level.SEVERE, ex.getMessage());
+            RedstoneChips.inst().log(Level.SEVERE, ex.getMessage());
         }
     }
     
-    private File getCircuitsFile(String name) {
-        return new File(rc.getDataFolder(), name);
+    private static File getCircuitsFile(String name) {
+        return new File(RedstoneChips.inst().getDataFolder(), name);
     }
         
     // -- Wireless channels persistence --
@@ -183,14 +184,14 @@ public class CircuitPersistence {
     /**
      * Loads channel data from file.
      */
-    public void loadChannelsIfExists() {
-        File channelsFile = new File(rc.getDataFolder(), channelsFileName);
+    public static void loadChannelsIfExists() {
+        File channelsFile = new File(RedstoneChips.inst().getDataFolder(), channelsFileName);
         if (channelsFile.exists()) {
             loadChannelsFromFile(channelsFile);
         }        
     }
     
-    private void loadChannelsFromFile(File file) {
+    private static void loadChannelsFromFile(File file) {
         try (FileInputStream fis = new FileInputStream(file)) {
             Yaml yaml = new Yaml();
             
@@ -201,36 +202,36 @@ public class CircuitPersistence {
             
             if (channelsList!=null) {
                 for (Map<String,Object> channelMap : channelsList) {
-                    ser.deserialize(rc, channelMap);
+                    ser.deserialize(channelMap);
                 }
             }
         } catch (IOException ex) {
-            rc.log(Level.SEVERE, "While reading channels file: "+ex.toString());
+            RedstoneChips.inst().log(Level.SEVERE, "While reading channels file: "+ex.toString());
         }
     }
     
     // -- Backup --
     
     private final static String backupFileExtension = ".BACKUP";    
-    private final List<String> madeBackup = new ArrayList<>();
+    private final static List<String> madeBackup = new ArrayList<>();
 
-    private void backupCircuitsFile(String filename) {
+    private static void backupCircuitsFile(String filename) {
         if (madeBackup.contains(filename)) return;
 
         try {
             File original = getCircuitsFile(filename);
             File backup = getBackupFileName(original.getParentFile(),filename);
 
-            rc.log(Level.INFO, "An error occurred while loading redstone chips. To make sure you won't lose any data, a backup copy is"
+            RedstoneChips.inst().log(Level.INFO, "An error occurred while loading redstone chips. To make sure you won't lose any data, a backup copy is"
                     + " being created at " + backup.getPath());
             copy(original, backup);
         } catch (IOException ex) {
-            rc.log(Level.SEVERE, "Error while trying to write backup file: " + ex);
+            RedstoneChips.inst().log(Level.SEVERE, "Error while trying to write backup file: " + ex);
         }
         madeBackup.add(filename);
     }
     
-    private File getBackupFileName(File parentFile,String filename) {
+    private static File getBackupFileName(File parentFile,String filename) {
         File backup;
         int idx = 0;
 
@@ -241,7 +242,7 @@ public class CircuitPersistence {
         return backup;
     }
     
-    private void copy(File src, File dst) throws IOException {
+    private static void copy(File src, File dst) throws IOException {
         try (InputStream in = new FileInputStream(src);
              OutputStream out = new FileOutputStream(dst)) {
 
@@ -254,7 +255,7 @@ public class CircuitPersistence {
         }
     }          
 
-    private void removeUnprotectedChannels(Collection<BroadcastChannel> channels) {
+    private static void removeUnprotectedChannels(Collection<BroadcastChannel> channels) {
         List<BroadcastChannel> toremove = new ArrayList<>();
         for (BroadcastChannel c : channels) if (!c.isProtected()) toremove.add(c);        
         for (BroadcastChannel c : toremove) channels.remove(c);

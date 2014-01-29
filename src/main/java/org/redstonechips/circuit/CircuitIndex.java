@@ -1,5 +1,5 @@
 
-package org.redstonechips.chip;
+package org.redstonechips.circuit;
 
 import org.redstonechips.RedstoneChips;
 

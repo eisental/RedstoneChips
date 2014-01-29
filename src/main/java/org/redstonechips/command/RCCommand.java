@@ -5,6 +5,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 
 /**
@@ -27,7 +29,7 @@ public abstract class RCCommand implements CommandExecutor {
             if (player==null) return true;
         }
         
-        if (!rc.permissionManager().enforceCommand(sender, command.getName(), isOpRequired(), true)) return true;
+        if (!RCPermissions.enforceCommand(sender, command.getName(), isOpRequired(), true)) return true;
         
         run(sender, command, label, args);
         return true;
@@ -36,11 +38,11 @@ public abstract class RCCommand implements CommandExecutor {
     public abstract void run(CommandSender sender, Command command, String label, String[] args);
 
     public static void error(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(org.redstonechips.RedstoneChips.inst().prefs().getErrorColor() + message);
+        if (sender!=null) sender.sendMessage(RCPrefs.getErrorColor() + message);
     }
     
     public static void info(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(org.redstonechips.RedstoneChips.inst().prefs().getInfoColor() + message);
+        if (sender!=null) sender.sendMessage(RCPrefs.getInfoColor() + message);
     }
     
 }

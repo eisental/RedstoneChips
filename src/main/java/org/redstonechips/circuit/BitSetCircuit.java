@@ -1,4 +1,6 @@
-package org.redstonechips.chip;
+package org.redstonechips.circuit;
+
+import org.redstonechips.circuit.Circuit;
 
 /**
  * A Redstone Circuit that treats its inputs as multiple bit sets.

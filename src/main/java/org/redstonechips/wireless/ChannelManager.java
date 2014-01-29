@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.redstonechips.RedstoneChips;
-import org.redstonechips.chip.Circuit;
+import org.redstonechips.circuit.Circuit;
 
 /**
  *

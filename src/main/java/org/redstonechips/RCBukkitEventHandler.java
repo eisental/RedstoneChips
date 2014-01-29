@@ -162,7 +162,7 @@ public class RCBukkitEventHandler implements Listener {
                     event.setCancelled(true);                            
                 }
             } else {
-                MaybeChip mChip = cm.maybeScanChip(event.getClickedBlock(), event.getPlayer(), -1);
+                MaybeChip mChip = cm.maybeCreateAndActivateChip(event.getClickedBlock(), event.getPlayer(), -1);
                 if (mChip!=MaybeChip.NotAChip) event.setCancelled(true);
             }   
         }
@@ -195,7 +195,7 @@ public class RCBukkitEventHandler implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onWorldSave(WorldSaveEvent event) {
         if (WorldsObserver.isWorldUnloading(event.getWorld())) {
-            rc.circuitPersistence().saveChipsOf(event.getWorld());
+            RCPersistence.saveChipsOf(event.getWorld());
             WorldsObserver.removeUnloadingWorld();
         }
     }
@@ -207,6 +207,6 @@ public class RCBukkitEventHandler implements Listener {
      */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onWorldLoad(WorldLoadEvent event) {
-        rc.circuitPersistence().loadChipsOf(event.getWorld());
+        RCPersistence.loadChipsOf(event.getWorld());
     }
 }

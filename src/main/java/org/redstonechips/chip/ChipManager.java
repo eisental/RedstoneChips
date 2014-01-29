@@ -1,5 +1,6 @@
 package org.redstonechips.chip;
 
+import org.redstonechips.circuit.Circuit;
 import java.util.*;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
@@ -11,7 +12,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Redstone;
-import org.redstonechips.PrefsManager;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.circuit.CircuitLoader;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
 import org.redstonechips.chip.io.IOBlock;
@@ -37,33 +40,46 @@ public class ChipManager {
     
     public ChipManager(RedstoneChips plugin) { rc = plugin; }
     
-    public MaybeChip maybeScanChip(Block activationBlock, CommandSender activator, int verboseLevel) {
-        return maybeScanChip(activationBlock, activator, ChipParameters.defaultIOMaterials(), verboseLevel);
+    /**
+     * {@link #maybeCreateAndActivateChip(org.bukkit.block.Block, org.bukkit.command.CommandSender, java.util.Map, int) maybeCretaeAndActivateChip}
+     * with default IO block materials.
+     */
+    public MaybeChip maybeCreateAndActivateChip(Block signBlock, CommandSender activator, int debugLevel) {
+        return maybeCreateAndActivateChip(signBlock, activator, ChipParameters.defaultIOMaterials(), debugLevel);
     }
-    
-    public MaybeChip maybeScanChip(Block activationBlock, CommandSender activator, Map<IOBlock.Type, MaterialData> iom, int verboseLevel) {
-        ChipParameters params = ChipParameters.generate(activationBlock, iom);
+
+    /**
+     * Tries to create a chip by scanning from signBlock and activate it. If successful a fully configured chip is added to the system.
+     * 
+     * @param signBlock The chip sign block. This is where scanning starts.
+     * @param activator The chip activator, usually a Player. Can be null.
+     * @param iom A map of IO block types to block materials used for scanning.
+     * @param debugLevel When greater than zero, the scanning process will produce debug messages.
+     * @return a MaybeChip object encapsulating either a new chip, a chip error or denoting that a chip was not recognized at the signBlock.
+     */
+    public MaybeChip maybeCreateAndActivateChip(Block signBlock, CommandSender activator, Map<IOBlock.Type, MaterialData> iom, int debugLevel) {
+        ChipParameters params = ChipParameters.generate(signBlock, iom);
         if (params!=null) {
-            MaybeChip mChip = ChipFactory.maybeCreateChip(params, activator);
+            MaybeChip mChip = ChipFactory.maybeCreateChip(params, activator, debugLevel);
             if (mChip==MaybeChip.AChip) {
-                if (initializeChip(mChip.getChip(), activator, verboseLevel))
+                if (activateChip(mChip.getChip(), activator, -1))
                     return mChip;
-                else return MaybeChip.ChipError.withError("Could not initialize chip.");
+                else return MaybeChip.ChipError.withError("Could not activate chip.");
             }
         } return MaybeChip.NotAChip;                
     }
     
     /**
-     * Activates an already scanned chip.
-     *
-     * @param chip Chip to initialize.
+     * Activates an existing chip. 
+     * Temporarily loads the chip chunk. Creates a circuit instance of the chip type and initializes it.
+     * Update the chip sign with a color denoting whether the chip is active or not.
+     * 
+     * @param chip Chip to activate.
      * @param activator The activator.
-     * @param id The desired circuit id. When less than 0, a new id is generated.
+     * @param id The desired chip id number. When less than 0, a free id is used.
      * @return true when the chip is successfully activated, false otherwise.
      */
-    public boolean initializeChip(Chip chip, CommandSender activator, int id) {
-        boolean ret;
-        
+    public boolean activateChip(Chip chip, CommandSender activator, int id) {
         List<ChunkLocation> chunksToUnload = new ArrayList<>();
         
         for (ChunkLocation chunk : chip.chunks) {
@@ -73,7 +89,28 @@ public class ChipManager {
             }
         }
         
-        if (chip.init(activator)) {
+        boolean success;
+        
+        try {            
+            Circuit c = Circuit.initalizeCircuit(
+                    CircuitLoader.getCircuitInstance(chip.getType()).constructWith(chip, chip), activator, chip.args);
+
+            if (c==null) success = false;
+            else {
+                chip.circuit = c;
+                if (chip.isDisabled()) chip.disable();
+                else restoreIOState(chip);
+                success = true;
+            }            
+        } catch (Exception e) {
+            if (activator!=null)
+                activator.sendMessage(RCPrefs.getErrorColor() + e.getMessage());
+            else RedstoneChips.inst().log(Level.WARNING, e.getMessage());
+            e.printStackTrace();
+            success = false;
+        }
+        
+        if (success) {
             if (id<0)
                 chip.id = generateId();
             else
@@ -81,33 +118,40 @@ public class ChipManager {
             chips.put(chip.id, chip);
 
             if (activator != null) {
-                ChatColor ic = rc.prefs().getInfoColor();
-                ChatColor dc = rc.prefs().getDebugColor();
+                ChatColor ic = RCPrefs.getInfoColor();
+                ChatColor dc = RCPrefs.getDebugColor();
                 activator.sendMessage(ic + "Activated " + ChatColor.YELLOW + chip + ic + ": "
                         + dc + ChatColor.GRAY + chip.inputPins.length + dc + " input"
                         + (chip.inputPins.length!=1?"s":"") + ", " + ChatColor.YELLOW + chip.outputPins.length + dc + " output"
                         + (chip.outputPins.length!=1?"s":"") + " and " + ChatColor.BLUE + chip.interfaceBlocks.length + dc
                         + " interface block" + (chip.interfaceBlocks.length!=1?"s":"") + ".");
             }
-
-            chip.updateCircuitSign(true);
-
-            ret = true;
-        } else {
-            //if (activator!=null)
-            //    activator.sendMessage(rc.prefs().getErrorColor() + chip.getClass().getSimpleName() + " was not activated.");
+            chip.updateSign(true);
             
-            chip.updateCircuitSign(false);
-            ret = false;
+        } else {
+            chip.updateSign(false);
         }
         
         for (ChunkLocation chunk : chunksToUnload) {
             releaseChunk(chunk);
         }
 
-        return ret;
+        return success;
     }
 
+    private void restoreIOState(Chip chip) {
+        for (int i=0; i<chip.outputPins.length; i++) {
+            chip.circuit.outputs[i] = chip.outputPins[i].getState();
+        }
+        
+        for (int i=0; i<chip.inputPins.length; i++) {
+            chip.inputPins[i].refreshSourceBlocks();
+            if (chip.circuit.isStateless())
+                chip.inputChange(i, chip.inputPins[i].getPinValue());
+            else chip.circuit.inputs[i] = chip.inputPins[i].getPinValue();
+        }        
+    }
+    
     /**
      * Redstone change event handler. Checks if this event reports an input change in any circuit's input pins.
      * When the new redstone state is different than the current one, the input pin is updated and the circuit is notified.
@@ -140,7 +184,7 @@ public class ChipManager {
 
         if (destroyed!=null && chips.containsValue(destroyed)) {
             if (destroyChip(destroyed, s, false)) {
-                if (s!=null) s.sendMessage(rc.prefs().getErrorColor() + "You destroyed " + destroyed.toString() + ".");
+                if (s!=null) s.sendMessage(RCPrefs.getErrorColor() + "You destroyed " + destroyed.toString() + ".");
             } else {
                 return false;
             }
@@ -212,22 +256,22 @@ public class ChipManager {
      */
     public boolean destroyChip(Chip destroyed, CommandSender destroyer, boolean destroyBlocks, boolean updateSign) {
         if (destroyBlocks) {
-            boolean enableDestroyCommand = (Boolean)rc.prefs().getPref(PrefsManager.Prefs.enableDestroyCommand.name());
+            boolean enableDestroyCommand = (Boolean)RCPrefs.getPref(RCPrefs.Prefs.enableDestroyCommand.name());
             if (!enableDestroyCommand) {
-                if (destroyer!=null) destroyer.sendMessage(rc.prefs().getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
+                if (destroyer!=null) destroyer.sendMessage(RCPrefs.getErrorColor()+"/rcdestroy is disabled. You can enable it using /rcprefs enableDestroyCommand true");
                 return false;
             }
         }
 
-        if (!rc.permissionManager().checkChipPermission(destroyer, destroyed.getType(), false)) {
-            if (destroyer!=null) destroyer.sendMessage(rc.prefs().getErrorColor() + "You do not have permission to destroy circuits of type " + destroyed.getType() + ".");
+        if (!RCPermissions.checkChipPermission(destroyer, destroyed.getType(), false)) {
+            if (destroyer!=null) destroyer.sendMessage(RCPrefs.getErrorColor() + "You do not have permission to destroy circuits of type " + destroyed.getType() + ".");
             return false;
         }
         
         if (destroyer!=null) {
             List<Wireless> list = rc.channelManager().getCircuitWireless(destroyed.circuit);
             for (Wireless w : list) {
-                if (w.getChannel()!=null && !rc.permissionManager().enforceChannel(destroyer, w.getChannel(), true)) {                    
+                if (w.getChannel()!=null && !RCPermissions.enforceChannel(destroyer, w.getChannel(), true)) {                    
                     return false;
                 }
             }
@@ -241,7 +285,7 @@ public class ChipManager {
             for (Location l : destroyed.structure)
                 destroyed.world.getBlockAt(l).setType(Material.AIR);
         } else if (updateSign) {
-            destroyed.updateCircuitSign(false);
+            destroyed.updateSign(false);
         }        
 
         return true;
@@ -274,11 +318,11 @@ public class ChipManager {
                 else newChip.addListener(l);
             }             
             
-            if (initializeChip(newChip, reseter, id)) {
+            if (activateChip(newChip, reseter, id)) {
                 newChip.name = name;
                 newChip.circuit.setResetData(data);
 
-                if (reseter!=null) reseter.sendMessage(rc.prefs().getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newChip + rc.prefs().getInfoColor() + ".");
+                if (reseter!=null) reseter.sendMessage(RCPrefs.getInfoColor() + "Successfully reactivated " + ChatColor.YELLOW + newChip + RCPrefs.getInfoColor() + ".");
                 return true;
             } else return false;
         } else {
@@ -462,14 +506,14 @@ public class ChipManager {
     public int fixIOBlocks(Chip c) {
         int blockCount = 0;
 
-        int inputType = rc.prefs().getInputBlockType().getItemTypeId();
-        byte inputData = rc.prefs().getInputBlockType().getData();
+        int inputType = RCPrefs.getInputBlockType().getItemTypeId();
+        byte inputData = RCPrefs.getInputBlockType().getData();
 
-        int outputType = rc.prefs().getOutputBlockType().getItemTypeId();
-        byte outputData = rc.prefs().getOutputBlockType().getData();
+        int outputType = RCPrefs.getOutputBlockType().getItemTypeId();
+        byte outputData = RCPrefs.getOutputBlockType().getData();
 
-        int interfaceType = rc.prefs().getInterfaceBlockType().getItemTypeId();
-        byte interfaceData = rc.prefs().getInterfaceBlockType().getData();
+        int interfaceType = RCPrefs.getInterfaceBlockType().getItemTypeId();
+        byte interfaceData = RCPrefs.getInterfaceBlockType().getData();
 
         List<ChunkLocation> chunksToUnload = new ArrayList<>();
         for (ChunkLocation chunk : c.chunks) {

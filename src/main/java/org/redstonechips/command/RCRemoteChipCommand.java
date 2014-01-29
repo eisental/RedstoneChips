@@ -2,6 +2,8 @@ package org.redstonechips.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 
 /**
@@ -17,11 +19,11 @@ public abstract class RCRemoteChipCommand extends RCCommand {
             c = CommandUtils.findTargetChip(sender);
             if (c!=null) runWithChip(c, sender, command, label, args);
         } else {
-            if (!rc.permissionManager().enforceRemoteCommand(sender, command.getName())) return ;            
+            if (!RCPermissions.enforceRemoteCommand(sender, command.getName())) return ;            
             c = rc.chipManager().getAllChips().getById(args[0]);
             if (c!=null) runWithChip(c, sender, command, label, truncateArgs(args));
             else
-                sender.sendMessage(rc.prefs().getErrorColor() + "There's no activated chip with id " + args[0]);                
+                sender.sendMessage(RCPrefs.getErrorColor() + "There's no activated chip with id " + args[0]);                
         }        
     }
 

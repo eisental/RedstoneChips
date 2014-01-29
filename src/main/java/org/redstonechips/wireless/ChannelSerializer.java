@@ -26,9 +26,9 @@ public class ChannelSerializer extends Serializer {
     }
 
     @Override
-    public BroadcastChannel deserialize(RedstoneChips rc, Map<String, Object> map) {
+    public BroadcastChannel deserialize(Map<String, Object> map) {
         BroadcastChannel channel;
-        channel = rc.channelManager().getChannelByName((String)map.get(Key.CHAN_NAME.key), true);
+        channel = RedstoneChips.inst().channelManager().getChannelByName((String)map.get(Key.CHAN_NAME.key), true);
         if (map.containsKey(Key.CHAN_STATE.key)) 
             channel.bits = BooleanArrays.fromString((String)map.get(Key.CHAN_STATE.key));
         

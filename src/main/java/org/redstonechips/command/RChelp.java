@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.paging.Pager;
 
 /**
@@ -22,8 +23,8 @@ public class RChelp extends RCCommand {
     @Override
     public void run(CommandSender sender, Command cmd, String label, String[] args) {
         Map commands = (Map)rc.getDescription().getCommands();
-        ChatColor infoColor = rc.prefs().getInfoColor();
-        ChatColor errorColor = rc.prefs().getErrorColor();
+        ChatColor infoColor = RCPrefs.getInfoColor();
+        ChatColor errorColor = RCPrefs.getErrorColor();
 
         if (args.length==0) {
             printCommandList(sender, commands, null, infoColor, errorColor);
@@ -87,6 +88,6 @@ public class RChelp extends RCCommand {
 
     public static void printCommandHelp(CommandSender sender, String command, org.redstonechips.RedstoneChips rc) {
         Pager.beginPaging(sender, "/" + command, getCommandHelp(command, rc), 
-                rc.prefs().getInfoColor(), rc.prefs().getErrorColor());
+                RCPrefs.getInfoColor(), RCPrefs.getErrorColor());
     }
 }

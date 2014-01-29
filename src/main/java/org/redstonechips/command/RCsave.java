@@ -4,6 +4,8 @@ package org.redstonechips.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPersistence;
+import org.redstonechips.RCPrefs;
 
 /**
  *
@@ -15,8 +17,8 @@ public class RCsave extends RCCommand {
     
     @Override
     public void run(CommandSender sender, Command command, String label, String[] args) {
-        rc.circuitPersistence().saveAll();
+        RCPersistence.saveAll();
         if (sender instanceof Player)
-            sender.sendMessage(rc.prefs().getInfoColor() + "Done saving " + rc.chipManager().getAllChips().size() + " chips.");
+            sender.sendMessage(RCPrefs.getInfoColor() + "Done saving " + rc.chipManager().getAllChips().size() + " chips.");
     }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.util.BooleanArrays;
 import org.redstonechips.util.ChunkLocation;
@@ -22,7 +23,7 @@ public class RCinfo extends RCRemoteChipCommand {
     public static void printCircuitInfo(CommandSender sender, Chip c) {
         org.redstonechips.RedstoneChips rc = org.redstonechips.RedstoneChips.inst();
         
-        ChatColor infoColor = rc.prefs().getInfoColor();
+        ChatColor infoColor = RCPrefs.getInfoColor();
         ChatColor extraColor = ChatColor.YELLOW;
 
         String disabled;

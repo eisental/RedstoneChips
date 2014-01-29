@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.redstonechips.PrefsManager;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.user.ChipProbe;
 import org.redstonechips.user.Tool;
 import org.redstonechips.user.UserSession;
@@ -28,7 +28,7 @@ public class RCtool extends RCCommand {
     
     private void processArg(Player player, String arg) {
         try {
-            Material m = PrefsManager.findMaterial(arg).getItemType();
+            Material m = RCPrefs.findMaterial(arg).getItemType();
             setToType(rc, player, m);
         } catch (IllegalArgumentException e) {
             if ("clear".startsWith(arg)) clearTools(rc, player);
@@ -50,18 +50,18 @@ public class RCtool extends RCCommand {
             t.setItem(type);
             session.addTool(t);
         } catch (IllegalArgumentException ie) {
-            player.sendMessage(rc.prefs().getErrorColor() + ie.getMessage());
+            player.sendMessage(RCPrefs.getErrorColor() + ie.getMessage());
             return;
         }
         
         info(player, "Chip probe set to " + ChatColor.YELLOW + type.name().toLowerCase() + ". " 
-                + rc.prefs().getInfoColor() + "Right-click a chip block to for info.");                
+                + RCPrefs.getInfoColor() + "Right-click a chip block to for info.");                
     }
     
     public static void clearTools(org.redstonechips.RedstoneChips rc, Player player) {
         UserSession session = rc.getUserSession(player, true);
         session.getTools().clear();
         
-        player.sendMessage(rc.prefs().getInfoColor() + "Tools cleared.");
+        player.sendMessage(RCPrefs.getInfoColor() + "Tools cleared.");
     }
 }

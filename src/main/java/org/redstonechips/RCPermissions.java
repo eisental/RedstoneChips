@@ -9,10 +9,8 @@ import org.redstonechips.wireless.BroadcastChannel;
  *
  * @author taleisenberg
  */
-public class PermissionManager {
-    RedstoneChips rc;
-    
-    public PermissionManager(RedstoneChips rc) { this.rc = rc; }
+public class RCPermissions {
+    private RCPermissions() {}
     
     /**
      * Checks if a player has permission to create or destroy a chip.
@@ -22,8 +20,8 @@ public class PermissionManager {
      * @param create
      * @return true if player has permission.
      */
-    public boolean checkChipPermission(CommandSender sender, String classname, boolean create) {
-        if (!rc.prefs().getUsePermissions()) return true;
+    public static boolean checkChipPermission(CommandSender sender, String classname, boolean create) {
+        if (!RCPrefs.getUsePermissions()) return true;
         if (!(sender instanceof Player)) return true;
         
         Player player = (Player)sender;
@@ -45,32 +43,32 @@ public class PermissionManager {
      * @param report Determines whether an error message is sent to the sender in case it doesn't have permission.
      * @return true if the sender has permission to use the command.
      */
-    public boolean enforceCommand(CommandSender sender, String commandName, boolean opRequired, boolean report) {
-        if (!rc.prefs().getUsePermissions()) return (opRequired?sender.isOp():true);
+    public static boolean enforceCommand(CommandSender sender, String commandName, boolean opRequired, boolean report) {
+        if (!RCPrefs.getUsePermissions()) return (opRequired?sender.isOp():true);
         if (!(sender instanceof Player)) return true;
         if(((Player)sender).hasPermission("redstonechips.command." + commandName) && !((Player)sender).hasPermission("redstonechips.command." + commandName + ".deny")) {
             return true;
         } else {
-            if (report) sender.sendMessage(rc.prefs().getErrorColor() + "You do not have permission to use command " + commandName + ".");
+            if (report) sender.sendMessage(RCPrefs.getErrorColor() + "You do not have permission to use command " + commandName + ".");
             return false;
         }
     }
 
-    public boolean enforceRemoteCommand(CommandSender sender, String commandName) {
+    public static boolean enforceRemoteCommand(CommandSender sender, String commandName) {
         if (enforceCommand(sender, commandName + ".id", true, false)) return true; 
         else {
-            sender.sendMessage(rc.prefs().getErrorColor() + "You do not have permissions to use " + commandName + " remotely.");
+            sender.sendMessage(RCPrefs.getErrorColor() + "You do not have permissions to use " + commandName + " remotely.");
             return false;
         }
     }
     
-    public boolean enforceChannel(CommandSender sender, String channelName, boolean report) {
-        if (!(rc.channelManager().getBroadcastChannels().containsKey(channelName))) return true;
+    public static boolean enforceChannel(CommandSender sender, String channelName, boolean report) {
+        if (!(RedstoneChips.inst().channelManager().getBroadcastChannels().containsKey(channelName))) return true;
         
-        return enforceChannel(sender, rc.channelManager().getChannelByName(channelName, false), report);
+        return enforceChannel(sender, RedstoneChips.inst().channelManager().getChannelByName(channelName, false), report);
     }
     
-    public boolean enforceChannel(CommandSender sender, BroadcastChannel channel, boolean report) {
+    public static boolean enforceChannel(CommandSender sender, BroadcastChannel channel, boolean report) {
         if (!(sender instanceof Player)) return true;
         
         if (!channel.isProtected()) return true;
@@ -82,7 +80,7 @@ public class PermissionManager {
                 channel.owners.contains(playerName.toLowerCase());
         
         if (report && !ret)
-            sender.sendMessage(rc.prefs().getErrorColor()+"You do not have permissions to use or modify channel " + channel.name + ".");
+            sender.sendMessage(RCPrefs.getErrorColor()+"You do not have permissions to use or modify channel " + channel.name + ".");
         
         return ret;
     }

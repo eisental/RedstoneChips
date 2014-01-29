@@ -9,8 +9,9 @@ import org.redstonechips.paging.Pager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.redstonechips.CircuitLoader;
-import org.redstonechips.chip.CircuitIndex;
+import org.redstonechips.RCPrefs;
+import org.redstonechips.circuit.CircuitLoader;
+import org.redstonechips.circuit.CircuitIndex;
 
 /**
  *
@@ -31,8 +32,8 @@ public class RCclasses extends RCCommand {
     public static void printClassesList(CommandSender sender, List<CircuitIndex> libs) {
         String list = "";        
         Collections.sort(libs, new CircuitIndexComparator());
-        ChatColor infoColor = org.redstonechips.RedstoneChips.inst().prefs().getInfoColor();
-        ChatColor errorColor = org.redstonechips.RedstoneChips.inst().prefs().getErrorColor();        
+        ChatColor infoColor = RCPrefs.getInfoColor();
+        ChatColor errorColor = RCPrefs.getErrorColor();        
         ChatColor otherColor = ChatColor.YELLOW;
         
         for (CircuitIndex lib : libs) {

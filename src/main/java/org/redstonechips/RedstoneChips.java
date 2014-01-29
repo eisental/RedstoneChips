@@ -1,5 +1,6 @@
 package org.redstonechips;
 
+import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.wireless.ChannelManager;
 import org.redstonechips.chip.ChipManager;
 import java.io.IOException;
@@ -12,8 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.redstonechips.chip.Circuit;
-import org.redstonechips.chip.CircuitIndex;
+import org.redstonechips.circuit.Circuit;
+import org.redstonechips.circuit.CircuitIndex;
 import org.redstonechips.command.*;
 import org.redstonechips.memory.Memory;
 import org.redstonechips.user.UserSession;
@@ -23,12 +24,9 @@ import org.redstonechips.user.UserSession;
  *
  * @author Tal Eisenberg
  */
-public class RedstoneChips extends JavaPlugin {    
-    private PrefsManager prefsManager;
+public class RedstoneChips extends JavaPlugin {
     private ChipManager circuitManager;
-    private CircuitPersistence circuitPersistence;
     private ChannelManager channelManager;
-    private PermissionManager permissionManager;
     
     /** List of registered /rctype receivers. */
     public Map<Location, RCTypeReceiver> rcTypeReceivers = new HashMap<>();
@@ -50,7 +48,7 @@ public class RedstoneChips extends JavaPlugin {
         setupFolders();        
         initManagers();
         loadCircuitLibraries();        
-        prefsManager.loadPrefs();        
+        RCPrefs.loadPrefs();        
         getServer().getPluginManager().registerEvents(new RCBukkitEventHandler(this), this);
         registerCommands();
         for (CircuitIndex lib : CircuitLoader.getCircuitLibraries()) lib.onRedstoneChipsEnable(this);
@@ -65,14 +63,14 @@ public class RedstoneChips extends JavaPlugin {
     private void postStartup() {
         for (World w : getServer().getWorlds()) {
             if (!WorldsObserver.isWorldLoaded(w)) 
-                circuitPersistence.loadChipsOf(w);
+                RCPersistence.loadChipsOf(w);
         }
         
-        circuitPersistence.loadChannelsIfExists();
+        RCPersistence.loadChannelsIfExists();
         
         log(Level.INFO, "Processing " + circuitManager.getAllChips().size() + " active chip(s).");
         
-        if (prefsManager.getCheckForUpdates()) {
+        if (RCPrefs.getCheckForUpdates()) {
             Runnable updater = new Runnable() {
 
                 @Override
@@ -100,7 +98,7 @@ public class RedstoneChips extends JavaPlugin {
         for (UserSession s : sessions.values())
             s.playerQuit();
         
-        circuitPersistence.saveAll();
+        RCPersistence.saveAll();
         circuitManager.shutdownAllChips();
         WorldsObserver.clearLoadedWorldsList();
         RedstoneChips.instance = null;
@@ -108,15 +106,13 @@ public class RedstoneChips extends JavaPlugin {
 
     private void initManagers() {
         try {
-            prefsManager = new PrefsManager(this);
+            RCPrefs.initialize();
         } catch (IOException ex) {
             log(Level.SEVERE, ex.toString());
         }   
 
         circuitManager = new ChipManager(this);
-        circuitPersistence = new CircuitPersistence(this);
         channelManager = new ChannelManager(this);
-        permissionManager = new PermissionManager(this);
     }                
 
     private void registerCommands() {
@@ -166,11 +162,6 @@ public class RedstoneChips extends JavaPlugin {
     }
 
     /**
-     * @return the preference manager. The object responsible for loading, saving and editing the plugin preferences.
-     */
-    public PrefsManager prefs() { return prefsManager; }
-
-    /**
      * @return the circuit manager. The object responsible for creating and managing active circuits.
      */
     public ChipManager chipManager() { return circuitManager; }
@@ -179,17 +170,7 @@ public class RedstoneChips extends JavaPlugin {
      * @return the channel manager. The object responsible for handling wireless broadcast channels.
      */
     public ChannelManager channelManager() { return channelManager; }
-    
-    /**
-     * @return the permission manager. The object responsible for handling various permission checks.
-     */
-    public PermissionManager permissionManager() { return permissionManager; }
-    
-    /**
-     * @return the circuit persistence handler. The object responsible for saving and loading the active circuit list from storage.
-     */
-    public CircuitPersistence circuitPersistence() { return circuitPersistence; }
-
+        
     /**
      * Called by CircuitLibrary to register the library with the plugin.
      *

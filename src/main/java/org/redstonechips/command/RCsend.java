@@ -3,6 +3,8 @@ package org.redstonechips.command;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.parsing.Parsing;
 import org.redstonechips.wireless.BroadcastChannel;
 import org.redstonechips.util.BooleanArrays;
@@ -27,7 +29,7 @@ public class RCsend extends RCCommand {
             return;
         } 
         
-        if (c.isProtected() && !rc.permissionManager().enforceChannel(sender, c, false)) {
+        if (c.isProtected() && !RCPermissions.enforceChannel(sender, c, false)) {
             error(sender, "You do not have permissions to transmit over this channel.");
             return;
         }
@@ -69,7 +71,7 @@ public class RCsend extends RCCommand {
                     }
                 }
 
-                ChatColor ic = rc.prefs().getInfoColor();
+                ChatColor ic = RCPrefs.getInfoColor();
                 sender.sendMessage(ic + "Transmitting " + ChatColor.YELLOW + BooleanArrays.toPrettyString(bits) 
                         + ic + " over channel " + c.name + " bit " + startBit + ".");
                 

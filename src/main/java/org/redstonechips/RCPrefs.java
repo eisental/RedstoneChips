@@ -19,7 +19,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @author Tal Eisenberg
  */
-public class PrefsManager {
+public class RCPrefs {
     private static final String defaultsFileName = "/defaultprefs.yml";
     private static final String prefsFileName = "preferences.yml";
 
@@ -30,41 +30,41 @@ public class PrefsManager {
         signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, checkForUpdates;
     };
 
-    private final RedstoneChips rc;
-    private final DumperOptions prefDump;
+    private static final DumperOptions prefDump;
+    static {
+        prefDump = new DumperOptions();
+        prefDump.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+    }
 
-    private MaterialData inputBlockType;
-    private MaterialData outputBlockType;
-    private MaterialData interfaceBlockType;
+    private static MaterialData inputBlockType;
+    private static MaterialData outputBlockType;
+    private static MaterialData interfaceBlockType;
 
-    private ChatColor infoColor;
-    private ChatColor errorColor;
-    private ChatColor debugColor;
+    private static ChatColor infoColor;
+    private static ChatColor errorColor;
+    private static ChatColor debugColor;
 
-    private String signColor;
+    private static String signColor;
 
-    private int maxInputChangesPerTick;
-    private boolean usePermissions;
-    private boolean checkForUpdates;
+    private static int maxInputChangesPerTick;
+    private static boolean usePermissions;
+    private static boolean checkForUpdates;
     
-    private final Map<String,Object> prefs;
-    private final Map<String, Object> defaults;
+    private static Map<String,Object> prefs;
+    private static Map<String, Object> defaults;
 
+    private RCPrefs() {}
+    
     /**
-     * PrefsManager constructor. Loads the defaults from file to the defaults Map.
+     * Initializes PrefsManager. Loads the defaults from file to the defaults Map.
      *
      * @param plugin reference to the RedstoneChips instance.
      * @throws java.io.IOException
      */
-    public PrefsManager(RedstoneChips plugin) throws IOException {
-        this.rc = plugin;
-
-        prefDump = new DumperOptions();
-        prefDump.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
+    public static void initialize() throws IOException {
         Yaml yaml = new Yaml();
 
-        URL res = getClass().getResource(defaultsFileName);
+        URL res = RedstoneChips.inst().getClass().getResource(defaultsFileName);
         InputStream stream;
 
         stream = res.openStream();
@@ -76,7 +76,8 @@ public class PrefsManager {
     /**
      * Loads the preferences from the preferences yaml file.
      */
-    public void loadPrefs() {       
+    public static void loadPrefs() {
+        RedstoneChips rc = RedstoneChips.inst();
         File propFile = new File(rc.getDataFolder(), prefsFileName);
         if (!propFile.exists()) { // create empty file if doesn't already exist
             try {
@@ -107,7 +108,8 @@ public class PrefsManager {
     /**
      * Saves the current preferences values from the prefs Map to the preferences yaml file.
      */
-    public void savePrefs() {
+    public static void savePrefs() {
+        RedstoneChips rc = RedstoneChips.inst();
         if (!rc.getDataFolder().exists()) rc.getDataFolder().mkdir();
 
         File prefsFile = new File(rc.getDataFolder(), prefsFileName);
@@ -135,7 +137,7 @@ public class PrefsManager {
      * @return Map object containing the parsed yaml values.
      * @throws IllegalArgumentException If one of the yaml keys was not found in the preferences map.
      */
-    public Map<String, Object> setYaml(String yaml) throws IllegalArgumentException {
+    public static Map<String, Object> setYaml(String yaml) throws IllegalArgumentException {
         Yaml y = new Yaml(prefDump);
         Map<String,Object> map = (Map<String,Object>)y.load(yaml);
         for (String key : map.keySet()) {
@@ -153,8 +155,9 @@ public class PrefsManager {
      * @param sender The sender that will receive the yaml dump messages.
      * @param map The map to dump into yaml code.
      */
-    public void printYaml(CommandSender sender, Map<String, Object> map) {
-
+    public static void printYaml(CommandSender sender, Map<String, Object> map) {
+        RedstoneChips rc = RedstoneChips.inst();
+        
         Yaml yaml = new Yaml(prefDump);
         String[] split = yaml.dump(map).split("\\n");
         sender.sendMessage("");
@@ -170,7 +173,7 @@ public class PrefsManager {
      *
      * @return The current input block type preference value.
      */
-    public MaterialData getInputBlockType() {
+    public static MaterialData getInputBlockType() {
         return inputBlockType;
     }
 
@@ -178,7 +181,7 @@ public class PrefsManager {
      *
      * @return The current output block type preference value.
      */
-    public MaterialData getOutputBlockType() {
+    public static MaterialData getOutputBlockType() {
         return outputBlockType;
     }
 
@@ -186,7 +189,7 @@ public class PrefsManager {
      *
      * @return The current interface block type preference value.
      */
-    public MaterialData getInterfaceBlockType() {
+    public static MaterialData getInterfaceBlockType() {
         return interfaceBlockType;
     }
 
@@ -194,7 +197,7 @@ public class PrefsManager {
      *
      * @return The current error chat message color preference value.
      */
-    public ChatColor getErrorColor() {
+    public static ChatColor getErrorColor() {
         return errorColor;
     }
 
@@ -202,7 +205,7 @@ public class PrefsManager {
      *
      * @return The current info chat message color preference value.
      */
-    public ChatColor getInfoColor() {
+    public static ChatColor getInfoColor() {
         return infoColor;
     }
 
@@ -210,7 +213,7 @@ public class PrefsManager {
      * 
      * @return The current sign activation color code. A hex value between 0-f.
      */
-    public String getSignColor() {
+    public static String getSignColor() {
         return signColor;
     }
 
@@ -218,7 +221,7 @@ public class PrefsManager {
      * 
      * @return The current maxInputChangesPerTick preference value.
      */
-    public int getMaxInputChangesPerTick() {
+    public static int getMaxInputChangesPerTick() {
         return maxInputChangesPerTick;
     }
 
@@ -226,7 +229,7 @@ public class PrefsManager {
      * 
      * @return The current permissions preference value.
      */
-    public boolean getUsePermissions() {
+    public static boolean getUsePermissions() {
         return usePermissions;
     }
 
@@ -234,7 +237,7 @@ public class PrefsManager {
      * 
      * @return The current value of checkForUpdates preference.
      */
-    public boolean getCheckForUpdates() {
+    public static boolean getCheckForUpdates() {
         return checkForUpdates;
     }
     
@@ -242,7 +245,7 @@ public class PrefsManager {
      *
      * @return The current debug chat message color preference value.
      */
-    public ChatColor getDebugColor() {
+    public static ChatColor getDebugColor() {
         return debugColor;
     }
 
@@ -251,7 +254,7 @@ public class PrefsManager {
      * @param p Preference name
      * @return The value of preference p.
      */
-    public Object getPref(String p) {
+    public static Object getPref(String p) {
         return prefs.get(p);
     }
     
@@ -259,7 +262,7 @@ public class PrefsManager {
      *
      * @return a Map containing all preference keys.
      */
-    public Map<String, Object> getPrefs() {
+    public static Map<String, Object> getPrefs() {
         return prefs;
     }
 
@@ -309,7 +312,7 @@ public class PrefsManager {
         }
     }
 
-    private void loadMissingPrefs(Map<String,Object> loadedPrefs) {
+    private static void loadMissingPrefs(Map<String,Object> loadedPrefs) {
         for (String key : defaults.keySet()) {
             if (!loadedPrefs.containsKey(key))
                 loadedPrefs.put(key, defaults.get(key));
@@ -325,7 +328,7 @@ public class PrefsManager {
      * @param key The new preference key.
      * @param defaultValue The preference default value.
      */
-    public void registerCircuitPreference(Class circuitClass, String key, Object defaultValue) {
+    public static void registerCircuitPreference(Class circuitClass, String key, Object defaultValue) {
         key = circuitClass.getSimpleName() + "." + key;
 
         // add default value
@@ -336,7 +339,7 @@ public class PrefsManager {
             prefs.put(key, defaultValue);
     }
 
-    private void applyPrefs(Map<String, Object> loadedPrefs) {
+    private static void applyPrefs(Map<String, Object> loadedPrefs) {
         Map toapply = new HashMap<>();
         toapply.putAll(prefs);
         toapply.putAll(loadedPrefs);

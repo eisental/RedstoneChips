@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.Chip;
 import org.yaml.snakeyaml.DumperOptions;
@@ -170,7 +171,7 @@ public class UserSession {
      */
     public void selectChip(Chip c) {
         if (c==null) return;
-        ChatColor infoColor = rc.prefs().getInfoColor();
+        ChatColor infoColor = RCPrefs.getInfoColor();
         Player p = getPlayer();
         if (selection.contains(c)) {
             selection.remove(c);
@@ -227,15 +228,15 @@ public class UserSession {
         
         if (cuboid[0]==null) {
             cuboid[0] = location;
-            p.sendMessage(rc.prefs().getInfoColor() + "1st corner selected: " + location.getBlockX() + ", " + 
+            p.sendMessage(RCPrefs.getInfoColor() + "1st corner selected: " + location.getBlockX() + ", " + 
                     location.getBlockY() + ", " + location.getBlockZ());
         } else {
             cuboid[1] = location;
             
             selectChipsInCuboid(cuboid, false);
-            p.sendMessage(rc.prefs().getInfoColor() + "2nd corner selected: " + location.getBlockX() + ", " + 
+            p.sendMessage(RCPrefs.getInfoColor() + "2nd corner selected: " + location.getBlockX() + ", " + 
                     location.getBlockY() + ", " + location.getBlockZ());            
-            p.sendMessage(rc.prefs().getInfoColor() + "Selected " + selection.size() + " active chips.");
+            p.sendMessage(RCPrefs.getInfoColor() + "Selected " + selection.size() + " active chips.");
             
             mode = Mode.NORMAL;
         }

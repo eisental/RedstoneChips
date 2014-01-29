@@ -55,10 +55,10 @@ public class ChipSerializer extends Serializer {
     }
 
     @Override
-    public MaybeChip deserialize(RedstoneChips rc, Map<String, Object> map) {
+    public MaybeChip deserialize(Map<String, Object> map) {
         if (!containsKeys(map, Key.SIGN, Key.WORLD, Key.STRUCTURE)) return null;
         
-        Server s = rc.getServer();
+        Server s = RedstoneChips.inst().getServer();
         World world = findWorld(s, (String)map.get(Key.WORLD.key));        
         Location signBlock = parseLocation(world, (List<Integer>)map.get(Key.SIGN.key));        
         ChipParameters params = ChipParameters.generateDefaultParams(signBlock.getBlock());
@@ -71,14 +71,15 @@ public class ChipSerializer extends Serializer {
         MaybeChip mChip = ChipFactory.maybeCreateChip(params, null);
         
         if (mChip!=MaybeChip.AChip) return mChip; // fail
-        
-        Chip c = mChip.getChip();
-        if (map.containsKey(Key.NAME.key))        c.name = (String)map.get(Key.NAME.key);
-        if (map.containsKey(Key.ID.key))          c.id = (Integer)map.get(Key.ID.key);        
-        if (map.containsKey(Key.OUTPUT_BITS.key)) syncOutputBits(c, BooleanArrays.fromString((String)map.get(Key.OUTPUT_BITS.key)));
-        if (map.containsKey(Key.DISABLED.key))    c.disabled = (Boolean)map.get(Key.DISABLED.key);
-                           
-        return mChip;
+        else {
+            Chip c = mChip.getChip();
+            if (map.containsKey(Key.NAME.key))        c.name = (String)map.get(Key.NAME.key);
+            if (map.containsKey(Key.ID.key))          c.id = (Integer)map.get(Key.ID.key);        
+            if (map.containsKey(Key.OUTPUT_BITS.key)) updateOutputPins(c, BooleanArrays.fromString((String)map.get(Key.OUTPUT_BITS.key)));
+            if (map.containsKey(Key.DISABLED.key))    c.disabled = (Boolean)map.get(Key.DISABLED.key);
+
+            return mChip;
+        }
     }   
     
     public static World findWorld(Server server, String worldName) {
@@ -121,7 +122,9 @@ public class ChipSerializer extends Serializer {
         return true;
     }
     
-    private void syncOutputBits(Chip c, boolean[] bits) {
-        System.arraycopy(bits, 0, c.circuit.outputs, 0, Math.min(c.circuit.outputs.length, bits.length));
+    private void updateOutputPins(Chip c, boolean[] bits) {
+        for (int i=0; i<bits.length; i++) {
+            c.outputPins[i].setState(bits[i]);
+        }
     }
 }

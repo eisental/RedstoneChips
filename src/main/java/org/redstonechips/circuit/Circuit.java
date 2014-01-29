@@ -1,11 +1,13 @@
-package org.redstonechips.chip;
+package org.redstonechips.circuit;
 
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
+import org.redstonechips.chip.Chip;
 import org.redstonechips.chip.io.IOWriter;
 import org.redstonechips.util.BooleanArrays;
 import org.redstonechips.util.BooleanSubset;
@@ -244,7 +246,7 @@ public abstract class Circuit {
     }
 
     public void errorForSender(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(rc.prefs().getErrorColor() + message);
+        if (sender!=null) sender.sendMessage(RCPrefs.getErrorColor() + message);
         else rc.log(Level.WARNING, chip + "> " + message);
     }
     /**
@@ -258,7 +260,7 @@ public abstract class Circuit {
     }
 
     public void infoForSender(CommandSender sender, String message) {
-        if (sender!=null) sender.sendMessage(rc.prefs().getInfoColor() + message);
+        if (sender!=null) sender.sendMessage(RCPrefs.getInfoColor() + message);
     }
     /**
      * Sends a debug message to all debugging players of this circuit, using the debug chat color preferences key.

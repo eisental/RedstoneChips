@@ -3,8 +3,9 @@ package org.redstonechips.wireless;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
-import org.redstonechips.chip.Circuit;
+import org.redstonechips.circuit.Circuit;
 
 /**
  * A Wireless device for sending or receiving over a BroadcastChannel.
@@ -117,7 +118,7 @@ public abstract class Wireless {
                 bits = "bits " + ChatColor.YELLOW + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
             else bits = "bit " + ChatColor.YELLOW + this.getStartBit();
 
-            ChatColor infoColor = RedstoneChips.inst().prefs().getInfoColor();
+            ChatColor infoColor = RCPrefs.getInfoColor();
             sender.sendMessage(ChatColor.YELLOW + circuit.getClass().getSimpleName() + infoColor + " will " + 
                     (this instanceof Receiver?"listen on channel ":"broadcast over channel ") +
                     ChatColor.YELLOW + getChannel().name + infoColor + " " + bits + " (" + this.getChannelLength() + ") " + infoColor + ".");

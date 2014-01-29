@@ -3,6 +3,7 @@ package org.redstonechips.command;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 
 /**
@@ -33,7 +34,7 @@ public class RCname extends RCRemoteChipCommand {
                  info(sender, "Renamed chip: " + ChatColor.YELLOW + target);
             else info(sender, "Removed name: " + ChatColor.YELLOW + target);
         } catch (IllegalArgumentException e) {
-            sender.sendMessage(rc.prefs().getErrorColor() + e.getMessage());
+            sender.sendMessage(RCPrefs.getErrorColor() + e.getMessage());
         }
     }
     

@@ -12,7 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
-import org.redstonechips.PrefsManager;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
 import org.redstonechips.user.UserSession;
@@ -61,8 +61,8 @@ public class RCsel extends RCCommand {
                 p.sendMessage(color + "Stopped selecting chips.");
             } else {
                 session.setMode(Mode.SELECTION);
-                p.sendMessage(rc.prefs().getInfoColor() + "rcselection");
-                p.sendMessage(rc.prefs().getInfoColor() + "-----------------");
+                p.sendMessage(RCPrefs.getInfoColor() + "rcselection");
+                p.sendMessage(RCPrefs.getInfoColor() + "-----------------");
                 p.sendMessage(color + "Right-click a chip block to select it. Run " + ChatColor.YELLOW + "/rcsel" + color + " again to stop selecting.");
                 p.sendMessage(color + "Run " + ChatColor.YELLOW + "/rchelp rcsel" + color + " for more selection commands.");
             }
@@ -230,7 +230,7 @@ public class RCsel extends RCCommand {
     
     private void massActivate(Player p, String[] args, UserSession session) {
         if (session.getCuboid()==null) {
-            p.sendMessage(rc.prefs().getErrorColor() + "You must define a cuboid before using this command.");
+            p.sendMessage(RCPrefs.getErrorColor() + "You must define a cuboid before using this command.");
             return;
         }
             
@@ -238,19 +238,19 @@ public class RCsel extends RCCommand {
 
         try {
             if (args.length>=2)
-                inputBlockType = PrefsManager.findMaterial(args[1]);
+                inputBlockType = RCPrefs.findMaterial(args[1]);
             if (args.length>=3)
-                outputBlockType = PrefsManager.findMaterial(args[2]);
+                outputBlockType = RCPrefs.findMaterial(args[2]);
             if (args.length>=4)
-                interfaceBlockType = PrefsManager.findMaterial(args[2]);
+                interfaceBlockType = RCPrefs.findMaterial(args[2]);
         } catch (IllegalArgumentException ie) {
             p.sendMessage(ie.getMessage());
             return;
         }
 
-        if (inputBlockType==null) inputBlockType = rc.prefs().getInputBlockType();
-        if (outputBlockType==null) outputBlockType = rc.prefs().getOutputBlockType();
-        if (interfaceBlockType==null) interfaceBlockType = rc.prefs().getInterfaceBlockType();
+        if (inputBlockType==null) inputBlockType = RCPrefs.getInputBlockType();
+        if (outputBlockType==null) outputBlockType = RCPrefs.getOutputBlockType();
+        if (interfaceBlockType==null) interfaceBlockType = RCPrefs.getInterfaceBlockType();
         
         Location[] cuboid = session.getCuboid();
         int lowx = Math.min(cuboid[0].getBlockX(), cuboid[1].getBlockX());

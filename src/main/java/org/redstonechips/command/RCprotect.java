@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.wireless.BroadcastChannel;
 
 /**
@@ -44,21 +46,21 @@ public class RCprotect extends RCCommand {
                         break;
                 }                
             } catch (IllegalArgumentException ie) {
-                if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Unknown command: " + args[1]);
+                if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Unknown command: " + args[1]);
             }                                
         }
     }
     
     private void channelInfo(CommandSender sender, String channelName) {
         if (!rc.channelManager().getBroadcastChannels().containsKey(channelName)) {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + channelName + " not found.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + channelName + " not found.");
             return;
         }
         
         ChatColor extraColor = ChatColor.YELLOW;
         BroadcastChannel curChannel = rc.channelManager().getChannelByName(channelName, false);
         if (curChannel.isProtected()) {
-            if (rc.permissionManager().enforceChannel(sender, curChannel, true)) return;
+            if (RCPermissions.enforceChannel(sender, curChannel, true)) return;
 
             String owners = "";
             String users = "";
@@ -71,11 +73,11 @@ public class RCprotect extends RCCommand {
             }
 
             if (!owners.isEmpty())
-                if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "admins: " + extraColor + owners.substring(0, owners.length()-2));
+                if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "admins: " + extraColor + owners.substring(0, owners.length()-2));
             if (!users.isEmpty())
-                if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "users: " + extraColor + users.substring(0, users.length()-2));
+                if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "users: " + extraColor + users.substring(0, users.length()-2));
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + channelName + " is not protected.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + channelName + " is not protected.");
         }
     }
     
@@ -83,13 +85,13 @@ public class RCprotect extends RCCommand {
         BroadcastChannel curChannel = rc.channelManager().getChannelByName(args[0], true);
         if (!curChannel.isProtected()) {
             if (!(sender instanceof Player) && args.length < 3) {
-                if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Usernames must be specified if run from console.");
+                if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Usernames must be specified if run from console.");
                 return;
             }
 
             if (args.length > 2) {
                 if (!addUsers(args, curChannel)) {
-                    if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Unable to parse user list.");
+                    if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Unable to parse user list.");
                     return;
                 }
             }
@@ -98,49 +100,49 @@ public class RCprotect extends RCCommand {
                 if (!curChannel.owners.contains(((Player)sender).getName().toLowerCase())) curChannel.owners.add(((Player)sender).getName().toLowerCase());
             }
 
-            if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "Channel " + args[0] + " has been protected.");
+            if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "Channel " + args[0] + " has been protected.");
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " is already protected.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " is already protected.");
         }                    
     }
     
     private void unprotect(CommandSender sender, String[] args) {    
         if (rc.channelManager().getBroadcastChannels().containsKey(args[0])) {
             BroadcastChannel curChannel = rc.channelManager().getChannelByName(args[0], false);
-            if (!rc.permissionManager().enforceChannel(sender, curChannel, true)) return;
+            if (!RCPermissions.enforceChannel(sender, curChannel, true)) return;
             
             if (curChannel.isProtected()) {
                 curChannel.owners.clear();
                 curChannel.users.clear();
-                if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "Channel " + args[0] + " has been unprotected.");
+                if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "Channel " + args[0] + " has been unprotected.");
             } else {
-                if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " is not protected.");
+                if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " is not protected.");
             }
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " not found.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " not found.");
         }
     }
         
     private void add(CommandSender sender, String[] args) {
         if (rc.channelManager().getBroadcastChannels().containsKey(args[0])) {
             BroadcastChannel curChannel = rc.channelManager().getChannelByName(args[0], false);
-            if (!rc.permissionManager().enforceChannel(sender, curChannel, true)) return;
+            if (!RCPermissions.enforceChannel(sender, curChannel, true)) return;
 
             if (curChannel.isProtected()) {
                 if (args.length > 2) {
                     if (!addUsers(args, curChannel)) {
-                        if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Unable to parse user list.");
+                        if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Unable to parse user list.");
                         return;
                     }
-                    if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "Channel " + args[0] + " has been updated.");
+                    if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "Channel " + args[0] + " has been updated.");
                 } else {
-                    if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "No usernames passed.");
+                    if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "No usernames passed.");
                 }
             } else {
-                if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " is not protected.");
+                if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " is not protected.");
             }
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " not found.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " not found.");
         }
     }
     
@@ -168,21 +170,21 @@ public class RCprotect extends RCCommand {
     private void remove(CommandSender sender, String[] args) {
         if (rc.channelManager().getBroadcastChannels().containsKey(args[0])) {
             BroadcastChannel curChannel = rc.channelManager().getChannelByName(args[0], true);
-            if (!rc.permissionManager().enforceChannel(sender, curChannel, true)) return;
+            if (!RCPermissions.enforceChannel(sender, curChannel, true)) return;
                     
             if (curChannel.isProtected()) {
                 if (args.length > 2) {
                     if (!removeUsers(args, curChannel)) {
-                        if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Unable to parse user list.");
-                    } else if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "Channel " + args[0] + " has been updated.");
+                        if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Unable to parse user list.");
+                    } else if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "Channel " + args[0] + " has been updated.");
                 } else {
-                    if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "No usernames passed.");
+                    if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "No usernames passed.");
                 }
             } else {
-                if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " is not protected.");
+                if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " is not protected.");
             }
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getErrorColor() + "Channel " + args[0] + " not found.");
+            if (sender != null) sender.sendMessage(RCPrefs.getErrorColor() + "Channel " + args[0] + " not found.");
         }        
     }
     
@@ -216,9 +218,9 @@ public class RCprotect extends RCCommand {
         }
 
         if (!protectedChannels.isEmpty()) {
-            if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "Protected Channels: " + protectedChannels.substring(0, protectedChannels.length()-2));
+            if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "Protected Channels: " + protectedChannels.substring(0, protectedChannels.length()-2));
         } else {
-            if (sender != null) sender.sendMessage(rc.prefs().getInfoColor() + "There are no protected channels.");
+            if (sender != null) sender.sendMessage(RCPrefs.getInfoColor() + "There are no protected channels.");
         }
     }    
 }

@@ -2,6 +2,7 @@ package org.redstonechips.user;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.ChipCollection;
 import org.redstonechips.chip.Chip;
@@ -41,9 +42,9 @@ public class ChipProbe extends Tool {
                 else RCinfo.printCircuitInfo(player, c);
             } else {
                 // try to activate
-                MaybeChip m = RedstoneChips.inst().chipManager().maybeScanChip(block, player, -1);
+                MaybeChip m = RedstoneChips.inst().chipManager().maybeCreateAndActivateChip(block, player, -1);
                 if (m==MaybeChip.ChipError)
-                    player.sendMessage(RedstoneChips.inst().prefs().getErrorColor() + m.getError());
+                    player.sendMessage(RCPrefs.getErrorColor() + m.getError());
             }
 
         }

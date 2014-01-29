@@ -7,6 +7,8 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPermissions;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.paging.Pager;
 import org.redstonechips.wireless.BroadcastChannel;
 import org.redstonechips.wireless.Receiver;
@@ -25,7 +27,7 @@ public class RCchannels extends RCCommand {
             info(sender, "There are no active broadcast channels.");
         } else {
             if (args.length>0 && rc.channelManager().getBroadcastChannels().containsKey(args[0])) {
-                if (rc.permissionManager().enforceChannel(sender, args[0], true)) printChannelInfo(sender, args[0]);
+                if (RCPermissions.enforceChannel(sender, args[0], true)) printChannelInfo(sender, args[0]);
             } else {
                 printChannelList(sender);
             }
@@ -37,7 +39,7 @@ public class RCchannels extends RCCommand {
         
         List<String> lines = new ArrayList<>();
         for (BroadcastChannel channel : rc.channelManager().getBroadcastChannels().values()) {
-            if (rc.permissionManager().enforceChannel(sender, channel, false)) {
+            if (RCPermissions.enforceChannel(sender, channel, false)) {
                 lines.add(ChatColor.YELLOW + channel.name + ChatColor.WHITE + " - " + channel.getLength() + " bits, " + channel.getTransmitters().size() + " transmitters, " + channel.getReceivers().size() + " receivers." + ChatColor.GREEN + (channel.isProtected()?" Protected":""));
             }
         }
@@ -47,7 +49,7 @@ public class RCchannels extends RCCommand {
         } else {
             String[] outputLines = lines.toArray(new String[lines.size()]);
             sender.sendMessage("");
-            Pager.beginPaging(sender, "Active wireless broadcast channels", new ArrayLineSource(outputLines), rc.prefs().getInfoColor(), rc.prefs().getErrorColor(), Pager.MaxLines - 1);
+            Pager.beginPaging(sender, "Active wireless broadcast channels", new ArrayLineSource(outputLines), RCPrefs.getInfoColor(), RCPrefs.getErrorColor(), Pager.MaxLines - 1);
             sender.sendMessage("Use " + ChatColor.YELLOW + "/rcchannels <channel name>" + ChatColor.WHITE + " for more info about it.");
         }        
     }
@@ -90,7 +92,7 @@ public class RCchannels extends RCCommand {
                 }
             }
 
-            ChatColor infoColor = rc.prefs().getInfoColor();
+            ChatColor infoColor = RCPrefs.getInfoColor();
             ChatColor extraColor = ChatColor.YELLOW;
 
             info(sender, "");

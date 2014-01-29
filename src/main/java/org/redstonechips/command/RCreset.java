@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPermissions;
 import org.redstonechips.chip.Chip;
 
 /**
@@ -18,11 +19,11 @@ public class RCreset extends RCCommand {
     public void run(CommandSender sender, Command command, String label, String[] args) {
         if (args.length>0) {
             if (args[0].equalsIgnoreCase("all")) {
-                if (rc.permissionManager().enforceCommand(sender, command.getName() + ".all", true, false))
+                if (RCPermissions.enforceCommand(sender, command.getName() + ".all", true, false))
                     resetAllCircuits(sender);
                 else error(sender, "You do not have permissions to reset all chips.");
             } else {
-                if (rc.permissionManager().enforceRemoteCommand(sender, command.getName())) {
+                if (RCPermissions.enforceRemoteCommand(sender, command.getName())) {
                     Chip c = rc.chipManager().getAllChips().getById(args[0]);
                     if (c!=null) rc.chipManager().resetChip(c, sender); 
                     else error(sender, "Unknown chip id: " + args[0] + ".");

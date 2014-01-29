@@ -80,5 +80,5 @@ public abstract class Serializer {
     }
     
     public abstract Map<String, Object> serialize(Object o);
-    public abstract Object deserialize(RedstoneChips rc, Map<String, Object> m);
+    public abstract Object deserialize(Map<String, Object> m);
 }

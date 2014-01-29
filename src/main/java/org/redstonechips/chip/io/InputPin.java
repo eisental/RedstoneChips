@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.util.ChunkLocation;
@@ -139,8 +140,8 @@ public class InputPin extends IOBlock {
         }
         
         if (chip.hasListeners()) {
-            ChatColor errorColor = RedstoneChips.inst().prefs().getErrorColor();
-            ChatColor debugColor = RedstoneChips.inst().prefs().getDebugColor();
+            ChatColor errorColor = RCPrefs.getErrorColor();
+            ChatColor debugColor = RCPrefs.getDebugColor();
             
             chip.notifyCircuitMessage(errorColor + "Possible infinite feedback loop " + debugColor + "detected in input " + errorColor + index + debugColor + ".");
             chip.notifyCircuitMessage("Use /rcenable to reactivate the circuit after solving the problem or destroy it normally.");

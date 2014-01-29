@@ -1,13 +1,12 @@
 
-package org.redstonechips;
+package org.redstonechips.circuit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.redstonechips.chip.Circuit;
-import org.redstonechips.chip.CircuitIndex;
+import org.redstonechips.RedstoneChips;
 
 /**
  * @author Tal Eisenberg

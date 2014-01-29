@@ -3,6 +3,7 @@ package org.redstonechips.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.paging.Pager;
 import org.redstonechips.parsing.Parsing;
 
@@ -18,7 +19,7 @@ public class RCp extends RCCommand {
 
         if (Pager.hasPageInfo(sender)) {
             if (args.length>1) {
-                sender.sendMessage(rc.prefs().getErrorColor() + "Bad rcp syntax. Expecting /rcp <page no.|prev|next|last>.");
+                sender.sendMessage(RCPrefs.getErrorColor() + "Bad rcp syntax. Expecting /rcp <page no.|prev|next|last>.");
                 
             } else if (args.length==0) {
                 Pager.nextPage(sender);
@@ -33,11 +34,11 @@ public class RCp extends RCCommand {
                 } else if ("last".startsWith(args[0].toLowerCase())) {
                     Pager.lastPage(sender);
                 } else {
-                    sender.sendMessage(rc.prefs().getErrorColor() + "Bad rcp syntax. Expecting /rcp <page no.|prev|next|last>.");
+                    sender.sendMessage(RCPrefs.getErrorColor() + "Bad rcp syntax. Expecting /rcp <page no.|prev|next|last>.");
                 }
             } 
         } else {
-            sender.sendMessage(rc.prefs().getErrorColor() + "You need to use a command with pages before using /rcp.");
+            sender.sendMessage(RCPrefs.getErrorColor() + "You need to use a command with pages before using /rcp.");
         }
     }
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.command.CommandSender;
-import org.redstonechips.CircuitLoader;
+import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.chip.Chip;
 
 /**

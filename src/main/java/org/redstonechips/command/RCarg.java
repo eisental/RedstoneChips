@@ -4,6 +4,7 @@ package org.redstonechips.command;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.util.Signs;
 
@@ -67,12 +68,12 @@ public class RCarg extends RCCommand {
             try {
                 clearIdx = Integer.decode(value) - 1;
             } catch (NumberFormatException ne) {
-                sender.sendMessage(rc.prefs().getErrorColor() + "Bad argument number: " + value);
+                sender.sendMessage(RCPrefs.getErrorColor() + "Bad argument number: " + value);
                 return null;
             }
 
             if (clearIdx>=args.length || clearIdx<0) {
-                sender.sendMessage(rc.prefs().getErrorColor() + "Argument number out of bounds: " + (clearIdx+1));
+                sender.sendMessage(RCPrefs.getErrorColor() + "Argument number out of bounds: " + (clearIdx+1));
                 return null;
             }
 
@@ -85,7 +86,7 @@ public class RCarg extends RCCommand {
                 }
             }
 
-            sender.sendMessage(rc.prefs().getInfoColor() + "Clearing argument #" + (clearIdx+1) + ": " + args[clearIdx]);
+            sender.sendMessage(RCPrefs.getInfoColor() + "Clearing argument #" + (clearIdx+1) + ": " + args[clearIdx]);
 
             args = tempArgs;
         } else {
@@ -94,24 +95,24 @@ public class RCarg extends RCCommand {
                 try {
                     idx = Integer.decode(index) - 1;
                 } catch (NumberFormatException ne) {
-                    sender.sendMessage(rc.prefs().getErrorColor() + "Bad argument number: " + index);
+                    sender.sendMessage(RCPrefs.getErrorColor() + "Bad argument number: " + index);
                     return null;
                 }
             }
 
             if (idx>args.length || idx<0) {
-                sender.sendMessage(rc.prefs().getErrorColor() + "Argument number out of bounds: " + (idx+1));
+                sender.sendMessage(RCPrefs.getErrorColor() + "Argument number out of bounds: " + (idx+1));
                 return null;
             } else {
                 if (idx==args.length) {
                     // add to last
-                    sender.sendMessage(rc.prefs().getInfoColor() + "Adding argument #" + (idx+1) + ": " + value);
+                    sender.sendMessage(RCPrefs.getInfoColor() + "Adding argument #" + (idx+1) + ": " + value);
                     String[] tempArgs = new String[args.length+1];
                     System.arraycopy(args, 0, tempArgs, 0, args.length);
                     tempArgs[tempArgs.length-1] = value;
                     args = tempArgs;
                 } else {
-                    sender.sendMessage(rc.prefs().getInfoColor() + "Setting argument #" + (idx+1) + " to " + value + " (was " + args[idx] + ").");
+                    sender.sendMessage(RCPrefs.getInfoColor() + "Setting argument #" + (idx+1) + " to " + value + " (was " + args[idx] + ").");
                     args[idx] = value;
                 }
             }
