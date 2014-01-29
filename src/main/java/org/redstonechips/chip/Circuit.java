@@ -173,14 +173,14 @@ public abstract class Circuit {
     }
 
     /**
-     * Send an integer through a set of outputs.
+     * Send a long integer through a set of outputs.
      * First converts to BitSet by calling intToBitSet(), then calls sendBitSet().
      *
      * @param firstOutput output index of first output (LSB).
      * @param length number of bits/outputs to write to.
      * @param value The integer value to send out.
      */
-    public void writeInt(int value, int firstOutput, int length) {
+    public void writeInt(long value, int firstOutput, int length) {
         boolean[] bits = BooleanArrays.fromInt(value, length);
         writeBits(bits, firstOutput, length);
     }

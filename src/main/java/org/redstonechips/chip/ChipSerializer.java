@@ -48,7 +48,7 @@ public class ChipSerializer extends Serializer {
         if (c.isDisabled()) 
             map.put(Serializer.Key.DISABLED.key, c.isDisabled());
         if (c.outputPins!=null && c.outputPins.length!=0) 
-            map.put(Serializer.Key.OUTPUT_BITS.key, BooleanArrays.asString(c.circuit.outputs, c.outputPins.length));
+            map.put(Serializer.Key.OUTPUT_BITS.key, BooleanArrays.toString(c.circuit.outputs, c.outputPins.length));
 
         return map;
 

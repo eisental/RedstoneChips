@@ -75,7 +75,7 @@ public abstract class Serializer {
     }
     
     public static Map<String, String> booleanArrayToMap(Map<String, String> map, String key, boolean[] bits, int length) {
-        map.put(key, BooleanArrays.asString(bits, length));
+        map.put(key, BooleanArrays.toString(bits, length));
         return map;
     }
     

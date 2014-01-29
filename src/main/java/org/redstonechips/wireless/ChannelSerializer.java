@@ -19,7 +19,7 @@ public class ChannelSerializer extends Serializer {
         BroadcastChannel chan = (BroadcastChannel)o;
         Map<String, Object> map = new HashMap<>();
         map.put(Key.CHAN_NAME.key, chan.name);
-        map.put(Key.CHAN_STATE.key, BooleanArrays.asString(chan.bits));
+        map.put(Key.CHAN_STATE.key, BooleanArrays.toString(chan.bits));
         map.put(Key.CHAN_OWNERS.key, chan.owners);
         map.put(Key.CHAN_USERS.key, chan.users);
         return map;

@@ -48,17 +48,17 @@ public class RCinfo extends RCRemoteChipCommand {
         info(sender, "location: " + extraColor + loc + infoColor + " @ " + extraColor + c.world.getName());
         info(sender, " chunks: " + chunkCoords);
 
-        int inputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
+        long inputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
         String inputBin = BooleanArrays.toPrettyString(c.circuit.inputs, 0, c.circuit.inputlen);
-        int outputInt = BooleanArrays.toUnsignedInt(c.circuit.outputs, 0, c.circuit.outputlen);
+        long outputInt = BooleanArrays.toUnsignedInt(c.circuit.outputs, 0, c.circuit.outputlen);
         String outputBin = BooleanArrays.toPrettyString(c.circuit.outputs, 0, c.circuit.outputlen);
         
         
         if (c.inputPins.length>0)
-            info(sender, "input states: " + extraColor + inputBin + infoColor + " (0x" + Integer.toHexString(inputInt) + ")");
+            info(sender, "input states: " + extraColor + inputBin + infoColor + " (0x" + Long.toHexString(inputInt) + ")");
 
         if (c.outputPins.length>0)
-            info(sender, "output states: " + extraColor + outputBin + infoColor + " (0x" + Integer.toHexString(outputInt) + ")");
+            info(sender, "output states: " + extraColor + outputBin + infoColor + " (0x" + Long.toHexString(outputInt) + ")");
 
         String signargs = "";
         for (String arg : c.args)

@@ -41,11 +41,11 @@ public class BooleanSubset {
         return ret;
     }
     
-    public int toUnsignedInt() {
+    public long toUnsignedInt() {
         return toUnsignedInt(0, length);
     }
     
-    public int toUnsignedInt(int start, int length) {
+    public long toUnsignedInt(int start, int length) {
         if (this.start+start>=this.length || this.start+start+length>this.length)
             throw new IndexOutOfBoundsException();
         
@@ -53,7 +53,7 @@ public class BooleanSubset {
     }    
 
     public String toBinaryString() {
-        return BooleanArrays.asString(array, start, length);
+        return BooleanArrays.toString(array, start, length);
     }
 
     public int length() {

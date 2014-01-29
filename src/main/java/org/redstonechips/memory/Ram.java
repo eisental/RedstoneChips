@@ -29,7 +29,7 @@ public class Ram extends Memory {
         else return b;
     }
     
-    public int readInt(long address) {
+    public long readInt(long address) {
         return BooleanArrays.toUnsignedInt(read(address));
     }    
     

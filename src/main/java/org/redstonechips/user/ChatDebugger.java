@@ -52,9 +52,9 @@ class ChatDebugger extends Debugger {
     public void inputChanged(Chip c, int idx, boolean state) {
         List<Flag> cflags = flags.get(c);
         if (cflags!=null && cflags.contains(Flag.IO)) {
-            int inputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
+            long inputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
             String inputBin = BooleanArrays.toPrettyString(c.circuit.inputs, 0, c.circuit.inputlen);
-            String i = ChatColor.WHITE + inputBin + " (0x" + Integer.toHexString(inputInt) + ")";
+            String i = ChatColor.WHITE + inputBin + " (0x" + Long.toHexString(inputInt) + ")";
 
             debug(c, "Input " + idx + " is " + (state?"on":"off")+ ": " + i + ".");
         }
@@ -66,10 +66,10 @@ class ChatDebugger extends Debugger {
         List<Flag> cflags = flags.get(c);
         if (cflags!=null && cflags.contains(Flag.IO)) {
 
-            int outputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
+            long outputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
             String outputBin = BooleanArrays.toPrettyString(c.circuit.outputs, 0, c.circuit.outputlen);
             String o = ChatColor.YELLOW + outputBin + " (0x" +
-                    Integer.toHexString(outputInt) + ")";
+                    Long.toHexString(outputInt) + ")";
 
             debug(c, "Output " + idx + " is " + (state?"on":"off") + ": " + o + ".");            
         }
