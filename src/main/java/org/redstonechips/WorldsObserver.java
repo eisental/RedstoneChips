@@ -6,7 +6,10 @@ import java.util.List;
 import org.bukkit.World;
 
 /**
- *
+ * Monitors loading/unloading behavior of worlds on the server. Mainly important
+ * for knowing when a world is in the process of unloading but has not unloaded
+ * yet.
+ * 
  * @author taleisenberg
  */
 public class WorldsObserver {

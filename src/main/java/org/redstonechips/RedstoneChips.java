@@ -33,6 +33,8 @@ public class RedstoneChips extends JavaPlugin {
     
     private final Map<String, UserSession> sessions = new HashMap<>();
 
+    private static final List<CircuitIndex> preloadedLibs = new ArrayList<>();    
+    
     /** All plugin commands */
     public RCCommand[] commands = new RCCommand[] {
         new RCactivate(), new RCarg(), new RCbreak(), new RCchannels(), new RCclasses(), new RCdebug(), new RCdestroy(),
@@ -183,7 +185,7 @@ public class RedstoneChips extends JavaPlugin {
     /**
      * Returns the UserSession object tied to this username.
      * @param username The player name.
-     * @param create Whether to create a new UserSession if none exists yet or not.
+     * @param create Whether to create a new UserSession if none exists yet.
      * @return The player UserSession or null if none was found and create is false.
      */
     public UserSession getUserSession(String username, boolean create) {
@@ -198,9 +200,9 @@ public class RedstoneChips extends JavaPlugin {
     
     /**
      * Returns the UserSession object tied to this player.
-     * @param player The requested UserSession player.
-     * @param create Whether to create a new UserSession if none exists yet or not.
-     * @return The player UserSession or null if none was found and create if false.
+     * @param player A Player object.
+     * @param create Whether to create a new UserSession if none exists yet.
+     * @return The player UserSession or null if none was found and create is false.
      */
     public UserSession getUserSession(Player player, boolean create) {
         return getUserSession(player.getName(), create);
@@ -257,10 +259,7 @@ public class RedstoneChips extends JavaPlugin {
     
     /**
      * 
-     * @return 
+     * @return The plugin instance or null if it is disabled.
      */
-    public static RedstoneChips inst() { return instance; }
-    
-    private static final List<CircuitIndex> preloadedLibs = new ArrayList<>();    
-
+    public static RedstoneChips inst() { return instance; }    
 }

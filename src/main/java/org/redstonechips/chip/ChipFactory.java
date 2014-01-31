@@ -24,13 +24,29 @@ import org.redstonechips.util.ChunkLocation;
 import org.redstonechips.util.Signs;
 
 /**
- *
+ * A static class responsible for creating new chips.
+ * 
  * @author taleisenberg
  */
 public class ChipFactory {   
 
+    /**
+     * A result object for chip factory methods.
+     */
     public enum MaybeChip { 
-        NotAChip, ChipError, AChip;
+        /**
+         * A chip could not be created since there was no chip found at the location.
+         */
+        NotAChip, 
+        /**
+         * A chip could not be created since an error was encountered while creating the chip.
+         * Use getError() to retrieve the error message.
+         */
+        ChipError, 
+        /**
+         * A chip was created. Use getChip() to retrieve the chip instance.
+         */
+        AChip;
         
         private Chip chip = null;
         private String error = null;
@@ -45,21 +61,40 @@ public class ChipFactory {
             return this;
         }
      
+        /**
+         * 
+         * @return The new chip instance or null if the result was not MaybeChip.AChip.
+         */
         public Chip getChip() { return chip; }
+        
+        /**
+         * 
+         * @return The chip error when the result is MaybeChip.ChipError.
+         */
         public String getError() { return error; }
     }
         
+    private ChipFactory() {}
+    
     /**
-     * Scans a chip starting at params.signBlock, debug level set to 0.
+     * Try to create a chip according to params. Debug level is set to 0.
      * 
-     * @param params An initialized ScanParameters object.
-     * @param activator The circuit activator
-     * @return The new chip id or -1 if a chip was not found or -2 if an error occurred.
+     * @param params An initialized ChipParameters object.
+     * @param activator The chip activator
+     * @return A {@link MaybeChip} object representing the result.
      */
     public static MaybeChip maybeCreateChip(ChipParameters params, CommandSender activator) {
         return maybeCreateChip(params, activator, 0);
     }
     
+    /**
+     * Try to create a chip according to params. 
+     * 
+     * @param params An initialized ChipParameters object.
+     * @param activator The chip activator
+     * @param debugLevel When greater than 0, activator will receive various debug messages when the chip is scanned.
+     * @return A {@link MaybeChip} object representing the result.
+     */
     public static MaybeChip maybeCreateChip(ChipParameters params, CommandSender activator, int debugLevel) {
         RedstoneChips rc = RedstoneChips.inst();
         ChatColor infoColor = RCPrefs.getInfoColor();
@@ -110,29 +145,22 @@ public class ChipFactory {
             }
         }
         
-        return maybeInstantiateChip(params, chips, 
-                                    signClass, 
-                                    Signs.readArgsFromSign(sign));
-    }
-    
-    private static void scan(ChipParameters params, CommandSender debugger, int debugLevel) throws ChipScanException {
-        IOChipScanner scanner = new RecursiveChipScanner();
-        scanner.setDebugger(debugger, debugLevel);
-        
-        if (scanner.isTypeAllowed(params, params.chipMaterial, params.origin.getData())) {
-            scanner.scan(params);
-        } else {
-            try { // a Single-block chip
-                scanner = new SingleBlockChipScanner();
-                scanner.setDebugger(debugger, debugLevel);
-                scanner.scan(params);
-            } catch (ChipScanException e) { // fail
-                throw new ChipScanException("You can't build a chip using this material (" + params.chipMaterial.name() + ").");
-            }
-        }
+        return MaybeChip.AChip.withChip(
+                instantiateChip(params, chips, signClass, Signs.readArgsFromSign(sign)));
     }
 
-    public static MaybeChip maybeInstantiateChip(ChipParameters params, ChipCollection chips, String type, String[] args) {
+    /**
+     * Instantiate a {@link org.redstonechips.chip.Chip Chip} object according to 
+     * Various parameters. The validity of the parameters is not checked or enforced.
+     * The new chip does not have a {@link org.redstonechips.circuit.Circuit Circuit} attached yet.
+     * 
+     * @param params An initialized ChipParameters object, representing a scanned chip.
+     * @param chips All chips running on the server.
+     * @param type The chip type.
+     * @param args The sign arguments of the chip.
+     * @return A new Chip object.
+     */
+    public static Chip instantiateChip(ChipParameters params, ChipCollection chips, String type, String[] args) {
         Chip c = new Chip();
         c.setType(type);
 
@@ -169,14 +197,39 @@ public class ChipFactory {
 
         c.args = args;
 
-        return MaybeChip.AChip.withChip(c);
+        return c;
     }
     
     /**
-     * Finds the circuit's chunks according to its activation block, output power blocks, input power blocks and interface blocks.
+     * Scans a chip, populating params with discovered values.
+     * @param params An initialized ChipParameters object.
+     * @param debugger A command sender that will receive debug messages while scanning.
+     * @param debugLevel The amount of debug messages. When greater than 0 messages are sent to debugger.
+     * 
+     * @throws org.redstonechips.chip.scan.ChipScanner.ChipScanException 
+     */
+    private static void scan(ChipParameters params, CommandSender debugger, int debugLevel) throws ChipScanException {
+        IOChipScanner scanner = new RecursiveChipScanner();
+        scanner.setDebugger(debugger, debugLevel);
+        
+        if (scanner.isTypeAllowed(params, params.chipMaterial, params.origin.getData())) {
+            scanner.scan(params);
+        } else {
+            try { // a Single-block chip
+                scanner = new SingleBlockChipScanner();
+                scanner.setDebugger(debugger, debugLevel);
+                scanner.scan(params);
+            } catch (ChipScanException e) { // fail
+                throw new ChipScanException("You can't build a chip using this material (" + params.chipMaterial.name() + ").");
+            }
+        }
+    }
+    
+    /**
+     * Finds the chip chunks according to its activation block, output power blocks, input power blocks and interface blocks.
      *
-     * @param c The circuit to check.
-     * @return All chunks used by this circuit.
+     * @param c A chip to check.
+     * @return All chunks used by this chip.
      */
     private static ChunkLocation[] findChipChunks(Chip c) {
         List<ChunkLocation> circuitChunks = new ArrayList<>();

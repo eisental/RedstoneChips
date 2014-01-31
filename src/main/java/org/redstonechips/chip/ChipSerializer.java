@@ -15,7 +15,9 @@ import org.redstonechips.chip.scan.ChipParameters;
 import org.redstonechips.util.BooleanArrays;
 
 /**
- *
+ * Responsible for turning a {@link org.redstonechips.chip.Chip Chip} object into
+ * a Map for serialization, as well as, turning a Map object back into a {@link org.redstonechips.chip.Chip Chip}.
+ * 
  * @author taleisenberg
  */
 public class ChipSerializer extends Serializer {

@@ -13,10 +13,13 @@ import org.redstonechips.RedstoneChips;
  */
 public class CircuitLoader {
     /**
-     * Contains all circuit classes from every loaded chip library.
+     * Contains all circuit classes from every loaded circuit library.
      */
     private static final Map<String,Class<? extends Circuit>> circuitClasses = new HashMap<>();
     
+    /**
+     * A list of installed circuit libraries.
+     */
     private static final List<CircuitIndex> libraries = new ArrayList<>();
     
     /**
@@ -38,7 +41,7 @@ public class CircuitLoader {
             } else if (circuitClasses.containsKey(name)) {
                 RedstoneChips.inst().log(Level.WARNING, "While trying to add " + c.getCanonicalName() + " to circuit pool: Another circuit class named " + name + " was found. ");
             } else if (!Circuit.class.isAssignableFrom(c)) {
-                RedstoneChips.inst().log(Level.WARNING, "While trying to add " + c.getCanonicalName() + ": Class does not extend org.tal.redstonechips.circuits.Circuit");
+                RedstoneChips.inst().log(Level.WARNING, "While trying to add " + c.getCanonicalName() + ": Class does not extend " + Circuit.class.getCanonicalName());
             } else {
                 circuitClasses.put(name, c);
             }

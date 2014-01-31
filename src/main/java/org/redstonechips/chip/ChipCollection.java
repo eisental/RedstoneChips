@@ -12,7 +12,10 @@ import org.redstonechips.parsing.Parsing;
 import org.redstonechips.util.ChunkLocation;
 
 /**
- *
+ * A collection of chips mapped to their id numbers. Used for referencing all the
+ * chips running on the server. Contains many methods and lookup maps for quickly
+ * finding chips according to various criteria.
+ * 
  * @author taleisenberg
  */
 public class ChipCollection extends HashMap<Integer, Chip> {
@@ -99,7 +102,7 @@ public class ChipCollection extends HashMap<Integer, Chip> {
 
     /**
      * @param world
-     * @return a map of all active circuits in the specified world. The map keys are circuit ids.
+     * @return a map of all active chips in the specified world. The map keys are chip ids.
      */
     public Map<Integer, Chip> getInWorld(World world) {
         Map<Integer, Chip> worldCircuits = new HashMap<>();
@@ -113,16 +116,32 @@ public class ChipCollection extends HashMap<Integer, Chip> {
         return worldCircuits;
     }
     
+    /**
+     * 
+     * @param chunk
+     * @return All chips in chunk or null if none was found.
+     */
     public List<Chip> getInChunk(ChunkLocation chunk) {
         return chunkLookupMap.get(chunk);
     }
     
+    /**
+     * Adds a chip to the collection. Updating lookup maps for fast retrieval.
+     * @param id Chip id number.
+     * @param chip The chip.
+     * @return The result of HashMap.put(id, chip)
+     */
     @Override
-    public Chip put(Integer key, Chip chip) {
-        addToLookupTables(chip);
-        return super.put(key, chip);
+    public Chip put(Integer id, Chip chip) {
+        addToLookupTables(chip); 
+        return super.put(id, chip);
     }
     
+    /**
+     * Adds a chip to all lookup tables for fast lookups.
+     * 
+     * @param c A chip.
+     */
     private void addToLookupTables(Chip c) {
         for (Location structure : c.structure)
             structureLookupMap.put(structure, c);
@@ -154,13 +173,40 @@ public class ChipCollection extends HashMap<Integer, Chip> {
         }
     }
 
+    /**
+     * Removes a chip from the collection and all lookup maps contained within.
+     * @param id An Integer object boxing the chip id number.
+     * @return The removed chip or null if the chip was not found.
+     */
     @Override
-    public Chip remove(Object key) {
-        Chip c = super.remove(key);
+    public Chip remove(Object id) {
+        Chip c = super.remove(id);
         if (c!=null) removeCircuitLookups(c);
         return c;
+    }    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Clears all lookup maps as well.
+     */
+    @Override
+    public void clear() {
+        structureLookupMap.clear();
+        outputPinLookupMap.clear();
+        inputPinLookupMap.clear();
+        sourceLookupMap.clear();
+        outputLookupMap.clear();
+        activationLookupMap.clear();
+        chunkLookupMap.clear();
+        
+        super.clear(); 
     }
-    
+    /**
+     * Removes a chip from all lookup tables.
+     * 
+     * @param c A chip.
+     */
     private void removeCircuitLookups(Chip c) {
         for (Location l : c.structure)
             structureLookupMap.remove(l);

@@ -25,7 +25,9 @@ import org.redstonechips.user.UserSession;
 import org.redstonechips.util.ChunkLocation;
 
 /**
- *
+ * Main plugin event handler. Routes events to other objects, adding some logic
+ * on the way.
+ * 
  * @author Tal Eisenberg
  */
 public class RCBukkitEventHandler implements Listener {
@@ -38,7 +40,7 @@ public class RCBukkitEventHandler implements Listener {
     }
     
     /**
-     * Pass redstone change events over to the circuit manager. 
+     * Pass redstone change events over to the chip manager. 
      * @param event 
      */
     @EventHandler (priority = EventPriority.MONITOR)
@@ -74,7 +76,7 @@ public class RCBukkitEventHandler implements Listener {
     }
 
     /**
-     * Break circuit if it's burning.
+     * Breaks a chip if it's burning.
      * 
      * @param event 
      */
@@ -127,6 +129,11 @@ public class RCBukkitEventHandler implements Listener {
         }  
     }
     
+    /**
+     * Notify the players UserSession that he quit the server.
+     * 
+     * @param event 
+     */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         UserSession s = rc.getUserSession(event.getPlayer(), false);
@@ -134,6 +141,11 @@ public class RCBukkitEventHandler implements Listener {
         
     }
 
+    /**
+     * Load UserSession file for the new player if one exists.
+     * 
+     * @param event 
+     */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {        
         if (UserSession.getPlayerFileFor(event.getPlayer(), rc.getDataFolder()).exists()) {
@@ -142,6 +154,10 @@ public class RCBukkitEventHandler implements Listener {
         }
     }
     
+    /**
+     * Handle right-click actions: chip activation, selection or defining cuboids.
+     * @param event 
+     */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.isCancelled()) return;
@@ -201,7 +217,7 @@ public class RCBukkitEventHandler implements Listener {
     }
 
     /**
-     * Loads circuits from the world's circuits file.
+     * Loads circuits from the world circuits file.
      * 
      * @param event 
      */

@@ -29,7 +29,6 @@ import org.redstonechips.util.ChunkLocation;
 import org.redstonechips.wireless.Wireless;
 
 /**
- *
  * @author Tal Eisenberg
  */
 public class ChipManager {
@@ -93,7 +92,7 @@ public class ChipManager {
         
         try {            
             Circuit c = Circuit.initalizeCircuit(
-                    CircuitLoader.getCircuitInstance(chip.getType()).constructWith(chip, chip), activator, chip.args);
+                    CircuitLoader.getCircuitInstance(chip.getType()).constructWith(chip), activator, chip.args);
 
             if (c==null) success = false;
             else {
@@ -331,14 +330,14 @@ public class ChipManager {
     }
 
     /**
-     * Calls Chip.shutdown on every activated circuit.
+     * Calls Chip.shutdown on every activated chip.
      */
     public void shutdownAllChips() {
         for (Chip c : chips.values()) c.shutdown();
     }
 
     /**
-     * @return a map of all active circuits. The map keys are circuit ids.
+     * @return a map of all active chips. The map keys are chip id numbers.
      */
     public ChipCollection getAllChips() {
         return chips;
@@ -359,7 +358,7 @@ public class ChipManager {
     }
     
     /**
-     * Called on every chunk load event. Finds any circuits in the loaded chunk and calls their .circuitChunkLoaded() method.
+     * Called on every chunk load event. Finds any chips in the loaded chunk and calls their chipChunkLoaded() method.
      * 
      * @param chunk The loaded chunk.
      */
@@ -375,7 +374,7 @@ public class ChipManager {
     }
     
     /**
-     * Generates a circuit id.
+     * Generate a chip id.
      * 
      * @return a unique (unused) circuit id number.
      */
@@ -389,7 +388,7 @@ public class ChipManager {
     }    
 
     /**
-     * Names a chip for id and debug purposes. 
+     * Name a chip for id and debug purposes. 
      * 
      * @param target chip
      * @param name A unique (unused), non-number name.

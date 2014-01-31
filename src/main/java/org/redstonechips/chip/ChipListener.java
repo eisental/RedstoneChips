@@ -4,7 +4,8 @@ package org.redstonechips.chip;
 import org.bukkit.command.CommandSender;
 
 /**
- *
+ * An interface for receiving notifications from a {@link org.redstonechips.chip.Chip Chip} object.
+ * 
  * @author taleisenberg
  */
 public interface ChipListener {

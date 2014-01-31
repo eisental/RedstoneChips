@@ -3,7 +3,8 @@ package org.redstonechips.chip;
 import org.bukkit.command.CommandSender;
 
 /**
- * A class for listening to circuit events.
+ * A default implementation of {@link ChipListener}. Does nothing. Useful for
+ * overriding only a subset of the notification hooks.
  * 
  * @author Tal Eisenberg
  */

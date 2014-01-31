@@ -20,12 +20,12 @@ import org.redstonechips.util.BooleanSubset;
  */
 public abstract class Circuit {
     /** 
-     * The chip enclosing this circuit.
+     * The chip containing this circuit.
      */
     public Chip chip;
     
     /**
-     * The object responsible for writing output states.
+     * The object responsible for writing output states. Usually the chip.
      */
     public IOWriter outWriter;
     
@@ -35,12 +35,12 @@ public abstract class Circuit {
     public RedstoneChips rc;
 
     /**
-     * Stores the current state of each input pin. Should be used only for monitoring.
+     * Stores the current state of each input pin. Should only be used for monitoring.
      */
     public boolean[] inputs;
 
     /**
-     * Stores the current state of each output bit. Should be used only for monitoring. 
+     * Stores the current state of each output pin. Should only be used for monitoring. 
      */
     public boolean[] outputs;
 
@@ -76,7 +76,7 @@ public abstract class Circuit {
     public abstract Circuit init(String[] args);
 
     /**
-     * Called when the plugin needs to save the circuits state to disk or when using /rcinfo.
+     * Called when the plugin needs to save the circuit state to disk or when using /rcinfo.
      * The circuit should return a map containing any data needed to bring the circuit back to its current state
      * after a server restart.
      *
@@ -107,7 +107,7 @@ public abstract class Circuit {
     /**
      * Called after the plugin resets the circuit.
      *
-     * @param data Map containing reset data to be restored. The map should hold the same data that was returned by setResetData()
+     * @param data Map containing reset data to be restored. The map should hold the same data that was returned by getResetData()
      */
     public void setResetData(Map<String,Object> data) {}
 
@@ -144,10 +144,23 @@ public abstract class Circuit {
         return true;
     }        
     
-    public Circuit constructWith(Chip chip, IOWriter writer) {
-        return constructWith(chip, writer, chip.inputPins.length, chip.outputPins.length);
+    /**
+     * {@link #constructWith(org.redstonechips.chip.Chip, org.redstonechips.chip.io.IOWriter, int, int) constructWith} 
+     * using inputlen and outputlen and IOWriter reflecting the chip IO configuration.
+     */
+    public Circuit constructWith(Chip chip) {
+        return constructWith(chip, chip, chip.inputPins.length, chip.outputPins.length);
     }
     
+    /**
+     * Configure the circuit IO.
+     * 
+     * @param chip Containing chip.
+     * @param writer Object responsible for writing circuit output states.
+     * @param inputlen Number of circuit inputs.
+     * @param outputlen Number of circuit outputs.
+     * @return The circuit.
+     */
     public Circuit constructWith(Chip chip, IOWriter writer, int inputlen, int outputlen) {
         this.chip = chip;
         this.outWriter = writer;
@@ -164,7 +177,8 @@ public abstract class Circuit {
     }
     
     /**
-     * Sets the physical state of one of the outputs.
+     * Sets the state of one of the outputs. Updates outputs[] and uses outWriter
+     * To output the new state.
      *
      * @param index Output index. First output is 0.
      * @param state The new state of the output.
@@ -175,11 +189,11 @@ public abstract class Circuit {
     }
 
     /**
-     * Send a long integer through a set of outputs.
-     * First converts to BitSet by calling intToBitSet(), then calls sendBitSet().
+     * Write a long integer over a set of outputs.
+     * First converts to boolean[] by calling BooleanArrays.fromInt, then calls writeBits().
      *
      * @param firstOutput output index of first output (LSB).
-     * @param length number of bits/outputs to write to.
+     * @param length number of outputs to write to.
      * @param value The integer value to send out.
      */
     public void writeInt(long value, int firstOutput, int length) {
@@ -187,55 +201,89 @@ public abstract class Circuit {
         writeBits(bits, firstOutput, length);
     }
 
+    /**
+     * Write a bunch of bits over a set of outputs.
+     * 
+     * @param bits The bits array to write.
+     * @param firstOutput Start writing from this output index.
+     * @param length Number of outputs to write to.
+     */
     public void writeBits(boolean[] bits, int firstOutput, int length) {
         for (int i=0; i<length; i++)
             write(bits[i], firstOutput+i);
     }
     
+    /**
+     * Write a bunch of bits over a set of outputs. Writes from firstOutput
+     * to the end of the array.
+     * 
+     * @param bits The bits array to write.
+     * @param firstOutput Start writing from this output index.
+     */
     public void writeBits(boolean[] bits, int firstOutput) {
         writeBits(bits, firstOutput, bits.length);
     }
     
+    /**
+     * Write a bunch of bits over a set of outputs. Starting from the 1st
+     * output until the end of the array.
+     * 
+     * @param bits The bits array to write.
+     */
     public void writeBits(boolean[] bits) {
         writeBits(bits, 0, outputlen);
     }
     
+    /**
+     * Write a {@link org.redstonechips.util.BooleanSubset} over a set of outputs.
+     * 
+     * @param bits The BooleanSubset to write.
+     * @param firstOutput Start writing from this output index.
+     * @param length Number of outputs to write to.
+     */
     public void writeBooleanSubset(BooleanSubset bits, int firstOutput, int length) {
         for (int i=0; i<length; i++)
             write(bits.get(i), firstOutput+i);
     }
     
+    /**
+     * Write a {@link org.redstonechips.util.BooleanSubset} over a set of outputs.
+     * Writes from firstOutput to the end of the array.
+     * 
+     * @param bits The BooleanSubset to write.
+     * @param firstOutput Start writing from this output index.
+     */
     public void writeBooleanSubset(BooleanSubset bits, int firstOutput) {
         writeBooleanSubset(bits, firstOutput, bits.length());
     }
     
     /**
-     * Sends a BitSet object to the circuit outputs.
+     * Write a {@link java.util.BitSet} over a set of outputs.
      *
-     * @param startOutIdx First output pin that will be set.
-     * @param length Number of bits to set.
-     * @param bits The BitSet object to send out. Any excessive bits in the BitSet are ignored.
+     * @param bits The BitSet object to write. 
+     * @param firstOutput Start writing from this output index.
+     * @param length Number of outputs to write to.
      */
-    public void writeBitSet(BitSet bits, int startOutIdx, int length) {
+    public void writeBitSet(BitSet bits, int firstOutput, int length) {
         for (int i=0; i<length; i++) {
             boolean b = bits.get(i);
-            write(b, startOutIdx+i);
+            write(b, firstOutput+i);
         }
     }
 
     /**
-     * Sends a BitSet object to the circuit outputs.
-     * Sends a bit to each circuit output, starting from output 0.
+     * Write a {@link java.util.BitSet} over a set of outputs. All circuit outputs
+     * are updated starting from the first.
      *
-     * @param bits BitSet object to send out.
+     * @param bits The BitSet object to write. 
      */
     public void writeBitSet(BitSet bits) {
         writeBitSet(bits, 0, outputlen);
     }
 
     /**
-     * Convenience method for posting error messages. Sends an error message to the current command sender using the error chat color as
-     * set in the preferences file. If sender is currently null the message is sent to the console logger as a warning.
+     * Convenience method for posting error messages. Sends an error message to the chip activator using the error chat color as
+     * set in the preferences file. If activator is currently null the message is sent to the console logger as a warning.
      * 
      * @param message The error message.
      * @return Always null.
@@ -245,13 +293,21 @@ public abstract class Circuit {
         return null;
     }
 
+    /**
+     * Convenience method for posting error messages. Sends an error message to sender using the error chat color as
+     * set in the preferences file. If sender is null the message is sent to the console logger as a warning.
+     * 
+     * @param sender Error message recipient.
+     * @param message The error message.
+     */    
     public void errorForSender(CommandSender sender, String message) {
         if (sender!=null) sender.sendMessage(RCPrefs.getErrorColor() + message);
         else rc.log(Level.WARNING, chip + "> " + message);
     }
+    
     /**
      * Convenience method for posting info messages. Sends an info message to the current command sender using the info chat color as
-     * set in the preferences file. If sender is null debug() is used instead.
+     * set in the preferences file. 
      * 
      * @param message The error message.
      */
@@ -259,12 +315,20 @@ public abstract class Circuit {
         infoForSender(activator, message);
     }
 
+    /**
+     * Convenience method for posting info messages. Sends an info message to sender using the info chat color as
+     * set in the preferences file. 
+     * 
+     * @param sender Info message recipient.
+     * @param message The error message.
+     */    
     public void infoForSender(CommandSender sender, String message) {
         if (sender!=null) sender.sendMessage(RCPrefs.getInfoColor() + message);
     }
     /**
-     * Sends a debug message to all debugging players of this circuit, using the debug chat color preferences key.
-     * Please check that hasDebuggers() returns true before processing any debug messages.
+     * Sends a debug message to all listeners of the chip, using the debug chat color preferences key.
+     * If the circuit has an activator it will receive this message as well.
+     * Please check that hasListeners() returns true before processing any debug messages.
      *
      * @param message The error message.
      */
@@ -286,20 +350,40 @@ public abstract class Circuit {
     
     private final Map<String, Object> metadata = new HashMap<>();
     
+    /**
+     * Store a value in the metadata map.
+     * @param key
+     * @param val 
+     */
     public void putMeta(String key, Object val) { metadata.put(key, val); }
     
+    /**
+     * Retreive a value from the metadata map.
+     * 
+     * @param key
+     * @return corresponding value or null if key was not found.
+     */
     public Object getMeta(String key) { return metadata.get(key); }
  
     // -- static --
     
-    public static Circuit initalizeCircuit(Circuit circuit, CommandSender sender, String[] args) {
+    /**
+     * Initalizes the circuit by calling the init() method, possibly recursively 
+     * in case init() returns a different circuit.
+     * 
+     * @param circuit The circuit to initialize.
+     * @param activator Circuit activator.
+     * @param args Sign arguments to activate with.
+     * @return The final circuit object.
+     */
+    public static Circuit initalizeCircuit(Circuit circuit, CommandSender activator, String[] args) {
         if (circuit==null) return null;
         
-        circuit.activator = sender;        
+        circuit.activator = activator;        
         Circuit initalizedCircuit = circuit.init(args);        
         circuit.activator = null;        
         
-        if (circuit != initalizedCircuit) return Circuit.initalizeCircuit(initalizedCircuit, sender, args);
+        if (circuit != initalizedCircuit) return Circuit.initalizeCircuit(initalizedCircuit, activator, args);
         else return circuit;
     }
 }

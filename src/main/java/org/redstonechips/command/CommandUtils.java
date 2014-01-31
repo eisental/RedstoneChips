@@ -13,6 +13,10 @@ import org.redstonechips.chip.Chip;
  * @author Tal Eisenberg
  */
 public class CommandUtils {
+    
+    /**
+     * The default target distance. Any blocks further away are ignored.
+     */
     private final static int DefaultBlockTargetDistance = 50;
     
     /**
@@ -25,21 +29,26 @@ public class CommandUtils {
         transparentMaterials.add((byte)Material.STATIONARY_WATER.getId());
     }
 
+    /**
+     * {@link #findTargetChip(org.bukkit.command.CommandSender, int, boolean) findTargetChip} with default target distance.
+     */
     public static Chip findTargetChip(CommandSender sender, boolean report) {
         return findTargetChip(sender, DefaultBlockTargetDistance, report);
     }
     
+    /**
+     * {@link #findTargetChip(org.bukkit.command.CommandSender, int, boolean) findTargetChip} with default target distance and report set to true.
+     */
     public static Chip findTargetChip(CommandSender sender) {
         return findTargetChip(sender, true);
     }
     
     /**
      * Checks whether the player is pointing towards a chip block.
-     * Sends an error message to the player in case no chip was found.
      * 
-     * @param sender 
-     * @param distance 
-     * @param report 
+     * @param sender The player.
+     * @param distance The maximum distance a target block can be away from the player to be identified.
+     * @param report When true, an error message is sent to sender if sender is not a player or a target chip was not foudn.
      * @return The chip pointed by the player or null if one was not found.
      */
     public static Chip findTargetChip(CommandSender sender, int distance, boolean report) {
@@ -71,7 +80,7 @@ public class CommandUtils {
     }
 
     /**
-     * Calls enforceIsPlayer with report set to true.
+     * {@link #enforceIsPlayer(org.bukkit.command.CommandSender, boolean) enforceIsPlayer} with report set to true.
      *
      * @param sender
      * @return
@@ -81,10 +90,10 @@ public class CommandUtils {
     }
 
     /**
-     * Checks whether this command sender is a player and sends the command sender an error otherwise.
+     * Checks whether sender is a Player.
      *
      * @param sender The command sender to check.
-     * @param report
+     * @param report When true, an error message is sent to sender when he is not a Player.
      * @return the sender object cast to the Player class.
      */
     public static Player enforceIsPlayer(CommandSender sender, boolean report) {

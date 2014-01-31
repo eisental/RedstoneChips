@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 import org.redstonechips.wireless.BroadcastChannel;
 
 /**
- *
+ * A static class for handling permission checks.
+ * 
  * @author taleisenberg
  */
 public class RCPermissions {
@@ -54,6 +55,12 @@ public class RCPermissions {
         }
     }
 
+    /**
+     * Checks whether sender has a permission to use a command remotely, usually by using a chip id as an argument instead of pointing at it.
+     * @param sender
+     * @param commandName command name without the slash (/).
+     * @return true if the sender has a permission to use the command.
+     */
     public static boolean enforceRemoteCommand(CommandSender sender, String commandName) {
         if (enforceCommand(sender, commandName + ".id", true, false)) return true; 
         else {
