@@ -75,6 +75,11 @@ public class RCsend extends RCCommand {
                 sender.sendMessage(ic + "Transmitting " + ChatColor.YELLOW + BooleanArrays.toPrettyString(bits) 
                         + ic + " over channel " + c.name + " bit " + startBit + ".");
                 
+                if (startBit+length > c.getLength()) {
+                    length = c.getLength() - startBit;
+                    sender.sendMessage(ChatColor.DARK_PURPLE + "Transmission is truncated to " + length + " bits to fit channel length.");
+                }
+                
                 c.transmit(bits, startBit, length);
             } catch (Exception e) {
                 error(sender, e.getMessage());
