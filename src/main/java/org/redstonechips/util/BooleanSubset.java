@@ -11,7 +11,7 @@ public class BooleanSubset {
     final int start, length;
     
     public BooleanSubset(boolean[] array, int start, int length) {
-        if (start+length>array.length) throw new IndexOutOfBoundsException("" + (start+ length));
+        if (start+length>array.length) throw new IndexOutOfBoundsException("" + (start + length));
         if ((start < 0) || (length < 0)) throw new IllegalArgumentException("Negative start or length arguments.");
         
         this.array = array;
@@ -41,6 +41,19 @@ public class BooleanSubset {
         return ret;
     }
     
+    /**
+     * Copy the subset into another boolean array.
+     * 
+     * @param dest Destination array.
+     * @param start The first index of dest that will be overwritten.
+     * @return Number of elements written.
+     */
+    public int copyInto(boolean[] dest, int start) {        
+        int len = Math.min(length, dest.length-start);
+        System.arraycopy(array, this.start, dest, start, len);
+        return len;
+    }
+    
     public long toUnsignedInt() {
         return toUnsignedInt(0, length);
     }
@@ -52,10 +65,19 @@ public class BooleanSubset {
         return BooleanArrays.toUnsignedInt(array, this.start+start, length);
     }    
 
-    public String toBinaryString() {
+    @Override
+    public String toString() {
         return BooleanArrays.toString(array, start, length);
     }
 
+    public String toPrettyString() { 
+        return BooleanArrays.toPrettyString(array, start, length);
+    }
+    
+    public String toPrettyString(int wordlength) {
+        return BooleanArrays.toPrettyString(array, start, length, wordlength);
+    }
+    
     public int length() {
         return length;
     }

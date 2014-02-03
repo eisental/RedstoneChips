@@ -132,6 +132,20 @@ public class BroadcastChannel {
     }
 
     /**
+     * Transmit a {@link org.redstonechips.util.BooleanSubset BooleanSubset} over this channel to all receivers.
+     * 
+     * @param subset The subset to transmit.
+     * @param start The index of the first channel bit that will be modified.
+     */
+    public void transmitSubset(BooleanSubset subset, int start) {
+        int len = subset.copyInto(bits, start);
+
+        for (Receiver r :receivers) {
+            transmitToReceiver(r, start, len);
+        }
+    }
+    
+    /**
      *
      * @return true if the channel has no registered circuits.
      */

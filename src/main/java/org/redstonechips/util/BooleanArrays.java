@@ -81,8 +81,8 @@ public class BooleanArrays {
     public static String toPrettyString(boolean[] bits, int start, int length, int wordlength) {
         StringBuilder ret = new StringBuilder();
 
-        for (int i=length-1+start; i>=start; i--) {
-            ret.append(bits[i]?"1":"0");
+        for (int i=length-1; i>=0; i--) {
+            ret.append(bits[i+start]?"1":"0");
             
             if (wordlength>0 && i>0 && i % wordlength==0)
                 ret.append(' ');

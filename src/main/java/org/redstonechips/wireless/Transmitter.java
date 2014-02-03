@@ -1,6 +1,7 @@
 package org.redstonechips.wireless;
 
 import org.redstonechips.util.BooleanArrays;
+import org.redstonechips.util.BooleanSubset;
 
 /**
  * A Wireless transmitter.
@@ -27,26 +28,24 @@ public class Transmitter extends Wireless {
     public void transmit(boolean state) {
         getChannel().transmit(state, startBit);
     }
-
+    
     /**
-     * Transmit a BitSet over the transmitter channel.
+     * Transmit a {@link org.redstonechips.util.BooleanSubset BooleanSubset} over the channel.
      * 
-     * @param bits BitSet to send.
-     * @param offset A bit offset that's added to the transmitter start bit.
-     * @param length Transmission bit length.
+     * @param transmission 
      */
-    public void transmit(boolean[] bits, int offset, int length) {
-        getChannel().transmit(bits, startBit+offset, length); 
+    public void transmitSubset(BooleanSubset transmission) {
+       getChannel().transmitSubset(transmission, startBit); 
     }
     
     /**
-     * Transmit an integer over the transmitter channel.
+     * Transmit a long integer over the transmitter channel.
      * 
-     * @param value Integer to send.
+     * @param value Transmitted value.
      * @param offset A bit offset that's added to the transmitter start bit.
      * @param length Transmission bit length.
      */
-    public void transmit(int value, int offset, int length) {
+    public void transmit(long value, int offset, int length) {
         boolean[] bits = BooleanArrays.fromInt(value, length);
         getChannel().transmit(bits, startBit+offset, length);
     }
