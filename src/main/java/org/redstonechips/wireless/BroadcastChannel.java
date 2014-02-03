@@ -79,7 +79,6 @@ public class BroadcastChannel {
         int clength = 0;
         for (Wireless w : devices)
             if (w.getStartBit()+w.getLength()>clength) clength = w.getStartBit()+w.getLength();
-        System.out.println("updating clength: " + clength);
         updateChannelLength(clength);
     }
 
