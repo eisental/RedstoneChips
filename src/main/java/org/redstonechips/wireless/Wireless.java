@@ -20,8 +20,8 @@ public abstract class Wireless {
     /** BroadcastChannel used by this Wireless object. */
     protected BroadcastChannel channel = null;
     
-    /** The Wireless channel length in bits. */
-    protected int channelLength;
+    /** The number of bits this Wireless will send/receive with. */
+    protected int length;
     
     private ChannelManager channelManager;
     
@@ -51,14 +51,14 @@ public abstract class Wireless {
      * and doesn't necessarily needs to be the same as the BroadcastChannel length.
      * @param length 
      */
-    public void setChannelLength(int length) {
-        channelLength = length;
+    public void setLength(int length) {
+        this.length = length;
     }
     
     /**
      * @return The Wireless channel length.
      */
-    public int getChannelLength() { return channelLength; }
+    public int getLength() { return length; }
 
     /**
      * @return The circuit that uses this Wireless object.
@@ -104,7 +104,7 @@ public abstract class Wireless {
             throw new IllegalArgumentException("You do not have permissions to use channel " + chanName + ".");
         }
 
-        this.channelLength = channelLength;
+        this.length = channelLength;
         
         if (this instanceof Receiver) {
             channel = channelManager.registerReceiver((Receiver)this, chanName);
@@ -114,14 +114,14 @@ public abstract class Wireless {
 
         if (sender!=null) {
             String bits;
-            if (this.getChannelLength()>1)
-                bits = "bits " + ChatColor.YELLOW + this.getStartBit() + "-" + (this.getStartBit() + this.getChannelLength()-1);
+            if (this.getLength()>1)
+                bits = "bits " + ChatColor.YELLOW + this.getStartBit() + "-" + (this.getStartBit() + this.getLength()-1);
             else bits = "bit " + ChatColor.YELLOW + this.getStartBit();
 
             ChatColor infoColor = RCPrefs.getInfoColor();
             sender.sendMessage(ChatColor.YELLOW + circuit.getClass().getSimpleName() + infoColor + " will " + 
                     (this instanceof Receiver?"listen on channel ":"broadcast over channel ") +
-                    ChatColor.YELLOW + getChannel().name + infoColor + " " + bits + " (" + this.getChannelLength() + ") " + infoColor + ".");
+                    ChatColor.YELLOW + getChannel().name + infoColor + " " + bits + " (" + this.getLength() + ") " + infoColor + ".");
         }        
     }
     

@@ -78,8 +78,8 @@ public class BroadcastChannel {
     private void calcChannelLength() {
         int clength = 0;
         for (Wireless w : devices)
-            if (w.getStartBit()+w.getChannelLength()>clength) clength = w.getStartBit()+w.getChannelLength();
-        
+            if (w.getStartBit()+w.getLength()>clength) clength = w.getStartBit()+w.getLength();
+        System.out.println("updating clength: " + clength);
         updateChannelLength(clength);
     }
 
@@ -154,11 +154,12 @@ public class BroadcastChannel {
     }
 
     private void transmitToReceiver(Receiver r, int startBit, int length) {
-        if (r.getChannelLength()!=0) {
+        if (r.getLength()!=0) {
             // only send to receiver if the change is in its bit range.
-            if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getChannelLength()) ||
-                    (startBit<r.getStartBit() && startBit+length>r.getStartBit())) 
-                r.receive(new BooleanSubset(bits, r.getStartBit(), r.getChannelLength()-r.getStartBit()));
+            if ((startBit>=r.getStartBit() && startBit<r.getStartBit()+r.getLength()) ||
+                    (startBit<r.getStartBit() && startBit+length>r.getStartBit())) {
+                r.receive(new BooleanSubset(bits, r.getStartBit(), r.getLength()));
+            }
                         
         }
     }
