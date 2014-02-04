@@ -40,12 +40,27 @@ public class RCBukkitEventHandler implements Listener {
     }
     
     /**
-     * Pass redstone change events over to the chip manager. 
+     * Pass redstone change events over to the chip manager. Also keeps Redstone lamps ON.
      * @param event 
      */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-        cm.redstoneStateChanged(event.getBlock(), event.getNewCurrent(), event.getOldCurrent());
+        Block b = event.getBlock();
+        
+        if (b.getType()==Material.REDSTONE_LAMP_OFF || b.getType()==Material.REDSTONE_LAMP_ON) {
+            List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());
+            if (pins==null) return;
+            
+            for (OutputPin p : pins) {
+                Material m = p.getState()?Material.REDSTONE_LAMP_ON:Material.REDSTONE_LAMP_OFF;
+                b.setType(m);
+                if (p.getState()) {
+                    event.setNewCurrent(100);
+                    break;
+                }
+            }
+        } else
+            cm.redstoneStateChanged(event.getBlock(), event.getNewCurrent(), event.getOldCurrent());
     }
     
     /**
@@ -101,7 +116,7 @@ public class RCBukkitEventHandler implements Listener {
     }
     
     /**
-     * Forces output redstone torches to stay at the right state.
+     * Forces output redstone torches and lamps to stay at the right state.
      * 
      * @param event 
      */
@@ -126,7 +141,7 @@ public class RCBukkitEventHandler implements Listener {
                     event.setCancelled(true);                    
                 } 
             }
-        }  
+        } 
     }
     
     /**

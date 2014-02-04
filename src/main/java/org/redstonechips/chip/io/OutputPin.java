@@ -29,7 +29,7 @@ import org.redstonechips.util.ChunkLocation;
 public class OutputPin extends IOBlock {
     public static final Material[] deviceMaterials = new Material[] { Material.LEVER, Material.REDSTONE_TORCH_OFF, 
         Material.REDSTONE_TORCH_ON, Material.WOODEN_DOOR, Material.IRON_DOOR_BLOCK, Material.TRAP_DOOR, 
-        Material.POWERED_RAIL, Material.NOTE_BLOCK, Material.COMMAND, Material.DISPENSER };
+        Material.POWERED_RAIL, Material.NOTE_BLOCK, Material.COMMAND, Material.DISPENSER, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON };
     
     private final List<Location> outputBlocks;
     
@@ -116,7 +116,11 @@ public class OutputPin extends IOBlock {
             case REDSTONE_TORCH_OFF:
                 if (!checkAttached(outputBlock)) return false;
                 updateRedstoneTorch(outputBlock, state);                
-                break;                
+                break;
+            case REDSTONE_LAMP_ON:
+            case REDSTONE_LAMP_OFF:
+                updateRedstoneLamp(outputBlock, state);
+                break;
             case POWERED_RAIL: updatePoweredRail(outputBlock, state);
                 break;
             case IRON_DOOR_BLOCK:
@@ -162,6 +166,11 @@ public class OutputPin extends IOBlock {
         byte oldData = outputBlock.getData();
         int type = (state?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF).getId();
         outputBlock.setTypeIdAndData(type, oldData, true);
+    }
+    
+    private void updateRedstoneLamp(Block outputBlock, boolean state) {
+        Material type = (state?Material.REDSTONE_LAMP_ON:Material.REDSTONE_LAMP_OFF);
+        outputBlock.setType(type);
     }
     
     private void updatePoweredRail(Block outputBlock, boolean state) {
