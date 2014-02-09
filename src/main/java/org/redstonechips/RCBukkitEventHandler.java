@@ -49,18 +49,26 @@ public class RCBukkitEventHandler implements Listener {
         
         if (b.getType()==Material.REDSTONE_LAMP_OFF || b.getType()==Material.REDSTONE_LAMP_ON) {
             List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());
-            if (pins==null) return;
-            
-            for (OutputPin p : pins) {
-                Material m = p.getState()?Material.REDSTONE_LAMP_ON:Material.REDSTONE_LAMP_OFF;
-                b.setType(m);
-                if (p.getState()) {
-                    event.setNewCurrent(100);
-                    break;
+            if (pins!=null) {
+                for (OutputPin p : pins) {
+                    Material m = p.getState()?Material.REDSTONE_LAMP_ON:Material.REDSTONE_LAMP_OFF;
+                    b.setType(m);
+                    if (p.getState()) {
+                        event.setNewCurrent(100);
+                        break;
+                    }
                 }
             }
-        } else
-            cm.redstoneStateChanged(event.getBlock(), event.getNewCurrent(), event.getOldCurrent());
+        } else if (b.getType()==Material.REDSTONE_WIRE) {
+            List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());
+            if (pins != null) {
+                for (OutputPin p : pins) {
+                    event.setNewCurrent(p.getState()?15:0);
+                }
+            }
+        } 
+        
+        cm.redstoneStateChanged(event.getBlock(), event.getNewCurrent(), event.getOldCurrent());
     }
     
     /**

@@ -29,7 +29,8 @@ import org.redstonechips.util.ChunkLocation;
 public class OutputPin extends IOBlock {
     public static final Material[] deviceMaterials = new Material[] { Material.LEVER, Material.REDSTONE_TORCH_OFF, 
         Material.REDSTONE_TORCH_ON, Material.WOODEN_DOOR, Material.IRON_DOOR_BLOCK, Material.TRAP_DOOR, 
-        Material.POWERED_RAIL, Material.NOTE_BLOCK, Material.COMMAND, Material.DISPENSER, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON };
+        Material.POWERED_RAIL, Material.NOTE_BLOCK, Material.COMMAND, Material.DISPENSER, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON,
+        Material.REDSTONE_WIRE};
     
     private final List<Location> outputBlocks;
     
@@ -108,6 +109,9 @@ public class OutputPin extends IOBlock {
         Block outputBlock = outputLoc.getBlock();
         
         switch (outputBlock.getType()) {
+            case REDSTONE_WIRE:
+                updateRedstoneWire(outputBlock, state);
+                break;
             case LEVER:
                 if (!checkAttached(outputBlock)) return false;
                 updateLever(outputBlock, state);
@@ -242,6 +246,10 @@ public class OutputPin extends IOBlock {
             Dispenser dispenser = (Dispenser)outputBlock.getState();
             dispenser.dispense();
         }
+    }
+    
+    private void updateRedstoneWire(Block outputBlock, boolean state) {
+        outputBlock.setData((byte)(state?15:0), true);
     }
     
     private boolean updateBlockData(Block b, boolean state) {
