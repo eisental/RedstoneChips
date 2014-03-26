@@ -66,7 +66,7 @@ class ChatDebugger extends Debugger {
         List<Flag> cflags = flags.get(c);
         if (cflags!=null && cflags.contains(Flag.IO)) {
 
-            long outputInt = BooleanArrays.toUnsignedInt(c.circuit.inputs, 0, c.circuit.inputlen);
+            long outputInt = BooleanArrays.toUnsignedInt(c.circuit.outputs, 0, c.circuit.outputlen);
             String outputBin = BooleanArrays.toPrettyString(c.circuit.outputs, 0, c.circuit.outputlen);
             String o = ChatColor.YELLOW + outputBin + " (0x" +
                     Long.toHexString(outputInt) + ")";

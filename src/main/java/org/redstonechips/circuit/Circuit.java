@@ -185,7 +185,7 @@ public abstract class Circuit {
      */
     public void write(boolean state, int index) {
         outputs[index] = state;
-        outWriter.writeOut(state, index);
+        outWriter.writeOut(this, state, index);
     }
 
     /**

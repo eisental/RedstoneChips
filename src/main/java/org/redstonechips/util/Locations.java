@@ -2,7 +2,10 @@
 package org.redstonechips.util;
 
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.material.MaterialData;
 
 /**
  *
@@ -64,4 +67,51 @@ public class Locations {
         return dx*dx + dy*dy + dz*dz;
     }
 
+    public static final BlockFace[] cardinalFaces = new BlockFace[] { BlockFace.NORTH, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.UP, BlockFace.DOWN };
+
+    /**
+     * Looks for another block around origin of the same type and returns the direction between the two blocks.
+     * 
+     * @param origin Origin block.
+     * @return BlockFace representing the direction to point from the origin to the direction block.
+     * @throws IllegalArgumentException If zero or more than one block of the same type as origin is found.
+     */
+    public static BlockFace getDirectionBlock(Block origin) throws IllegalArgumentException {
+        MaterialData type = origin.getState().getData();
+        BlockFace ret = null;
+
+        for (BlockFace face : cardinalFaces) {
+            Block b = origin.getRelative(face);
+            if (b.getType()==type.getItemType() && (b.getData()==type.getData() || type.getData()==-1)) {
+                if (ret==null)
+                    ret = face;
+                else throw new IllegalArgumentException("Found more than one direction block.");
+            }
+
+        }
+
+        if (ret==null)
+            throw new IllegalArgumentException("Couldn't find a direction block.");
+        return ret;
+    }    
+    
+    public static Location getFaceCenter(Location l, BlockFace face) {
+        return getFaceCenter(l.getWorld(), l.getBlockX(), l.getBlockY(), l.getBlockZ(), face);
+    }
+    
+    public static Location getFaceCenter(World w, int x, int y, int z, BlockFace face) {    
+        if (face==BlockFace.DOWN) {            
+            return new Location(w, x+0.5, y, z+0.5);
+        } else if (face==BlockFace.UP) {
+            return new Location(w, x+0.5, y+1, z+0.5);
+        } else if (face==BlockFace.NORTH) {
+            return new Location(w, x, y+0.5, z-0.5);
+        } else if (face==BlockFace.SOUTH) {
+            return new Location(w, x+1, y+0.5, z+0.5);
+        } else if (face==BlockFace.EAST) {
+            return new Location(w, x+0.5, y+0.5, z);
+        } else if (face==BlockFace.WEST) {
+            return new Location(w, x-0.5, y+0.5, z+1);
+        } else throw new IllegalArgumentException("Invalid direction: " + face.name());
+    }
 }

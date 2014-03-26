@@ -108,7 +108,7 @@ public class RClist extends RCCommand {
         ChatColor nameColor = (c.isDisabled()?ChatColor.GRAY:ChatColor.YELLOW);
         
         return c.id + ": " + nameColor + c.getType() + (c.name!=null?ChatColor.AQUA + " (" + c.name + ")":"") + ChatColor.WHITE + " @ "
-                + c.activationBlock.getX() + "," + c.activationBlock.getY() + "," + c.activationBlock.getZ()
+                + c.activationBlock.getBlockX() + "," + c.activationBlock.getBlockY() + "," + c.activationBlock.getBlockZ()
                 + " " + sworld + argsColor + cargs;
     }
 

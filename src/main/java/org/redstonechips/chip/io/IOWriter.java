@@ -1,10 +1,12 @@
 
 package org.redstonechips.chip.io;
 
+import org.redstonechips.circuit.Circuit;
+
 /**
  *
  * @author taleisenberg
  */
 public interface IOWriter {
-    public void writeOut(boolean state, int index);
+    public void writeOut(Circuit circuit, boolean state, int index);
 }

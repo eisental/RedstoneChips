@@ -172,24 +172,30 @@ public class BooleanArrays {
     }
     
     /**
-     * Convert a long value to it's corresponding boolean array.
+     * Convert a long value to it's corresponding two's complement boolean array.
      * 
      * @param value long value to convert.
      * @param length The length of the new boolean array.
      * @return A new boolean array.
      */
     public static boolean[] fromInt(long value, int length) {
-        boolean[] bits = new boolean[length];
-        int index = 0;
-        while (value != 0) {
-            if (value % 2 != 0) {
-                bits[index] = true;
+        if (value>=0) {
+            boolean[] bits = new boolean[length];
+            int index = 0;
+            while (value != 0 && index < length) {
+                if (value % 2 != 0) {
+                    bits[index] = true;
+                }
+                ++index;
+                value = value >>> 1;
             }
-            ++index;
-            value = value >>> 1;
+            return bits;
+        } else {
+            boolean[] bits = fromInt(-value, length);
+            
+            return add(not(bits, bits), 1, length);
+            
         }
-
-        return bits;
     }
 
     // -- BitSet conversion --
@@ -289,7 +295,7 @@ public class BooleanArrays {
         return bits;
     }
     
-    // -- Bitwise Operations --
+    // -- Gates --
     
     /**
      * A bitwise {@code and} of array a and array b. When array lengths are not 
@@ -350,6 +356,8 @@ public class BooleanArrays {
         return dest;
     }
 
+    // -- Binary Arithmetic --
+    
     /**
      * A bitwise {@code left shift} of src array. When array lengths are not equal, the
      * smallest array determines the length of the operation.
@@ -382,6 +390,22 @@ public class BooleanArrays {
         if (logical) dest[src.length-1] = false;
 
         return dest;
+    }
+
+    public static boolean[] add(long a, long b, int length) {
+        return fromInt(a+b, length);
+    }
+
+    public static boolean[] add(boolean[] a, long b, int length) {
+        return add(toUnsignedInt(a), b, length);
+    }
+    public static boolean[] add(boolean[] a, boolean[] b, int length) {
+        return add(toUnsignedInt(a), toUnsignedInt(b), length);
+    }
+        
+    public static boolean[] negate(boolean[] set, int length) {
+        long n = toSignedInt(set, 0, length);
+        return fromInt(-n, length);
     }
     
     // -- misc --

@@ -156,7 +156,7 @@ public class Chip implements IOWriter {
      * @param index output pin index.
      */
     @Override
-    public void writeOut(boolean state, int index) {
+    public void writeOut(Circuit circuit, boolean state, int index) {
         outputPins[index].setState(state);
         for (ChipListener l : listeners) l.outputChanged(Chip.this, index, state);        
     }    

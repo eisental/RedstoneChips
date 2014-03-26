@@ -2,6 +2,9 @@
 package org.redstonechips.command;
 
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -105,5 +108,18 @@ public class CommandUtils {
             }
             return null;
         }
+    }
+    
+    /**
+     * Add ChatColor to text according to some rules.
+     * Currently it only colors ` tags (as in `sometext`).
+     * @param str String to colorize.
+     * @param baseColor Color of untagged text.
+     * @return Colorized String.
+     */
+    public static String colorize(String str, ChatColor baseColor) {
+        Pattern p = Pattern.compile("(`)([^`]*)(`)");
+        Matcher m = p.matcher(str);
+        return baseColor + m.replaceAll(ChatColor.GRAY + "$2" + baseColor);
     }
 }
