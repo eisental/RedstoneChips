@@ -184,8 +184,9 @@ public class OutputPin extends IOBlock {
     }
     
     private void updateNoteBlock(Block outputBlock, boolean state) {
-        boolean wasPowered = this.state || outputBlock.isBlockIndirectlyPowered();
-        if (state != wasPowered) {
+        if (state) {
+            boolean wasPowered = this.state || outputBlock.isBlockIndirectlyPowered();
+            if (wasPowered) return;
             NoteBlock note = (NoteBlock)outputBlock.getState();
             note.play();
         }        
@@ -243,8 +244,9 @@ public class OutputPin extends IOBlock {
     }
 
     private void updateDispenser(Block outputBlock, boolean state) {        
-        boolean wasPowered = this.state || outputBlock.isBlockIndirectlyPowered() || outputBlock.getRelative(BlockFace.UP).isBlockIndirectlyPowered();
-        if (state != wasPowered) {
+        if (state) {
+            boolean wasPowered = this.state || outputBlock.isBlockIndirectlyPowered() || outputBlock.getRelative(BlockFace.UP).isBlockIndirectlyPowered();
+            if (wasPowered) return;
             Dispenser dispenser = (Dispenser)outputBlock.getState();
             dispenser.dispense();
         }
