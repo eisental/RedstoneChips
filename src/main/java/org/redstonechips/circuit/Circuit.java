@@ -210,7 +210,7 @@ public abstract class Circuit {
      */
     public void writeBits(boolean[] bits, int firstOutput, int length) {
         for (int i=0; i<length; i++)
-            write(bits[i], firstOutput+i);
+            write(i < bits.length ? bits[i] : false, firstOutput+i);
     }
     
     /**

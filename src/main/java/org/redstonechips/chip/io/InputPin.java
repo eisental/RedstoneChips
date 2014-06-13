@@ -27,6 +27,7 @@ public class InputPin extends IOBlock {
     private final Location bottomSourceBlock;
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
+    private int inputsHigh = -1;
 
     public static int maxInputChangesPerTick;
     /**
@@ -54,12 +55,7 @@ public class InputPin extends IOBlock {
      * @return the state of the pin according to the state of its surrounding source blocks.
      */
     public boolean getPinValue() {
-        boolean ret = false;
-        for (Boolean val : sourceBlocks.values()) {
-            ret = ret | val;
-        }
-        
-        return ret;
+        return inputsHigh > 0;
     }
 
     private void addSourceBlock(Location loc) {
@@ -92,14 +88,31 @@ public class InputPin extends IOBlock {
     public void updateValue(Block block, boolean newVal, SourceType source) throws IllegalArgumentException {
         Location l = block.getLocation();
 
-        if (!sourceBlocks.containsKey(l)) {
+        Boolean oldValue = sourceBlocks.get(l);
+        if (oldValue == null) {
             RedstoneChips.inst().log(Level.WARNING, "Block @ " + block + " is not a power block of input " + index + " of chip " + chip);
         } else {
             if (source==SourceType.REDSTONE && l.equals(bottomSourceBlock)) {
-                sourceBlocks.put(l, false);
+                newVal = false;
+            }
+            
+            if (oldValue == newVal) {
                 return;
             }
             
+            sourceBlocks.put(l, newVal);
+            
+            boolean oldPinValue = getPinValue();
+            if (newVal) {
+                inputsHigh++;
+            } else {
+                inputsHigh--;
+            }
+            boolean newPinValue = getPinValue();
+            if (oldPinValue == newPinValue) {
+                return;
+            }
+
             long curTick = chip.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;
@@ -110,12 +123,10 @@ public class InputPin extends IOBlock {
                 changesInTickCount = 1;
             }
 
-            sourceBlocks.put(l, newVal);
-
             lastRedstoneChangeTick = curTick;
             
             try {
-                chip.inputChange(getIndex(), getPinValue());
+                chip.inputChange(getIndex(), newPinValue);
             } catch (StackOverflowError e) {
                 abortFeedbackLoop();
             }
@@ -154,9 +165,14 @@ public class InputPin extends IOBlock {
      * refreshes the state of all source blocks according to their block state.
      */
     public void refreshSourceBlocks() {
+        inputsHigh = 0;
         for (Location l : this.sourceBlocks.keySet()) {
             if (ChunkLocation.fromLocation(l).isChunkLoaded()) {
-                sourceBlocks.put(l, findSourceBlockState(l));
+                boolean high = findSourceBlockState(l);
+                sourceBlocks.put(l, high);
+                if (high) {
+                    inputsHigh++;
+                }
             }
         }
     }
