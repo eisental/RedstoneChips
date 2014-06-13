@@ -29,8 +29,8 @@ public class RCPermissions {
         if (player.isOp()) return true;
         
         if (RCPrefs.getUseDenyPermissions() &&
-                player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || 
-                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny")) 
+                (player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".deny") || 
+                player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.")  + classname + ".deny"))) 
             return false;
         else return player.hasPermission("redstonechips.circuit." + (create?"create":"destroy") + ".*") || 
                 player.hasPermission("redstonechips.circuit." + (create?"create.":"destroy.") + classname);
@@ -49,8 +49,8 @@ public class RCPermissions {
         if (!RCPrefs.getUsePermissions()) return (opRequired?sender.isOp():true);
         if (!(sender instanceof Player)) return true;
         if(((Player)sender).hasPermission("redstonechips.command." + commandName) &&
-                !RCPrefs.getUseDenyPermissions() ||
-                !((Player)sender).hasPermission("redstonechips.command." + commandName + ".deny")) {
+                (!RCPrefs.getUseDenyPermissions() ||
+                !((Player)sender).hasPermission("redstonechips.command." + commandName + ".deny"))) {
             return true;
         } else {
             if (report) sender.sendMessage(RCPrefs.getErrorColor() + "You do not have permission to use command " + commandName + ".");
