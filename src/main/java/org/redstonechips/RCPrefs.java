@@ -27,7 +27,7 @@ public class RCPrefs {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, checkForUpdates;
+        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, useDenyPermissions, checkForUpdates;
     };
 
     private static final DumperOptions prefDump;
@@ -48,6 +48,7 @@ public class RCPrefs {
 
     private static int maxInputChangesPerTick;
     private static boolean usePermissions;
+    private static boolean useDenyPermissions;
     private static boolean checkForUpdates;
     
     private static Map<String,Object> prefs;
@@ -235,6 +236,14 @@ public class RCPrefs {
 
     /**
      * 
+     * @return Whether to check for *.deny permissions or not.
+     */
+    public static boolean getUseDenyPermissions() {
+        return useDenyPermissions;
+    }
+
+    /**
+     * 
      * @return The current value of checkForUpdates preference.
      */
     public static boolean getCheckForUpdates() {
@@ -355,6 +364,7 @@ public class RCPrefs {
         signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
         
         usePermissions = Boolean.parseBoolean(toapply.get(Prefs.usePermissions.name()).toString());
+        useDenyPermissions = Boolean.parseBoolean(toapply.get(Prefs.useDenyPermissions.name()).toString());
            
         checkForUpdates = Boolean.parseBoolean(toapply.get(Prefs.checkForUpdates.name()).toString());
         

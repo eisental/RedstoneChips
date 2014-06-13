@@ -20,5 +20,8 @@ maxInputChangesPerTick: 20000
 ## Use permissions?
 usePermissions: false
 
+## When using permissions, check *.deny nodes?
+useDenyPermissions: true
+
 ## Enable/disable update check
 checkForUpdates: true
