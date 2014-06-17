@@ -114,4 +114,19 @@ public class Locations {
             return new Location(w, x-0.5, y+0.5, z+1);
         } else throw new IllegalArgumentException("Invalid direction: " + face.name());
     }
+
+    /**
+     * Finds the location of all 4 blocks at each side of the origin block at l.
+     * @param l Origin block location.
+     * @return an array of 4 elements containing the locations of the side blocks.
+     */
+    public static Location[] getSides(Location l) {
+        return new Location[] 
+        {
+            l.clone().add(0, 0, 1),
+            l.clone().add(1, 0, 0),
+            l.clone().add(0, 0,-1),            
+            l.clone().add(-1,0, 0)
+        };
+    }
 }

@@ -231,7 +231,7 @@ public abstract class Circuit {
      * @param bits The bits array to write.
      */
     public void writeBits(boolean[] bits) {
-        writeBits(bits, 0, outputlen);
+        writeBits(bits, 0, bits.length);
     }
     
     /**

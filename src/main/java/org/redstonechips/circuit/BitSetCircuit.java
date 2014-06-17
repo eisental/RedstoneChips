@@ -1,7 +1,5 @@
 package org.redstonechips.circuit;
 
-import org.redstonechips.circuit.Circuit;
-
 /**
  * A Redstone Circuit that treats its inputs as multiple bit sets.
  * The word length of each set is determined by the number of output bits.
@@ -39,21 +37,16 @@ public abstract class BitSetCircuit extends Circuit {
     @Override
     public Circuit init(String[] args) {
         // number of inputs must be an integer multiple of num of outputs
-        if (outputlen==0) {
-            error("Expecting at least 1 output pin.");
-            return null;
-        }
+        if (outputlen==0) return error("Expecting at least 1 output pin.");
 
-        if ((inputlen % outputlen)!=0) {
-            error("Invalid number of inputs (" + inputlen + "). Number of inputs must be a multiple of the number of outputs.");
-            return null;
-        } else {
+        if ((inputlen % outputlen)==0) {
             int inBitSetCount = inputlen / outputlen;
             wordlength = outputlen;
             info("Activating " + chip.getType() + " with " + inBitSetCount + " input(s) of " + wordlength + " bits each.");
             inputBitSets = new boolean[inBitSetCount][wordlength];
-
             return this;
+        } else {
+            return error("Invalid number of inputs (" + inputlen + "). Number of inputs must be a multiple of the number of outputs.");
         }
     }    
 }

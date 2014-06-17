@@ -78,23 +78,14 @@ public class OutputPin extends IOBlock {
     public void setState(boolean state) {
         this.state = state;
         
-        boolean hasActuator = false;
-        
-        for (Location l : outputBlocks) { 
+        for (Location l : outputBlocks) {
             if (shouldUpdateChunk(l)) {
-                if (changeBlockState(l, state)) hasActuator = true;
-            }
-        }
-        
-        if (!hasActuator) {
-            for (Location l : outputBlocks) {
                 InputPin in = RedstoneChips.inst().chipManager().getAllChips().getInputPin(l);
-                
-                if (in!=null && shouldUpdateChunk(in.getLocation())) {
-                    in.updateValue(loc.getBlock(), state, SourceType.DIRECT);
-                } 
+            
+                if (in==null) changeBlockState(l, state);
+                else in.updateValue(loc.getBlock(), state, SourceType.DIRECT);
             }
-        }
+        }        
     }
 
     /**

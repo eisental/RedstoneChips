@@ -53,10 +53,9 @@ public class RCsend extends RCCommand {
                 boolean[] bits;
                 int length;                
                 try {
-                    int ret = Integer.decode(data);
-                    if (ret==0) length = 1;
-                    else length = (int)Math.ceil(Math.log(ret)/Math.log(2))+1;
-                    bits = BooleanArrays.fromInt(ret, length);
+                    int idata = Integer.decode(data);
+                    length = BooleanArrays.requiredBitsForUnsigned(idata);
+                    bits = BooleanArrays.fromInt(idata, length);
                 } catch (NumberFormatException ne) {
                     if (data.length()==1) {
                         bits = BooleanArrays.fromInt((int)data.charAt(0), 8);
