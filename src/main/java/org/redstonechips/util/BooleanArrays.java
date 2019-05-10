@@ -82,7 +82,10 @@ public class BooleanArrays {
         StringBuilder ret = new StringBuilder();
 
         for (int i=length-1; i>=0; i--) {
-            ret.append(bits[i+start]?"1":"0");
+            if (i < bits.length)
+                ret.append(bits[i+start]?"1":"0");
+            else
+                ret.append('0');
             
             if (wordlength>0 && i>0 && i % wordlength==0)
                 ret.append(' ');

@@ -62,11 +62,11 @@ public class ChunkLocation {
     }
 
     public boolean unloadChunk() {
-        return unloadChunk(true, true);
+        return unloadChunk(true	);
     }
     
-    public boolean unloadChunk(boolean save, boolean safe) {
-        boolean res = world.unloadChunk(x, z, save, safe);
+    public boolean unloadChunk(boolean save) {
+        boolean res = world.unloadChunk(x, z, save);
         return res;
     }
 

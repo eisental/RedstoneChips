@@ -170,7 +170,7 @@ public class Chip implements IOWriter {
             i.refreshSourceBlocks();
 
         for (int i=0; i<outputPins.length; i++)
-            outputPins[i].setState(circuit.outputs[i]);
+            outputPins[i].forceState(circuit.outputs[i]);
     }
         
     // -- Enable / Disable --
@@ -236,12 +236,12 @@ public class Chip implements IOWriter {
             if (!line.equals(sign.getLine(0))) {
                 sign.setLine(0, line);
 
-                RedstoneChips.inst().getServer().getScheduler().scheduleSyncDelayedTask(RedstoneChips.inst(), new Runnable() {
-                    @Override
-                    public void run() {
+//                RedstoneChips.inst().getServer().getScheduler().runTask(RedstoneChips.inst(), new Runnable() {
+//                    @Override
+//                    public void run() {
                         sign.update();
-                    }
-                });
+//                    }
+//                });
             }
         } catch (NullPointerException ne) { }
     }

@@ -3,15 +3,16 @@ package org.redstonechips.command;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
@@ -156,6 +157,8 @@ public class RCsel extends RCCommand {
                         c.disable();
                         count++;
                     }
+                    break;
+                default: break;
             }
         }
      
@@ -234,15 +237,15 @@ public class RCsel extends RCCommand {
             return;
         }
             
-        MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
+        Material inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
 
         try {
             if (args.length>=2)
-                inputBlockType = RCPrefs.findMaterial(args[1]);
+                inputBlockType = Material.matchMaterial(args[1]);
             if (args.length>=3)
-                outputBlockType = RCPrefs.findMaterial(args[2]);
+                outputBlockType = Material.matchMaterial(args[2]);
             if (args.length>=4)
-                interfaceBlockType = RCPrefs.findMaterial(args[2]);
+                interfaceBlockType = Material.matchMaterial(args[2]);
         } catch (IllegalArgumentException ie) {
             p.sendMessage(ie.getMessage());
             return;
@@ -262,15 +265,13 @@ public class RCsel extends RCCommand {
         int lowz = Math.min(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
         int highz = Math.max(cuboid[0].getBlockZ(), cuboid[1].getBlockZ());
 
-        int wallSignId = Material.WALL_SIGN.getId();
-
         int count = 0;
 
         for (int x=lowx; x<=highx; x++) {
             for (int y=lowy; y<=highy; y++) {
                 for (int z=lowz; z<=highz; z++) {
                     Block b = cuboid[0].getWorld().getBlockAt(x, y, z);
-                    if (b.getTypeId()==wallSignId) {
+                    if (b.getBlockData() instanceof WallSign) {
                         MaybeChip mChip = RCactivate.activate(p, b, 0, inputBlockType, outputBlockType, interfaceBlockType);
                         if (mChip==MaybeChip.AChip) count++;
                         else if (mChip==MaybeChip.ChipError) error(p, mChip.getError());

@@ -3,10 +3,16 @@ package org.redstonechips.chip.io;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
+import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.RedstoneWire;
+import org.bukkit.block.data.type.Switch;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.Chip;
@@ -27,6 +33,7 @@ public class InputPin extends IOBlock {
     private final Location bottomSourceBlock;
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
+    private int inputsHigh;
 
     public static int maxInputChangesPerTick;
     /**
@@ -54,27 +61,22 @@ public class InputPin extends IOBlock {
      * @return the state of the pin according to the state of its surrounding source blocks.
      */
     public boolean getPinValue() {
-        boolean ret = false;
-        for (Boolean val : sourceBlocks.values()) {
-            ret = ret | val;
-        }
-        
-        return ret;
+        return inputsHigh > 0;
     }
 
     private void addSourceBlock(Location loc) {
         if (!isPartOfStructure(loc)) {
             boolean state;
 
-            int type = chip.world.getBlockTypeIdAt(loc);
-            if (type==Material.REDSTONE_WIRE.getId()) {
-                byte data = chip.world.getBlockAt(loc).getData();
-                state = data>0;
-            } else if (type == Material.LEVER.getId()) {
-                byte data = chip.world.getBlockAt(loc).getData();
-                state = (data&8) == 8;
+            Block b = chip.world.getBlockAt(loc);
+            BlockData d = b.getBlockData();
+            
+            if (d instanceof RedstoneWire) {
+            	state = ((RedstoneWire)d).getPower()>0;
+            } else if (d instanceof Switch) {
+            	state = ((Powerable)d).isPowered();
             } else {
-                state = false;
+            	state = false;
             }
 
             sourceBlocks.put(loc, state);
@@ -92,14 +94,32 @@ public class InputPin extends IOBlock {
     public void updateValue(Block block, boolean newVal, SourceType source) throws IllegalArgumentException {
         Location l = block.getLocation();
 
-        if (!sourceBlocks.containsKey(l)) {
+        Boolean oldValue = sourceBlocks.get(l);
+        if (oldValue == null) {
             RedstoneChips.inst().log(Level.WARNING, "Block @ " + block + " is not a power block of input " + index + " of chip " + chip);
         } else {
             if (source==SourceType.REDSTONE && l.equals(bottomSourceBlock)) {
-                sourceBlocks.put(l, false);
+                newVal = false;
+            }
+            
+            if (oldValue == newVal) {
                 return;
             }
             
+            sourceBlocks.put(l, newVal);
+            
+            boolean oldPinValue = getPinValue();
+            if (newVal) {
+                inputsHigh++;
+            } else {
+                inputsHigh--;
+            }
+            
+            boolean newPinValue = getPinValue();
+            if (oldPinValue == newPinValue) {
+                return;
+            }
+
             long curTick = chip.world.getFullTime();
             if (curTick==lastRedstoneChangeTick) {
                 changesInTickCount++;
@@ -110,12 +130,10 @@ public class InputPin extends IOBlock {
                 changesInTickCount = 1;
             }
 
-            sourceBlocks.put(l, newVal);
-
             lastRedstoneChangeTick = curTick;
             
             try {
-                chip.inputChange(getIndex(), getPinValue());
+                chip.inputChange(getIndex(), newPinValue);
             } catch (StackOverflowError e) {
                 abortFeedbackLoop();
             }
@@ -154,9 +172,14 @@ public class InputPin extends IOBlock {
      * refreshes the state of all source blocks according to their block state.
      */
     public void refreshSourceBlocks() {
+        inputsHigh = 0;
         for (Location l : this.sourceBlocks.keySet()) {
             if (ChunkLocation.fromLocation(l).isChunkLoaded()) {
-                sourceBlocks.put(l, findSourceBlockState(l));
+                boolean high = findSourceBlockState(l);
+                sourceBlocks.put(l, high);
+                if (high) {
+                    inputsHigh++;
+                }
             }
         }
     }
@@ -173,13 +196,11 @@ public class InputPin extends IOBlock {
         switch (m) {
             case REDSTONE_WIRE:
                 if (loc.equals(bottomSourceBlock)) return false;
-                else return b.getData()>0;
+                else return ((RedstoneWire)b.getBlockData()).getPower() > 0;
             case LEVER:
-                return (b.getData()&8) == 8;
-            case REDSTONE_TORCH_OFF:
-                return false;
-            case REDSTONE_TORCH_ON:
-                return true;
+            	return ((Switch)b.getBlockData()).isPowered();
+            case REDSTONE_TORCH:
+            	return ((Lightable)b.getBlockData()).isLit();
             default: // looking for direct connection to an output block.
                 OutputPin out = RedstoneChips.inst().chipManager().getAllChips().getOutputPin(loc);
                 if (out!=null && out.isDirect()) 

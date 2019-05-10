@@ -21,8 +21,6 @@ public class RCinfo extends RCRemoteChipCommand {
     }
 
     public static void printCircuitInfo(CommandSender sender, Chip c) {
-        org.redstonechips.RedstoneChips rc = org.redstonechips.RedstoneChips.inst();
-        
         ChatColor infoColor = RCPrefs.getInfoColor();
         ChatColor extraColor = ChatColor.YELLOW;
 
@@ -36,10 +34,6 @@ public class RCinfo extends RCRemoteChipCommand {
             chunkCoords += (l.isChunkLoaded()?extraColor:ChatColor.WHITE) + "[" + l.getX() + ", " + l.getZ() + " " + (l.isChunkLoaded()?"L":"u") + "]" + infoColor + ", ";
 
         if (!chunkCoords.isEmpty()) chunkCoords = chunkCoords.substring(0, chunkCoords.length()-2);
-        
-        String name;
-        if (c.name==null) name = "unnamed";
-        else name = c.name;
         
         info(sender, "");
         info(sender, c.toString() + disabled);

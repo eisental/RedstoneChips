@@ -28,7 +28,7 @@ public class RCtool extends RCCommand {
     
     private void processArg(Player player, String arg) {
         try {
-            Material m = RCPrefs.findMaterial(arg).getItemType();
+            Material m = Material.matchMaterial(arg);
             setToType(rc, player, m);
         } catch (IllegalArgumentException e) {
             if ("clear".startsWith(arg)) clearTools(rc, player);
@@ -37,7 +37,7 @@ public class RCtool extends RCCommand {
     }
     
     public static void setToItemInHand(org.redstonechips.RedstoneChips rc, Player player) {
-        ItemStack item = player.getItemInHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         Material type = item.getType();        
         
         setToType(rc, player, type);

@@ -58,8 +58,6 @@ public class RCarg extends RCCommand {
     }
 
     private static String[] editArgs(CommandSender sender, String[] args, String index, String value) {
-        org.redstonechips.RedstoneChips rc = org.redstonechips.RedstoneChips.inst();
-        
         int idx;
 
         if ("clear".startsWith(index.toLowerCase())) {

@@ -212,7 +212,7 @@ public class ChipFactory {
         IOChipScanner scanner = new RecursiveChipScanner();
         scanner.setDebugger(debugger, debugLevel);
         
-        if (scanner.isTypeAllowed(params, params.chipMaterial, params.origin.getData())) {
+        if (scanner.isTypeAllowed(params, params.chipMaterial)) {
             scanner.scan(params);
         } else {
             try { // a Single-block chip

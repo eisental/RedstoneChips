@@ -6,7 +6,8 @@ package org.redstonechips.chip.scan;
  * @author Tal Eisenberg
  */
 public interface ChipScanner {    
-    public static class ChipScanException extends RuntimeException {
+    @SuppressWarnings("serial")
+	public static class ChipScanException extends RuntimeException {
         public ChipScanException(String string) {
             super(string);
         }

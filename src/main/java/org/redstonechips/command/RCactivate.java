@@ -3,12 +3,14 @@ package org.redstonechips.command;
 
 import java.util.EnumMap;
 import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
 import org.redstonechips.chip.io.IOBlock;
@@ -26,8 +28,8 @@ public class RCactivate extends RCCommand {
     @Override
     public void run(CommandSender sender, Command command, String label, String[] args) {
         Block target = CommandUtils.targetBlock((Player)sender);
-        if (target.getType()==Material.WALL_SIGN) {
-            MaterialData inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
+        if (target.getBlockData() instanceof WallSign) {
+            Material inputBlockType = null, outputBlockType = null, interfaceBlockType = null;
             
             int verboseLevel = -1;
             if (args.length>0) {
@@ -43,11 +45,11 @@ public class RCactivate extends RCCommand {
                 
                 try {
                     if (args.length>=(verboseLevel!=-1?2:1))
-                        inputBlockType = RCPrefs.findMaterial(args[0]);
+                        inputBlockType = Material.matchMaterial(args[0]);
                     if (args.length>=(verboseLevel!=-1?3:2))
-                        outputBlockType = RCPrefs.findMaterial(args[1]);
+                        outputBlockType = Material.matchMaterial(args[1]);
                     if (args.length>=(verboseLevel!=-1?4:3))
-                        interfaceBlockType = RCPrefs.findMaterial(args[2]);
+                        interfaceBlockType = Material.matchMaterial(args[2]);
                     
                     if (verboseLevel==-1) verboseLevel = 0;
                 } catch (IllegalArgumentException ie) {
@@ -66,13 +68,20 @@ public class RCactivate extends RCCommand {
                 case NotAChip:
                     sender.sendMessage(RCPrefs.getErrorColor() + "Can't find a chip at target block.");
                     break;
+                case AChip:
+                	break;
             }
         } else {
             sender.sendMessage(RCPrefs.getErrorColor() + "You need to point at a wall sign.");
         }
     }
 
-    public static MaybeChip activate(CommandSender sender, Block target, int debugLevel, MaterialData inputBlockType, MaterialData outputBlockType, MaterialData interfaceBlockType) {
+    public static MaybeChip activate(CommandSender sender, 
+    		Block target, 
+    		int debugLevel, 
+    		Material inputBlockType, 
+    		Material outputBlockType, 
+    		Material interfaceBlockType) {
 
         org.redstonechips.RedstoneChips rc = org.redstonechips.RedstoneChips.inst();
         
@@ -80,7 +89,7 @@ public class RCactivate extends RCCommand {
         if (outputBlockType==null) outputBlockType = RCPrefs.getOutputBlockType();
         if (interfaceBlockType==null) interfaceBlockType = RCPrefs.getInterfaceBlockType();
         
-        Map<Type, MaterialData> iom = new EnumMap<>(IOBlock.Type.class);
+        Map<Type, Material> iom = new EnumMap<>(IOBlock.Type.class);
         iom.put(IOBlock.Type.INPUT, inputBlockType);
         iom.put(IOBlock.Type.OUTPUT, outputBlockType);
         iom.put(IOBlock.Type.INTERFACE, interfaceBlockType);

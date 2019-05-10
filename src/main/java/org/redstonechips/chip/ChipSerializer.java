@@ -126,7 +126,7 @@ public class ChipSerializer extends Serializer {
     
     private void updateOutputPins(Chip c, boolean[] bits) {
         for (int i=0; i<bits.length; i++) {
-            c.outputPins[i].setState(bits[i]);
+            c.outputPins[i].forceState(bits[i]);
         }
     }
 }

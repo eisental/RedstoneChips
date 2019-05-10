@@ -27,7 +27,7 @@ public class RCPrefs {
      * enum of all the default preferences keys.
      */
     public enum Prefs { inputBlockType, outputBlockType, interfaceBlockType, infoColor, errorColor, debugColor,
-        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, checkForUpdates;
+        signColor, enableDestroyCommand, maxInputChangesPerTick, usePermissions, useDenyPermissions, checkForUpdates;
     };
 
     private static final DumperOptions prefDump;
@@ -36,9 +36,9 @@ public class RCPrefs {
         prefDump.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
     }
 
-    private static MaterialData inputBlockType;
-    private static MaterialData outputBlockType;
-    private static MaterialData interfaceBlockType;
+    private static Material inputBlockType;
+    private static Material outputBlockType;
+    private static Material interfaceBlockType;
 
     private static ChatColor infoColor;
     private static ChatColor errorColor;
@@ -48,6 +48,7 @@ public class RCPrefs {
 
     private static int maxInputChangesPerTick;
     private static boolean usePermissions;
+    private static boolean useDenyPermissions;
     private static boolean checkForUpdates;
     
     private static Map<String,Object> prefs;
@@ -173,7 +174,7 @@ public class RCPrefs {
      *
      * @return The current input block type preference value.
      */
-    public static MaterialData getInputBlockType() {
+    public static Material getInputBlockType() {
         return inputBlockType;
     }
 
@@ -181,7 +182,7 @@ public class RCPrefs {
      *
      * @return The current output block type preference value.
      */
-    public static MaterialData getOutputBlockType() {
+    public static Material getOutputBlockType() {
         return outputBlockType;
     }
 
@@ -189,7 +190,7 @@ public class RCPrefs {
      *
      * @return The current interface block type preference value.
      */
-    public static MaterialData getInterfaceBlockType() {
+    public static Material getInterfaceBlockType() {
         return interfaceBlockType;
     }
 
@@ -235,6 +236,14 @@ public class RCPrefs {
 
     /**
      * 
+     * @return Whether to check for *.deny permissions or not.
+     */
+    public static boolean getUseDenyPermissions() {
+        return useDenyPermissions;
+    }
+
+    /**
+     * 
      * @return The current value of checkForUpdates preference.
      */
     public static boolean getCheckForUpdates() {
@@ -266,52 +275,6 @@ public class RCPrefs {
         return prefs;
     }
 
-    /**
-     * Tries to find a material according to search string m.
-     * The string can be either a material name or a name and data value combination such as: wool:orange or wood:1.
-     * 
-     * @param m 
-     * @return a MaterialData that matches the search string.
-     * @throws IllegalArgumentException when parameter m is invalid.
-     */
-    public static MaterialData findMaterial(String m) throws IllegalArgumentException {
-        try {
-            // try to parse as int type id.
-            int i = Integer.decode(m);
-            MaterialData material = new MaterialData(Material.getMaterial(i), (byte)-1);
-            if (material==null) throw new IllegalArgumentException("Unknown material type id: " + m);
-            else return material;
-        } catch (NumberFormatException ne) {
-            // try material:data
-            int colonIdx = m.indexOf(':');
-            if (colonIdx!=-1) {
-                String smat = m.substring(0, colonIdx);
-                String sdata = m.substring(colonIdx+1);
-                Material material = findMaterial(smat).getItemType();
-
-                try {
-                    byte data = Byte.decode(sdata);
-                    return new MaterialData(material, data);
-                } catch (NumberFormatException le) {
-                    if (material==Material.WOOL || material==Material.STAINED_CLAY || material==Material.STAINED_GLASS || material==Material.STAINED_GLASS_PANE) {
-                        // try as dye color
-                        DyeColor color = DyeColor.valueOf(sdata.toUpperCase());
-                        return new MaterialData(material, color.getData());
-                    } else throw new IllegalArgumentException("Bad data value: " + m);
-                }
-            }
-            // try as material name
-            for (Material material : Material.values()) {
-                if (material.name().equals(m.toUpperCase()))
-                    return new MaterialData(material, (byte)-1);
-                else if(material.name().replaceAll("_", "").equals(m.toUpperCase()))
-                    return new MaterialData(material, (byte)-1);
-            }
-
-            throw new IllegalArgumentException("Unknown material name: " + m);
-        }
-    }
-
     private static void loadMissingPrefs(Map<String,Object> loadedPrefs) {
         for (String key : defaults.keySet()) {
             if (!loadedPrefs.containsKey(key))
@@ -340,13 +303,13 @@ public class RCPrefs {
     }
 
     private static void applyPrefs(Map<String, Object> loadedPrefs) {
-        Map toapply = new HashMap<>();
+        Map<String, Object> toapply = new HashMap<>();
         toapply.putAll(prefs);
         toapply.putAll(loadedPrefs);
 
-        inputBlockType = findMaterial(toapply.get(Prefs.inputBlockType.name()).toString());
-        outputBlockType = findMaterial(toapply.get(Prefs.outputBlockType.name()).toString());
-        interfaceBlockType = findMaterial(toapply.get(Prefs.interfaceBlockType.name()).toString());
+        inputBlockType = Material.matchMaterial(toapply.get(Prefs.inputBlockType.name()).toString());
+        outputBlockType = Material.matchMaterial(toapply.get(Prefs.outputBlockType.name()).toString());
+        interfaceBlockType = Material.matchMaterial(toapply.get(Prefs.interfaceBlockType.name()).toString());
 
         infoColor = ChatColor.valueOf((String)toapply.get(Prefs.infoColor.name()));
         errorColor = ChatColor.valueOf((String)toapply.get(Prefs.errorColor.name()));
@@ -355,6 +318,7 @@ public class RCPrefs {
         signColor = toapply.get(Prefs.signColor.name()).toString().toLowerCase();
         
         usePermissions = Boolean.parseBoolean(toapply.get(Prefs.usePermissions.name()).toString());
+        useDenyPermissions = Boolean.parseBoolean(toapply.get(Prefs.useDenyPermissions.name()).toString());
            
         checkForUpdates = Boolean.parseBoolean(toapply.get(Prefs.checkForUpdates.name()).toString());
         

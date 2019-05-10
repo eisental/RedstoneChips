@@ -1,19 +1,22 @@
 package org.redstonechips.chip;
 
-import org.redstonechips.circuit.Circuit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.RedstoneWire;
+import org.bukkit.block.data.type.Switch;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Redstone;
 import org.redstonechips.RCPermissions;
-import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
@@ -23,6 +26,8 @@ import org.redstonechips.chip.io.InputPin.SourceType;
 import org.redstonechips.chip.io.InterfaceBlock;
 import org.redstonechips.chip.io.OutputPin;
 import org.redstonechips.chip.scan.ChipParameters;
+import org.redstonechips.circuit.Circuit;
+import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.parsing.Parsing;
 import org.redstonechips.user.Debugger;
 import org.redstonechips.util.ChunkLocation;
@@ -56,7 +61,7 @@ public class ChipManager {
      * @param debugLevel When greater than zero, the scanning process will produce debug messages.
      * @return a MaybeChip object encapsulating either a new chip, a chip error or denoting that a chip was not recognized at the signBlock.
      */
-    public MaybeChip maybeCreateAndActivateChip(Block signBlock, CommandSender activator, Map<IOBlock.Type, MaterialData> iom, int debugLevel) {
+    public MaybeChip maybeCreateAndActivateChip(Block signBlock, CommandSender activator, Map<IOBlock.Type, Material> iom, int debugLevel) {
         ChipParameters params = ChipParameters.generate(signBlock, iom);
         if (params!=null) {
             MaybeChip mChip = ChipFactory.maybeCreateChip(params, activator, debugLevel);
@@ -191,8 +196,6 @@ public class ChipManager {
         return true;
     }
 
-    private final static Class redstoneClass = Redstone.class;
-
     /**
      * Called on block place and block break to see if any chip input pin state is affected by the change.
      *
@@ -202,8 +205,8 @@ public class ChipManager {
      * @return true if an input source block was placed or broken.
      */
     public boolean maybeChipInputBlockChanged(Block block, Player player, boolean isBroken) {
-        Class<? extends MaterialData> dataClass = block.getType().getData();
-        if (dataClass!=null && redstoneClass.isAssignableFrom(dataClass)) {
+    	BlockData d = block.getBlockData();    	
+    	if (d instanceof RedstoneWire || d instanceof Switch) {
             List<InputPin> inputs = chips.getInputPinBySource(block.getLocation());
             if (inputs!=null) {
                 for (InputPin pin : inputs) {
@@ -226,7 +229,7 @@ public class ChipManager {
      * @return true if an output block was placed.
      */
     public boolean maybeChipOutputBlockPlaced(Block block, Player player) {
-        if (OutputPin.isOutputMaterial(block.getType())) {
+    	if (OutputPin.isAllowedDataType(block.getBlockData())) {
             final List<OutputPin> outputs = chips.getOutputPinByOutputBlock(block.getLocation());
             if (outputs!=null && !outputs.isEmpty()) {
                 for (OutputPin pin : outputs) {
@@ -234,7 +237,6 @@ public class ChipManager {
                 }
                 return true;
             }
-
         }
         
         return false;
@@ -479,15 +481,15 @@ public class ChipManager {
      * @param c
      * @return True if the test passed.
      */
-    public boolean checkChipIntegrity(Chip c) {
-        if (c.world.getBlockTypeIdAt(c.activationBlock)!=Material.WALL_SIGN.getId()) {
+    public boolean checkChipIntegrity(Chip c) {    	
+        if (!(c.world.getBlockAt(c.activationBlock).getBlockData() instanceof WallSign)) {
             rc.log(Level.WARNING, "Circuit " + c.id + ": Sign is missing at " + c.activationBlock.getBlockX() + "," + c.activationBlock.getBlockY() + ", " + c.activationBlock.getBlockZ() + ".");
             return false;
         } 
         
         for (Location s : c.structure) {
             if (!s.equals(c.activationBlock)) {
-                if (c.world.getBlockTypeIdAt(s)==Material.AIR.getId()) {
+                if (c.world.getBlockAt(s).getBlockData().getMaterial()==Material.AIR) {
                     rc.log(Level.WARNING, "Circuit " + c.id + ": Chip block is missing at " + s.getBlockX() + "," + s.getBlockY() + ", " + s.getBlockZ() + ".");
                     return false;
                 }
@@ -505,14 +507,9 @@ public class ChipManager {
     public int fixIOBlocks(Chip c) {
         int blockCount = 0;
 
-        int inputType = RCPrefs.getInputBlockType().getItemTypeId();
-        byte inputData = RCPrefs.getInputBlockType().getData();
-
-        int outputType = RCPrefs.getOutputBlockType().getItemTypeId();
-        byte outputData = RCPrefs.getOutputBlockType().getData();
-
-        int interfaceType = RCPrefs.getInterfaceBlockType().getItemTypeId();
-        byte interfaceData = RCPrefs.getInterfaceBlockType().getData();
+        Material inputType = RCPrefs.getInputBlockType();
+        Material outputType = RCPrefs.getOutputBlockType();
+        Material interfaceType = RCPrefs.getInterfaceBlockType();
 
         List<ChunkLocation> chunksToUnload = new ArrayList<>();
         for (ChunkLocation chunk : c.chunks) {
@@ -526,8 +523,8 @@ public class ChipManager {
         for (InputPin i : c.inputPins) {
             Block input = i.getLocation().getBlock();
 
-            if (input.getTypeId()!=inputType || input.getData()!=inputData) {
-                input.setTypeIdAndData(inputType, inputData, false);
+            if (input.getType()!=inputType) {
+            	input.setType(inputType);
                 blockCount++;
             }
         }
@@ -535,8 +532,8 @@ public class ChipManager {
         for (OutputPin o : c.outputPins) {
             Block output = o.getLocation().getBlock();
 
-            if (output.getTypeId()!=outputType || output.getData()!=outputData) {
-                output.setTypeIdAndData(outputType, outputData, false);
+            if (output.getType()!=outputType) {
+                output.setType(outputType);
                 blockCount++;
             }
         }
@@ -544,8 +541,8 @@ public class ChipManager {
         for (InterfaceBlock t : c.interfaceBlocks) {
             Block tb = t.getLocation().getBlock();
 
-            if (tb.getTypeId()!=interfaceType || tb.getData()!=interfaceData) {
-                tb.setTypeIdAndData(interfaceType, interfaceData, false);
+            if (tb.getType()!=interfaceType) {
+                tb.setType(interfaceType);
                 blockCount++;
             }
         }

@@ -1,14 +1,20 @@
 package org.redstonechips;
 
-import org.redstonechips.chip.ChipManager;
 import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -20,6 +26,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.material.Attachable;
 import org.redstonechips.chip.Chip;
 import org.redstonechips.chip.ChipFactory.MaybeChip;
+import org.redstonechips.chip.ChipManager;
 import org.redstonechips.chip.io.OutputPin;
 import org.redstonechips.user.UserSession;
 import org.redstonechips.util.ChunkLocation;
@@ -47,19 +54,21 @@ public class RCBukkitEventHandler implements Listener {
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
         Block b = event.getBlock();
         
-        if (b.getType()==Material.REDSTONE_LAMP_OFF || b.getType()==Material.REDSTONE_LAMP_ON) {
+        if (b.getType()==Material.REDSTONE_LAMP) {
             List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());
             if (pins!=null) {
                 for (OutputPin p : pins) {
-                    Material m = p.getState()?Material.REDSTONE_LAMP_ON:Material.REDSTONE_LAMP_OFF;
-                    b.setType(m);
+                    Lightable data = (Lightable)b.getBlockData();
+                    data.setLit(p.getState());
+                    b.setBlockData(data);
                     if (p.getState()) {
                         event.setNewCurrent(100);
                         break;
                     }
                 }
             }
-        } else if (b.getType()==Material.REDSTONE_WIRE) {
+        } 
+        else if (b.getType()==Material.REDSTONE_WIRE) {
             List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());
             if (pins != null) {
                 for (OutputPin p : pins) {
@@ -131,7 +140,7 @@ public class RCBukkitEventHandler implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         Block b = event.getBlock();
-        if (b.getType()==Material.REDSTONE_TORCH_ON || b.getType()==Material.REDSTONE_TORCH_OFF) {
+        if (b.getType()==Material.REDSTONE_TORCH || (b.getType()==Material.REDSTONE_WALL_TORCH)) {
             // check if its an output device of a chip:
             List<OutputPin> pins = cm.getAllChips().getOutputPinByOutputBlock(b.getLocation());            
             if (pins==null) return;
@@ -144,8 +153,9 @@ public class RCBukkitEventHandler implements Listener {
 
             for (OutputPin o : pins) {
                 if (attached.getLocation().equals(o.getLocation())) {
-                    Material m = o.getState()?Material.REDSTONE_TORCH_ON:Material.REDSTONE_TORCH_OFF;
-                    b.setTypeIdAndData(m.getId(), b.getData(), false);
+                    Lightable data = (Lightable)b.getBlockData();
+                    data.setLit(o.getState());
+                    b.setBlockData(data);
                     event.setCancelled(true);                    
                 } 
             }

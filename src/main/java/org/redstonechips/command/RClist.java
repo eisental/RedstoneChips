@@ -75,8 +75,6 @@ public class RClist extends RCCommand {
     }
 
     public static void printCircuitList(CommandSender sender, Iterable<Chip> chips, String title) {
-        org.redstonechips.RedstoneChips rc = org.redstonechips.RedstoneChips.inst();
-        
         String lines = "";        
         int chipCount = 0;
         

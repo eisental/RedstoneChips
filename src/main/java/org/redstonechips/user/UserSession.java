@@ -42,7 +42,7 @@ public class UserSession {
     private Debugger debugger;
     private final RedstoneChips rc;    
     private final Map<Material, Tool> tools;
-    private final String username;
+    private final String username; // use uuid instead of username!!
     private List<Chip> selection;
     private Mode mode;
     private Location[] cuboid = null;

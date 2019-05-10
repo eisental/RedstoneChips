@@ -25,11 +25,10 @@ public class CommandUtils {
     /**
      * Regards air and water as transparent materials when trying to find the block a player is looking at.
      */
-    static final HashSet<Byte> transparentMaterials = new HashSet<>();
+    static final HashSet<Material> transparentMaterials = new HashSet<>();
     static {
-        transparentMaterials.add((byte)Material.AIR.getId());
-        transparentMaterials.add((byte)Material.WATER.getId());
-        transparentMaterials.add((byte)Material.STATIONARY_WATER.getId());
+    	transparentMaterials.add(Material.WATER);
+    	transparentMaterials.add(Material.AIR);
     }
 
     /**

@@ -22,7 +22,7 @@ public class RChelp extends RCCommand {
 
     @Override
     public void run(CommandSender sender, Command cmd, String label, String[] args) {
-        Map commands = (Map)rc.getDescription().getCommands();
+        Map<String, Map<String, Object>> commands = rc.getDescription().getCommands();
         ChatColor infoColor = RCPrefs.getInfoColor();
         ChatColor errorColor = RCPrefs.getErrorColor();
 
@@ -54,8 +54,8 @@ public class RChelp extends RCCommand {
     }
 
     public static String getCommandHelp(String  command, org.redstonechips.RedstoneChips rc) {
-        Map commands = (Map)rc.getDescription().getCommands();        
-        Map commandMap = (Map)commands.get(command);
+    	Map<String, Map<String, Object>> commands = rc.getDescription().getCommands();        
+        Map<String, Object> commandMap = (Map)commands.get(command);
         String help = "";
         help += ChatColor.YELLOW+commandMap.get("description").toString();
         if (commandMap.containsKey("usage") && commandMap.get("usage")!=null) {
