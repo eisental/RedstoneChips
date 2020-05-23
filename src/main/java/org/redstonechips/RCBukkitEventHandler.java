@@ -2,10 +2,13 @@ package org.redstonechips;
 
 import java.util.List;
 
+import org.bukkit.block.Sign;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Lightable;
+import org.bukkit.block.BlockState;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,6 +43,7 @@ import org.redstonechips.util.ChunkLocation;
 public class RCBukkitEventHandler implements Listener {
     RedstoneChips rc;
     ChipManager cm;
+    private boolean ran = true;
     
     public RCBukkitEventHandler(RedstoneChips rc) {
         this.rc = rc;
@@ -193,25 +197,34 @@ public class RCBukkitEventHandler implements Listener {
      */
     @EventHandler (priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.isCancelled()) return;
-        
-        if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
+    	if (event.useInteractedBlock() == Result.DENY) return;
+    	if (event.getAction()==Action.RIGHT_CLICK_BLOCK) {
             UserSession session = rc.getUserSession(event.getPlayer(), false);
-            
+            if (event.getClickedBlock().getState() instanceof Sign) ran=false;
+            if (session!=null && session.getMode()==UserSession.Mode.CUBOID_DEFINE) ran=false;
+            if (session!=null && session.getMode()==UserSession.Mode.SELECTION) ran=false;
+            if (ran) {
+        		ran = false;
+        		return;
+        	}     
+            ran = true;
             if (session!=null && session.useToolInHand(event.getClickedBlock())) event.setCancelled(true); // use session tool
             else if (session!=null && session.getMode()==UserSession.Mode.SELECTION) { // in chip selection mode
-                Chip c = cm.getAllChips().getByStructureBlock(event.getClickedBlock().getLocation());
-                if (c!=null) { 
-                    session.selectChip(c);
+                ran=false;
+            	Chip c = cm.getAllChips().getByStructureBlock(event.getClickedBlock().getLocation());
+                if (c!=null) {                    
+                	session.selectChip(c);
                     event.setCancelled(true);
                 }
             } else if (session!=null && session.getMode()==UserSession.Mode.CUBOID_DEFINE) { // in cuboid define mode
-                if (!event.getPlayer().getItemInHand().getType().isBlock()) {
-                    session.addCuboidLocation(event.getClickedBlock().getLocation());
+                ran = false;
+            	if (!event.getPlayer().getItemInHand().getType().isBlock()) {
+                	session.addCuboidLocation(event.getClickedBlock().getLocation());
                     event.setCancelled(true);                            
                 }
-            } else {
-                MaybeChip mChip = cm.maybeCreateAndActivateChip(event.getClickedBlock(), event.getPlayer(), -1);
+            } else {                
+            	ran=false;
+            	MaybeChip mChip = cm.maybeCreateAndActivateChip(event.getClickedBlock(), event.getPlayer(), -1);
                 if (mChip!=MaybeChip.NotAChip) event.setCancelled(true);
             }   
         }
