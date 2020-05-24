@@ -111,15 +111,11 @@ public class InputPin extends IOBlock {
             boolean oldPinValue = getPinValue();
             if (newVal) {
                 inputsHigh++;
-        //        System.out.println("Chip " + chip.toString() + " InputPin.updateValue inputsHigh ++ =" + inputsHigh);
-                //System.out.println("updateValue's inputsHigh++ =" + inputsHigh++); 
             } else {
                 inputsHigh--;                
                 if (inputsHigh<0) {
                                   inputsHigh=0;
-            //                      System.out.println("inputsHigh went negative");
                 }
-      //          System.out.println("Chip " + chip.toString() + " InputPin.updateValue inputsHigh -- =" + inputsHigh);
             }
             
             boolean newPinValue = getPinValue();
@@ -179,49 +175,24 @@ public class InputPin extends IOBlock {
      * refreshes the state of all source blocks according to their block state.
      */
     public void refreshSourceBlocks() {
-        //System.out.println("Previous inputsHigh = " + inputsHigh);            	
         inputsHigh = 0;
         refreshRun = false;
-    	//System.out.println("After inputsHigh = 0 = " + inputsHigh);
         Location ioblock = getLocation();
-        //System.out.println("Chip " + chip.toString() + " Function - refreshSourceBlocks");        
         for (Location l : this.sourceBlocks.keySet()) {
         	
         	if (ChunkLocation.fromLocation(l).isChunkLoaded()) {        	
-               	int blockEW = l.getBlockX() - ioblock.getBlockX();
-            	int blockNS = l.getBlockZ() - ioblock.getBlockZ();
-            	int blockAB = l.getBlockY() - ioblock.getBlockY();
-        //		System.out.println("Chip " + chip.toString() + " Chunk IS loaded");
                 boolean high = findSourceBlockState(l);
         		sourceBlocks.put(l, high);
         		if (refreshRun==true) {
-        //			System.out.println("Refresh Problem");
         			inputsHigh = 0;
         			refreshRun=false;
         		}
                 if (high==true) {                	
-                	//if (blockEW<0) System.out.println("Chip " + chip.toString() + " Source FOUND to the West for input " + getIndex() + " is West @ ");                	
-                	//if (blockEW>0) System.out.println("Chip " + chip.toString() + " Source FOUND to the Eastfor input " + getIndex() + " is East");
-                	//if (blockNS<0) System.out.println("Chip " + chip.toString() + " Source FOUND to the North for input " + getIndex() + " is North");
-                	//if (blockNS>0) System.out.println("Chip " + chip.toString() + " Source FOUND to the Southfor input " + getIndex() + " is South");
-                	//if (blockAB>0) System.out.println("Chip " + chip.toString() + " Source FOUND above for input " + getIndex() + " is Above");
-                	//if (blockEW==0&&blockAB==0&&blockNS==0) System.out.println("Chip " + chip.toString() + " Source FOUND for input " + getIndex() + " is the input itself");
                 	inputsHigh++;
                 }
-                else {
-                	//if (blockEW<0) System.out.println("Chip " + chip.toString() + " Source NOT found to the West for input " + getIndex());
-                	//if (blockEW>0) System.out.println("Chip " + chip.toString() + " Source NOT found to the East for input " + getIndex());
-                	//if (blockNS<0) System.out.println("Chip " + chip.toString() + " Source NOT found to the North for input " + getIndex());
-                	//if (blockNS>0) System.out.println("Chip " + chip.toString() + " Source NOT found to the South for input " + getIndex());
-                	//if (blockAB>0) System.out.println("Chip " + chip.toString() + " Source NOT found Above for input " + getIndex());
-                	//if (blockAB<0) System.out.println("Chip " + chip.toString() + " Source NOT found Below for input " + getIndex());
-                }
-                
             }
-        	//else System.out.println("Chip " + chip.toString() + " Chunk is NOT Loaded");
         }
         refreshRun = true;
-        //System.out.println("Chip " + chip.toString() + " inputsHigh AFTER refresh = " + inputsHigh);
     }
 
     /**
@@ -239,7 +210,6 @@ public class InputPin extends IOBlock {
                 else return ((RedstoneWire)b.getBlockData()).getPower() > 0;
             }
             case LEVER: {
-            	//System.out.println("Chip " + chip.toString() + " Lever connection found");
                 return ((Switch)b.getBlockData()).isPowered();
                 }
             case REDSTONE_TORCH: {
@@ -248,7 +218,6 @@ public class InputPin extends IOBlock {
             default: // looking for direct connection to an output block.
                 OutputPin out = RedstoneChips.inst().chipManager().getAllChips().getOutputPin(loc);                
                 if (out!=null && out.isDirect()) {
-                	//System.out.println("Chip " + chip.toString() + " Direct connection found from " + out.chip.toString());
                 	
                 	if (out.chip!=chip) {
                 		return out.getState();
