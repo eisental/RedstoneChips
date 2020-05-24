@@ -132,6 +132,21 @@ public abstract class Memory {
     public static final Map<String,Memory> memories = new HashMap<>();
     
     /**
+     * Checks if the memory file for memId exists. 
+     * 
+     * @param memId The memory id.
+     * @return True if file exists.
+     */
+    
+    public static boolean checkFile(String memId) {
+    	File chkfile = Memory.getMemoryFile(memId);
+        
+        if (chkfile.exists()) return true;
+        else return false;
+            
+        }
+   
+    /**
      * Retrieves the Memory object for this id or creates and configures a new one if it's not used. If the 
      * memory file exists data is loaded from it.
      * 
@@ -140,11 +155,11 @@ public abstract class Memory {
      * @return A Memory object
      * @throws IOException 
      */
+
     public static Memory getMemory(String memId, Class<? extends Memory> type ) throws IOException, IllegalArgumentException {
         if (!isValidId(memId)) throw new IllegalArgumentException("Invalid memory id: " + memId);
-        
         if (!Memory.memories.containsKey(memId)) {
-            Memory memory;
+        	Memory memory;
             try {
                 memory = type.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
@@ -154,7 +169,7 @@ public abstract class Memory {
 
             File file = Memory.getMemoryFile(memId);
             
-            if (file.exists()) {
+            if (file.exists()) {            	
                 memory.load(file);
             } else {
                 file.createNewFile();
@@ -168,6 +183,32 @@ public abstract class Memory {
             return m;
         }
         
+    }
+    
+    /**
+     * Loads an existing memory file data and loads the data from it. 
+     * 
+     * 
+     * @param memId The memory id.
+     * @param type Memory class (Ram.class for ex.). Ignored when the memory already exists.
+     * @return A Memory object
+     * @throws IOException 
+     */
+
+    public static Memory reGetMemory(String memId, Class<? extends Memory> type ) throws IOException, IllegalArgumentException {
+        if (!isValidId(memId)) throw new IllegalArgumentException("Invalid memory id: " + memId);
+            Memory memory = memories.get(memId);
+            memories.remove(memId);
+            try {
+                memory = type.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+            	return null;
+            }
+            memory.init(memId);
+            File file = Memory.getMemoryFile(memId);
+            memory.load(file);
+            memory.alloc();
+            return memory;        
     }
     
     /**
