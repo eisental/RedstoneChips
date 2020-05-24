@@ -142,14 +142,113 @@ public class ChipManager {
 
         return success;
     }
-
-    private void restoreIOState(Chip chip) {
-        for (int i=0; i<chip.outputPins.length; i++) {
-            chip.circuit.outputs[i] = chip.outputPins[i].getState();
+    
+    public boolean activateChipFromFile(Chip chip, CommandSender activator, int id) {
+        List<ChunkLocation> chunksToUnload = new ArrayList<>();
+        
+        for (ChunkLocation chunk : chip.chunks) {
+            if (!chunk.isChunkLoaded()) {
+                chunksToUnload.add(chunk);
+                workOnChunk(chunk);
+            }
         }
         
+        boolean success;
+        
+        try {            
+            Circuit c = Circuit.initalizeCircuit(
+                    CircuitLoader.getCircuitInstance(chip.getType()).constructWith(chip), activator, chip.args);
+
+            if (c==null) success = false;
+            else {
+                chip.circuit = c;
+                if (chip.isDisabled()) chip.disable();
+                //else restoreIOState(chip);
+                success = true;
+            }            
+        } catch (Exception e) {
+            if (activator!=null)
+                activator.sendMessage(RCPrefs.getErrorColor() + e.getMessage());
+            else RedstoneChips.inst().log(Level.WARNING, e.getMessage());
+            e.printStackTrace();
+            success = false;
+        }
+        
+        if (success) {
+            if (id<0)
+                chip.id = generateId();
+            else
+                chip.id = id;
+            chips.put(chip.id, chip);
+
+            if (activator != null) {
+                ChatColor ic = RCPrefs.getInfoColor();
+                ChatColor dc = RCPrefs.getDebugColor();
+                activator.sendMessage(ic + "Activated " + ChatColor.YELLOW + chip + ic + ": "
+                        + dc + ChatColor.GRAY + chip.inputPins.length + dc + " input"
+                        + (chip.inputPins.length!=1?"s":"") + ", " + ChatColor.YELLOW + chip.outputPins.length + dc + " output"
+                        + (chip.outputPins.length!=1?"s":"") + " and " + ChatColor.BLUE + chip.interfaceBlocks.length + dc
+                        + " interface block" + (chip.interfaceBlocks.length!=1?"s":"") + ".");
+            }
+            chip.updateSign(true);
+            
+        } else {
+            chip.updateSign(false);
+        }
+        
+        for (ChunkLocation chunk : chunksToUnload) {
+            releaseChunk(chunk);
+        }
+
+        return success;
+    }
+    
+    public boolean fixChip(Chip chip, CommandSender activator, int id) {
+        List<ChunkLocation> chunksToUnload = new ArrayList<>();
+    
+        for (ChunkLocation chunk : chip.chunks) {
+            if (!chunk.isChunkLoaded()) {
+                chunksToUnload.add(chunk);
+                workOnChunk(chunk);
+            }
+        }
+        
+        boolean success;
+        
+        try {
+            if (chip.isDisabled()) chip.disable();
+            else restoreIOState(chip);
+            
+            success = true;
+                     
+        } catch (Exception e) {
+            if (activator!=null)
+                activator.sendMessage(RCPrefs.getErrorColor() + e.getMessage());
+            else RedstoneChips.inst().log(Level.WARNING, e.getMessage());
+            e.printStackTrace();
+            success = false;
+        }
+        for (ChunkLocation chunk : chunksToUnload) {
+            releaseChunk(chunk);
+        }
+
+        return success;
+    }
+
+    private void runInputLogic(Chip chip) {
+        if (chip.circuit.isStateless())
+            for (int i=0; i<chip.inputPins.length; i++)
+            	chip.inputChange(i, chip.circuit.inputs[i]);
+    }
+    
+    private void restoreIOState(Chip chip) {
+    	for (int i=0; i<chip.outputPins.length; i++) {
+            chip.circuit.outputs[i] = chip.outputPins[i].getState();
+        }
+ 
+        
         for (int i=0; i<chip.inputPins.length; i++) {
-            chip.inputPins[i].refreshSourceBlocks();
+        	chip.inputPins[i].refreshSourceBlocks();
             if (chip.circuit.isStateless())
                 chip.inputChange(i, chip.inputPins[i].getPinValue());
             else chip.circuit.inputs[i] = chip.inputPins[i].getPinValue();
