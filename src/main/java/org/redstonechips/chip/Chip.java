@@ -166,11 +166,18 @@ public class Chip implements IOWriter {
       * the state of its output levers according to the current values in circuit.outputs[].
       */
     public void chipChunkLoaded() {
-        for (InputPin i : inputPins)
-            i.refreshSourceBlocks();
+      
 
         for (int i=0; i<outputPins.length; i++)
             outputPins[i].forceState(circuit.outputs[i]);
+       
+        for (InputPin i : inputPins) {
+             i.refreshSourceBlocks();
+        if (circuit.isStateless())  // have not tested yet
+        	circuit.chip.inputChange(i.getIndex(), inputPins[i.getIndex()].getPinValue());
+        else circuit.inputs[i.getIndex()] = inputPins[i.getIndex()].getPinValue(); 
+        
+        }
     }
         
     // -- Enable / Disable --
