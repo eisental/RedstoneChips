@@ -1,11 +1,11 @@
 name: RedstoneChips
 main: org.redstonechips.RedstoneChips
 version: 1.1
-api-version: 1.14
+api-version: 1.15
 author: eisental
 description: Core RedstoneChips plugin for building integrated redstone circuits.
 website: http://eisental.github.com/RedstoneChips
-load: startup
+load: STARTUP
 commands:
   redstonechips:
     description: General plugin information.
