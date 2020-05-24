@@ -71,12 +71,12 @@ public class Ram extends Memory {
      * @return a Map<BitSet, BitSet> containing all memory data.
      */
     @Override
-    protected Map getData() {
+    protected Map getData() {    	
         Map<BitSet, BitSet> data = new HashMap<>();
         for (Long address : words.keySet()) {
             BitSet a = BitSet.valueOf(new long[] {address});
             BitSet d = BooleanArrays.toBitSet(words.get(address));
-            if (!d.isEmpty())
+            //if (!d.isEmpty())  //breaks things
                 data.put(a, d);
         }
         return data;
@@ -89,7 +89,7 @@ public class Ram extends Memory {
     @Override
     protected void setData(Map data) {
         words.clear();
-        if (data==null) return;
+        if (data==null) return; //suspect
         for (Object key : data.keySet()) {            
             Object value = data.get(key);
             
