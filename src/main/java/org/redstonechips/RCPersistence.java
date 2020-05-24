@@ -54,6 +54,7 @@ public class RCPersistence {
             rc.log(Level.INFO, "Loading chips for world '" + world.getName() + "'...");
             try {
                 loadChipsFromFile(file);
+                
                 WorldsObserver.addLoadedWorld(world);                
             } catch (IOException ex) {
                 rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
@@ -67,19 +68,25 @@ public class RCPersistence {
         Yaml yaml = new Yaml();
         List<Map<String, Object>> circuitsList;
         try (FileInputStream fis = new FileInputStream(file)) {
-            circuitsList = (List<Map<String, Object>>) yaml.load(fis);
+            circuitsList = (List<Map<String, Object>>) yaml.load(fis);                        
         }
         
         Map<Chip, Map<String, String>> chipsAndState = new HashMap<>();
 
         if (circuitsList!=null) {
+
             ChipSerializer s = new ChipSerializer();
 
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
-                    MaybeChip mChip = s.deserialize(circuitMap);
+                   // System.out.println("trying");
+                	MaybeChip mChip = s.deserialize(circuitMap);
+               //     System.out.println("mChip.values = " + mChip);
+                //    System.out.println("mChip.values = " + mChip.values());
+                    
                     if (mChip==MaybeChip.AChip) {
                         Map<String, String> state = (Map<String, String>)circuitMap.get(ChipSerializer.Key.STATE.key);
+                  //      System.out.println(state);
                         chipsAndState.put(mChip.getChip(), state);
                     } else 
                         rc.log(Level.WARNING, "Found bad chip entry in " + file.getName() + (mChip==MaybeChip.ChipError? ": " + mChip.getError():""));
@@ -93,14 +100,22 @@ public class RCPersistence {
                         
             // Activate all compiled chips.
             for (Chip c : chipsAndState.keySet()) {
-                if (rc.chipManager().activateChip(c, null, c.id)) {
+                if (rc.chipManager().activateChipFromFile(c, null, c.id)) {  //if (rc.chipManager().activateChipFromFile(c, null, c.id)) { // works but testing
+               // 	System.out.println("activatechip = " + c);
                     Map<String, String> state = chipsAndState.get(c);
                     if (state!=null) c.circuit.setInternalState(state);
                 } 
             }
+            for (Chip c : rc.chipManager().getAllChips().values()) {   //seems to set values properly but not exactly needed
+            //	System.out.println("fixchip = " + c);
+                rc.chipManager().fixChip(c, null, c.id);
+            }
+          //  for (Chip c : rc.chipManager().getAllChips().values()) {   //seems to set values properly but not exactly needed
+          //  	System.out.println("fixchip = " + c);
+          //      rc.chipManager().fixChip(c, null, c.id);
+          //  }
         }
     }
-
     /**
      * Saves all the circuits on the server.
      */
