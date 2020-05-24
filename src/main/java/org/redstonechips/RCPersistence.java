@@ -74,19 +74,13 @@ public class RCPersistence {
         Map<Chip, Map<String, String>> chipsAndState = new HashMap<>();
 
         if (circuitsList!=null) {
-
             ChipSerializer s = new ChipSerializer();
 
             for (Map<String,Object> circuitMap : circuitsList) {
                 try {
-                   // System.out.println("trying");
                 	MaybeChip mChip = s.deserialize(circuitMap);
-               //     System.out.println("mChip.values = " + mChip);
-                //    System.out.println("mChip.values = " + mChip.values());
-                    
                     if (mChip==MaybeChip.AChip) {
                         Map<String, String> state = (Map<String, String>)circuitMap.get(ChipSerializer.Key.STATE.key);
-                  //      System.out.println(state);
                         chipsAndState.put(mChip.getChip(), state);
                     } else 
                         rc.log(Level.WARNING, "Found bad chip entry in " + file.getName() + (mChip==MaybeChip.ChipError? ": " + mChip.getError():""));
@@ -101,19 +95,13 @@ public class RCPersistence {
             // Activate all compiled chips.
             for (Chip c : chipsAndState.keySet()) {
                 if (rc.chipManager().activateChipFromFile(c, null, c.id)) {  //if (rc.chipManager().activateChipFromFile(c, null, c.id)) { // works but testing
-               // 	System.out.println("activatechip = " + c);
                     Map<String, String> state = chipsAndState.get(c);
                     if (state!=null) c.circuit.setInternalState(state);
                 } 
             }
             for (Chip c : rc.chipManager().getAllChips().values()) {   //seems to set values properly but not exactly needed
-            //	System.out.println("fixchip = " + c);
                 rc.chipManager().fixChip(c, null, c.id);
             }
-          //  for (Chip c : rc.chipManager().getAllChips().values()) {   //seems to set values properly but not exactly needed
-          //  	System.out.println("fixchip = " + c);
-          //      rc.chipManager().fixChip(c, null, c.id);
-          //  }
         }
     }
     /**
