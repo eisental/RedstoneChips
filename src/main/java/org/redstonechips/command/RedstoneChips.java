@@ -1,14 +1,15 @@
 package org.redstonechips.command;
 
 import java.io.IOException;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.redstonechips.RCPrefs;
-import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.UpdateChecker;
 import org.redstonechips.circuit.CircuitIndex;
+import org.redstonechips.circuit.CircuitLoader;
 
 /**
  *

@@ -2,6 +2,7 @@ package org.redstonechips.paging;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

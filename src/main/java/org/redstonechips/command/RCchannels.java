@@ -1,19 +1,20 @@
 
 package org.redstonechips.command;
 
-import org.redstonechips.paging.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPermissions;
 import org.redstonechips.RCPrefs;
+import org.redstonechips.paging.ArrayLineSource;
 import org.redstonechips.paging.Pager;
+import org.redstonechips.util.BooleanArrays;
 import org.redstonechips.wireless.BroadcastChannel;
 import org.redstonechips.wireless.Receiver;
 import org.redstonechips.wireless.Transmitter;
-import org.redstonechips.util.BooleanArrays;
 
 /**
  *

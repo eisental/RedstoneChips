@@ -2,12 +2,11 @@ package org.redstonechips;
 
 import java.util.List;
 
-import org.bukkit.block.Sign;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.Lightable;
-import org.bukkit.block.BlockState;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

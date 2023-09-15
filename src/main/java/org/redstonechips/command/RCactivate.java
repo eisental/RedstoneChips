@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

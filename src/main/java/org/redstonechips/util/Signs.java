@@ -1,6 +1,7 @@
 package org.redstonechips.util;
 
 import java.util.StringTokenizer;
+
 import org.bukkit.block.Sign;
 
 /**

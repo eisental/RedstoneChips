@@ -1,9 +1,9 @@
 
 package org.redstonechips.chip;
 
-import org.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -11,11 +11,12 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
+import org.redstonechips.chip.io.IOWriter;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
 import org.redstonechips.chip.io.OutputPin;
+import org.redstonechips.circuit.Circuit;
 import org.redstonechips.util.ChunkLocation;
-import org.redstonechips.chip.io.IOWriter;
 
 /**
  * Represents a chip in a world. Every chip has a Circuit object tied to it that

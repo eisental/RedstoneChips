@@ -2,6 +2,7 @@
 package org.redstonechips.util;
 
 import java.util.BitSet;
+
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;

@@ -3,11 +3,12 @@ package org.redstonechips.command.filters;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.redstonechips.util.Locations;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.redstonechips.chip.Chip;
+import org.redstonechips.util.Locations;
 
 /**
  *

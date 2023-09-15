@@ -2,6 +2,7 @@
 package org.redstonechips.command;
 
 import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

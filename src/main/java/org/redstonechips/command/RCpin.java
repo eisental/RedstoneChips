@@ -3,14 +3,15 @@ package org.redstonechips.command;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.redstonechips.chip.ChipCollection;
 import org.redstonechips.chip.Chip;
+import org.redstonechips.chip.ChipCollection;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
 import org.redstonechips.chip.io.OutputPin;

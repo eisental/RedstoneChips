@@ -4,8 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Wool;
 
 /**
  * An abstract ChipScanner that supports debugging and adding IO blocks.

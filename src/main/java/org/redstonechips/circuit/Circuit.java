@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;

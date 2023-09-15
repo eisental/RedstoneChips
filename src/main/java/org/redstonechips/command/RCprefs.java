@@ -3,6 +3,7 @@ package org.redstonechips.command;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPermissions;
