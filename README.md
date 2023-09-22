@@ -22,6 +22,9 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 1.1 (Sept 21th, 2023)
+- Updated for Spigot 1.21.1
+- Fixed broken plugins except for synth chip. (synth chip fixes and additions coming soon)
 
 #### RedstoneChips 0.97 (Apr 30th, 2013)
 - Fixed the saving bug on cb 1.5.1.
