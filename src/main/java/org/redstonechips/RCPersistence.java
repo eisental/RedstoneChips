@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import org.redstonechips.chip.ChipSerializer;
 import org.redstonechips.wireless.BroadcastChannel;
 import org.redstonechips.wireless.ChannelSerializer;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -40,6 +42,33 @@ public class RCPersistence {
     private static final List<World> dontSaveCircuits = new ArrayList<>();
     
     private RCPersistence() {}
+    
+    private static long getCodePointCount(File file) {
+        long codePointCount = 0;
+        if (file.exists()) {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
+                int character;
+                while ((character = reader.read()) != -1) {
+                    if (Character.isHighSurrogate((char) character)) {
+                        // If it's a high surrogate, we need to read the next character too
+                        int nextCharacter = reader.read();
+                        if (Character.isLowSurrogate((char) nextCharacter)) {
+                            codePointCount++;
+                        } else {
+                            // Invalid surrogate pair; handle accordingly
+                        }
+                    } else if (!Character.isLowSurrogate((char) character)) {
+                        // If it's not a low surrogate (standalone high surrogate or regular character)
+                        codePointCount++;
+                    }
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return codePointCount;
+    }
 
     // -- Chip persistence --
     
@@ -54,7 +83,7 @@ public class RCPersistence {
             rc.log(Level.INFO, "Loading chips for world '" + world.getName() + "'...");
             try {
                 loadChipsFromFile(file);
-                
+                System.out.println("Code Points = " + getCodePointCount(file));
                 WorldsObserver.addLoadedWorld(world);                
             } catch (IOException ex) {
                 rc.log(Level.SEVERE, "Circuits file '" + file + "' threw error "+ex.toString()+".");
@@ -65,7 +94,15 @@ public class RCPersistence {
     private static void loadChipsFromFile(File file) throws IOException {        
         RedstoneChips rc = RedstoneChips.inst();
         
-        Yaml yaml = new Yaml();
+        LoaderOptions loaderOptions = new LoaderOptions();
+        try {
+            // 64 MB default
+            int yamlCodePointLimit = 64 * 1024 * 1024;
+            loaderOptions.setCodePointLimit(yamlCodePointLimit);
+        } catch (NoSuchMethodError ignored) {
+            // pre-1.32 snakeyaml
+        }
+        Yaml yaml = new Yaml(loaderOptions);
         List<Map<String, Object>> circuitsList;
         try (FileInputStream fis = new FileInputStream(file)) {
             circuitsList = (List<Map<String, Object>>) yaml.load(fis);                        
@@ -147,7 +184,7 @@ public class RCPersistence {
         Collection<Chip> chips = rc.chipManager().getAllChips().getInWorld(world).values();
         for (Chip c : chips) c.circuit.save();        
         serialize(chips, new ChipSerializer(), circuitsFile);
-        
+        System.out.println("SaveChipsOf getCodePointCount = " + getCodePointCount(circuitsFile));
         File channelsFile = new File(rc.getDataFolder(), channelsFileName);
         Collection<BroadcastChannel> channels = rc.channelManager().getBroadcastChannels().values();
         removeUnprotectedChannels(channels);
