@@ -16,6 +16,7 @@ import org.redstonechips.util.BitSetConstructor;
 import org.redstonechips.util.BitSetRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.LoaderOptions;
 
 /**
  * Represents an abstract memory that can be saved to file.
@@ -23,7 +24,8 @@ import org.yaml.snakeyaml.Yaml;
  * @author Tal Eisenberg
  */
 public abstract class Memory {
-
+	
+	
     /** Memory id string. */
     private String id;
 
@@ -50,7 +52,7 @@ public abstract class Memory {
     public void store(File file) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(new BitSetRepresenter(), options);
+        Yaml yaml = new Yaml(new BitSetRepresenter(options));
         yaml.dump(getData(), new FileWriter(file));
     }
     
@@ -60,7 +62,10 @@ public abstract class Memory {
      * @throws FileNotFoundException When the file is not found.
      */
     public void load(File file) throws FileNotFoundException {
-        Yaml yaml = new Yaml(new BitSetConstructor());
+    	LoaderOptions customLoaderOptions = new LoaderOptions();
+    	customLoaderOptions.setAllowRecursiveKeys(true);
+
+        Yaml yaml = new Yaml(new BitSetConstructor(customLoaderOptions));
         setData((Map)yaml.load(new FileInputStream(file)));
     }
 

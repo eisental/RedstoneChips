@@ -2,9 +2,10 @@
 package org.redstonechips.util;
 
 import java.util.BitSet;
-
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
@@ -15,7 +16,8 @@ import org.yaml.snakeyaml.representer.Representer;
  * @author Tal Eisenberg
  */
 public class BitSetRepresenter extends Representer {
-    public BitSetRepresenter() {
+    public BitSetRepresenter(DumperOptions options) {
+    	super(options);
         this.representers.put(BitSet.class, new RepresentBitSet7());
     }
 

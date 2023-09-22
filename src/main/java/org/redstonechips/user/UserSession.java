@@ -332,6 +332,7 @@ public class UserSession {
         map.put("tools", saveTools());
         map.put("data", playerData);
         yaml.dump(map, new FileWriter(getPlayerFile()));        
+        
     }
     
     /**
@@ -341,36 +342,48 @@ public class UserSession {
      * @throws IllegalAccessException When a tool can't be reconstructed.
      * @throws ClassNotFoundException When a tool can't be reconstructed.
      */
+   
     public void load() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         File f = getPlayerFile();
 
         try {
             Yaml yaml = new Yaml();
-            Map<String,Object> map = (Map<String, Object>)yaml.load(new FileInputStream(f));
+            Map<String, Object> map = (Map<String, Object>) yaml.load(new FileInputStream(f));
 
-            if (map.containsKey("tools")) loadTools((Map<Material, String>)map.get("tools"));
-            if (map.containsKey("data")) playerData = (Map<String, Object>)map.get("data");
+            if (map.containsKey("tools")) {
+                Map<String, String> toolsData = (Map<String, String>) map.get("tools");
+                loadTools(toolsData);
+            }
+
+            if (map.containsKey("data")) {
+                playerData = (Map<String, Object>) map.get("data");
+            }
         } catch (FileNotFoundException ex) {
-        } 
-        
+        }
     }
+
     
-    private void loadTools(Map<Material, String> tools) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+   
+    private void loadTools(Map<String, String> tools) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         this.tools.clear();
-        for (Material m : tools.keySet()) {
-            Tool t = (Tool)Class.forName(tools.get(m)).newInstance();
-            t.setItem(m);
-            t.setSession(this);
-            this.tools.put(m, t);
+        for (String materialName : tools.keySet()) {
+            Material m = Material.getMaterial(materialName);
+            if (m != null) {
+                Tool t = (Tool) Class.forName(tools.get(materialName)).newInstance();
+                t.setItem(m);
+                t.setSession(this);
+                this.tools.put(m, t);
+            }
         }
     }
+
     
-    private Map<Material, String> saveTools() {
-        Map<Material, String> map = new EnumMap<>(Material.class);
+    private Map<String, String> saveTools() {
+        Map<String, String> map = new HashMap<>();
         for (Material m : tools.keySet()) {
-            map.put(m, tools.get(m).getClass().getCanonicalName());
+            map.put(m.name(), tools.get(m).getClass().getCanonicalName());
         }
-        
+           
         return map;
     }
     
