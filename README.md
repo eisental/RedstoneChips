@@ -28,10 +28,10 @@ Changelog
 - Fixed Synth
 - Synth Sign arguments.  
   1. synth
-  2. none/octave/$InstrumentToPlay/#wirelesschannel
-  3. none/octave/$InstrumentToPlay
+  2. none/octave/$Instrument/$InstrumentToPlay/#wirelesschannel
+  3. none/octave/$Instrument/$InstrumentToPlay
   4. none/octave
-
+- Synth Chip requires +4 pins for $instrument argument, to choose what instrument to play based on the value of the pins.
 Instruments:
     PIANO (default),
     BANJO,
