@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
@@ -43,7 +44,7 @@ public abstract class Circuit {
      * Stores the current state of each output pin. Should only be used for monitoring. 
      */
     public boolean[] outputs;
-
+    
     /**
      * Number of input pins.
      */
@@ -184,9 +185,9 @@ public abstract class Circuit {
      * @param state The new state of the output.
      */
     public void write(boolean state, int index) {
-        outputs[index] = state;
-        outWriter.writeOut(this, state, index);
-    }
+    	outputs[index] = state;
+    	outWriter.writeOut(this, state, index);
+        }
 
     /**
      * Write a long integer over a set of outputs.
@@ -197,7 +198,7 @@ public abstract class Circuit {
      * @param value The integer value to send out.
      */
     public void writeInt(long value, int firstOutput, int length) {
-        boolean[] bits = BooleanArrays.fromInt(value, length);
+    	boolean[] bits = BooleanArrays.fromInt(value, length);
         writeBits(bits, firstOutput, length);
     }
 
@@ -209,8 +210,10 @@ public abstract class Circuit {
      * @param length Number of outputs to write to.
      */
     public void writeBits(boolean[] bits, int firstOutput, int length) {
-        for (int i=0; i<length; i++)
-            write(i < bits.length ? bits[i] : false, firstOutput+i);
+    	for (int i=0; i<length; i++) {
+    		if (bits.length > length) write((i+firstOutput) < bits.length ? bits[i+firstOutput] : false, i); // works // Check for Inputs > Outputs
+    		else write(i < (bits.length) ? bits[i] : false, (i+firstOutput));
+    	}
     }
     
     /**
@@ -242,8 +245,19 @@ public abstract class Circuit {
      * @param length Number of outputs to write to.
      */
     public void writeBooleanSubset(BooleanSubset bits, int firstOutput, int length) {
-        for (int i=0; i<length; i++)
-            write(bits.get(i), firstOutput+i);
+    //	System.out.println("public void writeBooleanSubset(BooleanSubset bits, int firstOutput, int length) { --- START");
+    //	System.out.println("length = " + length);
+    //	System.out.println("firstOutput = " + firstOutput);
+    //	System.out.println("bits.length() = " + bits.length());
+    	for (int i=0; i<length; i++)
+    	{
+    //		System.out.println("--------------------");    				
+    //		System.out.println("i = " + i);
+    //		System.out.println("firstOutput + i = " + (firstOutput+i));
+    		write(bits.get(i), firstOutput+i);
+    //		System.out.println("--------------------");
+    	}
+    //	System.out.println("public void writeBooleanSubset(BooleanSubset bits, int firstOutput, int length) { --- STOP");
     }
     
     /**
@@ -254,7 +268,12 @@ public abstract class Circuit {
      * @param firstOutput Start writing from this output index.
      */
     public void writeBooleanSubset(BooleanSubset bits, int firstOutput) {
-        writeBooleanSubset(bits, firstOutput, bits.length());
+    //	System.out.println("public void writeBooleanSubset(BooleanSubset bits, int firstOutput) { --- START");
+    //	System.out.println("firstOutput = " + firstOutput);
+    //	System.out.println("bits.length() = " + bits.length());
+    	writeBooleanSubset(bits, firstOutput, bits.length());
+    //	System.out.println("public void writeBooleanSubset(BooleanSubset bits, int firstOutput) { --- STOP");
+
     }
     
     /**

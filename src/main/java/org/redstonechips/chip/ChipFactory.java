@@ -2,6 +2,7 @@ package org.redstonechips.chip;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -10,16 +11,16 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPermissions;
 import org.redstonechips.RCPrefs;
-import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.RedstoneChips;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
 import org.redstonechips.chip.io.OutputPin;
+import org.redstonechips.chip.scan.ChipParameters;
 import org.redstonechips.chip.scan.ChipScanner.ChipScanException;
 import org.redstonechips.chip.scan.IOChipScanner;
 import org.redstonechips.chip.scan.RecursiveChipScanner;
-import org.redstonechips.chip.scan.ChipParameters;
 import org.redstonechips.chip.scan.SingleBlockChipScanner;
+import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.util.ChunkLocation;
 import org.redstonechips.util.Signs;
 

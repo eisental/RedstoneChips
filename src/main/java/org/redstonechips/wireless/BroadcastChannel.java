@@ -2,6 +2,7 @@ package org.redstonechips.wireless;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.redstonechips.util.BooleanArrays;
 import org.redstonechips.util.BooleanSubset;
 

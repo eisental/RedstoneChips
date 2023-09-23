@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
 import org.redstonechips.util.BitSetConstructor;
 import org.redstonechips.util.BitSetRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.LoaderOptions;
 
 /**
  * Represents an abstract memory that can be saved to file.
@@ -22,7 +24,8 @@ import org.yaml.snakeyaml.Yaml;
  * @author Tal Eisenberg
  */
 public abstract class Memory {
-
+	
+	
     /** Memory id string. */
     private String id;
 
@@ -49,7 +52,7 @@ public abstract class Memory {
     public void store(File file) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(new BitSetRepresenter(), options);
+        Yaml yaml = new Yaml(new BitSetRepresenter(options));
         yaml.dump(getData(), new FileWriter(file));
     }
     
@@ -59,7 +62,10 @@ public abstract class Memory {
      * @throws FileNotFoundException When the file is not found.
      */
     public void load(File file) throws FileNotFoundException {
-        Yaml yaml = new Yaml(new BitSetConstructor());
+    	LoaderOptions customLoaderOptions = new LoaderOptions();
+    	customLoaderOptions.setAllowRecursiveKeys(true);
+
+        Yaml yaml = new Yaml(new BitSetConstructor(customLoaderOptions));
         setData((Map)yaml.load(new FileInputStream(file)));
     }
 
@@ -132,6 +138,21 @@ public abstract class Memory {
     public static final Map<String,Memory> memories = new HashMap<>();
     
     /**
+     * Checks if the memory file for memId exists. 
+     * 
+     * @param memId The memory id.
+     * @return True if file exists.
+     */
+    
+    public static boolean checkFile(String memId) {
+    	File chkfile = Memory.getMemoryFile(memId);
+        
+        if (chkfile.exists()) return true;
+        else return false;
+            
+        }
+   
+    /**
      * Retrieves the Memory object for this id or creates and configures a new one if it's not used. If the 
      * memory file exists data is loaded from it.
      * 
@@ -140,11 +161,11 @@ public abstract class Memory {
      * @return A Memory object
      * @throws IOException 
      */
+
     public static Memory getMemory(String memId, Class<? extends Memory> type ) throws IOException, IllegalArgumentException {
         if (!isValidId(memId)) throw new IllegalArgumentException("Invalid memory id: " + memId);
-        
         if (!Memory.memories.containsKey(memId)) {
-            Memory memory;
+        	Memory memory;
             try {
                 memory = type.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
@@ -154,7 +175,7 @@ public abstract class Memory {
 
             File file = Memory.getMemoryFile(memId);
             
-            if (file.exists()) {
+            if (file.exists()) {            	
                 memory.load(file);
             } else {
                 file.createNewFile();
@@ -168,6 +189,32 @@ public abstract class Memory {
             return m;
         }
         
+    }
+    
+    /**
+     * Loads an existing memory file data and loads the data from it. 
+     * 
+     * 
+     * @param memId The memory id.
+     * @param type Memory class (Ram.class for ex.). Ignored when the memory already exists.
+     * @return A Memory object
+     * @throws IOException 
+     */
+
+    public static Memory reGetMemory(String memId, Class<? extends Memory> type ) throws IOException, IllegalArgumentException {
+        if (!isValidId(memId)) throw new IllegalArgumentException("Invalid memory id: " + memId);
+            Memory memory = memories.get(memId);
+            memories.remove(memId);
+            try {
+                memory = type.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+            	return null;
+            }
+            memory.init(memId);
+            File file = Memory.getMemoryFile(memId);
+            memory.load(file);
+            memory.alloc();
+            return memory;        
     }
     
     /**

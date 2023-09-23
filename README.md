@@ -1,26 +1,58 @@
 RedstoneChips 
+
 =============
 
 RedstoneChips is a Minecraft Bukkit plugin that allows you to build custom integrated circuits on your minecraft server. 
 Chips can be constructed with any number of inputs and outputs and in almost any imaginable structure. RedstoneChips currently consists of the following plugins:
 
-- RedstoneChips - The core plugin (required). 
+- [RedstoneChips](https://github.com/RufiS/RedstoneChips) - The core plugin (required). 
 
-- [BasicCircuits](http://github.com/eisental/BasicCircuits) - The basic chip library containing most chip types you might need (required).
+- [BasicCircuits](https://github.com/RufiS/BasicCircuits) - The basic chip library containing most chip types you might need (required).
 
-- [SensorLibrary](http://github.com/eisental/SensorLibrary) - A chip library for various sensor chips (optional).
+- [SensorLibrary](https://github.com/RufiS/SensorLibrary) - A chip library for various sensor chips (optional).
 
 Check out the [circuitdocs](http://eisental.github.com/RedstoneChips/circuitdocs) for more info on available RedstoneChips circuits.
 
-__For much more information, visit the [RedstoneChips](http://eisental.github.com/RedstoneChips) site.__
+__For much more information, visit the [RedstoneChips](https://eisental.github.io/RedstoneChips) site.__
+
+To see how to use go to [HowTo(works as of 9/23/2023)](https://eisental.github.io/RedstoneChips/howto.html)
 
 Installation
 ------------
 * [Download](http://eisental.github.com/RedstoneChips) the latest version bundle.
-* Copy all jar files to the plugins folder of your craftbukkit installation. 
+* Copy all jar files to the plugins folder of your craftbukkit/spigot/paper installation. 
 
 Changelog
 ----------
+#### RedstoneChips 1.1.000000001 (Sept 22nd, 2023)
+- Fixed Synth
+- Synth Sign arguments.  
+  1. synth
+  2. none/octave/$Instrument/$InstrumentToPlay/#wirelesschannel
+  3. none/octave/$Instrument/$InstrumentToPlay
+  4. none/octave
+- Synth Chip requires +4 pins for $instrument argument, to choose what instrument to play based on the value of the pins.
+Instruments:
+    PIANO (default),
+    BANJO,
+    BASS DRUM,
+    BASS GUITAR,
+    BELL,
+    BIT,
+    CHIME,
+    COW BELL,
+    DIDGERIDOO,
+    FLUTE,
+    GUITAR,
+    IRON XYLOPHONE,
+    PLING,
+    SNARE DRUM,
+    STICKS,
+    XYLOPHONE
+    
+#### RedstoneChips 1.1 (Sept 21th, 2023)
+- Updated for Spigot 1.21.1
+- Fixed broken plugins except for synth chip. (synth chip fixes and additions coming soon)
 
 #### RedstoneChips 0.97 (Apr 30th, 2013)
 - Fixed the saving bug on cb 1.5.1.

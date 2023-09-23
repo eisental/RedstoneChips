@@ -1,23 +1,49 @@
 package org.redstonechips;
 
-import org.redstonechips.circuit.CircuitLoader;
-import org.redstonechips.wireless.ChannelManager;
-import org.redstonechips.chip.ChipManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.redstonechips.chip.ChipManager;
 import org.redstonechips.circuit.Circuit;
 import org.redstonechips.circuit.CircuitIndex;
-import org.redstonechips.command.*;
+import org.redstonechips.circuit.CircuitLoader;
+import org.redstonechips.command.RCCommand;
+import org.redstonechips.command.RCactivate;
+import org.redstonechips.command.RCarg;
+import org.redstonechips.command.RCbreak;
+import org.redstonechips.command.RCchannels;
+import org.redstonechips.command.RCclasses;
+import org.redstonechips.command.RCdebug;
+import org.redstonechips.command.RCdestroy;
+import org.redstonechips.command.RCdisable;
+import org.redstonechips.command.RCenable;
+import org.redstonechips.command.RCfixioblocks;
+import org.redstonechips.command.RChelp;
+import org.redstonechips.command.RCinfo;
+import org.redstonechips.command.RClist;
+import org.redstonechips.command.RCload;
+import org.redstonechips.command.RCname;
+import org.redstonechips.command.RCp;
+import org.redstonechips.command.RCpin;
+import org.redstonechips.command.RCprefs;
+import org.redstonechips.command.RCprotect;
+import org.redstonechips.command.RCreset;
+import org.redstonechips.command.RCsave;
+import org.redstonechips.command.RCsel;
+import org.redstonechips.command.RCsend;
+import org.redstonechips.command.RCtool;
+import org.redstonechips.command.RCtype;
 import org.redstonechips.memory.Memory;
 import org.redstonechips.user.UserSession;
+import org.redstonechips.wireless.ChannelManager;
 
 /**
  * RedstoneChips Bukkit JavaPlugin implementation. The main entry point of the plugin.

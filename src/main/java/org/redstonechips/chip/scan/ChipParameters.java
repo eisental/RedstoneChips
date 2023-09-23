@@ -1,7 +1,6 @@
 package org.redstonechips.chip.scan;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;

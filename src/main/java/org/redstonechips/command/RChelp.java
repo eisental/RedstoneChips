@@ -1,17 +1,18 @@
 
 package org.redstonechips.command;
 
-import org.redstonechips.paging.ArrayLineSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.redstonechips.RCPrefs;
+import org.redstonechips.paging.ArrayLineSource;
 import org.redstonechips.paging.Pager;
 
 /**

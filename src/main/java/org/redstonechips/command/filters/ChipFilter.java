@@ -1,6 +1,7 @@
 package org.redstonechips.command.filters;
 
 import java.util.Collection;
+
 import org.bukkit.command.CommandSender;
 import org.redstonechips.chip.Chip;
 

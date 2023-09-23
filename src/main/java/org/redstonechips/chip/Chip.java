@@ -1,9 +1,9 @@
 
 package org.redstonechips.chip;
 
-import org.redstonechips.circuit.Circuit;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -11,11 +11,12 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.RedstoneChips;
+import org.redstonechips.chip.io.IOWriter;
 import org.redstonechips.chip.io.InputPin;
 import org.redstonechips.chip.io.InterfaceBlock;
 import org.redstonechips.chip.io.OutputPin;
+import org.redstonechips.circuit.Circuit;
 import org.redstonechips.util.ChunkLocation;
-import org.redstonechips.chip.io.IOWriter;
 
 /**
  * Represents a chip in a world. Every chip has a Circuit object tied to it that
@@ -166,11 +167,18 @@ public class Chip implements IOWriter {
       * the state of its output levers according to the current values in circuit.outputs[].
       */
     public void chipChunkLoaded() {
-        for (InputPin i : inputPins)
-            i.refreshSourceBlocks();
+      
 
         for (int i=0; i<outputPins.length; i++)
             outputPins[i].forceState(circuit.outputs[i]);
+       
+        for (InputPin i : inputPins) {
+             i.refreshSourceBlocks();
+        if (circuit.isStateless())  // have not tested yet
+        	circuit.chip.inputChange(i.getIndex(), inputPins[i.getIndex()].getPinValue());
+        else circuit.inputs[i.getIndex()] = inputPins[i.getIndex()].getPinValue(); 
+        
+        }
     }
         
     // -- Enable / Disable --

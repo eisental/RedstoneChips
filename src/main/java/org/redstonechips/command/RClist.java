@@ -1,22 +1,23 @@
 
 package org.redstonechips.command;
 
-import org.redstonechips.command.filters.ChipFilter;
-import org.redstonechips.command.filters.ChunkFilter;
-import org.redstonechips.command.filters.WorldFilter;
-import org.redstonechips.command.filters.LocationFilter;
-import org.redstonechips.command.filters.TypeFilter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
-import org.redstonechips.paging.Pager;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.chip.Chip;
+import org.redstonechips.command.filters.ChipFilter;
+import org.redstonechips.command.filters.ChunkFilter;
+import org.redstonechips.command.filters.LocationFilter;
+import org.redstonechips.command.filters.TypeFilter;
+import org.redstonechips.command.filters.WorldFilter;
+import org.redstonechips.paging.Pager;
 import org.redstonechips.parsing.Tokenizer;
 
 /**

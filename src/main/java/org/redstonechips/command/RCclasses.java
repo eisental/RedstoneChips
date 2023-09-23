@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.redstonechips.paging.Pager;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPrefs;
-import org.redstonechips.circuit.CircuitLoader;
 import org.redstonechips.circuit.CircuitIndex;
+import org.redstonechips.circuit.CircuitLoader;
+import org.redstonechips.paging.Pager;
 
 /**
  *

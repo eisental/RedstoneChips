@@ -34,7 +34,7 @@ public class InputPin extends IOBlock {
     private long lastRedstoneChangeTick = -1;
     private int changesInTickCount = 0;
     private int inputsHigh;
-
+    private boolean refreshRun;
     public static int maxInputChangesPerTick;
     /**
      *
@@ -93,7 +93,7 @@ public class InputPin extends IOBlock {
      */
     public void updateValue(Block block, boolean newVal, SourceType source) throws IllegalArgumentException {
         Location l = block.getLocation();
-
+        
         Boolean oldValue = sourceBlocks.get(l);
         if (oldValue == null) {
             RedstoneChips.inst().log(Level.WARNING, "Block @ " + block + " is not a power block of input " + index + " of chip " + chip);
@@ -112,7 +112,10 @@ public class InputPin extends IOBlock {
             if (newVal) {
                 inputsHigh++;
             } else {
-                inputsHigh--;
+                inputsHigh--;                
+                if (inputsHigh<0) {
+                                  inputsHigh=0;
+                }
             }
             
             boolean newPinValue = getPinValue();
@@ -173,15 +176,23 @@ public class InputPin extends IOBlock {
      */
     public void refreshSourceBlocks() {
         inputsHigh = 0;
+        refreshRun = false;
+        Location ioblock = getLocation();
         for (Location l : this.sourceBlocks.keySet()) {
-            if (ChunkLocation.fromLocation(l).isChunkLoaded()) {
+        	
+        	if (ChunkLocation.fromLocation(l).isChunkLoaded()) {        	
                 boolean high = findSourceBlockState(l);
-                sourceBlocks.put(l, high);
-                if (high) {
-                    inputsHigh++;
+        		sourceBlocks.put(l, high);
+        		if (refreshRun==true) {
+        			inputsHigh = 0;
+        			refreshRun=false;
+        		}
+                if (high==true) {                	
+                	inputsHigh++;
                 }
             }
         }
+        refreshRun = true;
     }
 
     /**
@@ -194,18 +205,26 @@ public class InputPin extends IOBlock {
         Material m = b.getType();
         
         switch (m) {
-            case REDSTONE_WIRE:
+            case REDSTONE_WIRE: {
                 if (loc.equals(bottomSourceBlock)) return false;
                 else return ((RedstoneWire)b.getBlockData()).getPower() > 0;
-            case LEVER:
-            	return ((Switch)b.getBlockData()).isPowered();
-            case REDSTONE_TORCH:
+            }
+            case LEVER: {
+                return ((Switch)b.getBlockData()).isPowered();
+                }
+            case REDSTONE_TORCH: {
             	return ((Lightable)b.getBlockData()).isLit();
+            	}
             default: // looking for direct connection to an output block.
-                OutputPin out = RedstoneChips.inst().chipManager().getAllChips().getOutputPin(loc);
-                if (out!=null && out.isDirect()) 
-                    return out.getState();
+                OutputPin out = RedstoneChips.inst().chipManager().getAllChips().getOutputPin(loc);                
+                if (out!=null && out.isDirect()) {
+                	
+                	if (out.chip!=chip) {
+                		return out.getState();
+                	}
+                	else return false;
+                }
                 else return false;
-        }
+        }     
     }
 }

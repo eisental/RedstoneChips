@@ -6,8 +6,8 @@ import org.bukkit.command.CommandSender;
 import org.redstonechips.RCPermissions;
 import org.redstonechips.RCPrefs;
 import org.redstonechips.parsing.Parsing;
-import org.redstonechips.wireless.BroadcastChannel;
 import org.redstonechips.util.BooleanArrays;
+import org.redstonechips.wireless.BroadcastChannel;
 
 /**
  *
