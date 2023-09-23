@@ -22,6 +22,32 @@ Installation
 
 Changelog
 ----------
+#### RedstoneChips 1.1.000000001 (Sept 22nd, 2023)
+- Fixed Synth
+- Synth Sign arguments.  
+  1. synth
+  2. none/octave/$InstrumentToPlay/#wirelesschannel
+  3. none/octave/$InstrumentToPlay
+  4. none/octave
+
+Instruments:
+    PIANO (default)
+    BANJO
+    BASS DRUM
+    BASS GUITAR
+    BELL
+    BIT
+    CHIME
+    COW BELL
+    DIDGERIDOO
+    FLUTE
+    GUITAR
+    IRON XYLOPHONE
+    PLING
+    SNARE DRUM
+    STICKS
+    XYLOPHONE
+
 #### RedstoneChips 1.1 (Sept 21th, 2023)
 - Updated for Spigot 1.21.1
 - Fixed broken plugins except for synth chip. (synth chip fixes and additions coming soon)
